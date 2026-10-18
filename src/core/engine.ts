@@ -3,7 +3,7 @@ import {
   WOUND_FIRST_MULTIPLIER, WOUND_LEVELS, WOUND_NEXT_MULTIPLIER,
   type RingKey, type Stance,
 } from "../rules/l5r4e";
-import { describeModifier } from "./modifiers";
+import { describeModifier, woundPenaltyReduction } from "./modifiers";
 import type { Character, Maneuver, Modifier, RollTrait, Skill, TraitKey } from "./schema";
 
 export type Rng = () => number;
@@ -250,7 +250,9 @@ export function woundState(c: Character): WoundState {
     return { level: last, label: DEAD_LABEL, penalty: null, thresholds, status: "dead" };
   }
   const { label, penalty } = WOUND_LEVELS[passed];
-  return { level: passed, label, penalty, thresholds, status: penalty === null ? "out" : "ok" };
+  if (penalty === null) return { level: passed, label, penalty, thresholds, status: "out" };
+  // Force de la Terre et effets semblables : pénalité réduite, jamais négative.
+  return { level: passed, label, penalty: Math.max(0, penalty - woundPenaltyReduction(c)), thresholds, status: "ok" };
 }
 
 export function armorTN(c: Character, state: CombatState): number {
@@ -279,9 +281,9 @@ export function maneuverRaises(selection: Readonly<Record<string, number>>, mane
   }, 0);
 }
 
-export function targetNumber(o: { base: number | null | "opposed"; calledRaises: number; woundPenalty: number }): number | null | "opposed" {
+export function targetNumber(o: { base: number | null | "opposed"; calledRaises: number; woundPenalty: number; modifier?: number }): number | null | "opposed" {
   if (o.base === null || o.base === "opposed") return o.base;
-  return o.base + TN_PER_RAISE * o.calledRaises + o.woundPenalty;
+  return o.base + TN_PER_RAISE * o.calledRaises + o.woundPenalty + (o.modifier ?? 0);
 }
 
 export function raiseCapExceeded(c: Character, called: number): boolean {

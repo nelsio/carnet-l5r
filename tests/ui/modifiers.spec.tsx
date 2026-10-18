@@ -8,7 +8,7 @@ import kakita from "../../reference/exemple-personnage.json";
 
 const base = () => structuredClone(kakita) as Character;
 const mod = (patch: Partial<Modifier>): Modifier => ({
-  id: "m", name: "Bonus", source: "technique", appliesTo: "all", rolled: 0, kept: 0, flat: 0, freeRaises: 0,
+  id: "m", name: "Bonus", source: "technique", appliesTo: "all", rolled: 0, kept: 0, flat: 0, freeRaises: 0, tn: 0,
   mode: "always", note: "", ...patch,
 });
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
@@ -130,6 +130,64 @@ describe("Lanceur", () => {
     click("Combat");
     click(/^Attaque · Katana/);
     fireEvent.click(roller().getByRole("checkbox", { name: /Bien-né/ }));
+    expect(screen.getByTestId("pool")).toHaveTextContent("7g4");
+  });
+});
+
+describe("Catalogue : Crabe Hiruma Bushi, Force de la Terre, Aspect dérangeant", () => {
+  async function addFromCatalogue(...ids: string[]) {
+    click("Modifier la fiche");
+    for (const id of ids) {
+      fireEvent.change(screen.getByRole("combobox", { name: "Modèle de bonus" }), { target: { value: id } });
+      click("+ Bonus");
+    }
+    click("Terminer");
+  }
+
+  it("les entrées du catalogue sont proposées en tête de liste", async () => {
+    await mount();
+    click("Modifier la fiche");
+    const select = screen.getByRole("combobox", { name: "Modèle de bonus" });
+    const group = within(select).getByRole("group", { name: "Catalogue (livre de base 4e, à vérifier)" });
+    expect(within(group).getAllByRole("option").map((o) => o.textContent)).toEqual([
+      "Hiruma Bushi, rang 1 : Torch's Flame Flickers",
+      "Hiruma Bushi, rang 2 : Wolf's Little Lesson",
+      "Hiruma Bushi, rang 3 : Hummingbird Wings",
+      "Force de la Terre (Strength of the Earth)",
+      "Aspect dérangeant (Disturbing Countenance)",
+    ]);
+  });
+
+  it("Force de la Terre : la pénalité de blessure baisse de 3", async () => {
+    await mount();
+    await addFromCatalogue("force-de-la-terre");
+    fireEvent.change(screen.getByRole("spinbutton", { name: "Blessures subies" }), { target: { value: "18" } });
+    expect(screen.getByText("+2", { selector: ".pen b" })).toBeInTheDocument();
+    expect(screen.getByText("-3 à la pénalité de blessure")).toBeInTheDocument();
+  });
+
+  it("Aspect dérangeant : +5 au ND des jets sociaux, pas des autres", async () => {
+    await mount();
+    await addFromCatalogue("aspect-derangeant");
+    click("Aide de jeu");
+    click(/^Garder contenance/);
+    expect(screen.getByTestId("final-tn")).toHaveTextContent("20");
+    expect(roller().getByText(/= 15 \+ 5 bonus/)).toBeInTheDocument();
+    click(/^Remarquer un détail/);
+    expect(screen.getByTestId("final-tn")).toHaveTextContent("15");
+  });
+
+  it("Hiruma Bushi rang 1 : +1g0 aux attaques en posture Attaque seulement", async () => {
+    await mount();
+    await addFromCatalogue("hiruma-bushi-1");
+    click("Aide de jeu");
+    click("Combat");
+    click(/^Attaque · Katana/);
+    expect(screen.getByTestId("pool")).toHaveTextContent("6g3");
+    click(/^Défense\s*Ajoute/);
+    expect(screen.getByTestId("pool")).toHaveTextContent("5g3");
+    expect(roller().queryByRole("checkbox", { name: /Torch's Flame/ })).toBeNull();
+    click(/^Attaque totale/);
     expect(screen.getByTestId("pool")).toHaveTextContent("7g4");
   });
 });

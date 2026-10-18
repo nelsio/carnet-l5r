@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import {
-  applicableModifiers, describeModifier, findSkill, formatDice, isRanged, poolStats, rollDice, woundState,
+  applicableModifiers, describeModifier, findSkill, modifierTN, formatDice, isRanged, poolStats, rollDice, woundState,
   type ActionDef, type Character,
 } from "@carnet/core";
 import { COMBAT_SUBS, SITUATIONS, TN_PER_RAISE, TN_SCALE, TRAIT_LABELS } from "../../rules/l5r4e";
@@ -32,13 +32,15 @@ export function Roller() {
   if (!a) return <p className="muted">Choisis une action.</p>;
 
   const { opts } = ui;
-  const pool = poolFor(c, a, opts, ui.stance, activeModifiers(c, a, ui.modifierToggles));
-  const bonuses = applicableModifiers(c, toPoolAction(a));
+  const active = activeModifiers(c, a, ui.modifierToggles, ui.stance);
+  const pool = poolFor(c, a, opts, ui.stance, active);
+  const bonuses = applicableModifiers(c, toPoolAction(a), ui.stance);
+  const bonusTN = modifierTN(active);
   const bonusFree = pool.canRaise ? (pool.freeRaises ?? 0) : 0;
   const set = (patch: Partial<RollOptions>) => dispatch({ type: "option", patch });
   const ws = woundState(c);
   const base = baseTN(a, opts);
-  const tn = finalTN(c, a, opts, ui.maneuvers);
+  const tn = finalTN(c, a, opts, ui.maneuvers, active);
   const raises = pool.canRaise ? calledRaises(c, a, opts, ui.maneuvers) : 0;
   const unskilled = isUnskilled(c, a);
   const emphasisOffered = a.kind === "skill" && pool.canRaise;
@@ -145,7 +147,7 @@ export function Roller() {
           <span>ND final</span>
           <span className="mono">
             <b style={{ fontSize: 18 }} data-testid="final-tn">{tn}</b>{" "}
-            <span className="muted">= {base}{raises ? ` + ${TN_PER_RAISE * raises} augm.` : ""}{ws.penalty ? ` + ${ws.penalty} blessures` : ""}</span>
+            <span className="muted">= {base}{raises ? ` + ${TN_PER_RAISE * raises} augm.` : ""}{ws.penalty ? ` + ${ws.penalty} blessures` : ""}{bonusTN ? ` ${bonusTN > 0 ? "+" : "−"} ${Math.abs(bonusTN)} bonus` : ""}</span>
           </span>
         </div>
       )}

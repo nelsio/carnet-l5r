@@ -13,12 +13,12 @@ export function exampleCharacter(): Character {
     modifiers: [
       {
         id: "exemple-technique", name: "Exemple : technique d'école (à adapter)", source: "technique",
-        appliesTo: "skill", skill: "Iaijutsu", rolled: 1, kept: 0, flat: 0, freeRaises: 0, mode: "always",
+        appliesTo: "skill", skill: "Iaijutsu", rolled: 1, kept: 0, flat: 0, freeRaises: 0, tn: 0, mode: "always",
         note: "Remplace par l'effet réel de ta technique, tiré du livre.",
       },
       {
         id: "exemple-avantage", name: "Exemple : avantage situationnel (à adapter)", source: "advantage",
-        appliesTo: "all", rolled: 1, kept: 1, flat: 0, freeRaises: 0, mode: "optional",
+        appliesTo: "all", rolled: 1, kept: 1, flat: 0, freeRaises: 0, tn: 0, mode: "optional",
         note: "À cocher dans le lanceur quand la condition est remplie.",
       },
     ],

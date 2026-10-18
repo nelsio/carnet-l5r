@@ -10,7 +10,7 @@ import kakita from "../reference/exemple-personnage.json";
 
 const base = () => structuredClone(kakita) as Character;
 const mod = (patch: Partial<Modifier>): Modifier => ({
-  id: "m", name: "Bonus", source: "technique", appliesTo: "all", rolled: 0, kept: 0, flat: 0, freeRaises: 0,
+  id: "m", name: "Bonus", source: "technique", appliesTo: "all", rolled: 0, kept: 0, flat: 0, freeRaises: 0, tn: 0,
   mode: "always", note: "", ...patch,
 });
 const kenjutsu: PoolAction = { kind: "skill", skill: "Kenjutsu", trait: "agility", attack: true };
@@ -108,5 +108,70 @@ describe("Modèles", () => {
     expect(describeModifier(mod({ freeRaises: 2 }))).toBe("2 augm. gratuites");
     expect(describeModifier(mod({ appliesTo: "armor", flat: 5 }))).toBe("+5 au ND d'armure");
     expect(describeModifier(mod({}))).toBe("sans effet");
+  });
+});
+
+describe("Compétences sociales, pénalité de blessure, ND, posture", () => {
+  it("compétences sociales : Courtoisie, Intimidation, Représentation : Chant ; pas Kenjutsu ni Investigation", async () => {
+    const { isSocialSkill } = await import("@carnet/core");
+    expect(["Courtoisie", "Étiquette", "sincerite", "Intimidation", "Tentation", "Comédie", "Représentation : Chant", "Courtier"].map(isSocialSkill)).toEqual(Array(8).fill(true));
+    expect(["Kenjutsu", "Investigation", "Représentations"].map(isSocialSkill)).toEqual([false, false, false]);
+    const social = mod({ appliesTo: "social", tn: 5 });
+    expect(modifierApplies(social, { kind: "skill", skill: "Étiquette", trait: "awareness" })).toBe(true);
+    expect(modifierApplies(social, kenjutsu)).toBe(false);
+    expect(modifierApplies(social, { kind: "trait", trait: "awareness" })).toBe(false);
+  });
+
+  it("pénalité de blessure réduite, jamais négative ; Hors de combat inchangé", async () => {
+    const { woundState } = await import("@carnet/core");
+    const c = (wounds: number) => ({ ...base(), wounds, modifiers: [mod({ appliesTo: "wounds", flat: 3 })] });
+    expect(woundState(c(11))).toMatchObject({ label: "Égratigné", penalty: 0 });
+    expect(woundState(c(18))).toMatchObject({ label: "Éraflé", penalty: 2 });
+    expect(woundState(c(34))).toMatchObject({ label: "À terre", penalty: 37 });
+    expect(woundState(c(35))).toMatchObject({ penalty: null, status: "out" });
+    expect(modifierApplies(mod({ appliesTo: "wounds" }), kenjutsu)).toBe(false);
+  });
+
+  it("effet sur le ND : additionné au ND final", async () => {
+    const { modifierTN, targetNumber } = await import("@carnet/core");
+    expect(modifierTN([mod({ tn: 5 }), mod({ tn: -2 })])).toBe(3);
+    expect(targetNumber({ base: 15, calledRaises: 1, woundPenalty: 3, modifier: 5 })).toBe(28);
+    expect(targetNumber({ base: "opposed", calledRaises: 0, woundPenalty: 0, modifier: 5 })).toBe("opposed");
+  });
+
+  it("posture requise : le bonus ne vaut que dans cette posture, ND d'armure compris", () => {
+    const attackOnly = mod({ appliesTo: "attack", rolled: 1, stance: "attack" });
+    expect(modifierApplies(attackOnly, kenjutsu)).toBe(true);
+    expect(modifierApplies(attackOnly, kenjutsu, "attack")).toBe(true);
+    expect(modifierApplies(attackOnly, kenjutsu, "fullAttack")).toBe(false);
+    const c = { ...base(), modifiers: [attackOnly] };
+    expect(defaultModifiers(c, kenjutsu, "defense")).toEqual([]);
+    const armor = [mod({ appliesTo: "armor", flat: 5, stance: "attack" })];
+    expect(armorModifierBonus(armor, "attack")).toBe(5);
+    expect(armorModifierBonus(armor, "defense")).toBe(0);
+  });
+
+  it("résumés", () => {
+    expect(describeModifier(mod({ appliesTo: "wounds", flat: 3 }))).toBe("-3 à la pénalité de blessure");
+    expect(describeModifier(mod({ appliesTo: "social", tn: 5 }))).toBe("+5 au ND");
+    expect(describeModifier(mod({ rolled: 1, tn: -5 }))).toBe("+1g0, -5 au ND");
+  });
+});
+
+describe("Catalogue nommé (livre de base 4e, résumés à vérifier)", () => {
+  const entry = (id: string) => NAMED_MODIFIERS.find((t) => t.id === id)!;
+  it("Hiruma Bushi rang 1 : +1g0 aux attaques en posture Attaque", () => {
+    expect(entry("hiruma-bushi-1")).toMatchObject({ appliesTo: "attack", rolled: 1, kept: 0, stance: "attack", mode: "always" });
+  });
+  it("Hiruma Bushi rangs 2 et 3 : ND d'armure, à cocher", () => {
+    expect(entry("hiruma-bushi-2")).toMatchObject({ appliesTo: "armor", flat: 5, stance: "attack", mode: "optional" });
+    expect(entry("hiruma-bushi-3")).toMatchObject({ appliesTo: "armor", flat: 6, mode: "optional" });
+  });
+  it("Force de la Terre : pénalité de blessure −3 ; Aspect dérangeant : +5 au ND des compétences sociales", () => {
+    expect(entry("force-de-la-terre")).toMatchObject({ source: "advantage", appliesTo: "wounds", flat: 3, mode: "always" });
+    expect(entry("aspect-derangeant")).toMatchObject({ source: "disadvantage", appliesTo: "social", tn: 5, mode: "always" });
+  });
+  it("chaque entrée signale qu'elle est à vérifier dans le livre", () => {
+    for (const t of NAMED_MODIFIERS) expect(t.note).toMatch(/À vérifier dans le livre/);
   });
 });

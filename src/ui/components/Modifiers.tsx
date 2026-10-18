@@ -1,17 +1,29 @@
 import { useState } from "react";
 import { describeModifier, modifiersOf, ROLL_TRAITS, type Modifier } from "@carnet/core";
 import {
-  MODIFIER_SOURCE_LABELS, MODIFIER_TARGET_LABELS, MODIFIER_TEMPLATES, NAMED_MODIFIERS, TRAIT_LABELS, type ModifierTemplate,
+  MODIFIER_SOURCE_LABELS, MODIFIER_TARGET_LABELS, MODIFIER_TEMPLATES, NAMED_MODIFIERS, STANCES, TRAIT_LABELS, type ModifierTemplate,
 } from "../../rules/l5r4e";
 import { useCharacter, useStore } from "../store";
 import { NumberField } from "./fields";
 
 const CATALOG: readonly ModifierTemplate[] = [...NAMED_MODIFIERS, ...MODIFIER_TEMPLATES];
 
+const stanceLabel = (id: Modifier["stance"]) => STANCES.find((s) => s.id === id)?.label;
+
 function targetLabel(m: Modifier): string {
-  if (m.appliesTo === "skill") return m.skill ? `Compétence : ${m.skill}` : "Compétence à choisir";
-  if (m.appliesTo === "trait") return m.trait ? `Trait : ${TRAIT_LABELS[m.trait]}` : "Trait à choisir";
-  return MODIFIER_TARGET_LABELS[m.appliesTo];
+  const base = m.appliesTo === "skill" ? (m.skill ? `Compétence : ${m.skill}` : "Compétence à choisir")
+    : m.appliesTo === "trait" ? (m.trait ? `Trait : ${TRAIT_LABELS[m.trait]}` : "Trait à choisir")
+      : MODIFIER_TARGET_LABELS[m.appliesTo];
+  return m.stance ? `${base}, en posture ${stanceLabel(m.stance)}` : base;
+}
+
+/** Bonus créé depuis une entrée du catalogue ou un modèle. */
+function fromTemplate(t: ModifierTemplate): Modifier {
+  return {
+    id: `mod-${crypto.randomUUID()}`, name: t.label, source: t.source, appliesTo: t.appliesTo,
+    ...(t.skill ? { skill: t.skill } : {}), ...(t.trait ? { trait: t.trait } : {}), ...(t.stance ? { stance: t.stance } : {}),
+    rolled: t.rolled, kept: t.kept, flat: t.flat, freeRaises: t.freeRaises, tn: t.tn, mode: t.mode, note: t.note ?? "",
+  };
 }
 
 /** Bonus de jet des techniques, avantages et désavantages (HANDOFF annexe B). */
@@ -93,7 +105,7 @@ function ModifierEditor({ m, index: i, set }: { m: Modifier; index: number; set:
             </select>
           </label>
         )}
-        {m.appliesTo !== "armor" && (
+        {m.appliesTo !== "armor" && m.appliesTo !== "wounds" && (
           <>
             <label className="field"><span className="label">Dés lancés</span>
               <NumberField min={-10} max={10} value={m.rolled} onChange={(n) => set(i, { rolled: n })} />
@@ -104,11 +116,25 @@ function ModifierEditor({ m, index: i, set }: { m: Modifier; index: number; set:
             <label className="field"><span className="label">Augm. gratuites</span>
               <NumberField min={0} max={10} value={m.freeRaises} onChange={(n) => set(i, { freeRaises: n })} />
             </label>
+            <label className="field"><span className="label">Modifie le ND</span>
+              <NumberField min={-50} max={50} value={m.tn} onChange={(n) => set(i, { tn: n })} />
+            </label>
           </>
         )}
-        <label className="field"><span className="label">{m.appliesTo === "armor" ? "Bonus au ND d'armure" : "Bonus fixe au total"}</span>
+        <label className="field">
+          <span className="label">
+            {m.appliesTo === "armor" ? "Bonus au ND d'armure" : m.appliesTo === "wounds" ? "Réduction de la pénalité" : "Bonus fixe au total"}
+          </span>
           <NumberField min={-50} max={50} value={m.flat} onChange={(n) => set(i, { flat: n })} />
         </label>
+        {m.appliesTo !== "wounds" && (
+          <label className="field"><span className="label">Posture requise</span>
+            <select className="in" value={m.stance ?? ""} onChange={(e) => set(i, { stance: (e.target.value || undefined) as Modifier["stance"] })}>
+              <option value="">Toutes</option>
+              {STANCES.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
+            </select>
+          </label>
+        )}
         <label className="field"><span className="label">Application</span>
           <select className="in" value={m.mode} onChange={(e) => set(i, { mode: e.target.value as Modifier["mode"] })}>
             <option value="always">D'office</option>
@@ -131,8 +157,8 @@ function AddModifier() {
   const add = () => {
     const t = CATALOG.find((x) => x.id === choice);
     const item: Modifier = t
-      ? { id: `mod-${crypto.randomUUID()}`, name: t.label, source: t.source, appliesTo: t.appliesTo, rolled: t.rolled, kept: t.kept, flat: t.flat, freeRaises: t.freeRaises, mode: t.mode, note: "" }
-      : { id: `mod-${crypto.randomUUID()}`, name: "", source: "technique", appliesTo: "skill", rolled: 0, kept: 0, flat: 0, freeRaises: 0, mode: "always", note: "" };
+      ? fromTemplate(t)
+      : { id: `mod-${crypto.randomUUID()}`, name: "", source: "technique", appliesTo: "skill", rolled: 0, kept: 0, flat: 0, freeRaises: 0, tn: 0, mode: "always", note: "" };
     dispatch({ type: "add", list: "modifiers", item });
     setChoice("");
   };
@@ -140,7 +166,7 @@ function AddModifier() {
     <div className="file-actions" style={{ marginTop: 8 }}>
       <select className="in" style={{ width: "auto", flex: "1 1 220px" }} aria-label="Modèle de bonus" value={choice} onChange={(e) => setChoice(e.target.value)}>
         <option value="">Bonus libre</option>
-        {NAMED_MODIFIERS.length > 0 && <optgroup label="Catalogue">{NAMED_MODIFIERS.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}</optgroup>}
+        {NAMED_MODIFIERS.length > 0 && <optgroup label="Catalogue (livre de base 4e, à vérifier)">{NAMED_MODIFIERS.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}</optgroup>}
         <optgroup label="Modèles">{MODIFIER_TEMPLATES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}</optgroup>
       </select>
       <button type="button" className="btn sm" onClick={add}>+ Bonus</button>
