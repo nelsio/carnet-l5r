@@ -20,8 +20,8 @@ export interface AppProps extends LibraryOptions {
 
 export function App({ storage, rng = d10, ...libraryOptions }: AppProps) {
   const [state, dispatch] = useReducer(reducer, undefined, initialState);
-  const { ready, api } = useLibrary(storage, state, dispatch, libraryOptions);
   const [pending, setPending] = useState<PendingImport | null>(null);
+  const { ready, api } = useLibrary(storage, state, dispatch, setPending, libraryOptions);
   const startImport = useCallback((file: File) => {
     void file.text().then((text) => setPending({ fileName: file.name, text }));
   }, []);

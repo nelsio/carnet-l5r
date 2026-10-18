@@ -2,6 +2,7 @@ import { armorTN, movement, woundState } from "@carnet/core";
 import { WOUND_LEVELS } from "../../rules/l5r4e";
 import { useCharacter, useStore } from "../store";
 import { NumberField } from "./fields";
+import { LinkBanner } from "./LinkBanner";
 
 /** Barre d'état collante : blessures, Vide et tuiles de combat (HANDOFF §6.2). */
 export function StatusBar() {
@@ -18,6 +19,8 @@ export function StatusBar() {
 
   return (
     <div className={`status${ui.woundsExpanded ? " exp" : ""}`}>
+      {/* Dans la barre collante : un conflit reste visible où que l'on soit dans la fiche. */}
+      <LinkBanner />
       <div className="status-in">
         <button type="button" className={`wsum${hurt ? " hurt" : ""}`} aria-expanded={ui.woundsExpanded} onClick={() => dispatch({ type: "toggleWounds" })}>
           <span>

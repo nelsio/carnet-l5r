@@ -299,6 +299,14 @@ function rolled(state: AppState, c: Character, action: Extract<AppAction, { type
   };
 }
 
+/** État du fichier lié de la fiche ouverte (HANDOFF §5.2). */
+export interface FileLinkState {
+  /** none : pas de fichier lié ; permission : à reprendre par un clic ; conflict : modifié ailleurs. */
+  state: "none" | "linked" | "permission" | "conflict" | "error";
+  name: string | null;
+  message?: string;
+}
+
 /** Opérations sur la bibliothèque locale, asynchrones (HANDOFF §5, §6.1). */
 export interface LibraryApi {
   entries: LibraryEntry[];
@@ -313,12 +321,29 @@ export interface LibraryApi {
   makeEditableCopy(): Promise<void>;
   /** Import « Nouvelle fiche » ou « Consultation » : nouvelle entrée, ouverte aussitôt. */
   importEntry(character: Character, mode: EntryMode): Promise<void>;
+  /** Fichier lié : proposé seulement si le navigateur le permet (Chrome, Edge desktop). */
+  file: FileLinkState & { supported: boolean };
+  linkFile(): Promise<void>;
+  /** Retire le lien sans toucher au fichier. */
+  unlinkFile(): Promise<void>;
+  /** Redemande la permission d'écriture (après un rechargement). */
+  resumeFile(): Promise<void>;
+  /** Conflit : « Charger la version du fichier ». */
+  loadFileVersion(): Promise<void>;
+  /** Conflit : « Écraser avec ma version ». */
+  overwriteFile(): Promise<void>;
+  /** Conflit : « Fusionner » (aperçu de fusion). */
+  mergeFileVersion(): Promise<void>;
 }
 
 /** Import en cours : fichier choisi ou déposé, en attente d'une destination. */
 export interface PendingImport {
   fileName: string;
   text: string;
+  /** Fusion seulement (conflit avec le fichier lié). */
+  mergeOnly?: boolean;
+  /** Appelé après « Appliquer ». */
+  onApplied?: () => void;
 }
 
 export interface Store {
