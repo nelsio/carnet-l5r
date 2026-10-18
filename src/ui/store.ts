@@ -4,9 +4,10 @@
  */
 import { createContext, useContext, type Dispatch } from "react";
 import {
-  buildActions, createCharacter, DAMAGE_MANEUVER_ID, DEFAULT_MANEUVERS, emphasisMatches,
+  buildActions, DAMAGE_MANEUVER_ID, DEFAULT_MANEUVERS, emphasisMatches,
   type ActionDef, type Character, type CombatSub, type RollResult, type Situation, type Stance,
 } from "@carnet/core";
+import type { LibraryEntry } from "../storage";
 import { DEFAULT_ROLL_OPTIONS, effectiveManeuvers, isRollable, isUnskilled, type RollOptions } from "./rolls";
 
 export type Theme = "auto" | "light" | "dark";
@@ -53,7 +54,14 @@ export interface UiState {
   stats: { voidPoint: boolean; emphasis: boolean; penalty: boolean };
 }
 
+export type Screen = "library" | "character";
+export type EntryMode = "edit" | "readonly";
+
 export interface AppState {
+  screen: Screen;
+  /** Fiche ouverte et son entrée de bibliothèque. */
+  entryId: string | null;
+  mode: EntryMode;
   character: Character | null;
   ui: UiState;
 }
@@ -82,13 +90,13 @@ export const initialUi: UiState = {
   stats: { voidPoint: false, emphasis: true, penalty: true },
 };
 
-export function initialState(character: Character | null = null): AppState {
-  return { character, ui: initialUi };
+export function initialState(): AppState {
+  return { screen: "library", entryId: null, mode: "edit", character: null, ui: initialUi };
 }
 
 export type AppAction =
-  | { type: "create" }
-  | { type: "deleteCharacter" }
+  | { type: "open"; id: string; character: Character; mode: EntryMode; edit?: boolean }
+  | { type: "library" }
   | { type: "set"; path: Path; value: unknown }
   | { type: "add"; list: ListKey; item: unknown }
   | { type: "remove"; list: ListKey; index: number }
@@ -130,10 +138,11 @@ export function selectedAction(c: Character, ui: UiState): ActionDef | undefined
   return currentActions(c, ui).find((a) => a.id === ui.selectedId);
 }
 
+/** Dépense un point de Vide ; une fiche en consultation ne dépense rien (HANDOFF §6.1). */
 function spendVoid(state: AppState): AppState {
   const c = state.character;
-  if (!c || c.voidPoints < 1) return state;
-  return { character: { ...c, voidPoints: c.voidPoints - 1 }, ui: { ...state.ui, voidSpentThisRound: true } };
+  if (!c || c.voidPoints < 1 || state.mode === "readonly") return state;
+  return { ...state, character: { ...c, voidPoints: c.voidPoints - 1 }, ui: { ...state.ui, voidSpentThisRound: true } };
 }
 
 /** Sélectionne une action et prépare le lanceur (ND, spécialisation, dégâts en attente). */
@@ -188,17 +197,25 @@ function uiReducer(state: AppState, action: AppAction): AppState {
   }
 }
 
+/** Actions qui modifient la fiche : refusées en consultation. */
+const EDITING = new Set<AppAction["type"]>(["set", "add", "remove", "wounds", "pip", "toggleEdit"]);
+
 export function reducer(state: AppState, action: AppAction): AppState {
   const { character: c, ui } = state;
 
-  if (action.type === "create") {
-    return { character: createCharacter(), ui: { ...initialUi, theme: ui.theme, edit: true } };
+  if (action.type === "open") {
+    return {
+      screen: "character", entryId: action.id, mode: action.mode, character: action.character,
+      ui: { ...initialUi, theme: ui.theme, edit: !!action.edit && action.mode === "edit" },
+    };
+  }
+  if (action.type === "library") {
+    return { ...initialState(), ui: { ...initialUi, theme: ui.theme } };
   }
   if (!c) return uiReducer(state, action);
+  if (state.mode === "readonly" && EDITING.has(action.type)) return state;
 
   switch (action.type) {
-    case "deleteCharacter":
-      return { character: null, ui: { ...initialUi, theme: ui.theme } };
     case "set":
       return { ...state, character: setIn(c, action.path, action.value) };
     case "add":
@@ -212,16 +229,18 @@ export function reducer(state: AppState, action: AppAction): AppState {
     case "toggleEdit": {
       // Passer en modification fait apparaître les manœuvres par défaut, pour pouvoir ajuster leurs coûts.
       const character = !ui.edit && c.maneuvers.length === 0 ? { ...c, maneuvers: DEFAULT_MANEUVERS.map((m) => ({ ...m })) } : c;
-      return { character, ui: { ...ui, edit: !ui.edit } };
+      return { ...state, character, ui: { ...ui, edit: !ui.edit } };
     }
     case "select": {
       const a = currentActions(c, ui).find((x) => x.id === action.id);
       return a && isRollable(a) ? { ...state, ui: select(c, ui, a, true) } : state;
     }
     case "voidArmor":
+      // En consultation, l'effet s'applique sans rien dépenser.
+      if (state.mode === "readonly") return { ...state, ui: { ...ui, voidArmor: !ui.voidArmor } };
       if (ui.voidArmor) {
         // Annuler rend le point de Vide.
-        return { character: { ...c, voidPoints: Math.min(c.voidRing, c.voidPoints + 1) }, ui: { ...ui, voidArmor: false, voidSpentThisRound: false } };
+        return { ...state, character: { ...c, voidPoints: Math.min(c.voidRing, c.voidPoints + 1) }, ui: { ...ui, voidArmor: false, voidSpentThisRound: false } };
       }
       if (c.voidPoints < 1) return state;
       {
@@ -263,7 +282,7 @@ function rolled(state: AppState, c: Character, action: Extract<AppAction, { type
     raises: action.raises, free: opts.free, maneuvers, damageDice, fullDefense: !!a.fullDefense,
   };
   return {
-    character: next.character,
+    ...next,
     ui: {
       ...ui,
       opts: { ...ui.opts, voidPoint: false, voidSkill: false },
@@ -276,11 +295,26 @@ function rolled(state: AppState, c: Character, action: Extract<AppAction, { type
   };
 }
 
+/** Opérations sur la bibliothèque locale, asynchrones (HANDOFF §5, §6.1). */
+export interface LibraryApi {
+  entries: LibraryEntry[];
+  /** IndexedDB indisponible : rien ne survivra à la fermeture de l'onglet. */
+  degraded: boolean;
+  saveStatus: "idle" | "saved" | "error";
+  create(): Promise<void>;
+  open(id: string): Promise<void>;
+  remove(id: string): Promise<void>;
+  showLibrary(): Promise<void>;
+  /** Fiche en consultation → copie modifiable, ouverte aussitôt. */
+  makeEditableCopy(): Promise<void>;
+}
+
 export interface Store {
   state: AppState;
   dispatch: Dispatch<AppAction>;
   /** Tirage d'un d10 (1..10), injectable pour les tests. */
   rng: () => number;
+  library: LibraryApi;
 }
 
 export const StoreContext = createContext<Store | null>(null);

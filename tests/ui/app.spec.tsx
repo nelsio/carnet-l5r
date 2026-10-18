@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import type { Character } from "@carnet/core";
+import { memoryStorage, type LibraryEntry } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../../reference/exemple-personnage.json";
 
@@ -8,8 +9,16 @@ const base = () => structuredClone(kakita) as Character;
 const always = (v: number) => () => v;
 const root = document.documentElement;
 
-function renderApp(character: Character | null = base(), rng = always(5)) {
-  return render(<App initialCharacter={character} rng={rng} />);
+/** Rend l'application sur un stockage en mémoire, avec la fiche ouverte s'il y en a une. */
+async function renderApp(character: Character | null = base(), rng = always(5), mode: LibraryEntry["mode"] = "edit") {
+  const storage = memoryStorage();
+  if (character) {
+    await storage.library.put({ id: "kakita", character, mode, updatedAt: "2026-10-18T10:00:00.000Z" });
+  }
+  const view = render(<App storage={storage} rng={rng} />);
+  await screen.findByText(/^Carnet de Rokugan v/);
+  await (character ? screen.findByRole("heading", { level: 1, name: new RegExp(character.name.slice(0, 5)) }) : screen.findByRole("button", { name: "Créer mon personnage" }));
+  return { ...view, storage };
 }
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
 const goToAid = () => click("Aide de jeu");
@@ -22,18 +31,18 @@ beforeEach(() => {
 });
 
 describe("Socle", () => {
-  it("affiche la version en pied de page", () => {
-    renderApp(null);
+  it("affiche la version en pied de page", async () => {
+    await renderApp(null);
     expect(screen.getByText(`Carnet de Rokugan v${__APP_VERSION__}`)).toBeInTheDocument();
   });
-  it("sans fiche : crée un personnage et passe en modification", () => {
-    renderApp(null);
+  it("sans fiche : crée un personnage et passe en modification", async () => {
+    await renderApp(null);
     click("Créer mon personnage");
-    expect(screen.getByRole("heading", { level: 1, name: "Nouveau samouraï" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Nouveau samouraï" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Terminer" })).toBeInTheDocument();
   });
-  it("le thème passe d'auto à clair, sombre, puis auto", () => {
-    renderApp();
+  it("le thème passe d'auto à clair, sombre, puis auto", async () => {
+    await renderApp();
     click("Thème : auto");
     expect(root.dataset.theme).toBe("light");
     click("Thème : clair");
@@ -44,15 +53,15 @@ describe("Socle", () => {
 });
 
 describe("Fiche", () => {
-  it("affiche l'en-tête : clan, nom, famille, école et Rang", () => {
-    renderApp();
+  it("affiche l'en-tête : clan, nom, famille, école et Rang", async () => {
+    await renderApp();
     expect(screen.getByText("Clan de la Grue")).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 1, name: "Kakita Haruto" })).toBeInTheDocument();
     expect(screen.getByText("Kakita · École de duellistes Kakita · Rang 1")).toBeInTheDocument();
   });
 
-  it("U2 : modifier un trait met à jour les réserves des compétences liées", () => {
-    renderApp();
+  it("U2 : modifier un trait met à jour les réserves des compétences liées", async () => {
+    await renderApp();
     expect(screen.getByTestId("skill-pool-Kenjutsu")).toHaveTextContent("5g3");
     click("Modifier la fiche");
     fireEvent.change(screen.getByRole("spinbutton", { name: "Agilité" }), { target: { value: "4" } });
@@ -62,8 +71,8 @@ describe("Fiche", () => {
     expect(screen.getByTestId("skill-pool-Iaijutsu")).toHaveTextContent("6g3");
   });
 
-  it("U3 : clan « Scorpion » puis « crane » : accent rouge, puis bleu ciel", () => {
-    renderApp();
+  it("U3 : clan « Scorpion » puis « crane » : accent rouge, puis bleu ciel", async () => {
+    await renderApp();
     click("Modifier la fiche");
     const clan = screen.getByRole("combobox", { name: "Clan" });
     fireEvent.change(clan, { target: { value: "Scorpion" } });
@@ -76,9 +85,9 @@ describe("Fiche", () => {
     expect(root.style.getPropertyValue("--acc-l")).toBe("");
   });
 
-  it("U4 : un texte saisi n'est jamais interprété comme du HTML", () => {
+  it("U4 : un texte saisi n'est jamais interprété comme du HTML", async () => {
     const evil = "<img src=x onerror=alert(1)>";
-    const { container } = renderApp();
+    const { container } = await renderApp();
     click("Modifier la fiche");
     fireEvent.change(screen.getByRole("textbox", { name: "Notes de campagne" }), { target: { value: evil } });
     fireEvent.change(screen.getByRole("textbox", { name: "Nom" }), { target: { value: evil } });
@@ -88,8 +97,8 @@ describe("Fiche", () => {
     expect(container.querySelector("img")).toBeNull();
   });
 
-  it("ajoute et retire une compétence ; les manœuvres par défaut deviennent modifiables", () => {
-    renderApp();
+  it("ajoute et retire une compétence ; les manœuvres par défaut deviennent modifiables", async () => {
+    await renderApp();
     click("Modifier la fiche");
     click("+ Compétence");
     const names = screen.getAllByRole("textbox", { name: "Nom de la compétence" });
@@ -105,8 +114,8 @@ describe("Fiche", () => {
     expect(screen.queryByTestId("skill-pool-Kyujutsu")).toBeNull();
   });
 
-  it("barre d'état : blessures, pénalité et points de Vide", () => {
-    renderApp();
+  it("barre d'état : blessures, pénalité et points de Vide", async () => {
+    await renderApp();
     expect(screen.getByTestId("armor-tn")).toHaveTextContent("20");
     fireEvent.change(screen.getByRole("spinbutton", { name: "Blessures subies" }), { target: { value: "11" } });
     expect(screen.getByRole("button", { name: /Égratigné/ })).toHaveAttribute("aria-expanded", "false");
@@ -120,8 +129,8 @@ describe("Fiche", () => {
 });
 
 describe("Aide de jeu", () => {
-  it("Déplacement : encart en tête, en pieds et en mètres", () => {
-    renderApp();
+  it("Déplacement : encart en tête, en pieds et en mètres", async () => {
+    await renderApp();
     goToAid();
     click("Déplacement");
     expect(screen.getByRole("heading", { name: "Se déplacer en combat" })).toBeInTheDocument();
@@ -130,8 +139,8 @@ describe("Aide de jeu", () => {
     expect(screen.getByText(/^12,2 m/)).toBeInTheDocument();
   });
 
-  it("E6 : Initiative en tête ; Attaque totale passe le ND d'armure de 20 à 10 ; « Nouveau round » garde l'initiative", () => {
-    renderApp(base(), always(5));
+  it("E6 : Initiative en tête ; Attaque totale passe le ND d'armure de 20 à 10 ; « Nouveau round » garde l'initiative", async () => {
+    await renderApp(base(), always(5));
     goToAid();
     click("Combat");
     const cards = screen.getAllByRole("button").filter((b) => b.classList.contains("act"));
@@ -146,8 +155,8 @@ describe("Aide de jeu", () => {
     expect(screen.getByTestId("initiative")).toHaveTextContent("15");
   });
 
-  it("E7 : attaque réussie avec 2 « Augmentation des dégâts » → dégâts pré-remplis à +2 dés", () => {
-    renderApp(base(), always(9));
+  it("E7 : attaque réussie avec 2 « Augmentation des dégâts » → dégâts pré-remplis à +2 dés", async () => {
+    await renderApp(base(), always(9));
     goToAid();
     click("Combat");
     click(/^Attaque · Katana/);
@@ -163,8 +172,8 @@ describe("Aide de jeu", () => {
     expect(screen.queryByText("+2g0 en attente")).toBeNull();
   });
 
-  it("E10 : ajouter une augmentation monte le ND final de 5 et baisse la chance de réussite", () => {
-    renderApp();
+  it("E10 : ajouter une augmentation monte le ND final de 5 et baisse la chance de réussite", async () => {
+    await renderApp();
     goToAid();
     click(/^Remarquer un détail/);
     expect(screen.getByTestId("final-tn")).toHaveTextContent("15");
@@ -174,8 +183,8 @@ describe("Aide de jeu", () => {
     expect(chance()).toBeLessThan(before);
   });
 
-  it("spécialisation cochée automatiquement quand elle correspond à l'action", () => {
-    renderApp();
+  it("spécialisation cochée automatiquement quand elle correspond à l'action", async () => {
+    await renderApp();
     goToAid();
     click(/^Remarquer un détail/);
     expect(roller().getByRole("checkbox", { name: /Spécialisation/ })).toBeChecked();
@@ -183,8 +192,8 @@ describe("Aide de jeu", () => {
     expect(roller().getByRole("checkbox", { name: /Spécialisation/ })).not.toBeChecked();
   });
 
-  it("dépenser un point de Vide au jet le décompte, une seule fois", () => {
-    renderApp();
+  it("dépenser un point de Vide au jet le décompte, une seule fois", async () => {
+    await renderApp();
     goToAid();
     click(/^Remarquer un détail/);
     fireEvent.click(roller().getByRole("checkbox", { name: /Dépenser 1 point de Vide \(\+1g1\)/ }));
@@ -194,8 +203,8 @@ describe("Aide de jeu", () => {
     expect(screen.getByTestId("pool")).toHaveTextContent("3g2");
   });
 
-  it("Défense totale lancée : posture et ND d'armure mis à jour", () => {
-    renderApp(base(), always(5));
+  it("Défense totale lancée : posture et ND d'armure mis à jour", async () => {
+    await renderApp(base(), always(5));
     goToAid();
     click("Combat");
     click(/^Défense totale.*moitié du résultat/);
@@ -205,8 +214,8 @@ describe("Aide de jeu", () => {
     expect(screen.getByRole("button", { name: /^Défense totale.*Jet Défense/ })).toHaveAttribute("aria-pressed", "true");
   });
 
-  it("Duel : pas de posture, Frappe puis dégâts rattachés", () => {
-    renderApp();
+  it("Duel : pas de posture, Frappe puis dégâts rattachés", async () => {
+    await renderApp();
     goToAid();
     click("Combat");
     click("Duel iaijutsu");
@@ -215,8 +224,8 @@ describe("Aide de jeu", () => {
     expect(screen.getByTestId("final-tn")).toHaveTextContent("20");
   });
 
-  it("le panneau du lanceur s'ouvre au choix d'une action et se ferme par Échap, × et le fond", () => {
-    const { container } = renderApp();
+  it("le panneau du lanceur s'ouvre au choix d'une action et se ferme par Échap, × et le fond", async () => {
+    const { container } = await renderApp();
     goToAid();
     const dialog = screen.getByRole("dialog", { name: "Lanceur de dés" });
     expect(dialog).not.toHaveClass("open");
@@ -232,8 +241,8 @@ describe("Aide de jeu", () => {
     expect(dialog).not.toHaveClass("open");
   });
 
-  it("E9 : une ligne par jet ; « point de Vide » ajoute +1g1 et augmente les chances", () => {
-    renderApp();
+  it("E9 : une ligne par jet ; « point de Vide » ajoute +1g1 et augmente les chances", async () => {
+    await renderApp();
     goToAid();
     click("Statistiques");
     const rows = () => screen.getAllByRole("row").slice(1);

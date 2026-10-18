@@ -12,6 +12,8 @@ export function StatusBar() {
   const move = movement(c);
   const tn = armorTN(c, { stance: ui.stance, fullDefenseBonus: ui.fullDefenseBonus, voidArmor: ui.voidArmor });
   const hurt = c.wounds > 0;
+  // Fiche en consultation : blessures et Vide affichés, mais ni modifiables ni cliquables (HANDOFF §6.1).
+  const readonly = state.mode === "readonly";
   const maxWounds = ws.thresholds[ws.thresholds.length - 1];
 
   return (
@@ -37,12 +39,18 @@ export function StatusBar() {
         <div>
           <div className="label">Blessures</div>
           <div className="stepper">
-            <button type="button" aria-label="Retirer 1 blessure" onClick={() => dispatch({ type: "wounds", value: c.wounds - 1 })}>−</button>
-            <NumberField
-              className="in mono" style={{ width: 56, textAlign: "center" }} min={0} aria-label="Blessures subies"
-              value={c.wounds} onChange={(n) => dispatch({ type: "wounds", value: n })}
-            />
-            <button type="button" aria-label="Ajouter 1 blessure" onClick={() => dispatch({ type: "wounds", value: c.wounds + 1 })}>+</button>
+            {readonly ? (
+              <b className="stat-big" aria-label="Blessures subies">{c.wounds}</b>
+            ) : (
+              <>
+                <button type="button" aria-label="Retirer 1 blessure" onClick={() => dispatch({ type: "wounds", value: c.wounds - 1 })}>−</button>
+                <NumberField
+                  className="in mono" style={{ width: 56, textAlign: "center" }} min={0} aria-label="Blessures subies"
+                  value={c.wounds} onChange={(n) => dispatch({ type: "wounds", value: n })}
+                />
+                <button type="button" aria-label="Ajouter 1 blessure" onClick={() => dispatch({ type: "wounds", value: c.wounds + 1 })}>+</button>
+              </>
+            )}
           </div>
         </div>
         <div>
@@ -51,7 +59,7 @@ export function StatusBar() {
             {Array.from({ length: c.voidRing }, (_, i) => (
               <button
                 key={i} type="button" className={`pip${i < c.voidPoints ? " on" : ""}`}
-                aria-label={`Point de Vide ${i + 1}`} aria-pressed={i < c.voidPoints}
+                aria-label={`Point de Vide ${i + 1}`} aria-pressed={i < c.voidPoints} disabled={readonly}
                 onClick={() => dispatch({ type: "pip", index: i })}
               />
             ))}

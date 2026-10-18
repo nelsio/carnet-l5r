@@ -69,6 +69,12 @@ test("M1 : aucune vue ne défile horizontalement", async ({ page }) => {
   }
   await openAction(page, "Combat", /Attaque · Katana/, "Escarmouche");
   await noHorizontalScroll(page, "lanceur ouvert");
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "Bibliothèque" }).click();
+  await expect(page.getByRole("heading", { name: "Bibliothèque" })).toBeVisible();
+  await noHorizontalScroll(page, "Bibliothèque");
+  await page.getByRole("button", { name: /^Supprimer / }).click();
+  await noHorizontalScroll(page, "Bibliothèque, confirmation de suppression");
 });
 
 test("M2 : la barre de navigation est fixe en bas, sur Fiche comme sur Aide de jeu", async ({ page }) => {

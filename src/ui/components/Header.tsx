@@ -3,8 +3,9 @@ import { useStore } from "../store";
 import { NEXT_THEME, THEME_LABELS } from "../theme";
 
 export function Header() {
-  const { state, dispatch } = useStore();
+  const { state, dispatch, library } = useStore();
   const { character: c, ui } = state;
+  const readonly = state.mode === "readonly";
   const clan = c?.clan.trim() ? clanAccent(c.clan) : null;
   const sub = c ? [c.family, c.school].filter(Boolean).join(" · ") : "";
 
@@ -14,7 +15,7 @@ export function Header() {
         {c ? (
           <>
             {clan && <div className="mon">{clan.label ?? `Clan ${c.clan}`}</div>}
-            <h1>{c.name}</h1>
+            <h1>{c.name}{readonly && <> <span className="badge">Consultation</span></>}</h1>
             <div className="sub">{sub}{sub ? " · " : ""}Rang {c.insightRank}</div>
           </>
         ) : (
@@ -25,6 +26,9 @@ export function Header() {
         )}
       </div>
       <div className="top-right">
+        {c && (
+          <button className="lib-btn" type="button" onClick={() => void library.showLibrary()}>Bibliothèque</button>
+        )}
         <button className="theme-btn" type="button" title="Changer de thème" onClick={() => dispatch({ type: "theme", theme: NEXT_THEME[ui.theme] })}>
           Thème : {THEME_LABELS[ui.theme]}
         </button>
