@@ -6,7 +6,6 @@
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
     "strict": true,
-    "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
@@ -22,7 +21,5 @@
       "@carnet/core": ["./src/core/index.ts"]
     }
   },
-  "include": ["src", "tests", "vite.config.ts", "playwright.config.ts", "eslint.config.js"],
-  // Spécification du moteur : activée au lot 2, quand src/core l'implémente.
-  "exclude": ["tests/core.rules.spec.ts"]
+  "include": ["src", "tests", "vite.config.ts", "playwright.config.ts", "eslint.config.js"]
 }

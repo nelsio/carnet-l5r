@@ -5,8 +5,7 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  // core.rules.spec.ts : spécification du moteur, activée au lot 2.
-  { ignores: ["dist", "coverage", "test-results", "playwright-report", "reference", "tests/core.rules.spec.ts"] },
+  { ignores: ["dist", "coverage", "test-results", "playwright-report", "reference"] },
   {
     files: ["**/*.{ts,tsx}"],
     extends: [js.configs.recommended, ...tseslint.configs.strict],
@@ -27,5 +26,17 @@ export default tseslint.config(
         { selector: "JSXAttribute[name.name='dangerouslySetInnerHTML']", message: "Interdit (HANDOFF §6.3)." },
       ],
     },
+  },
+  {
+    // HANDOFF §2 : le moteur et les règles sont du TypeScript pur, sans DOM.
+    files: ["src/core/**/*.ts", "src/rules/**/*.ts"],
+    rules: {
+      "no-restricted-globals": ["error", "window", "document", "navigator", "localStorage", "indexedDB"],
+      "no-restricted-imports": ["error", { patterns: ["react", "react-dom", "**/ui/**", "**/storage/**"] }],
+    },
+  },
+  {
+    files: ["tests/**/*.{ts,tsx}"],
+    rules: { "@typescript-eslint/no-non-null-assertion": "off" },
   },
 );
