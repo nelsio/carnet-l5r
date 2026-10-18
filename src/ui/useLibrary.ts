@@ -120,8 +120,11 @@ export function useLibrary(storage: Storage, state: AppState, dispatch: Dispatch
     },
     async makeEditableCopy() {
       const { character } = latest.current;
-      if (!character) return;
-      const entry: LibraryEntry = { id: newId(), character: structuredClone(character), mode: "edit", updatedAt: now().toISOString() };
+      if (character) await api.importEntry(structuredClone(character), "edit");
+    },
+    async importEntry(character, mode) {
+      await save();
+      const entry: LibraryEntry = { id: newId(), character, mode, updatedAt: now().toISOString() };
       await storage.library.put(entry);
       await openEntry(entry);
       await refresh();

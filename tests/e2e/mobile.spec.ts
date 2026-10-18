@@ -75,6 +75,13 @@ test("M1 : aucune vue ne défile horizontalement", async ({ page }) => {
   await noHorizontalScroll(page, "Bibliothèque");
   await page.getByRole("button", { name: /^Supprimer / }).click();
   await noHorizontalScroll(page, "Bibliothèque, confirmation de suppression");
+  await page.getByRole("button", { name: "Annuler" }).click();
+  await page.getByRole("button", { name: /^Ouvrir / }).click();
+  const patch = { schemaVersion: 1, traits: { agility: 4 }, skills: [{ name: "Kyujutsu", rank: 1, trait: "reflexes", emphases: [] }], notes: "x".repeat(400), foo: 1 };
+  await page.getByLabel("Fichier JSON à importer").setInputFiles({ name: "fusion-avec-un-nom-de-fichier-tres-long.json", mimeType: "application/json", buffer: Buffer.from(JSON.stringify(patch)) });
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await noHorizontalScroll(page, "fenêtre d'import");
+  await inViewport(page, page.getByRole("dialog").getByRole("button", { name: "Appliquer" }));
 });
 
 test("M2 : la barre de navigation est fixe en bas, sur Fiche comme sur Aide de jeu", async ({ page }) => {
@@ -155,7 +162,8 @@ test("M6 bis : la page ne défile pas derrière le panneau ouvert", async ({ pag
 
 test("M7 : en modification, les champs ont une police d'au moins 16 px", async ({ page }) => {
   await page.getByRole("button", { name: "Modifier la fiche" }).click();
-  const sizes = await page.locator("input:not([type=checkbox]), select, textarea").evaluateAll((els) =>
+  // Le champ fichier caché (bouton « Importer ») n'est jamais saisi au clavier.
+  const sizes = await page.locator("input:not([type=checkbox]):not([type=file]), select, textarea").evaluateAll((els) =>
     els.map((e) => ({ name: e.getAttribute("aria-label") ?? e.className, size: parseFloat(getComputedStyle(e).fontSize) })));
   expect(sizes.length).toBeGreaterThan(20);
   expect(sizes.filter((s) => s.size < 16)).toEqual([]);

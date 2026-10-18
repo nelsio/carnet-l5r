@@ -2,6 +2,7 @@ import { useState } from "react";
 import { clanAccent } from "@carnet/core";
 import type { LibraryEntry } from "../../storage";
 import { useStore } from "../store";
+import { ImportButton } from "./FileActions";
 
 const dateFormat = new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeStyle: "short" });
 
@@ -15,7 +16,11 @@ export function Library() {
       <div className="empty panel">
         <h2>Aucun personnage dans ce carnet</h2>
         <p className="muted">Crée ta fiche : Traits, Compétences, armes, techniques. L'aide de jeu calculera tes réserves de dés à partir d'elle.</p>
-        <p><button type="button" className="btn primary" onClick={() => void library.create()}>Créer mon personnage</button></p>
+        <p className="file-actions" style={{ justifyContent: "center" }}>
+          <button type="button" className="btn primary" onClick={() => void library.create()}>Créer mon personnage</button>
+          <ImportButton />
+        </p>
+        <p className="hint">Tu as déjà une fiche en JSON ? Importe-la, ou dépose le fichier sur la page.</p>
       </div>
     );
   }
@@ -23,9 +28,14 @@ export function Library() {
     <div className="panel">
       <div className="panel-head">
         <h2>Bibliothèque</h2>
-        <button type="button" className="btn primary" onClick={() => void library.create()}>Nouvelle fiche</button>
+        <div className="file-actions">
+          <ImportButton />
+          <button type="button" className="btn primary" onClick={() => void library.create()}>Nouvelle fiche</button>
+        </div>
       </div>
-      <p className="hint" style={{ marginTop: 0 }}>Les fiches restent dans ce navigateur. Rien n'est envoyé.</p>
+      <p className="hint" style={{ marginTop: 0 }}>
+        Les fiches restent dans ce navigateur. Rien n'est envoyé. Pour importer, tu peux aussi déposer un fichier JSON sur la page.
+      </p>
       <ul className="library" aria-label="Fiches">
         {entries.map((e) => <EntryRow key={e.id} entry={e} />)}
       </ul>
