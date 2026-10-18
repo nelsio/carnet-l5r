@@ -4,8 +4,8 @@
  */
 import { describe, it, expect } from "vitest";
 import {
-  assessmentTN, attackTrait, buildActions, CharacterFormatError, clanAccent, computePool,
-  DEFAULT_MANEUVERS, formatDice, formatPath, mergeCharacter, migrate, poolStats, rollDice,
+  assessmentTN, attackTrait, buildActions, CharacterFormatError, CharacterSchema, createCharacter, clanAccent, computePool,
+  DEFAULT_MANEUVERS, emphasisMatches, formatDice, formatPath, mergeCharacter, migrate, poolStats, rollDice,
   woundState, type Character,
 } from "@carnet/core";
 import kakita from "../reference/exemple-personnage.json";
@@ -197,5 +197,21 @@ describe("Couleur de clan", () => {
   });
   it("clan non reconnu : couleur par défaut", () => {
     expect(clanAccent("Ronin")).toEqual({ id: null, label: null, light: "#7a6a3a", dark: "#cdb67a" });
+  });
+});
+
+describe("Spécialisation suggérée", () => {
+  it("coche la spécialisation qui correspond à l'action, sans accents ni casse", () => {
+    expect(emphasisMatches(base(), "Investigation", "Remarquer")).toBe(true);
+    expect(emphasisMatches(base(), "investigation", "remarquer un détail")).toBe(true);
+    expect(emphasisMatches(base(), "Investigation", "Fouille")).toBe(false);
+    expect(emphasisMatches(base(), "Investigation", undefined)).toBe(false);
+    expect(emphasisMatches(base(), "Jiujutsu", "Saisie")).toBe(false);
+  });
+});
+
+describe("Fiche vierge", () => {
+  it("est valide pour le schéma", () => {
+    expect(CharacterSchema.parse(createCharacter())).toEqual(createCharacter());
   });
 });

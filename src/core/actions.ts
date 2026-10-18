@@ -16,11 +16,12 @@ export function weaponActions(w: WeaponLike, sub: CombatSub): ActionDef[] {
   return [
     {
       id: attackId, situation: "combat", sub, kind: "skill", skill: w.skill, trait, tn: "target", attack: true,
+      emphasisHint: w.name, weapon: w,
       label: `${ranged ? "Tir" : "Attaque"} · ${w.name}`,
       description: `${w.skill} (${TRAIT_LABELS[trait]}) contre le ND d'armure de la cible. Choisis tes manœuvres dans le lanceur.`,
     },
     {
-      id: `dmg-${sub}-${w.name}`, situation: "combat", sub, parent: attackId, kind: "damage", dr: w.dr, tn: null,
+      id: `dmg-${sub}-${w.name}`, situation: "combat", sub, parent: attackId, kind: "damage", dr: w.dr, weapon: w, tn: null,
       label: `Dégâts · ${w.name}`,
       description: ranged
         ? `Force de l'arc ${w.bowStrength ?? 0} + VD de la flèche ${w.dr}.`
@@ -47,7 +48,7 @@ export function buildActions(c: Character, situation: Situation, sub?: CombatSub
       return [
         ...fixed("combat", "duel"),
         ...c.weapons.filter((w) => DUEL_WEAPON_PATTERN.test(w.name)).map((w): ActionDef => ({
-          id: `dmg-duel-${w.name}`, situation: "combat", sub: "duel", parent: "strike", kind: "damage", dr: w.dr, tn: null,
+          id: `dmg-duel-${w.name}`, situation: "combat", sub: "duel", parent: "strike", kind: "damage", dr: w.dr, weapon: w, tn: null,
           label: `Dégâts · ${w.name}`, description: "Les augmentations de la Frappe ajoutent +1g0 chacune.",
         })),
       ];

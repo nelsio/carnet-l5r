@@ -4,6 +4,7 @@
  * Points à vérifier dans le livre : voir HANDOFF §12 (P2, P5).
  */
 import type { Maneuver, RollTrait, TraitKey } from "../core/schema";
+import type { WeaponLike } from "../core/engine";
 
 export type RingKey = "earth" | "water" | "fire" | "air" | "void";
 export type Stance = "attack" | "fullAttack" | "defense" | "fullDefense" | "center";
@@ -101,6 +102,11 @@ export const DEFAULT_MANEUVERS: readonly Maneuver[] = [
 /** Manœuvre dont chaque prise ajoute +1g0 au jet de dégâts suivant. */
 export const DAMAGE_MANEUVER_ID = "dmg";
 
+/** Fiche vierge (bouton « Nouvelle fiche »). */
+export const NEW_CHARACTER_NAME = "Nouveau samouraï";
+export const STARTING_XP = 40;
+export const STARTING_TRAIT = 2;
+
 /** Mots qui désignent une arme à distance (dans le nom ou la compétence). */
 export const RANGED_PATTERN = /kyujutsu|arc|yumi/i;
 /** Armes utilisables pour la Frappe d'un duel iaijutsu. */
@@ -158,6 +164,8 @@ export interface ActionDef {
   fullDefense?: boolean;
   /** Valeur de dégâts, pour les actions `damage`. */
   dr?: string;
+  /** Arme utilisée, pour les attaques et dégâts générés depuis la fiche. */
+  weapon?: WeaponLike;
   description: string;
 }
 
@@ -193,7 +201,7 @@ export const FIXED_ACTIONS: readonly ActionDef[] = [
   // Escarmouche
   { id: "initiative", situation: "combat", sub: "skirmish", label: "Initiative", kind: "initiative", tn: null, description: "Rang + Réflexes, gardé Réflexes. Ordre du round." },
   { id: "unarmed", situation: "combat", sub: "skirmish", label: "Attaque à mains nues", kind: "skill", skill: "Jiujutsu", trait: "agility", tn: "target", attack: true, description: "Jiujutsu (Agilité) contre le ND d'armure. Dégâts : Force + 0g1." },
-  { id: "unarmed-dmg", situation: "combat", sub: "skirmish", parent: "unarmed", label: "Dégâts · mains nues", kind: "damage", dr: "0g1", tn: null, description: "Force + 0g1." },
+  { id: "unarmed-dmg", situation: "combat", sub: "skirmish", parent: "unarmed", label: "Dégâts · mains nues", kind: "damage", dr: "0g1", weapon: { name: "Mains nues", skill: "Jiujutsu", dr: "0g1" }, tn: null, description: "Force + 0g1." },
   { id: "grapple", situation: "combat", sub: "skirmish", label: "Lutte (saisie)", kind: "skill", skill: "Jiujutsu", trait: "agility", tn: "target", attack: true, description: "Attaque Jiujutsu ; si elle touche, jets de Force en opposition pour établir et tenir la prise." },
   { id: "full-defense", situation: "combat", sub: "skirmish", label: "Défense totale", kind: "skill", skill: "Défense", trait: "reflexes", tn: null, fullDefense: true, description: "Posture Défense totale : la moitié du résultat s'ajoute à ton ND d'armure ce round." },
   // Duel iaijutsu
