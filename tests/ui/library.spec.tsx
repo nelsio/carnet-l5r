@@ -208,3 +208,26 @@ describe("Fiche en consultation", () => {
     expect(list.find((e) => e.mode === "edit")?.character).toEqual(base());
   });
 });
+
+describe("Onglet masqué", () => {
+  it("la modification en attente est enregistrée sans attendre les 500 ms", async () => {
+    const s = memoryStorage();
+    await s.library.put(entry("a"));
+    await mount(s);
+    click("Ajouter 1 blessure");
+    Object.defineProperty(document, "visibilityState", { configurable: true, value: "hidden" });
+    fireEvent(document, new Event("visibilitychange"));
+    await waitFor(async () => expect((await s.library.get("a"))?.character.wounds).toBe(1), { timeout: 200 });
+    Object.defineProperty(document, "visibilityState", { configurable: true, value: "visible" });
+    fireEvent(document, new Event("visibilitychange"));
+  });
+
+  it("de même quand la page est quittée", async () => {
+    const s = memoryStorage();
+    await s.library.put(entry("a"));
+    await mount(s);
+    click("Ajouter 1 blessure");
+    fireEvent(window, new Event("pagehide"));
+    await waitFor(async () => expect((await s.library.get("a"))?.character.wounds).toBe(1), { timeout: 200 });
+  });
+});

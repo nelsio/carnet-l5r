@@ -1,6 +1,6 @@
 import { wrap, type DBSchema, type IDBPDatabase } from "idb";
 import { migrate, upgrade, type Character } from "@carnet/core";
-import type { LibraryEntry, LibraryStore, Prefs, PrefsStore } from "./types";
+import type { LibraryEntry, LibraryStore, Prefs, PrefsStore, SaveReport } from "./types";
 
 export const DB_NAME = "carnet-l5r";
 export const DB_VERSION = 1;
@@ -55,8 +55,10 @@ export class IndexedDbLibrary implements LibraryStore {
     const raw = await this.db.get("entries", id);
     return raw && readEntry(raw);
   }
-  async put(entry: LibraryEntry): Promise<void> {
-    await this.db.put("entries", structuredClone(entry));
+  async put(entry: LibraryEntry): Promise<SaveReport> {
+    // La poignée du fichier lié se range telle quelle dans IndexedDB (elle est sérialisable).
+    await this.db.put("entries", entry);
+    return {};
   }
   async remove(id: string): Promise<void> {
     await this.db.delete("entries", id);

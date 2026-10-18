@@ -40,6 +40,7 @@ export function ImportDialog({ pending, onClose }: { pending: PendingImport; onC
   const titleId = useId();
   const current = state.character && state.mode === "edit" ? state.character : null;
   const [destination, setDestination] = useState<Destination>(current ? "merge" : "new");
+  const mergeOnly = !!pending.mergeOnly && !!current;
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -56,8 +57,12 @@ export function ImportDialog({ pending, onClose }: { pending: PendingImport; onC
 
   const apply = async (character: Character) => {
     setBusy(true);
-    if (destination === "merge") dispatch({ type: "replaceCharacter", character });
-    else await library.importEntry(character, destination === "readonly" ? "readonly" : "edit");
+    if (destination === "merge") {
+      dispatch({ type: "replaceCharacter", character });
+      pending.onApplied?.();
+    } else {
+      await library.importEntry(character, destination === "readonly" ? "readonly" : "edit");
+    }
     onClose();
   };
 
@@ -126,8 +131,9 @@ export function ImportDialog({ pending, onClose }: { pending: PendingImport; onC
   return (
     <div className="modal-backdrop" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="panel modal" role="dialog" aria-modal="true" aria-labelledby={titleId}>
-        <h2 id={titleId}>Importer « {pending.fileName} »</h2>
-        {parsed.ok && (
+        <h2 id={titleId}>{mergeOnly ? `Fusionner « ${pending.fileName} »` : `Importer « ${pending.fileName} »`}</h2>
+        {mergeOnly && <p className="hint">Version du fichier lié, modifiée ailleurs : vérifie les changements avant de les appliquer à ta fiche.</p>}
+        {parsed.ok && !mergeOnly && (
           <fieldset className="dest">
             <legend className="label">Destination</legend>
             {choices.map((ch) => (

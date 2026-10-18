@@ -55,6 +55,7 @@ function EntryRow({ entry: e }: { entry: LibraryEntry }) {
       <div className="entry-main">
         <b>{name}</b>
         {e.mode === "readonly" && <span className="badge">Consultation</span>}
+        {e.linkedFile && <span className="badge linked-badge" title="Fichier lié">{e.linkedFile.name}</span>}
         <div className="muted">
           {[c.clan, c.school].filter(Boolean).join(" · ") || "—"} · <time dateTime={e.updatedAt}>{dateFormat.format(new Date(e.updatedAt))}</time>
         </div>

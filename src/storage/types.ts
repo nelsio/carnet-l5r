@@ -1,6 +1,7 @@
 import type { Character } from "@carnet/core";
+import type { FileSync, LinkedFile } from "./linkedFile";
 
-/** Une fiche de la bibliothèque locale (HANDOFF §3.2). Le fichier lié arrive au lot 7. */
+/** Une fiche de la bibliothèque locale (HANDOFF §3.2). */
 export interface LibraryEntry {
   /** UUID local. */
   id: string;
@@ -9,13 +10,21 @@ export interface LibraryEntry {
   mode: "edit" | "readonly";
   /** Date ISO de la dernière modification. */
   updatedAt: string;
+  /** Fichier lié (Chrome et Edge desktop uniquement). */
+  linkedFile?: LinkedFile;
+}
+
+/** Compte rendu d'un enregistrement : écriture du fichier lié, s'il y en a un. */
+export interface SaveReport {
+  file?: FileSync;
 }
 
 /** Accès à la bibliothèque, indépendant de l'interface (HANDOFF §5). */
 export interface LibraryStore {
   list(): Promise<LibraryEntry[]>;
   get(id: string): Promise<LibraryEntry | undefined>;
-  put(entry: LibraryEntry): Promise<void>;
+  /** Enregistre, puis écrit dans le fichier lié s'il y en a un (sauf conflit, sauf avec `force`). */
+  put(entry: LibraryEntry, opts?: { force?: boolean }): Promise<SaveReport>;
   remove(id: string): Promise<void>;
 }
 
