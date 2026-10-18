@@ -6,6 +6,12 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? "github" : "list",
+  // E2 : le même fichier servi en HTTP, comme sur GitHub Pages.
+  webServer: {
+    command: "npx vite preview --port 4173 --strictPort",
+    url: "http://localhost:4173/carnet-l5r.html",
+    reuseExistingServer: !process.env.CI,
+  },
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] }, testIgnore: /mobile\.spec\.ts/ },
     // HANDOFF §10.5 : appareils « iPhone 13 » et « Pixel 7 ».

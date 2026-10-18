@@ -28,14 +28,25 @@ const pool = (c: Character, trait: RollTrait, skill: string) => {
 
 export function Sheet() {
   const { edit, dispatch } = useSheet();
+  const { state, library } = useStore();
+  const readonly = state.mode === "readonly";
   return (
     <div className="grid">
+      {readonly && (
+        <p className="hint" style={{ margin: 0 }}>
+          Fiche en consultation : lecture seule. Le lanceur reste utilisable mais ne dépense rien.
+        </p>
+      )}
       <div className="panel">
         <div className="panel-head">
           <h2>Anneaux &amp; Traits</h2>
-          <button type="button" className={`btn${edit ? " gold" : ""}`} onClick={() => dispatch({ type: "toggleEdit" })}>
-            {edit ? "Terminer" : "Modifier la fiche"}
-          </button>
+          {readonly ? (
+            <button type="button" className="btn" onClick={() => void library.makeEditableCopy()}>Rendre modifiable</button>
+          ) : (
+            <button type="button" className={`btn${edit ? " gold" : ""}`} onClick={() => dispatch({ type: "toggleEdit" })}>
+              {edit ? "Terminer" : "Modifier la fiche"}
+            </button>
+          )}
         </div>
         <Rings />
       </div>
@@ -352,13 +363,13 @@ function LongText({ field, label }: { field: "advantages" | "disadvantages" | "n
 }
 
 function DeleteCharacter() {
-  const { dispatch } = useStore();
+  const { state, library } = useStore();
   const [confirm, setConfirm] = useState(false);
   return (
     <p>
       <button type="button" className="btn" onClick={() => setConfirm(true)}>Supprimer ce personnage…</button>{" "}
       {confirm && (
-        <button type="button" className="btn" style={{ color: "var(--bad)" }} onClick={() => dispatch({ type: "deleteCharacter" })}>
+        <button type="button" className="btn" style={{ color: "var(--bad)" }} onClick={() => state.entryId && void library.remove(state.entryId)}>
           Confirmer la suppression
         </button>
       )}
