@@ -29,7 +29,7 @@ export function StatusBar() {
             return (
               <div key={w.label} className={cls} title={`${w.label} jusqu'à ${ws.thresholds[i]} blessures`} aria-current={i === ws.level && hurt ? "step" : undefined}>
                 <b>{w.penalty === null ? "✕" : `+${w.penalty}`}</b>
-                <span>{w.label}</span>
+                <span>{w.short ?? w.label}</span>
               </div>
             );
           })}
