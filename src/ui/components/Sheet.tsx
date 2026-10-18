@@ -1,13 +1,14 @@
 import { useState, type ReactNode } from "react";
 import {
-  attackTrait, computePool, formatDice, isRanged, rings, ROLL_TRAITS,
-  type Character, type RollTrait, type TraitKey,
+  attackTrait, computePool, defaultModifiers, formatDice, isRanged, rings, ROLL_TRAITS,
+  type Character, type PoolAction, type RollTrait, type TraitKey,
 } from "@carnet/core";
 import { RINGS, TRAIT_LABELS, type RingKey } from "../../rules/l5r4e";
 import { decimal } from "../format";
 import { effectiveManeuvers } from "../rolls";
 import { useCharacter, useStore, type ListKey } from "../store";
 import { FileActions } from "./FileActions";
+import { Modifiers } from "./Modifiers";
 import { ListField, NumberField } from "./fields";
 
 const CLAN_SUGGESTIONS = ["Crabe", "Grue", "Dragon", "Licorne", "Lion", "Mante", "Phénix", "Scorpion", "Araignée", "Impérial"];
@@ -22,9 +23,12 @@ function useSheet() {
   return { c, edit: state.ui.edit, dispatch, set };
 }
 
+/** Réserve affichée sur la fiche : avec les bonus appliqués d'office. */
+const poolOf = (c: Character, action: PoolAction) => computePool(c, action, { modifiers: defaultModifiers(c, action) });
+
 const pool = (c: Character, trait: RollTrait, skill: string) => {
-  const p = computePool(c, { kind: "skill", skill, trait }, {});
-  return formatDice(p.rolled, p.kept);
+  const p = poolOf(c, { kind: "skill", skill, trait });
+  return formatDice(p.rolled, p.kept) + (p.bonus ? ` ${p.bonus > 0 ? "+" : ""}${p.bonus}` : "");
 };
 
 export function Sheet() {
@@ -58,6 +62,7 @@ export function Sheet() {
           <div className="panel"><h2>Armes</h2><Weapons /></div>
           <div className="panel"><h2>Techniques d'école</h2><Techniques /></div>
           <div className="panel"><h2>Manœuvres</h2><Maneuvers /></div>
+          <div className="panel"><h2>Bonus de jet</h2><Modifiers /></div>
         </div>
       </div>
       <div className="panel">
@@ -139,7 +144,7 @@ function Identity() {
       </div>
     );
   }
-  const init = computePool(c, { kind: "initiative" }, {});
+  const init = poolOf(c, { kind: "initiative" });
   return (
     <div className="kv">
       <div><span className="label">Honneur</span><b>{decimal(c.honor)}</b></div>
@@ -254,8 +259,8 @@ function Weapons() {
         <thead><tr><th>Arme</th><th>Attaque</th><th>Dégâts</th></tr></thead>
         <tbody>
           {c.weapons.length ? c.weapons.map((w, i) => {
-            const atk = computePool(c, { kind: "skill", skill: w.skill, trait: attackTrait(w), attack: true }, {});
-            const dmg = computePool(c, { kind: "damage", weapon: w }, {});
+            const atk = poolOf(c, { kind: "skill", skill: w.skill, trait: attackTrait(w), attack: true });
+            const dmg = poolOf(c, { kind: "damage", weapon: w });
             return (
               <tr key={i}>
                 <td>

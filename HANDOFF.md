@@ -99,6 +99,7 @@ interface Character {
   weapons: { name: string; skill: string; dr: string; bowStrength?: number }[];      // dr "3k2" ou "3g2"
   techniques: { name: string; text: string }[];
   maneuvers: { id: string; name: string; cost: number; effect: string; stackable: boolean }[];
+  modifiers?: Modifier[];       // facultatif : bonus de jet des techniques et avantages (annexe B)
   advantages: string; disadvantages: string; notes: string;
 }
 ```
@@ -493,6 +494,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 | P3 | Récupération des points de Vide (repos, Méditation) | Saisie manuelle |
 | P5 | Déplacement 4e : Eau × 5 (libre) / × 10 (simple) / × 20 (max par round), unité pieds ou mètres selon l'édition française | Valeurs actuelles, pieds + conversion en mètres |
 | P4 | Nom du dépôt et de la page | `carnet-l5r` |
+| P6 | Bonus de jet (annexe B) ajoutés comme champ **facultatif** du format v1, sans incrémenter `schemaVersion` : la spécification fournie attend `schemaVersion: 1`. Acceptable tant que la v1.0.0 n'est pas publiée. | Champ facultatif en v1 ; passer en v2 (et mettre à jour la spécification) si le format évolue après la v1.0.0 |
 
 ---
 
@@ -509,3 +511,35 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 | `maneuvers[]{k,n,cost,eff,rep}` | `maneuvers[]{id,name,cost,effect,stackable}` |
 | `armor.reduction` absent | `armor.reduction: 0` |
 | pas de `schemaVersion` | v0 |
+
+---
+
+## Annexe B — Bonus de jet (techniques, avantages, désavantages)
+
+Ajout demandé après le lot 7 : certaines techniques d'école, certains avantages et désavantages modifient les jets.
+
+### Données (`Character.modifiers`, facultatif)
+```ts
+interface Modifier {
+  id: string; name: string;                        // ex. « Voie de la Grue (Rang 1) »
+  source: "technique" | "advantage" | "disadvantage" | "other";
+  appliesTo: "all" | "skill" | "trait" | "attack" | "damage" | "initiative" | "armor";
+  skill?: string;                                   // si appliesTo = skill (nom normalisé)
+  trait?: RollTrait;                                // si appliesTo = trait
+  rolled: number; kept: number;                     // −10..10, défaut 0 (négatif = malus)
+  flat: number;                                     // −50..50 : bonus fixe au total, ou au ND d'armure si appliesTo = armor
+  freeRaises: number;                               // 0..10 : augmentations gratuites
+  mode: "always" | "optional";                      // d'office, ou situationnel (à cocher au jet)
+  note: string;                                     // condition, précision
+}
+```
+
+### Règles
+- **Portée** : `all` = jets de compétence et de trait ; `skill` = cette compétence ; `trait` = jets sur ce trait (compétence ou trait pur) ; `attack` = attaques ; `damage` = dégâts ; `initiative` ; `armor` = ND d'armure (aucun jet).
+- **Ordre** dans `computePool` : posture → dés ± → **bonus de jet** → point de Vide → règle des dix dés. Un malus ne descend jamais sous 0 dé. Le bonus fixe s'ajoute au total ; les augmentations gratuites s'ajoutent à celles saisies.
+- **Application** : un bonus `always` est compris dans les réserves de la fiche, des actions et des statistiques, et coché d'office dans le lanceur (décochable pour un jet). Un bonus `optional` est proposé décoché. Les cases sont remises à zéro au choix d'une action. Les bonus de ND d'armure situationnels se cochent dans le panneau Posture.
+- **Fusion** (§8) : liste avec clé, par `id` puis par nom normalisé.
+
+### Saisie
+Panneau « Bonus de jet » de la fiche : bonus libre, ou départ d'un **modèle** générique (`MODIFIER_TEMPLATES` dans `src/rules/l5r4e.ts` : +1g0 à une compétence, augmentation gratuite, +5 au ND d'armure, malus situationnel…). Le **catalogue nommé** (`NAMED_MODIFIERS`) est vide : il se remplit depuis le livre, avec le nom exact et l'effet ; aucune valeur n'est inventée.
+

@@ -3,7 +3,8 @@ import {
   WOUND_FIRST_MULTIPLIER, WOUND_LEVELS, WOUND_NEXT_MULTIPLIER,
   type RingKey, type Stance,
 } from "../rules/l5r4e";
-import type { Character, Maneuver, RollTrait, Skill, TraitKey } from "./schema";
+import { describeModifier } from "./modifiers";
+import type { Character, Maneuver, Modifier, RollTrait, Skill, TraitKey } from "./schema";
 
 export type Rng = () => number;
 
@@ -14,6 +15,8 @@ export interface Pool extends TenDice {
   explodes: boolean;
   canRaise: boolean;
   notes: string[];
+  /** Augmentations gratuites apportées par les bonus de jet. */
+  freeRaises?: number;
 }
 
 /** Arme telle que lue par le moteur (`bowStrength` facultatif). */
@@ -32,6 +35,8 @@ export interface PoolMods {
   voidPoint?: boolean;
   /** Point de Vide dépensé pour jouer une compétence non maîtrisée au rang 1. */
   voidSkill?: boolean;
+  /** Bonus de jet actifs (techniques, avantages, désavantages) : appliqués avant le point de Vide. */
+  modifiers?: readonly Modifier[];
 }
 
 export interface CombatState {
@@ -39,6 +44,8 @@ export interface CombatState {
   /** Bonus de Défense totale, déjà réduit de moitié. */
   fullDefenseBonus?: number;
   voidArmor?: boolean;
+  /** Bonus au ND d'armure des techniques et avantages actifs. */
+  bonus?: number;
 }
 
 /** Minuscules, sans accents, espaces rognés et réduits. */
@@ -151,6 +158,15 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
     rolled = Math.max(0, rolled + mods.extraRolled);
     notes.push(`${mods.extraRolled > 0 ? "+" : ""}${mods.extraRolled} dé(s) lancé(s)`);
   }
+  let flat = 0;
+  let freeRaises = 0;
+  for (const m of mods.modifiers ?? []) {
+    rolled = Math.max(0, rolled + m.rolled);
+    kept = Math.max(0, kept + m.kept);
+    flat += m.flat;
+    freeRaises += m.freeRaises;
+    notes.push(`${m.name} : ${describeModifier(m)}`);
+  }
   if (mods.voidPoint) {
     rolled += POOL_BONUS.voidPoint.rolled;
     kept += POOL_BONUS.voidPoint.kept;
@@ -158,7 +174,9 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
   }
   const ten = applyTenDiceRule(rolled, kept);
   if (ten.bonus) notes.push(`Règle des dix dés : +${ten.bonus}`);
-  return { ...ten, explodes, canRaise, notes };
+  const pool: Pool = { ...ten, bonus: ten.bonus + flat, explodes, canRaise, notes };
+  if (freeRaises) pool.freeRaises = freeRaises;
+  return pool;
 }
 
 export interface Die {
@@ -249,7 +267,7 @@ export function armorTN(c: Character, state: CombatState): number {
       break;
   }
   if (state.voidArmor) tn += ARMOR_TN.voidArmorBonus;
-  return tn;
+  return tn + (state.bonus ?? 0);
 }
 
 /** Somme des coûts : une manœuvre cumulable compte coût × nombre, une autre compte une fois. */

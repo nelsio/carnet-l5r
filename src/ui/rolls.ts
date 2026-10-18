@@ -1,7 +1,8 @@
 /** Passerelle entre les actions de l'aide de jeu et le moteur de règles. */
 import {
-  assessmentTN, computePool, DEFAULT_MANEUVERS, findSkill, maneuverRaises, targetNumber, woundState,
-  type ActionDef, type Character, type Maneuver, type Pool, type PoolAction, type Stance,
+  applicableModifiers, armorModifierBonus, assessmentTN, computePool, DEFAULT_MANEUVERS, findSkill, maneuverRaises,
+  modifiersOf, targetNumber, woundState,
+  type ActionDef, type Character, type Maneuver, type Modifier, type Pool, type PoolAction, type Stance,
 } from "@carnet/core";
 
 export interface RollOptions {
@@ -46,12 +47,32 @@ export function isUnskilled(c: Character, a: ActionDef): boolean {
   return a.kind === "skill" && (findSkill(c, a.skill ?? "")?.rank ?? 0) < 1;
 }
 
-export function poolFor(c: Character, a: ActionDef, opts: Pick<RollOptions, "extraRolled" | "voidPoint" | "voidSkill">, stance: Stance): Pool {
+/** Coché pour ce jet ? À défaut de choix, les bonus « d'office » le sont, pas les situationnels. */
+export const isActive = (m: Modifier, toggles: Readonly<Record<string, boolean>>) => toggles[m.id] ?? m.mode === "always";
+
+/** Bonus de jet actifs pour cette action (HANDOFF annexe B). */
+export function activeModifiers(c: Character, a: ActionDef, toggles: Readonly<Record<string, boolean>> = {}): Modifier[] {
+  return applicableModifiers(c, toPoolAction(a)).filter((m) => isActive(m, toggles));
+}
+
+/** Bonus au ND d'armure des techniques et avantages actifs. */
+export function armorBonus(c: Character, toggles: Readonly<Record<string, boolean>> = {}): number {
+  return armorModifierBonus(modifiersOf(c).filter((m) => m.appliesTo === "armor" && isActive(m, toggles)));
+}
+
+export function poolFor(
+  c: Character,
+  a: ActionDef,
+  opts: Pick<RollOptions, "extraRolled" | "voidPoint" | "voidSkill">,
+  stance: Stance,
+  modifiers: readonly Modifier[] = activeModifiers(c, a),
+): Pool {
   return computePool(c, toPoolAction(a), {
     stance,
     extraRolled: opts.extraRolled,
     voidPoint: opts.voidPoint,
     voidSkill: opts.voidSkill && isUnskilled(c, a),
+    modifiers,
   });
 }
 

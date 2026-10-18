@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import { armorTN, formatDice, movement, rings, type ActionDef } from "@carnet/core";
+import { armorTN, describeModifier, formatDice, modifiersOf, movement, rings, type ActionDef } from "@carnet/core";
 import { COMBAT_SUBS, SITUATIONS, STANCES } from "../../rules/l5r4e";
 import { toMeters } from "../format";
-import { DEFAULT_ROLL_OPTIONS, isRollable, poolFor } from "../rolls";
+import { armorBonus, DEFAULT_ROLL_OPTIONS, isActive, isRollable, poolFor } from "../rolls";
 import { currentActions, useCharacter, useStore, type AidSituation } from "../store";
 import { Roller } from "./Roller";
 import { Stats } from "./Stats";
@@ -93,7 +93,8 @@ function StancePanel() {
   const { state, dispatch } = useStore();
   const c = useCharacter();
   const { ui } = state;
-  const tn = armorTN(c, { stance: ui.stance, fullDefenseBonus: ui.fullDefenseBonus, voidArmor: ui.voidArmor });
+  const tn = armorTN(c, { stance: ui.stance, fullDefenseBonus: ui.fullDefenseBonus, voidArmor: ui.voidArmor, bonus: armorBonus(c, ui.armorToggles) });
+  const armorMods = modifiersOf(c).filter((m) => m.appliesTo === "armor");
   return (
     <div className="panel" style={{ padding: 12 }}>
       <div className="panel-head" style={{ marginBottom: 8 }}>
@@ -110,6 +111,16 @@ function StancePanel() {
           </button>
         ))}
       </div>
+      {armorMods.length > 0 && (
+        <div className="grid" style={{ gap: 4, marginTop: 8 }}>
+          {armorMods.map((m) => (
+            <label key={m.id} className="chk">
+              <input type="checkbox" checked={isActive(m, ui.armorToggles)} onChange={(e) => dispatch({ type: "toggleArmorModifier", id: m.id, on: e.target.checked })} />
+              {" "}{m.name} <span className="muted">· {describeModifier(m)}</span>
+            </label>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

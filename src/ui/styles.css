@@ -307,3 +307,6 @@ header.top + main{margin-top:18px}
 .linked{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin:10px 0 0;font-size:14px}
 .linked-badge{border-color:var(--line);color:var(--muted);text-transform:none;letter-spacing:0;font-weight:500}
 @media (max-width:720px){.link-banner .btn{min-height:40px}}
+
+/* ---------- Bonus de jet ---------- */
+.modifier{border:1px solid var(--line);border-radius:8px;padding:10px;margin:0 0 10px;display:grid;gap:8px;min-width:0}
