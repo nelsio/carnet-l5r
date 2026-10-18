@@ -47,13 +47,16 @@ export const TN_SCALE = [
 /** Augmentation du ND par augmentation annoncée. */
 export const TN_PER_RAISE = 5;
 
-/** Niveaux de blessure : pénalité au ND, `null` = aucune action possible. */
-export const WOUND_LEVELS: readonly { label: string; penalty: number | null }[] = [
+/**
+ * Niveaux de blessure : pénalité au ND, `null` = aucune action possible.
+ * `short` : libellé abrégé pour la piste de la barre d'état.
+ */
+export const WOUND_LEVELS: readonly { label: string; short?: string; penalty: number | null }[] = [
   { label: "Indemne", penalty: 0 },
   { label: "Égratigné", penalty: 3 },
   { label: "Éraflé", penalty: 5 },
   { label: "Blessé", penalty: 10 },
-  { label: "Gravement blessé", penalty: 15 },
+  { label: "Gravement blessé", short: "Grav. blessé", penalty: 15 },
   { label: "Estropié", penalty: 20 },
   { label: "À terre", penalty: 40 },
   { label: "Hors de combat", penalty: null },

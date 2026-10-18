@@ -91,7 +91,8 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
 .ring .rv{font-family:var(--f-mono);font-size:28px;font-weight:700;line-height:1.1}
 .ring .tr{display:flex;justify-content:space-between;gap:4px;font-size:12.5px;margin-top:4px}
 .ring .tr span:first-child{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-@media (max-width:620px){.rings{grid-template-columns:repeat(2,minmax(0,1fr))}.ring.void{grid-column:1/-1}}
+/* Mobile (HANDOFF §7) : 2 colonnes, le Vide sur toute la largeur */
+@media (max-width:720px){.rings{grid-template-columns:repeat(2,minmax(0,1fr))}.ring.void{grid-column:1/-1}}
 
 table{border-collapse:collapse;width:100%}
 .tbl{overflow-x:auto}
@@ -213,8 +214,12 @@ div.man button{border:0;background:var(--surface);width:24px;height:24px;border-
   .status.exp .wtrack{display:grid}
   .wl{font-size:11.5px;padding:5px 6px}
   .stepper button{width:40px;height:40px;font-size:18px}
-  .pip{width:26px;height:26px}
-  .voidpips{gap:7px}
+  /* Pastille visible de 26 px, zone d'appui de 40 × 40 px (HANDOFF §7, M8) */
+  .pip{position:relative;width:40px;height:40px;border:0;background:transparent}
+  .pip::before{content:"";position:absolute;inset:7px;border-radius:50%;border:2px solid var(--void)}
+  .pip.on{background:transparent}
+  .pip.on::before{background:var(--void)}
+  .voidpips{gap:0;margin-left:-7px}
 
   .in{font-size:16px;padding:8px 9px}   /* 16 px : évite le zoom auto d'iOS */
   .btn{padding:10px 14px}
@@ -240,7 +245,7 @@ div.man button{border:0;background:var(--surface);width:24px;height:24px;border-
   .note{margin-bottom:12px}
 }
 @keyframes sheetIn{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
-@media (max-width:720px){body.sheet-open{overflow:hidden}}
+@media (max-width:720px){body.sheet-open,html:has(body.sheet-open){overflow:hidden}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @keyframes pop{from{transform:scale(.6);opacity:.2}to{transform:none;opacity:1}}
 .die{animation:pop .18s ease-out both}
