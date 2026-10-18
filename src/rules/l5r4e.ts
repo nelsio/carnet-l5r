@@ -216,3 +216,58 @@ export const FIXED_ACTIONS: readonly ActionDef[] = [
   { id: "battle", situation: "combat", sub: "battle", label: "Jet de bataille personnel", kind: "skill", skill: "Bataille", trait: "perception", tn: 15, description: "Selon ton niveau d'engagement, le résultat détermine ta ligne sur la table de bataille de masse (gloire, blessures, opportunités)." },
   { id: "engagement", situation: "combat", sub: "battle", label: "Niveau d'engagement", kind: "info", tn: null, description: "Réserve → Désengagé → Engagé → Fortement engagé. Plus tu t'engages, plus tu gagnes de Gloire et d'opportunités, plus tu risques de blessures." },
 ];
+
+/* ---------- Bonus de jet (HANDOFF annexe B) ---------- */
+
+export const MODIFIER_SOURCE_LABELS = {
+  technique: "Technique",
+  advantage: "Avantage",
+  disadvantage: "Désavantage",
+  other: "Autre",
+} as const;
+
+export const MODIFIER_TARGET_LABELS = {
+  all: "Tous les jets de compétence et de trait",
+  skill: "Une compétence",
+  trait: "Un trait",
+  attack: "Les attaques",
+  damage: "Les dégâts",
+  initiative: "L'initiative",
+  armor: "Le ND d'armure",
+} as const;
+
+/** Effet d'un bonus, sans son identité. */
+export interface ModifierTemplate {
+  id: string;
+  label: string;
+  source: "technique" | "advantage" | "disadvantage" | "other";
+  appliesTo: keyof typeof MODIFIER_TARGET_LABELS;
+  rolled: number;
+  kept: number;
+  flat: number;
+  freeRaises: number;
+  mode: "always" | "optional";
+}
+
+/**
+ * Modèles génériques : des formes d'effet courantes, à ajuster (valeurs, compétence visée).
+ * Ils ne reprennent aucune technique ni aucun avantage du livre.
+ */
+export const MODIFIER_TEMPLATES: readonly ModifierTemplate[] = [
+  { id: "skill-1g0", label: "+1g0 à une compétence", source: "technique", appliesTo: "skill", rolled: 1, kept: 0, flat: 0, freeRaises: 0, mode: "always" },
+  { id: "skill-1g1", label: "+1g1 à une compétence", source: "technique", appliesTo: "skill", rolled: 1, kept: 1, flat: 0, freeRaises: 0, mode: "always" },
+  { id: "skill-free-raise", label: "Augmentation gratuite sur une compétence", source: "advantage", appliesTo: "skill", rolled: 0, kept: 0, flat: 0, freeRaises: 1, mode: "always" },
+  { id: "attack-1g0", label: "+1g0 aux attaques", source: "technique", appliesTo: "attack", rolled: 1, kept: 0, flat: 0, freeRaises: 0, mode: "always" },
+  { id: "damage-1g0", label: "+1g0 aux dégâts", source: "technique", appliesTo: "damage", rolled: 1, kept: 0, flat: 0, freeRaises: 0, mode: "always" },
+  { id: "initiative-1g0", label: "+1g0 à l'initiative", source: "technique", appliesTo: "initiative", rolled: 1, kept: 0, flat: 0, freeRaises: 0, mode: "always" },
+  { id: "armor-5", label: "+5 au ND d'armure", source: "technique", appliesTo: "armor", rolled: 0, kept: 0, flat: 5, freeRaises: 0, mode: "always" },
+  { id: "situational-1g1", label: "+1g1 situationnel (à cocher au jet)", source: "advantage", appliesTo: "all", rolled: 1, kept: 1, flat: 0, freeRaises: 0, mode: "optional" },
+  { id: "trait-malus", label: "Malus de −1g0 sur un trait (désavantage)", source: "disadvantage", appliesTo: "trait", rolled: -1, kept: 0, flat: 0, freeRaises: 0, mode: "always" },
+  { id: "flat-malus", label: "Malus de −5 au total, situationnel (désavantage)", source: "disadvantage", appliesTo: "all", rolled: 0, kept: 0, flat: -5, freeRaises: 0, mode: "optional" },
+];
+
+/**
+ * Catalogue nommé de techniques et d'avantages, à remplir depuis le livre (même forme que les
+ * modèles, avec le nom exact et sa source). Vide par défaut : aucun effet n'est inventé.
+ */
+export const NAMED_MODIFIERS: readonly (ModifierTemplate & { skill?: string; trait?: RollTrait })[] = [];

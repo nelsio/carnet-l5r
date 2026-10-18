@@ -3,7 +3,7 @@ import { DEFAULT_MANEUVERS } from "../rules/l5r4e";
 import { normalize } from "./engine";
 import { CharacterFormatError, isObject, upgrade } from "./migrate";
 import {
-  ArmorSchema, CharacterSchema, ManeuverSchema, SkillSchema, TechniqueSchema, TraitsSchema,
+  ArmorSchema, CharacterSchema, ManeuverSchema, ModifierSchema, SkillSchema, TechniqueSchema, TraitsSchema,
   WeaponSchema, XpSchema, characterShape, zodErrors,
   type Character, type FieldError,
 } from "./schema";
@@ -35,6 +35,7 @@ const LIST_FIELDS: Record<string, ListField> = {
   weapons: { schema: WeaponSchema, identity: ["name"] },
   techniques: { schema: TechniqueSchema, identity: ["name"] },
   maneuvers: { schema: ManeuverSchema, identity: ["id", "name"] },
+  modifiers: { schema: ModifierSchema, identity: ["id", "name"] },
 };
 
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
@@ -108,6 +109,8 @@ export function mergeCharacter(base: Character, patch: unknown): MergeResult {
     if (value.length === 0) return;
     // Une liste de manœuvres vide vaut les manœuvres par défaut.
     if (key === "maneuvers" && (out.maneuvers as unknown[]).length === 0) out.maneuvers = structuredClone(DEFAULT_MANEUVERS);
+    // Liste facultative (bonus de jet) absente de la fiche : elle est créée.
+    out[key] ??= [];
     const list = out[key] as Json[];
 
     value.forEach((item, i) => {

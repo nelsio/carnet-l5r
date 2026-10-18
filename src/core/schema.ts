@@ -78,6 +78,31 @@ export const ManeuverSchema = z.object({
   stackable: z.boolean("doit être vrai ou faux"),
 }, "doit être un objet");
 
+export const MODIFIER_SOURCES = ["technique", "advantage", "disadvantage", "other"] as const;
+export const MODIFIER_TARGETS = ["all", "skill", "trait", "attack", "damage", "initiative", "armor"] as const;
+
+/**
+ * Bonus (ou malus) de jet venant d'une technique, d'un avantage ou d'un désavantage (HANDOFF annexe B).
+ * `always` : appliqué d'office (décochable au moment du jet) ; `optional` : situationnel, à cocher.
+ */
+export const ModifierSchema = z.object({
+  id: text(40).min(1, "ne doit pas être vide"),
+  name: text(120).min(1, "ne doit pas être vide"),
+  source: z.enum(MODIFIER_SOURCES, "doit être technique, advantage, disadvantage ou other"),
+  appliesTo: z.enum(MODIFIER_TARGETS, "doit être all, skill, trait, attack, damage, initiative ou armor"),
+  /** Compétence visée (appliesTo = skill). */
+  skill: text(80).optional(),
+  /** Trait visé (appliesTo = trait). */
+  trait: RollTraitSchema.optional(),
+  rolled: int(-10, 10).default(0),
+  kept: int(-10, 10).default(0),
+  /** Bonus fixe au total, ou au ND d'armure pour appliesTo = armor. */
+  flat: int(-50, 50).default(0),
+  freeRaises: int(0, 10).default(0),
+  mode: z.enum(["always", "optional"], "doit être always ou optional").default("always"),
+  note: text().default(""),
+}, "doit être un objet");
+
 /**
  * Champs de la fiche, validés un par un lors d'une fusion (HANDOFF §8).
  * Les textes libres et listes secondaires sont facultatifs dans un fichier importé.
@@ -102,6 +127,8 @@ export const characterShape = {
   weapons: z.array(WeaponSchema, "doit être une liste"),
   techniques: z.array(TechniqueSchema, "doit être une liste").default([]),
   maneuvers: z.array(ManeuverSchema, "doit être une liste").default([]),
+  /** Facultatif : ajout compatible au format v1 (HANDOFF annexe B). */
+  modifiers: z.array(ModifierSchema, "doit être une liste").optional(),
   advantages: text().default(""),
   disadvantages: text().default(""),
   notes: text().default(""),
@@ -119,6 +146,8 @@ export type Skill = z.infer<typeof SkillSchema>;
 export type Weapon = z.infer<typeof WeaponSchema>;
 export type Technique = z.infer<typeof TechniqueSchema>;
 export type Maneuver = z.infer<typeof ManeuverSchema>;
+export type Modifier = z.infer<typeof ModifierSchema>;
+export type ModifierTarget = (typeof MODIFIER_TARGETS)[number];
 export type Character = z.infer<typeof CharacterSchema>;
 
 export interface FieldError { path: string; message: string }

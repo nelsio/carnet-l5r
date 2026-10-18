@@ -1,5 +1,5 @@
 import {
-  attackTrait, computePool, DEFAULT_SAMPLES, emphasisMatches, formatDice, poolStats, woundState,
+  attackTrait, computePool, DEFAULT_SAMPLES, defaultModifiers, emphasisMatches, formatDice, poolStats, woundState,
   type Character, type Pool, type PoolAction,
 } from "@carnet/core";
 import { TRAIT_LABELS } from "../../rules/l5r4e";
@@ -19,7 +19,7 @@ interface Row {
 
 function buildRows(c: Character, voidPoint: boolean, emphasis: boolean): Row[] {
   const row = (label: string, action: PoolAction, child = false, emph = false): Row => ({
-    label, child, pool: computePool(c, action, { voidPoint }),
+    label, child, pool: computePool(c, action, { voidPoint, modifiers: defaultModifiers(c, action) }),
     emphasis: emphasis && emph, hasTN: action.kind === "skill" || action.kind === "trait",
   });
   return [

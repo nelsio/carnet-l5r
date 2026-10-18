@@ -13,7 +13,7 @@ import { DEFAULT_ROLL_OPTIONS, effectiveManeuvers, isRollable, isUnskilled, type
 export type Theme = "auto" | "light" | "dark";
 export type View = "sheet" | "aid";
 export type AidSituation = Situation | "stats";
-export type ListKey = "skills" | "weapons" | "techniques" | "maneuvers";
+export type ListKey = "skills" | "weapons" | "techniques" | "maneuvers" | "modifiers";
 type Path = readonly (string | number)[];
 
 export interface RollRecord {
@@ -51,6 +51,10 @@ export interface UiState {
   history: { label: string; total: number; tn: number | null | "opposed" }[];
   sheetOpen: boolean;
   woundsExpanded: boolean;
+  /** Bonus de jet cochés ou décochés pour le jet en cours (remis à zéro au choix d'une action). */
+  modifierToggles: Record<string, boolean>;
+  /** Bonus de ND d'armure cochés ou décochés pour le combat en cours. */
+  armorToggles: Record<string, boolean>;
   stats: { voidPoint: boolean; emphasis: boolean; penalty: boolean };
 }
 
@@ -87,6 +91,8 @@ export const initialUi: UiState = {
   history: [],
   sheetOpen: false,
   woundsExpanded: false,
+  modifierToggles: {},
+  armorToggles: {},
   stats: { voidPoint: false, emphasis: true, penalty: true },
 };
 
@@ -119,7 +125,9 @@ export type AppAction =
   | { type: "voidTechnique" }
   | { type: "newRound" }
   | { type: "statsOption"; patch: Partial<UiState["stats"]> }
-  | { type: "rolled"; result: RollResult; tn: number | null | "opposed"; raises: number };
+  | { type: "toggleModifier"; id: string; on: boolean }
+  | { type: "toggleArmorModifier"; id: string; on: boolean }
+  | { type: "rolled"; result: RollResult; tn: number | null | "opposed"; raises: number; free?: number };
 
 /** Copie immuable avec une valeur remplacée au chemin donné. */
 export function setIn<T>(obj: T, path: Path, value: unknown): T {
@@ -160,7 +168,7 @@ function select(c: Character, ui: UiState, a: ActionDef, open: boolean): UiState
     opts.extraRolled = pendingDamage.dice;
     pendingDamage = null;
   }
-  return { ...ui, selectedId: a.id, opts, maneuvers: {}, pendingDamage, sheetOpen: open || ui.sheetOpen };
+  return { ...ui, selectedId: a.id, opts, maneuvers: {}, modifierToggles: {}, pendingDamage, sheetOpen: open || ui.sheetOpen };
 }
 
 /** Après un changement de situation : première action jouable sélectionnée, lanceur fermé. */
@@ -190,6 +198,8 @@ function uiReducer(state: AppState, action: AppAction): AppState {
     case "option": return withUi({ opts: { ...ui.opts, ...action.patch } });
     case "maneuver": return withUi({ maneuvers: { ...ui.maneuvers, [action.id]: Math.max(0, action.count) } });
     case "statsOption": return withUi({ stats: { ...ui.stats, ...action.patch } });
+    case "toggleModifier": return withUi({ modifierToggles: { ...ui.modifierToggles, [action.id]: action.on } });
+    case "toggleArmorModifier": return withUi({ armorToggles: { ...ui.armorToggles, [action.id]: action.on } });
     case "newRound":
       return withUi({
         voidArmor: false, voidSpentThisRound: false, fullDefenseBonus: 0,
@@ -223,9 +233,9 @@ export function reducer(state: AppState, action: AppAction): AppState {
     case "replaceCharacter":
       return { ...state, character: action.character };
     case "add":
-      return { ...state, character: { ...c, [action.list]: [...c[action.list], action.item] } };
+      return { ...state, character: { ...c, [action.list]: [...(c[action.list] ?? []), action.item] } };
     case "remove":
-      return { ...state, character: { ...c, [action.list]: c[action.list].filter((_, i) => i !== action.index) } };
+      return { ...state, character: { ...c, [action.list]: (c[action.list] ?? []).filter((_: unknown, i: number) => i !== action.index) } };
     case "wounds":
       return { ...state, character: { ...c, wounds: Math.max(0, Math.floor(action.value) || 0) } };
     case "pip":
@@ -283,7 +293,7 @@ function rolled(state: AppState, c: Character, action: Extract<AppAction, { type
 
   const record: RollRecord = {
     actionId: a.id, label: a.label, kind: a.kind, result: action.result, tn: action.tn,
-    raises: action.raises, free: opts.free, maneuvers, damageDice, fullDefense: !!a.fullDefense,
+    raises: action.raises, free: action.free ?? opts.free, maneuvers, damageDice, fullDefense: !!a.fullDefense,
   };
   return {
     ...next,

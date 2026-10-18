@@ -1,11 +1,13 @@
 import { useEffect, useRef } from "react";
 import {
-  findSkill, formatDice, isRanged, poolStats, rollDice, woundState,
+  applicableModifiers, describeModifier, findSkill, formatDice, isRanged, poolStats, rollDice, woundState,
   type ActionDef, type Character,
 } from "@carnet/core";
 import { COMBAT_SUBS, SITUATIONS, TN_PER_RAISE, TN_SCALE, TRAIT_LABELS } from "../../rules/l5r4e";
 import { pct } from "../format";
-import { baseTN, calledRaises, effectiveManeuvers, finalTN, isUnskilled, poolFor, type RollOptions } from "../rolls";
+import {
+  activeModifiers, baseTN, calledRaises, effectiveManeuvers, finalTN, isActive, isUnskilled, poolFor, toPoolAction, type RollOptions,
+} from "../rolls";
 import { selectedAction, useCharacter, useStore, type RollRecord } from "../store";
 import { NumberField } from "./fields";
 
@@ -30,7 +32,9 @@ export function Roller() {
   if (!a) return <p className="muted">Choisis une action.</p>;
 
   const { opts } = ui;
-  const pool = poolFor(c, a, opts, ui.stance);
+  const pool = poolFor(c, a, opts, ui.stance, activeModifiers(c, a, ui.modifierToggles));
+  const bonuses = applicableModifiers(c, toPoolAction(a));
+  const bonusFree = pool.canRaise ? (pool.freeRaises ?? 0) : 0;
   const set = (patch: Partial<RollOptions>) => dispatch({ type: "option", patch });
   const ws = woundState(c);
   const base = baseTN(a, opts);
@@ -45,7 +49,7 @@ export function Roller() {
 
   const roll = () => {
     const result = rollDice(pool, { emphasis: opts.emphasis && emphasisOffered, flatBonus: opts.flat }, rng);
-    dispatch({ type: "rolled", result, tn, raises });
+    dispatch({ type: "rolled", result, tn, raises, free: opts.free + bonusFree });
   };
 
   return (
@@ -58,7 +62,7 @@ export function Roller() {
       <h2 style={{ margin: "2px 0 8px" }}>{a.label}</h2>
       <div style={{ display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
         <span className="poolbig" data-testid="pool">{formatDice(pool.rolled, pool.kept)}</span>
-        <span className="muted" style={{ fontSize: 13 }}>{poolOrigin(c, a, opts)}{pool.bonus ? ` · +${pool.bonus} (règle des dix dés)` : ""}</span>
+        <span className="muted" style={{ fontSize: 13 }}>{poolOrigin(c, a, opts)}{pool.bonus ? ` · ${pool.bonus > 0 ? "+" : ""}${pool.bonus} au total` : ""}</span>
       </div>
       {stats && (
         <div className="statline">
@@ -80,7 +84,7 @@ export function Roller() {
         ) : <div />}
         {pool.canRaise && (
           <label className="field">
-            <span className="label">Augm. gratuites</span>
+            <span className="label">Augm. gratuites{bonusFree ? ` (+${bonusFree} bonus)` : ""}</span>
             <NumberField className="in mono" min={0} value={opts.free} onChange={(n) => set({ free: n })} />
           </label>
         )}
@@ -112,6 +116,21 @@ export function Roller() {
           </label>
         )}
       </div>
+
+      {bonuses.length > 0 && (
+        <div className="grid bonuses" style={{ gap: 6, marginBottom: 12 }}>
+          <div className="label">Bonus de jet <span style={{ textTransform: "none", letterSpacing: 0, fontWeight: 500 }}>· techniques, avantages, désavantages</span></div>
+          {bonuses.map((m) => (
+            <label key={m.id} className="chk">
+              <input
+                type="checkbox" checked={isActive(m, ui.modifierToggles)}
+                onChange={(e) => dispatch({ type: "toggleModifier", id: m.id, on: e.target.checked })}
+              />
+              {" "}{m.name} <span className="muted">· {describeModifier(m)}{m.mode === "optional" ? " · situationnel" : ""}</span>
+            </label>
+          ))}
+        </div>
+      )}
 
       {a.attack && pool.canRaise && <ManeuverPicker />}
 

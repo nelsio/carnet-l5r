@@ -1,5 +1,6 @@
 import { armorTN, movement, woundState } from "@carnet/core";
 import { WOUND_LEVELS } from "../../rules/l5r4e";
+import { armorBonus } from "../rolls";
 import { useCharacter, useStore } from "../store";
 import { NumberField } from "./fields";
 import { LinkBanner } from "./LinkBanner";
@@ -11,7 +12,7 @@ export function StatusBar() {
   const { ui } = state;
   const ws = woundState(c);
   const move = movement(c);
-  const tn = armorTN(c, { stance: ui.stance, fullDefenseBonus: ui.fullDefenseBonus, voidArmor: ui.voidArmor });
+  const tn = armorTN(c, { stance: ui.stance, fullDefenseBonus: ui.fullDefenseBonus, voidArmor: ui.voidArmor, bonus: armorBonus(c, ui.armorToggles) });
   const hurt = c.wounds > 0;
   // Fiche en consultation : blessures et Vide affichés, mais ni modifiables ni cliquables (HANDOFF §6.1).
   const readonly = state.mode === "readonly";
