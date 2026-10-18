@@ -79,7 +79,8 @@ export const ManeuverSchema = z.object({
 }, "doit être un objet");
 
 export const MODIFIER_SOURCES = ["technique", "advantage", "disadvantage", "other"] as const;
-export const MODIFIER_TARGETS = ["all", "skill", "trait", "attack", "damage", "initiative", "armor"] as const;
+export const MODIFIER_TARGETS = ["all", "skill", "trait", "social", "attack", "damage", "initiative", "armor", "wounds"] as const;
+export const STANCE_IDS = ["attack", "fullAttack", "defense", "fullDefense", "center"] as const;
 
 /**
  * Bonus (ou malus) de jet venant d'une technique, d'un avantage ou d'un désavantage (HANDOFF annexe B).
@@ -89,15 +90,22 @@ export const ModifierSchema = z.object({
   id: text(40).min(1, "ne doit pas être vide"),
   name: text(120).min(1, "ne doit pas être vide"),
   source: z.enum(MODIFIER_SOURCES, "doit être technique, advantage, disadvantage ou other"),
-  appliesTo: z.enum(MODIFIER_TARGETS, "doit être all, skill, trait, attack, damage, initiative ou armor"),
+  appliesTo: z.enum(MODIFIER_TARGETS, "doit être all, skill, trait, social, attack, damage, initiative, armor ou wounds"),
   /** Compétence visée (appliesTo = skill). */
   skill: text(80).optional(),
   /** Trait visé (appliesTo = trait). */
   trait: RollTraitSchema.optional(),
   rolled: int(-10, 10).default(0),
   kept: int(-10, 10).default(0),
-  /** Bonus fixe au total, ou au ND d'armure pour appliesTo = armor. */
+  /**
+   * Bonus fixe au total ; au ND d'armure pour appliesTo = armor ;
+   * réduction de la pénalité de blessure pour appliesTo = wounds.
+   */
   flat: int(-50, 50).default(0),
+  /** Modification du ND des jets concernés (ex. +5 = jets plus difficiles). */
+  tn: int(-50, 50).default(0),
+  /** Posture requise : le bonus ne s'applique que dans cette posture. */
+  stance: z.enum(STANCE_IDS, "doit être une posture valide").optional(),
   freeRaises: int(0, 10).default(0),
   mode: z.enum(["always", "optional"], "doit être always ou optional").default("always"),
   note: text().default(""),

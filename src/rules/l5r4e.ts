@@ -219,6 +219,20 @@ export const FIXED_ACTIONS: readonly ActionDef[] = [
 
 /* ---------- Bonus de jet (HANDOFF annexe B) ---------- */
 
+/**
+ * Compétences sociales de la 4e (mot-clé « Social ») : noms français et anglais.
+ * Représentation (Perform) couvre aussi ses spécialités, ex. « Représentation : Chant ».
+ */
+export const SOCIAL_SKILLS: readonly string[] = [
+  "Comédie", "Acting",
+  "Courtoisie", "Courtier",
+  "Étiquette",
+  "Sincérité", "Sincerity",
+  "Intimidation",
+  "Tentation", "Temptation",
+  "Représentation", "Perform",
+];
+
 export const MODIFIER_SOURCE_LABELS = {
   technique: "Technique",
   advantage: "Avantage",
@@ -230,10 +244,12 @@ export const MODIFIER_TARGET_LABELS = {
   all: "Tous les jets de compétence et de trait",
   skill: "Une compétence",
   trait: "Un trait",
+  social: "Les compétences sociales",
   attack: "Les attaques",
   damage: "Les dégâts",
   initiative: "L'initiative",
   armor: "Le ND d'armure",
+  wounds: "La pénalité de blessure",
 } as const;
 
 /** Effet d'un bonus, sans son identité. */
@@ -242,32 +258,70 @@ export interface ModifierTemplate {
   label: string;
   source: "technique" | "advantage" | "disadvantage" | "other";
   appliesTo: keyof typeof MODIFIER_TARGET_LABELS;
+  skill?: string;
+  trait?: RollTrait;
   rolled: number;
   kept: number;
   flat: number;
   freeRaises: number;
+  tn: number;
+  stance?: Stance;
   mode: "always" | "optional";
+  note?: string;
 }
+
+const T = { rolled: 0, kept: 0, flat: 0, freeRaises: 0, tn: 0 } as const;
 
 /**
  * Modèles génériques : des formes d'effet courantes, à ajuster (valeurs, compétence visée).
  * Ils ne reprennent aucune technique ni aucun avantage du livre.
  */
 export const MODIFIER_TEMPLATES: readonly ModifierTemplate[] = [
-  { id: "skill-1g0", label: "+1g0 à une compétence", source: "technique", appliesTo: "skill", rolled: 1, kept: 0, flat: 0, freeRaises: 0, mode: "always" },
-  { id: "skill-1g1", label: "+1g1 à une compétence", source: "technique", appliesTo: "skill", rolled: 1, kept: 1, flat: 0, freeRaises: 0, mode: "always" },
-  { id: "skill-free-raise", label: "Augmentation gratuite sur une compétence", source: "advantage", appliesTo: "skill", rolled: 0, kept: 0, flat: 0, freeRaises: 1, mode: "always" },
-  { id: "attack-1g0", label: "+1g0 aux attaques", source: "technique", appliesTo: "attack", rolled: 1, kept: 0, flat: 0, freeRaises: 0, mode: "always" },
-  { id: "damage-1g0", label: "+1g0 aux dégâts", source: "technique", appliesTo: "damage", rolled: 1, kept: 0, flat: 0, freeRaises: 0, mode: "always" },
-  { id: "initiative-1g0", label: "+1g0 à l'initiative", source: "technique", appliesTo: "initiative", rolled: 1, kept: 0, flat: 0, freeRaises: 0, mode: "always" },
-  { id: "armor-5", label: "+5 au ND d'armure", source: "technique", appliesTo: "armor", rolled: 0, kept: 0, flat: 5, freeRaises: 0, mode: "always" },
-  { id: "situational-1g1", label: "+1g1 situationnel (à cocher au jet)", source: "advantage", appliesTo: "all", rolled: 1, kept: 1, flat: 0, freeRaises: 0, mode: "optional" },
-  { id: "trait-malus", label: "Malus de −1g0 sur un trait (désavantage)", source: "disadvantage", appliesTo: "trait", rolled: -1, kept: 0, flat: 0, freeRaises: 0, mode: "always" },
-  { id: "flat-malus", label: "Malus de −5 au total, situationnel (désavantage)", source: "disadvantage", appliesTo: "all", rolled: 0, kept: 0, flat: -5, freeRaises: 0, mode: "optional" },
+  { ...T, id: "skill-1g0", label: "+1g0 à une compétence", source: "technique", appliesTo: "skill", rolled: 1, mode: "always" },
+  { ...T, id: "skill-1g1", label: "+1g1 à une compétence", source: "technique", appliesTo: "skill", rolled: 1, kept: 1, mode: "always" },
+  { ...T, id: "skill-free-raise", label: "Augmentation gratuite sur une compétence", source: "advantage", appliesTo: "skill", freeRaises: 1, mode: "always" },
+  { ...T, id: "attack-1g0", label: "+1g0 aux attaques", source: "technique", appliesTo: "attack", rolled: 1, mode: "always" },
+  { ...T, id: "damage-1g0", label: "+1g0 aux dégâts", source: "technique", appliesTo: "damage", rolled: 1, mode: "always" },
+  { ...T, id: "initiative-1g0", label: "+1g0 à l'initiative", source: "technique", appliesTo: "initiative", rolled: 1, mode: "always" },
+  { ...T, id: "armor-5", label: "+5 au ND d'armure", source: "technique", appliesTo: "armor", flat: 5, mode: "always" },
+  { ...T, id: "situational-1g1", label: "+1g1 situationnel (à cocher au jet)", source: "advantage", appliesTo: "all", rolled: 1, kept: 1, mode: "optional" },
+  { ...T, id: "social-tn", label: "+5 au ND des compétences sociales (désavantage)", source: "disadvantage", appliesTo: "social", tn: 5, mode: "always" },
+  { ...T, id: "wounds-3", label: "Pénalité de blessure réduite de 3", source: "advantage", appliesTo: "wounds", flat: 3, mode: "always" },
+  { ...T, id: "trait-malus", label: "Malus de −1g0 sur un trait (désavantage)", source: "disadvantage", appliesTo: "trait", rolled: -1, mode: "always" },
+  { ...T, id: "flat-malus", label: "Malus de −5 au total, situationnel (désavantage)", source: "disadvantage", appliesTo: "all", flat: -5, mode: "optional" },
 ];
 
 /**
- * Catalogue nommé de techniques et d'avantages, à remplir depuis le livre (même forme que les
- * modèles, avec le nom exact et sa source). Vide par défaut : aucun effet n'est inventé.
+ * Catalogue nommé : techniques et avantages du livre de base 4e, résumés (effet chiffré seulement).
+ * Sources : wikis de règles 4e (magicalsamurai.wikidot.com, lasthaiku.wikidot.com), concordants.
+ * À vérifier dans le livre avant de s'y fier ; les effets non chiffrables restent dans le texte des techniques.
  */
-export const NAMED_MODIFIERS: readonly (ModifierTemplate & { skill?: string; trait?: RollTrait })[] = [];
+export const NAMED_MODIFIERS: readonly ModifierTemplate[] = [
+  // École Hiruma Bushi (Crabe), livre de base 4e.
+  {
+    ...T, id: "hiruma-bushi-1", label: "Hiruma Bushi, rang 1 : Torch's Flame Flickers", source: "technique",
+    appliesTo: "attack", rolled: 1, stance: "attack", mode: "always",
+    note: "+1g0 aux attaques en posture Attaque. Aussi : rations deux fois plus longues pour (rang de Chasse) personnes. À vérifier dans le livre.",
+  },
+  {
+    ...T, id: "hiruma-bushi-2", label: "Hiruma Bushi, rang 2 : Wolf's Little Lesson", source: "technique",
+    appliesTo: "armor", flat: 5, stance: "attack", mode: "optional",
+    note: "+5 au ND d'armure à chaque touche au corps à corps en posture Attaque, cumulable jusqu'au rang d'école, jusqu'à la fin de l'escarmouche : ajuste la valeur (5, 10, 15…). À vérifier dans le livre.",
+  },
+  {
+    ...T, id: "hiruma-bushi-3", label: "Hiruma Bushi, rang 3 : Hummingbird Wings", source: "technique",
+    appliesTo: "armor", flat: 6, mode: "optional",
+    note: "Une fois par round, quand tu es pris pour cible : + (2 × rang d'école) au ND d'armure pour cette attaque. 6 au rang 3 : ajuste au rang 4 (8) et 5 (10). À vérifier dans le livre.",
+  },
+  // Avantages et désavantages, livre de base 4e.
+  {
+    ...T, id: "force-de-la-terre", label: "Force de la Terre (Strength of the Earth)", source: "advantage",
+    appliesTo: "wounds", flat: 3, mode: "always",
+    note: "Avantage physique, 3 points (2 pour un bushi) : pénalités de ND des niveaux de blessure réduites de 3. À vérifier dans le livre.",
+  },
+  {
+    ...T, id: "aspect-derangeant", label: "Aspect dérangeant (Disturbing Countenance)", source: "disadvantage",
+    appliesTo: "social", tn: 5, mode: "always",
+    note: "Désavantage physique, 3 points : +5 au ND de tous les jets de compétences sociales. À vérifier dans le livre.",
+  },
+];

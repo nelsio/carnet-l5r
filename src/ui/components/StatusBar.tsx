@@ -12,7 +12,7 @@ export function StatusBar() {
   const { ui } = state;
   const ws = woundState(c);
   const move = movement(c);
-  const tn = armorTN(c, { stance: ui.stance, fullDefenseBonus: ui.fullDefenseBonus, voidArmor: ui.voidArmor, bonus: armorBonus(c, ui.armorToggles) });
+  const tn = armorTN(c, { stance: ui.stance, fullDefenseBonus: ui.fullDefenseBonus, voidArmor: ui.voidArmor, bonus: armorBonus(c, ui.armorToggles, ui.stance) });
   const hurt = c.wounds > 0;
   // Fiche en consultation : blessures et Vide affichés, mais ni modifiables ni cliquables (HANDOFF §6.1).
   const readonly = state.mode === "readonly";

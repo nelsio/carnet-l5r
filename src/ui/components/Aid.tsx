@@ -93,7 +93,7 @@ function StancePanel() {
   const { state, dispatch } = useStore();
   const c = useCharacter();
   const { ui } = state;
-  const tn = armorTN(c, { stance: ui.stance, fullDefenseBonus: ui.fullDefenseBonus, voidArmor: ui.voidArmor, bonus: armorBonus(c, ui.armorToggles) });
+  const tn = armorTN(c, { stance: ui.stance, fullDefenseBonus: ui.fullDefenseBonus, voidArmor: ui.voidArmor, bonus: armorBonus(c, ui.armorToggles, ui.stance) });
   const armorMods = modifiersOf(c).filter((m) => m.appliesTo === "armor");
   return (
     <div className="panel" style={{ padding: 12 }}>
@@ -116,7 +116,7 @@ function StancePanel() {
           {armorMods.map((m) => (
             <label key={m.id} className="chk">
               <input type="checkbox" checked={isActive(m, ui.armorToggles)} onChange={(e) => dispatch({ type: "toggleArmorModifier", id: m.id, on: e.target.checked })} />
-              {" "}{m.name} <span className="muted">· {describeModifier(m)}</span>
+              {" "}{m.name} <span className="muted">· {describeModifier(m)}{m.stance ? ` · ${STANCES.find((s) => s.id === m.stance)?.label}` : ""}</span>
             </label>
           ))}
         </div>

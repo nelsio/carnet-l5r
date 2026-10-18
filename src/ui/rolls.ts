@@ -1,7 +1,7 @@
 /** Passerelle entre les actions de l'aide de jeu et le moteur de règles. */
 import {
   applicableModifiers, armorModifierBonus, assessmentTN, computePool, DEFAULT_MANEUVERS, findSkill, maneuverRaises,
-  modifiersOf, targetNumber, woundState,
+  modifiersOf, modifierTN, targetNumber, woundState,
   type ActionDef, type Character, type Maneuver, type Modifier, type Pool, type PoolAction, type Stance,
 } from "@carnet/core";
 
@@ -50,14 +50,14 @@ export function isUnskilled(c: Character, a: ActionDef): boolean {
 /** Coché pour ce jet ? À défaut de choix, les bonus « d'office » le sont, pas les situationnels. */
 export const isActive = (m: Modifier, toggles: Readonly<Record<string, boolean>>) => toggles[m.id] ?? m.mode === "always";
 
-/** Bonus de jet actifs pour cette action (HANDOFF annexe B). */
-export function activeModifiers(c: Character, a: ActionDef, toggles: Readonly<Record<string, boolean>> = {}): Modifier[] {
-  return applicableModifiers(c, toPoolAction(a)).filter((m) => isActive(m, toggles));
+/** Bonus de jet actifs pour cette action, dans cette posture (HANDOFF annexe B). */
+export function activeModifiers(c: Character, a: ActionDef, toggles: Readonly<Record<string, boolean>> = {}, stance: Stance = "attack"): Modifier[] {
+  return applicableModifiers(c, toPoolAction(a), stance).filter((m) => isActive(m, toggles));
 }
 
-/** Bonus au ND d'armure des techniques et avantages actifs. */
-export function armorBonus(c: Character, toggles: Readonly<Record<string, boolean>> = {}): number {
-  return armorModifierBonus(modifiersOf(c).filter((m) => m.appliesTo === "armor" && isActive(m, toggles)));
+/** Bonus au ND d'armure des techniques et avantages actifs, dans cette posture. */
+export function armorBonus(c: Character, toggles: Readonly<Record<string, boolean>> = {}, stance: Stance = "attack"): number {
+  return armorModifierBonus(modifiersOf(c).filter((m) => m.appliesTo === "armor" && isActive(m, toggles)), stance);
 }
 
 export function poolFor(
@@ -65,7 +65,7 @@ export function poolFor(
   a: ActionDef,
   opts: Pick<RollOptions, "extraRolled" | "voidPoint" | "voidSkill">,
   stance: Stance,
-  modifiers: readonly Modifier[] = activeModifiers(c, a),
+  modifiers: readonly Modifier[] = activeModifiers(c, a, {}, stance),
 ): Pool {
   return computePool(c, toPoolAction(a), {
     stance,
@@ -95,10 +95,13 @@ export function calledRaises(c: Character, a: ActionDef, opts: RollOptions, sele
   return opts.raises + (a.attack ? maneuverRaises(selection, effectiveManeuvers(c)) : 0);
 }
 
-export function finalTN(c: Character, a: ActionDef, opts: RollOptions, selection: Readonly<Record<string, number>>): number | null | "opposed" {
+export function finalTN(
+  c: Character, a: ActionDef, opts: RollOptions, selection: Readonly<Record<string, number>>, active: readonly Modifier[] = [],
+): number | null | "opposed" {
   return targetNumber({
     base: baseTN(a, opts),
     calledRaises: calledRaises(c, a, opts, selection),
     woundPenalty: woundState(c).penalty ?? 0,
+    modifier: modifierTN(active),
   });
 }

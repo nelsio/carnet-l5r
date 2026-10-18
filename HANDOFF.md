@@ -523,23 +523,39 @@ Ajout demandé après le lot 7 : certaines techniques d'école, certains avantag
 interface Modifier {
   id: string; name: string;                        // ex. « Voie de la Grue (Rang 1) »
   source: "technique" | "advantage" | "disadvantage" | "other";
-  appliesTo: "all" | "skill" | "trait" | "attack" | "damage" | "initiative" | "armor";
+  appliesTo: "all" | "skill" | "trait" | "social" | "attack" | "damage" | "initiative" | "armor" | "wounds";
   skill?: string;                                   // si appliesTo = skill (nom normalisé)
   trait?: RollTrait;                                // si appliesTo = trait
   rolled: number; kept: number;                     // −10..10, défaut 0 (négatif = malus)
-  flat: number;                                     // −50..50 : bonus fixe au total, ou au ND d'armure si appliesTo = armor
+  flat: number;                                     // −50..50 : bonus fixe au total ; ND d'armure (armor) ; réduction de pénalité (wounds)
   freeRaises: number;                               // 0..10 : augmentations gratuites
+  tn: number;                                       // −50..50 : modification du ND des jets concernés
+  stance?: Stance;                                  // posture requise (sinon : toutes)
   mode: "always" | "optional";                      // d'office, ou situationnel (à cocher au jet)
   note: string;                                     // condition, précision
 }
 ```
 
 ### Règles
-- **Portée** : `all` = jets de compétence et de trait ; `skill` = cette compétence ; `trait` = jets sur ce trait (compétence ou trait pur) ; `attack` = attaques ; `damage` = dégâts ; `initiative` ; `armor` = ND d'armure (aucun jet).
+- **Portée** : `all` = jets de compétence et de trait ; `skill` = cette compétence ; `trait` = jets sur ce trait (compétence ou trait pur) ; `social` = compétences sociales (`SOCIAL_SKILLS` : Comédie, Courtoisie, Étiquette, Sincérité, Intimidation, Tentation, Représentation et ses spécialités) ; `attack` = attaques ; `damage` = dégâts ; `initiative` ; `armor` = ND d'armure ; `wounds` = pénalité de blessure (réduite de `flat`, jamais sous 0, toujours appliquée). Ni `armor` ni `wounds` ne concernent un jet.
+- **Posture** : un bonus avec `stance` ne s'applique que dans cette posture (jets et ND d'armure). Hors du lanceur (fiche, statistiques), la posture de référence est Attaque.
+- **ND** : `tn` s'ajoute au ND final des jets concernés (`targetNumber({…, modifier})`).
 - **Ordre** dans `computePool` : posture → dés ± → **bonus de jet** → point de Vide → règle des dix dés. Un malus ne descend jamais sous 0 dé. Le bonus fixe s'ajoute au total ; les augmentations gratuites s'ajoutent à celles saisies.
 - **Application** : un bonus `always` est compris dans les réserves de la fiche, des actions et des statistiques, et coché d'office dans le lanceur (décochable pour un jet). Un bonus `optional` est proposé décoché. Les cases sont remises à zéro au choix d'une action. Les bonus de ND d'armure situationnels se cochent dans le panneau Posture.
 - **Fusion** (§8) : liste avec clé, par `id` puis par nom normalisé.
 
 ### Saisie
-Panneau « Bonus de jet » de la fiche : bonus libre, ou départ d'un **modèle** générique (`MODIFIER_TEMPLATES` dans `src/rules/l5r4e.ts` : +1g0 à une compétence, augmentation gratuite, +5 au ND d'armure, malus situationnel…). Le **catalogue nommé** (`NAMED_MODIFIERS`) est vide : il se remplit depuis le livre, avec le nom exact et l'effet ; aucune valeur n'est inventée.
+Panneau « Bonus de jet » de la fiche : bonus libre, ou départ d'un **modèle** générique (`MODIFIER_TEMPLATES` dans `src/rules/l5r4e.ts` : +1g0 à une compétence, augmentation gratuite, +5 au ND d'armure, +5 au ND des jets sociaux, pénalité de blessure réduite, malus situationnel…).
+
+Le **catalogue nommé** (`NAMED_MODIFIERS`) ne contient que des entrées demandées, résumées par leur effet chiffré (aucun texte du livre), avec leur source et la mention « à vérifier dans le livre » :
+
+| Entrée | Effet encodé | Source |
+|---|---|---|
+| Hiruma Bushi, rang 1 (Torch's Flame Flickers) | +1g0 aux attaques en posture Attaque, d'office | magicalsamurai.wikidot.com/schools-crab ; lasthaiku.wikidot.com/sccrab |
+| Hiruma Bushi, rang 2 (Wolf's Little Lesson) | +5 au ND d'armure par touche au corps à corps en posture Attaque (cumulable jusqu'au rang d'école), à cocher | idem |
+| Hiruma Bushi, rang 3 (Hummingbird Wings) | + 2 × rang d'école au ND d'armure contre une attaque, une fois par round, à cocher | idem |
+| Force de la Terre (Strength of the Earth) | pénalités de blessure réduites de 3 | magicalsamurai.wikidot.com/advantages |
+| Aspect dérangeant (Disturbing Countenance) | +5 au ND des jets de compétences sociales | magicalsamurai.wikidot.com/disadvantages |
+
+Les rangs 4 et 5 de l'école Hiruma Bushi n'ont pas d'effet sur les jets (attaque en action simple, blessures excédentaires reportées) : ils restent dans le texte des techniques de la fiche.
 
