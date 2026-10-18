@@ -35,7 +35,12 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ["./tests/setup.ts"],
     include: ["tests/**/*.spec.{ts,tsx}"],
-    // core.rules.spec.ts : spécification du moteur, activée au lot 2.
-    exclude: ["tests/e2e/**", "tests/core.rules.spec.ts", "node_modules/**"],
+    exclude: ["tests/e2e/**", "node_modules/**"],
+    coverage: {
+      provider: "v8",
+      // HANDOFF §10.1 : 100 % des lignes du moteur.
+      include: ["src/core/**"],
+      thresholds: { "src/core/**": { lines: 100 } },
+    },
   },
 });
