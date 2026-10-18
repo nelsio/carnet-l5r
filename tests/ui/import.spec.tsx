@@ -1,7 +1,7 @@
 /** Import et export JSON (HANDOFF §8, U5). */
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { serializeCharacter, type Character } from "@carnet/core";
+import { importCharacter, serializeCharacter, type Character } from "@carnet/core";
 import { memoryStorage, type LibraryEntry } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../../reference/exemple-personnage.json";
@@ -164,5 +164,35 @@ describe("Export", () => {
     click("Exporter la fiche");
     expect(names).toEqual(["kakita-haruto-l5r.json"]);
     expect(screen.queryByRole("button", { name: /Importer/ })).toBeNull();
+  });
+});
+
+describe("Exemple de fiche", () => {
+  it("la Bibliothèque propose un exemple déjà rempli, valide et réimportable", async () => {
+    const blobs: Blob[] = [];
+    const names: string[] = [];
+    URL.createObjectURL = vi.fn((b: Blob) => { blobs.push(b); return "blob:exemple"; });
+    URL.revokeObjectURL = vi.fn();
+    vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(function (this: HTMLAnchorElement) { names.push(this.download); });
+    const { storage } = await mount([]);
+    click("Télécharger un exemple de fiche (JSON)");
+    expect(names).toEqual(["exemple-fiche-l5r.json"]);
+    const text = await blobs[0]!.text();
+    const json = JSON.parse(text) as Character;
+    expect(json).toMatchObject({ schemaVersion: 1, name: "Kakita Haruto" });
+    expect(json.modifiers).toHaveLength(2);
+    expect(importCharacter(json)).toEqual({ ok: true, character: json });
+
+    const dialog = await chooseFile(new File([text], "exemple-fiche-l5r.json", { type: "application/json" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Importer" }));
+    expect(await screen.findByRole("heading", { level: 1, name: "Kakita Haruto" })).toBeInTheDocument();
+    expect(screen.getByText("Exemple : technique d'école (à adapter)")).toBeInTheDocument();
+    expect(await storage.library.list()).toHaveLength(1);
+  });
+
+  it("aussi depuis une Bibliothèque déjà remplie", async () => {
+    await mount();
+    click("Bibliothèque");
+    expect(await screen.findByRole("button", { name: "Télécharger un exemple de fiche (JSON)" })).toBeInTheDocument();
   });
 });

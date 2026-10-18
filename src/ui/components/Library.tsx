@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { clanAccent } from "@carnet/core";
+import { clanAccent, serializeCharacter } from "@carnet/core";
+import { EXAMPLE_FILE_NAME, exampleCharacter } from "../../rules/example";
+import { downloadText } from "../download";
 import type { LibraryEntry } from "../../storage";
 import { useStore } from "../store";
 import { ImportButton } from "./FileActions";
@@ -21,6 +23,7 @@ export function Library() {
           <ImportButton />
         </p>
         <p className="hint">Tu as déjà une fiche en JSON ? Importe-la, ou dépose le fichier sur la page.</p>
+        <p><ExampleButton /></p>
       </div>
     );
   }
@@ -36,6 +39,7 @@ export function Library() {
       <p className="hint" style={{ marginTop: 0 }}>
         Les fiches restent dans ce navigateur. Rien n'est envoyé. Pour importer, tu peux aussi déposer un fichier JSON sur la page.
       </p>
+      <p className="hint"><ExampleButton /></p>
       <ul className="library" aria-label="Fiches">
         {entries.map((e) => <EntryRow key={e.id} entry={e} />)}
       </ul>
@@ -75,5 +79,14 @@ function EntryRow({ entry: e }: { entry: LibraryEntry }) {
         )}
       </div>
     </li>
+  );
+}
+
+/** Fiche d'exemple déjà remplie, à modifier puis importer. */
+function ExampleButton() {
+  return (
+    <button type="button" className="btn sm" onClick={() => downloadText(EXAMPLE_FILE_NAME, serializeCharacter(exampleCharacter()))}>
+      Télécharger un exemple de fiche (JSON)
+    </button>
   );
 }
