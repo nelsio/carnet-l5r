@@ -274,3 +274,14 @@ export function movement(c: Character): { free: number; simple: number; max: num
   const water = rings(c).water;
   return { free: water * MOVEMENT.free, simple: water * MOVEMENT.simple, max: water * MOVEMENT.max };
 }
+
+/** Une spécialisation de la compétence correspond-elle à l'indice de l'action ? */
+export function emphasisMatches(c: Character, skillName: string, hint: string | undefined): boolean {
+  if (!hint) return false;
+  const h = normalize(hint);
+  const skill = findSkill(c, skillName);
+  return !!skill && skill.emphases.some((e) => {
+    const n = normalize(e);
+    return n !== "" && (h.includes(n) || n.includes(h));
+  });
+}

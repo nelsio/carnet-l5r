@@ -6,4 +6,6 @@ export * from "./migrate";
 export * from "./merge";
 export * from "./actions";
 export * from "./clan";
-export { DEFAULT_MANEUVERS } from "../rules/l5r4e";
+export * from "./character";
+export { DAMAGE_MANEUVER_ID, DEFAULT_MANEUVERS } from "../rules/l5r4e";
+export type { ActionDef, CombatSub, Situation, Stance } from "../rules/l5r4e";
