@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "name": "Kakita Haruto",
+  "clan": "Grue",
+  "family": "Kakita",
+  "school": "École de duellistes Kakita",
+  "insightRank": 1,
+  "honor": 6.5,
+  "glory": 1.0,
+  "status": 1.0,
+  "xp": { "total": 40, "spent": 34 },
+  "traits": {
+    "stamina": 2, "willpower": 2,
+    "strength": 2, "perception": 2,
+    "agility": 3, "intelligence": 2,
+    "reflexes": 3, "awareness": 3
+  },
+  "voidRing": 2,
+  "voidPoints": 2,
+  "wounds": 0,
+  "armor": { "name": "Aucune (tenue de cour)", "bonus": 0, "reduction": 0 },
+  "skills": [
+    { "name": "Iaijutsu", "rank": 3, "trait": "reflexes", "emphases": ["Concentration"] },
+    { "name": "Kenjutsu", "rank": 2, "trait": "agility", "emphases": ["Katana"] },
+    { "name": "Défense", "rank": 1, "trait": "reflexes", "emphases": [] },
+    { "name": "Étiquette", "rank": 2, "trait": "awareness", "emphases": ["Courtoisie"] },
+    { "name": "Courtoisie", "rank": 1, "trait": "awareness", "emphases": [] },
+    { "name": "Investigation", "rank": 1, "trait": "perception", "emphases": ["Remarquer"] },
+    { "name": "Sincérité", "rank": 1, "trait": "awareness", "emphases": ["Honnêteté"] },
+    { "name": "Athlétisme", "rank": 1, "trait": "strength", "emphases": [] },
+    { "name": "Équitation", "rank": 1, "trait": "agility", "emphases": [] },
+    { "name": "Bataille", "rank": 1, "trait": "perception", "emphases": [] }
+  ],
+  "weapons": [
+    { "name": "Katana", "skill": "Kenjutsu", "dr": "3k2" },
+    { "name": "Wakizashi", "skill": "Kenjutsu", "dr": "2k2" }
+  ],
+  "techniques": [
+    { "name": "Voie de la Grue (Rang 1)", "text": "Texte de la technique d'école, à recopier depuis le livre." }
+  ],
+  "maneuvers": [],
+  "advantages": "Bien-né, Voix",
+  "disadvantages": "Orgueil",
+  "notes": ""
+}

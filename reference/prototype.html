@@ -1,0 +1,818 @@
+<title>Carnet de Rokugan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout : carnet à onglets — barre d'état collante (blessures, Vide, ND d'armure), puis Fiche ou Aide de jeu.
+   Couleurs : gris neutres, accent pris sur le clan du personnage, une teinte par Anneau. */
+/* Fond écru en clair, anthracite en sombre ; l'accent --gold vient de la couleur du clan (--acc-l / --acc-d, posées par le script). */
+:root{
+  --acc-l:#7a6a3a; --acc-d:#cdb67a;
+  --bg:#ece6d8; --surface:#f7f3ea; --sunk:#e0d9c8; --ink:#2a261f; --muted:#6c6556; --line:#d2cab7;
+  --gold:var(--acc-l); --gold-soft:color-mix(in srgb,var(--gold) 15%,var(--surface));
+  --earth:#5e6d2c; --water:#245f8c; --fire:#a8382a; --air:#6a7f99; --void:#5d4290;
+  --ok:#2e7a4b; --bad:#a8382a;
+  --f-display:"Shippori Mincho B1","Hiragino Mincho ProN","Times New Roman",serif;
+  --f-body:"Zen Kaku Gothic New","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#25272a; --surface:#2f3236; --sunk:#1c1e21; --ink:#e7e5e0; --muted:#a2a19c; --line:#44474c;
+  --gold:var(--acc-d);
+  --earth:#9fb25a; --water:#6fb0e0; --fire:#e8735f; --air:#a9bbd2; --void:#a98be0; --ok:#6cc58f; --bad:#f07b68; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#25272a; --surface:#2f3236; --sunk:#1c1e21; --ink:#e7e5e0; --muted:#a2a19c; --line:#44474c;
+  --gold:var(--acc-d);
+  --earth:#9fb25a; --water:#6fb0e0; --fire:#e8735f; --air:#a9bbd2; --void:#a98be0; --ok:#6cc58f; --bad:#f07b68; color-scheme:dark}
+:root[data-theme="light"]{color-scheme:light}
+header.top{border-bottom:3px solid var(--gold)}
+.mon{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
+.mon::before{content:"";width:12px;height:12px;border-radius:50%;background:var(--gold)}
+.top-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.theme-btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 12px;font-weight:700;font-size:13px;color:var(--muted)}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--f-body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:1080px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.2}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.muted{color:var(--muted)}
+
+/* En-tête */
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;padding-block:22px 14px}
+.who h1{font-size:clamp(26px,5vw,38px);font-weight:800}
+.who .sub{color:var(--muted);margin-top:2px}
+.tabs{display:flex;gap:4px;background:var(--sunk);padding:4px;border-radius:999px}
+.tabs button{border:0;background:transparent;padding:8px 16px;border-radius:999px;font-weight:700;color:var(--muted)}
+.tabs button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+
+/* Barre d'état */
+.status{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:8px 10px;border-bottom:1px solid var(--line);margin-bottom:18px}
+.status-in{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:18px;align-items:center}
+.cstats{display:grid;grid-template-columns:repeat(4,auto);gap:6px}
+.cstats div{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:3px 8px;min-width:0;display:grid;line-height:1.2}
+.cstats .label{font-size:9.5px;letter-spacing:.08em;white-space:nowrap}
+.cstats b{font-family:var(--f-mono);font-size:15px;white-space:nowrap}
+.cstats small{font-size:11px;color:var(--muted);font-weight:500}
+.cstats .pen{border-color:var(--bad)}
+.cstats .pen b{color:var(--bad)}
+.wtrack{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:3px;min-width:0}
+.wl{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:3px 4px;font-size:10.5px;line-height:1.2;min-width:0;overflow:hidden}
+.wl b{display:block;font-family:var(--f-mono);font-size:11px}
+.wl span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
+.wl.past{background:var(--sunk);opacity:.55}
+.wl.cur{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,var(--surface))}
+.wl.cur span{color:var(--ink);font-weight:700}
+.stepper{display:flex;align-items:center;gap:6px}
+.stepper button{width:30px;height:30px;border-radius:6px;border:1px solid var(--line);background:var(--surface);font-weight:700}
+.stat-big{font-family:var(--f-mono);font-size:22px;font-weight:700;line-height:1}
+.voidpips{display:flex;gap:5px}
+.pip{width:18px;height:18px;border-radius:50%;border:2px solid var(--void);background:transparent;padding:0}
+.pip.on{background:var(--void)}
+.wsum{display:none}
+.sheet-head{display:none}
+.backdrop{display:none}
+
+/* Cartes / sections */
+.grid{display:grid;gap:16px}
+.cols-2{grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+.panel h2{font-size:19px;margin-bottom:10px}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.panel-head h2{margin:0}
+
+/* Anneaux */
+.rings{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.ring{border-top:4px solid var(--rc);background:var(--bg);border-radius:6px;padding:10px 8px;min-width:0}
+.ring .rn{font-family:var(--f-display);font-weight:800;font-size:16px;color:var(--rc)}
+.ring .rv{font-family:var(--f-mono);font-size:28px;font-weight:700;line-height:1.1}
+.ring .tr{display:flex;justify-content:space-between;gap:4px;font-size:12.5px;margin-top:4px}
+.ring .tr span:first-child{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:620px){.rings{grid-template-columns:repeat(2,minmax(0,1fr))}.ring.void{grid-column:1/-1}}
+
+table{border-collapse:collapse;width:100%}
+.tbl{overflow-x:auto}
+th{text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:6px 6px;border-bottom:1px solid var(--line)}
+td{padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+.pool{font-family:var(--f-mono);font-weight:700;color:var(--gold)}
+.tag{display:inline-block;font-size:11.5px;padding:1px 7px;border-radius:999px;background:var(--sunk);color:var(--muted);margin:1px 2px 1px 0}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}
+.kv div{min-width:0}
+.kv b{display:block;font-family:var(--f-mono);font-size:18px}
+.prose{white-space:pre-wrap}
+.tech{border-left:3px solid var(--gold);padding-left:10px;margin-bottom:10px}
+.tech b{font-family:var(--f-display)}
+
+/* Édition */
+.btn{border:1px solid var(--line);background:var(--surface);padding:7px 13px;border-radius:7px;font-weight:700}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.gold{background:var(--gold);color:var(--surface);border-color:var(--gold)}
+.btn.sm{padding:3px 9px;font-size:13px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.in{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:5px 7px;min-width:0}
+input.in[type=number]{font-family:var(--f-mono)}
+textarea.in{min-height:80px;resize:vertical}
+.field{display:grid;gap:3px;min-width:0}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.x{border:0;background:transparent;color:var(--bad);font-weight:700;font-size:18px;line-height:1;padding:2px 6px}
+
+/* Aide de jeu */
+.sit{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.sit button{border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:7px;font-weight:700}
+.sit button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sit.sub button{padding:5px 12px;font-size:13.5px}
+.sit.sub button[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:var(--surface)}
+.aid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,400px);gap:16px;align-items:start}
+@media (max-width:860px){.aid{grid-template-columns:1fr}}
+.actions{display:grid;gap:8px}
+.act{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:10px 12px;width:100%}
+.act:hover{border-color:var(--gold)}
+.act[aria-pressed="true"]{border-color:var(--gold);box-shadow:inset 3px 0 0 var(--gold)}
+.act .t{font-weight:700}
+.act .d{grid-column:1/-1;font-size:13px;color:var(--muted)}
+.act .p{font-family:var(--f-mono);font-weight:700;color:var(--gold);text-align:right}
+.act.info{cursor:default;background:var(--bg)}
+/* Dégâts rattachés à l'attaque : décalés, avec un connecteur en arbre */
+.act.child{margin-left:26px;width:calc(100% - 26px);position:relative;overflow:visible}
+.act.child::before{content:"";position:absolute;left:-17px;top:-10px;width:13px;height:calc(50% + 10px);
+  border-left:2px solid var(--line);border-bottom:2px solid var(--line);border-bottom-left-radius:7px;pointer-events:none}
+.act.child.linked::before{border-color:var(--gold)}
+.act.child .pend{font-family:var(--f-mono);font-size:12px;color:var(--gold);font-weight:700}
+.stance{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px}
+.stance button{border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:7px 8px;text-align:left;font-size:13px}
+.stance button b{display:block;font-size:14px}
+.stance button[aria-pressed="true"]{border-color:var(--gold);background:var(--gold-soft)}
+.stance button:disabled{opacity:.45;cursor:not-allowed}
+.statline{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.statline span{background:var(--bg);border-radius:6px;padding:4px 9px;font-size:13px;color:var(--muted)}
+.statline b{font-family:var(--f-mono);color:var(--ink);font-size:14px}
+.statline .ch{background:var(--gold-soft)}
+.moves{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.moves div{background:var(--bg);border-radius:8px;padding:8px 10px;display:grid;gap:2px;min-width:0}
+.moves b{font-size:22px}
+.moves .muted{font-size:12px}
+@media (max-width:480px){.moves{grid-template-columns:1fr}}
+.statopts{display:flex;flex-wrap:wrap;gap:8px 18px;margin-bottom:10px}
+table.stats td,table.stats th{white-space:nowrap;text-align:right}
+table.stats td:first-child,table.stats th:first-child{text-align:left}
+table.stats tr.child td.jl{padding-left:14px;color:var(--muted)}
+table.stats td.pc{font-family:var(--f-mono);font-variant-numeric:tabular-nums;background:color-mix(in srgb,var(--ok) var(--p),transparent)}
+.mans{display:flex;flex-wrap:wrap;gap:6px;margin-block:6px 4px}
+.man{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:4px 11px;font-size:13px}
+.man b{color:var(--gold)}
+.man.on{border-color:var(--gold);background:var(--gold-soft)}
+div.man{padding:2px 4px}
+div.man button{border:0;background:var(--surface);width:24px;height:24px;border-radius:50%;font-weight:700}
+.roller{position:static}
+@media (max-width:860px){.roller{position:static}}
+.roller .poolbig{font-family:var(--f-mono);font-size:40px;font-weight:700;color:var(--gold);line-height:1}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-block:12px}
+.chk{display:flex;align-items:center;gap:7px;font-size:14px}
+.chk input{width:17px;height:17px;accent-color:var(--gold)}
+.tnline{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:13.5px}
+.dice{display:flex;flex-wrap:wrap;gap:5px;margin-block:10px}
+.die{min-width:34px;height:34px;padding:0 6px;border-radius:6px;display:grid;place-items:center;font-family:var(--f-mono);font-weight:700;border:1.5px solid var(--line);color:var(--muted);background:var(--bg)}
+.die.kept{border-color:var(--ink);color:var(--ink);background:var(--surface)}
+.die.ex{border-color:var(--fire);color:var(--fire)}
+.die.kept.ex{background:color-mix(in srgb,var(--fire) 12%,var(--surface))}
+.verdict{font-family:var(--f-display);font-size:24px;font-weight:800}
+.verdict.ok{color:var(--ok)} .verdict.ko{color:var(--bad)}
+.hist{display:grid;gap:4px;margin-top:10px;font-size:13px}
+.hist div{display:flex;justify-content:space-between;gap:8px;border-top:1px dashed var(--line);padding-top:4px}
+.hint{font-size:13px;color:var(--muted);margin-top:8px}
+.note{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px;margin-top:16px}
+.empty{text-align:center;padding:60px 16px}
+.empty h2{font-size:26px;margin-bottom:8px}
+.toast{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:7px 12px;border-radius:7px;font-size:13px;opacity:0;transition:opacity .2s}
+.toast.show{opacity:1}
+/* ---------- Mobile (≤ 720 px) : navigation en bas, état compact, lanceur en panneau glissant ---------- */
+@media (max-width:720px){
+  body{font-size:15.5px;padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+  header.top{padding-block:14px 10px}
+  .who h1{font-size:26px}
+  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;border-radius:0;display:grid;grid-template-columns:1fr 1fr;gap:6px;
+    background:var(--surface);border-top:1px solid var(--line);
+    padding:6px max(12px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
+  .tabs button{padding:12px;border-radius:8px;font-size:15px}
+  .tabs button[aria-pressed="true"]{background:var(--gold-soft);color:var(--ink);box-shadow:none}
+  .theme-btn{padding:6px 10px;font-size:12px}
+
+  .status{margin-bottom:12px;padding-block:6px 8px}
+  .status-in{grid-template-columns:minmax(0,1fr) auto;gap:8px 12px}
+  .cstats{grid-column:1/-1;grid-template-columns:repeat(4,minmax(0,1fr))}
+  .cstats div{text-align:center;padding:4px 4px}
+  .wsum{display:flex;align-items:center;justify-content:space-between;gap:8px;grid-column:1/-1;min-width:0;
+    border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 10px;text-align:left}
+  .wsum.hurt{border-color:var(--bad)}
+  .wsum b{font-family:var(--f-display);font-size:16px}
+  .wtrack{display:none;grid-column:1/-1;grid-template-columns:repeat(4,minmax(0,1fr))}
+  .status.exp .wtrack{display:grid}
+  .wl{font-size:11.5px;padding:5px 6px}
+  .stepper button{width:40px;height:40px;font-size:18px}
+  .pip{width:26px;height:26px}
+  .voidpips{gap:7px}
+
+  .in{font-size:16px;padding:8px 9px}   /* 16 px : évite le zoom auto d'iOS */
+  .btn{padding:10px 14px}
+  .x{font-size:22px;padding:6px 10px}
+  .sit{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding-inline:max(16px,env(safe-area-inset-left,0px))}
+  .sit button{flex:0 0 auto;padding:10px 16px}
+  .act{padding:12px}
+  .stance{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .stance button{padding:10px}
+
+  /* Lanceur = panneau glissant depuis le bas */
+  .roller{display:none}
+  .roller.open{display:block;position:fixed;left:0;right:0;bottom:0;z-index:31;max-height:88vh;overflow-y:auto;overscroll-behavior:contain;
+    border-radius:16px 16px 0 0;border:0;border-top:1px solid var(--line);box-shadow:0 -8px 30px rgba(0,0,0,.25);
+    padding:0 max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
+    animation:sheetIn .2s ease-out}
+  .sheet-head{display:flex;justify-content:center;position:sticky;top:0;background:var(--surface);padding-block:8px 4px;z-index:1}
+  .sheet-head .grip{width:44px;height:5px;border-radius:3px;background:var(--line)}
+  .sheet-head .close{position:absolute;right:-6px;top:2px;border:0;background:transparent;font-size:26px;line-height:1;padding:4px 10px;color:var(--muted)}
+  .backdrop.open{display:block;position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.4)}
+  .rollbtn{position:sticky;bottom:0;box-shadow:0 -10px 14px var(--surface)}
+  .opts{grid-template-columns:1fr 1fr}
+  .note{margin-bottom:12px}
+}
+@keyframes sheetIn{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+@media (max-width:720px){body.sheet-open{overflow:hidden}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@keyframes pop{from{transform:scale(.6);opacity:.2}to{transform:none;opacity:1}}
+.die{animation:pop .18s ease-out both}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="who" id="who"><h1>Carnet de Rokugan</h1><div class="sub">Chargement de la fiche…</div></div>
+    <div class="top-right">
+      <button class="theme-btn" id="theme-btn" title="Changer de thème">Thème : auto</button>
+      <div class="tabs" role="group" aria-label="Vue">
+        <button id="tab-sheet" aria-pressed="true">Fiche</button>
+        <button id="tab-aid" aria-pressed="false">Aide de jeu</button>
+      </div>
+    </div>
+  </header>
+  <div class="status" id="status" hidden></div>
+  <main id="main"><div class="empty"><p class="muted">Ouverture du carnet…</p></div></main>
+  <p class="note">Règles de référence : L5R 4e édition (Roll &amp; Keep). Les jets explosent sur 10, les augmentations ajoutent +5 au ND (max = Anneau de Vide), la pénalité de blessure s'ajoute au ND. Les procédures de duel et de bataille de masse sont résumées : vérifie le détail dans ton livre de base.</p>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const RINGS={earth:{n:"Terre",t:["stamina","willpower"]},water:{n:"Eau",t:["strength","perception"]},fire:{n:"Feu",t:["agility","intelligence"]},air:{n:"Air",t:["reflexes","awareness"]},void:{n:"Vide",t:[]}};
+const TRAITS={stamina:"Constitution",willpower:"Volonté",strength:"Force",perception:"Perception",agility:"Agilité",intelligence:"Intelligence",reflexes:"Réflexes",awareness:"Intuition",void:"Vide"};
+const WOUNDS=[["Indemne",0],["Égratigné",3],["Éraflé",5],["Blessé",10],["Grav. blessé",15],["Estropié",20],["À terre",40],["Hors de combat",null]];
+const STANCES={
+  attaque:{n:"Attaque",d:"Posture normale."},
+  totale:{n:"Attaque totale",d:"+2g1 à l'attaque, −10 au ND d'armure."},
+  defense:{n:"Défense",d:"Ajoute Air + Défense au ND d'armure."},
+  totaldef:{n:"Défense totale",d:"Jet Défense (Réflexes), + moitié au ND d'armure."},
+  centre:{n:"Centre",d:"Aucune action ; bonus au round suivant (voir livre)."}
+};
+
+let C=null, db=null, ref=null, saveTimer=null, view="sheet", edit=false, sit="enquete", sub="escarmouche", stance="attaque";
+let sel=null, fullDefBonus=0, hist=[], lastRoll=null, store="none";
+let lastAtk=null, voidArmor=false, voidRound=false, man={}, pendingDmg=0, initVal=null, wExp=false, sheetOpen=false;
+const opt={tn:15,raises:0,free:0,voidp:false,voidSkill:false,emph:false,flat:0,dmod:0,targetTN:20,oppInsight:2};
+const DEF_MANS=[
+  {k:"dmg",n:"Augmentation des dégâts",cost:1,eff:"+1g0 aux dégâts par augmentation (cumulable).",rep:true},
+  {k:"called",n:"Coup ciblé",cost:1,eff:"Viser une zone précise (main, jambe, tête…). Coût selon la zone, à fixer avec le MJ."},
+  {k:"feint",n:"Feinte",cost:2,eff:"Effet détaillé dans les manœuvres de base de ton livre."},
+  {k:"knock",n:"Renversement",cost:2,eff:"Jet de Force en opposition : la cible tombe à terre si tu l'emportes."},
+  {k:"disarm",n:"Désarmement",cost:3,eff:"Pas de dégâts. Jet de Force en opposition : la cible lâche son arme si tu l'emportes."},
+  {k:"extra",n:"Attaque supplémentaire",cost:5,eff:"Une attaque de plus ce round."}];
+const mans=()=>C.maneuvers&&C.maneuvers.length?C.maneuvers:DEF_MANS;
+const isRanged=w=>/kyujutsu|arc|yumi/i.test((w.skill||"")+" "+(w.name||""));
+const wTrait=w=>isRanged(w)?"reflexes":"agility";
+function manRaises(){return mans().reduce((s,m)=>s+(m.rep?num(man[m.k])*num(m.cost):(man[m.k]?num(m.cost):0)),0)}
+function calledRaises(a){return num(opt.raises)+(a&&a.attack?manRaises():0)}
+function spendVoid(){if(num(C.voidPoints)<1)return false;C.voidPoints=num(C.voidPoints)-1;voidRound=true;save();return true}
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const num=v=>{const n=parseInt(v,10);return isNaN(n)?0:n};
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove("show"),1600)}
+
+/* ---------- Règles ---------- */
+const tv=k=>k==="void"?num(C.void):num(C.traits?.[k]);
+function ringVal(r){return r==="void"?num(C.void):Math.min(tv(RINGS[r].t[0]),tv(RINGS[r].t[1]))}
+function skill(name){return (C.skills||[]).find(s=>s.name.trim().toLowerCase()===String(name).toLowerCase())}
+function skillRank(name){return num(skill(name)?.rank)}
+function hasEmph(name,e){if(!e)return false;const s=skill(name);return !!s&&String(s.emph||"").toLowerCase().split(/[,;]/).map(x=>x.trim()).some(x=>x&&e.toLowerCase().includes(x)||x&&x.includes(e.toLowerCase()))}
+function woundState(){
+  const E=ringVal("earth"), w=num(C.wounds); let cap=0;
+  for(let i=0;i<WOUNDS.length;i++){cap+= i===0?E*5:E*2; if(w<=cap||i===WOUNDS.length-1)return{i,pen:WOUNDS[i][1],dead:WOUNDS[i][1]===null&&w>=cap,cap}}
+}
+function woundCaps(){const E=ringVal("earth");let cap=0;return WOUNDS.map((w,i)=>cap+=(i===0?E*5:E*2))}
+function armorTN(){
+  let tn=5*tv("reflexes")+5+num(C.armor?.bonus);
+  if(stance==="totale")tn-=10;
+  if(stance==="defense")tn+=ringVal("air")+skillRank("Défense");
+  if(stance==="totaldef")tn+=fullDefBonus;
+  if(voidArmor)tn+=10;
+  return tn;
+}
+function moveFt(){const w=ringVal("water");return{free:w*5,simple:w*10,max:w*20}}
+const toM=f=>(f*0.3048).toFixed(1).replace(".",",")+" m";
+function parseDR(s){const m=String(s||"").match(/(\d+)\s*[gk]\s*(\d+)/i);return m?{r:+m[1],k:+m[2]}:{r:0,k:0}}
+const fmt=(r,k)=>`${r}g${k}`;
+
+/* ---------- Persistance ---------- */
+function blank(){return{name:"Nouveau samouraï",clan:"",family:"",school:"",insight:1,honor:"",glory:"",status:"",xpTotal:40,xpSpent:0,
+  traits:{stamina:2,willpower:2,strength:2,perception:2,agility:2,intelligence:2,reflexes:2,awareness:2},void:2,voidPoints:2,wounds:0,
+  armor:{name:"Aucune",bonus:0,reduction:0},skills:[],weapons:[],techniques:[],advantages:"",disadvantages:"",notes:""}}
+function save(){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(async()=>{
+    const data=JSON.parse(JSON.stringify(C));
+    if(ref){try{await ref.set(data);toast("Fiche enregistrée")}catch(e){toast("Échec de l'enregistrement : "+(e.code||"erreur"))}}
+    else{try{localStorage.setItem("l5r-char",JSON.stringify(data));toast("Enregistré dans ce navigateur")}catch(e){}}
+  },600);
+}
+function setPath(p,v){const ks=p.split(".");let o=C;for(let i=0;i<ks.length-1;i++)o=o[ks[i]];o[ks.at(-1)]=v}
+
+/* ---------- Clan et thème ---------- */
+const CLANS={
+  crabe:{n:"Clan du Crabe",l:"#3d5a73",d:"#8fb0cc"},
+  grue:{n:"Clan de la Grue",l:"#2f7fb5",d:"#8cc4ea"},
+  dragon:{n:"Clan du Dragon",l:"#2f7a45",d:"#7fcb93"},
+  licorne:{n:"Clan de la Licorne",l:"#6b3fa0",d:"#bb9ae6"},
+  lion:{n:"Clan du Lion",l:"#a87b0c",d:"#e6bf55"},
+  mante:{n:"Clan de la Mante",l:"#1f8073",d:"#6fd0c1"},
+  phenix:{n:"Clan du Phénix",l:"#c25a14",d:"#f0a066"},
+  scorpion:{n:"Clan du Scorpion",l:"#a82828",d:"#f07a7a"},
+  araignee:{n:"Clan de l'Araignée",l:"#4a4a4a",d:"#b5b5b5"},
+  imperial:{n:"Familles impériales",l:"#8a6d12",d:"#dcc06a"}};
+const norm=s=>String(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+const CLAN_ALIASES={crab:"crabe",crane:"grue",unicorn:"licorne",mantis:"mante",phoenix:"phenix",spider:"araignee",imperiale:"imperial",empire:"imperial"};
+function applyClan(){
+  const n=norm(C&&C.clan); let key=Object.keys(CLANS).find(k=>n.includes(k));
+  if(!key)key=Object.entries(CLAN_ALIASES).find(([a])=>n.includes(a))?.[1];
+  const c=key?CLANS[key]:null, s=document.documentElement.style;
+  if(c){s.setProperty("--acc-l",c.l);s.setProperty("--acc-d",c.d)}else{s.removeProperty("--acc-l");s.removeProperty("--acc-d")}
+  return c;
+}
+let theme="auto";
+function applyTheme(){
+  const r=document.documentElement;
+  if(theme==="auto")r.removeAttribute("data-theme");else r.setAttribute("data-theme",theme);
+  $("#theme-btn").textContent="Thème : "+({auto:"auto",light:"clair",dark:"sombre"}[theme]);
+}
+try{theme=localStorage.getItem("l5r-theme")||"auto"}catch(e){}
+applyTheme();
+$("#theme-btn").onclick=()=>{theme={auto:"light",light:"dark",dark:"auto"}[theme];applyTheme();try{localStorage.setItem("l5r-theme",theme)}catch(e){}};
+
+/* ---------- Rendu général ---------- */
+function render(){
+  $("#tab-sheet").setAttribute("aria-pressed",view==="sheet");
+  $("#tab-aid").setAttribute("aria-pressed",view==="aid");
+  if(!C){
+    $("#who").innerHTML=`<h1>Carnet de Rokugan</h1><div class="sub">Compagnon de campagne · L5R 4e</div>`;
+    $("#status").hidden=true;
+    $("#main").innerHTML=`<div class="empty panel"><h2>Aucun personnage dans ce carnet</h2><p class="muted">Crée ta fiche : Traits, Compétences, armes, techniques. L'aide de jeu calculera tes réserves de dés à partir d'elle.</p><p><button class="btn primary" data-act="create">Créer mon personnage</button></p></div>`;
+    return;
+  }
+  const cl=applyClan();
+  $("#who").innerHTML=`${C.clan?`<div class="mon">${esc(cl?cl.n:("Clan "+C.clan))}</div>`:""}<h1>${esc(C.name)}</h1><div class="sub">${esc([C.family,C.school].filter(Boolean).join(" · "))}${C.insight?` · Rang ${esc(C.insight)}`:""}</div>`;
+  renderStatus();
+  const st=$("#roller")?.scrollTop||0;
+  $("#main").innerHTML= view==="sheet"?renderSheet():renderAid();
+  const r=$("#roller"); if(r&&sheetOpen)r.scrollTop=st;
+  document.body.classList.toggle("sheet-open",view==="aid"&&sheetOpen);
+}
+function renderStatus(){
+  const ws=woundState(), caps=woundCaps(), vp=num(C.voidPoints), vmax=num(C.void);
+  const track=WOUNDS.map((w,i)=>`<div class="wl ${i<ws.i?"past":""} ${i===ws.i&&num(C.wounds)>0?"cur":""}" title="${w[0]} jusqu'à ${caps[i]} blessures"><b>${w[1]===null?"✕":"+"+w[1]}</b><span>${w[0]}</span></div>`).join("");
+  $("#status").hidden=false;
+  $("#status").classList.toggle("exp",wExp);
+  const hurt=num(C.wounds)>0;
+  $("#status").innerHTML=`<div class="status-in">
+    <button class="wsum ${hurt?"hurt":""}" data-act="wexp" aria-expanded="${wExp}"><span><b>${ws.dead?"Mort":WOUNDS[ws.i][0]}</b> <span class="muted">${ws.pen===null?"":"· pénalité +"+ws.pen}</span></span><span class="muted mono">${num(C.wounds)} / ${caps[7]} ${wExp?"▴":"▾"}</span></button>
+    <div class="wtrack" aria-label="Niveaux de blessure">${track}</div>
+    <div><div class="label">Blessures</div><div class="stepper"><button data-act="w-" aria-label="Retirer 1 blessure">−</button><input class="in mono" style="width:56px;text-align:center" id="wounds" type="number" min="0" value="${num(C.wounds)}" aria-label="Blessures subies"><button data-act="w+" aria-label="Ajouter 1 blessure">+</button></div></div>
+    <div><div class="label">Points de Vide ${vp}/${vmax}</div><div class="voidpips">${Array.from({length:vmax},(_,i)=>`<button class="pip ${i<vp?"on":""}" data-act="vp" data-i="${i}" aria-label="Point de Vide ${i+1}"></button>`).join("")}</div>
+    </div>
+    <div class="cstats"><div><span class="label">Dépl.</span><b>${moveFt().free}/${moveFt().simple}<small> pi</small></b></div><div><span class="label">ND armure</span><b>${armorTN()}</b></div><div><span class="label">Réduction</span><b>${num(C.armor?.reduction)}</b></div><div class="${ws.pen?"pen":""}"><span class="label">Pénalité</span><b>${ws.pen===null?"—":"+"+ws.pen}</b></div></div>
+  </div>`;
+}
+
+/* ---------- Fiche ---------- */
+function inp(p,v,type="text",extra=""){return `<input class="in" data-p="${p}" type="${type}" value="${esc(v)}" ${extra}>`}
+function renderSheet(){
+  const ringsHtml=["earth","water","fire","air","void"].map(r=>{
+    const R=RINGS[r];
+    const traits= r==="void"
+      ? `<div class="tr"><span>Anneau</span>${edit?`<input class="in" style="width:56px" type="number" min="1" max="10" data-p="void" data-n value="${num(C.void)}">`:`<b class="mono">${num(C.void)}</b>`}</div><div class="tr"><span>Augm. max</span><b class="mono">${num(C.void)}</b></div>`
+      : R.t.map(t=>`<div class="tr"><span>${TRAITS[t]}</span>${edit?`<input class="in" style="width:56px" type="number" min="1" max="10" data-p="traits.${t}" data-n value="${tv(t)}">`:`<b class="mono">${tv(t)}</b>`}</div>`).join("");
+    return `<div class="ring ${r}" style="--rc:var(--${r})"><div class="rn">${R.n}</div><div class="rv">${ringVal(r)}</div>${traits}</div>`}).join("");
+
+  const ident = edit ? `<div class="form-grid">
+      <label class="field"><span class="label">Nom</span>${inp("name",C.name)}</label>
+      <label class="field"><span class="label">Clan</span>${inp("clan",C.clan,"text",'list="clan-list"')}<datalist id="clan-list">${["Crabe","Grue","Dragon","Licorne","Lion","Mante","Phénix","Scorpion","Araignée","Impérial"].map(c=>`<option value="${c}"></option>`).join("")}</datalist></label>
+      <label class="field"><span class="label">Famille</span>${inp("family",C.family)}</label>
+      <label class="field"><span class="label">École</span>${inp("school",C.school)}</label>
+      <label class="field"><span class="label">Rang (Insight)</span>${inp("insight",C.insight,"number",'min="1" data-n')}</label>
+      <label class="field"><span class="label">Honneur</span>${inp("honor",C.honor)}</label>
+      <label class="field"><span class="label">Gloire</span>${inp("glory",C.glory)}</label>
+      <label class="field"><span class="label">Statut</span>${inp("status",C.status)}</label>
+      <label class="field"><span class="label">XP total</span>${inp("xpTotal",C.xpTotal,"number","data-n")}</label>
+      <label class="field"><span class="label">XP dépensée</span>${inp("xpSpent",C.xpSpent,"number","data-n")}</label>
+      <label class="field"><span class="label">Armure</span>${inp("armor.name",C.armor?.name)}</label>
+      <label class="field"><span class="label">Bonus d'armure (ND)</span>${inp("armor.bonus",C.armor?.bonus,"number","data-n")}</label>
+      <label class="field"><span class="label">Réduction de dégâts</span>${inp("armor.reduction",C.armor?.reduction??0,"number",'min="0" data-n')}</label>
+    </div>`
+    : `<div class="kv">
+      <div><span class="label">Honneur</span><b>${esc(C.honor||"—")}</b></div>
+      <div><span class="label">Gloire</span><b>${esc(C.glory||"—")}</b></div>
+      <div><span class="label">Statut</span><b>${esc(C.status||"—")}</b></div>
+      <div><span class="label">XP libre</span><b>${num(C.xpTotal)-num(C.xpSpent)}</b></div>
+      <div><span class="label">Armure</span><b style="font-size:15px">${esc(C.armor?.name||"—")} <span class="muted">ND +${num(C.armor?.bonus)} · réd. ${num(C.armor?.reduction)}</span></b></div>
+      <div><span class="label">Initiative</span><b>${fmt(num(C.insight)+tv("reflexes"),tv("reflexes"))}</b></div>
+    </div>`;
+
+  const traitOpts=v=>Object.entries(TRAITS).map(([k,n])=>`<option value="${k}" ${k===v?"selected":""}>${n}</option>`).join("");
+  const skills=(C.skills||[]).slice().map((s,i)=>({s,i})).sort((a,b)=>edit?0:a.s.name.localeCompare(b.s.name,"fr"));
+  const skillsHtml = edit
+    ? `<div class="tbl"><table><thead><tr><th>Compétence</th><th>Rang</th><th>Trait</th><th>Spécialisations</th><th></th></tr></thead><tbody>${
+      skills.map(({s,i})=>`<tr><td>${inp(`skills.${i}.name`,s.name)}</td><td style="width:70px">${inp(`skills.${i}.rank`,s.rank,"number",'min="0" max="10" data-n')}</td><td style="width:140px"><select class="in" data-p="skills.${i}.trait">${traitOpts(s.trait)}</select></td><td>${inp(`skills.${i}.emph`,s.emph,"text",'placeholder="ex. Fouille, Remarquer"')}</td><td><button class="x" data-act="del" data-list="skills" data-i="${i}" aria-label="Supprimer">×</button></td></tr>`).join("")}</tbody></table></div><button class="btn sm" data-act="add" data-list="skills">+ Compétence</button>`
+    : `<div class="tbl"><table><thead><tr><th>Compétence</th><th>Rang</th><th>Trait</th><th>Jet</th></tr></thead><tbody>${
+      skills.map(({s})=>`<tr><td><b>${esc(s.name)}</b>${s.emph?`<div>${String(s.emph).split(/[,;]/).filter(x=>x.trim()).map(x=>`<span class="tag">${esc(x.trim())}</span>`).join("")}</div>`:""}</td><td class="mono">${num(s.rank)}</td><td class="muted">${TRAITS[s.trait]||"—"}</td><td class="pool">${fmt(num(s.rank)+tv(s.trait),tv(s.trait))}</td></tr>`).join("")||`<tr><td colspan="4" class="muted">Aucune compétence. Passe en mode modification pour en ajouter.</td></tr>`}</tbody></table></div>`;
+
+  const weaponsHtml = edit
+    ? `<div class="tbl"><table><thead><tr><th>Arme</th><th>Compétence</th><th>VD</th><th>Force arc</th><th></th></tr></thead><tbody>${
+      (C.weapons||[]).map((w,i)=>`<tr><td>${inp(`weapons.${i}.name`,w.name)}</td><td>${inp(`weapons.${i}.skill`,w.skill)}</td><td style="width:80px">${inp(`weapons.${i}.dr`,w.dr,"text",'placeholder="3g2"')}</td><td style="width:70px">${inp(`weapons.${i}.bow`,w.bow??"","number",'data-n placeholder="—"')}</td><td><button class="x" data-act="del" data-list="weapons" data-i="${i}" aria-label="Supprimer">×</button></td></tr>`).join("")}</tbody></table></div><button class="btn sm" data-act="add" data-list="weapons">+ Arme</button>`
+    : `<div class="tbl"><table><thead><tr><th>Arme</th><th>Attaque</th><th>Dégâts</th></tr></thead><tbody>${
+      (C.weapons||[]).map(w=>{const dr=parseDR(w.dr),sr=skillRank(w.skill),t=wTrait(w),rg=isRanged(w);return `<tr><td><b>${esc(w.name)}</b><div class="muted" style="font-size:12.5px">${esc(w.skill)} · VD ${esc(w.dr)}${rg?` · arc ${num(w.bow)}`:""}</div></td><td class="pool">${fmt(sr+tv(t),tv(t))}</td><td class="pool">${fmt((rg?num(w.bow):tv("strength"))+dr.r,dr.k)}</td></tr>`}).join("")||`<tr><td colspan="3" class="muted">Aucune arme.</td></tr>`}</tbody></table></div>`;
+
+  const techHtml = edit
+    ? (C.techniques||[]).map((t,i)=>`<div class="field" style="margin-bottom:10px"><div style="display:flex;gap:6px">${inp(`techniques.${i}.name`,t.name,"text",'placeholder="Nom de la technique"')}<button class="x" data-act="del" data-list="techniques" data-i="${i}" aria-label="Supprimer">×</button></div><textarea class="in" data-p="techniques.${i}.text" placeholder="Effet">${esc(t.text)}</textarea></div>`).join("")+`<button class="btn sm" data-act="add" data-list="techniques">+ Technique / sort / kata</button>`
+    : (C.techniques||[]).map(t=>`<div class="tech"><b>${esc(t.name)}</b><div class="prose muted">${esc(t.text)}</div></div>`).join("")||`<p class="muted">Aucune technique notée.</p>`;
+
+  const txt=(p,label)=>edit?`<label class="field"><span class="label">${label}</span><textarea class="in" data-p="${p}">${esc(C[p])}</textarea></label>`:`<div><div class="label">${label}</div><div class="prose">${esc(C[p]||"—")}</div></div>`;
+
+  return `<div class="grid">
+    <div class="panel"><div class="panel-head"><h2>Anneaux &amp; Traits</h2><button class="btn ${edit?"gold":""}" data-act="edit">${edit?"Terminer":"Modifier la fiche"}</button></div><div class="rings">${ringsHtml}</div></div>
+    <div class="panel"><h2>Identité &amp; réputation</h2>${ident}</div>
+    <div class="grid cols-2">
+      <div class="panel"><h2>Compétences</h2>${skillsHtml}</div>
+      <div class="grid">
+        <div class="panel"><h2>Armes</h2>${weaponsHtml}</div>
+        <div class="panel"><h2>Techniques d'école</h2>${techHtml}</div>
+        <div class="panel"><h2>Manœuvres</h2>${edit
+          ? `<p class="hint" style="margin-top:0">Ajuste les coûts à ton livre ou aux règles de ta table. « Cumulable » : on peut la prendre plusieurs fois.</p><div class="tbl"><table><thead><tr><th>Manœuvre</th><th>Coût</th><th>Cumul.</th><th></th></tr></thead><tbody>${
+            (C.maneuvers||[]).map((m,i)=>`<tr><td>${inp(`maneuvers.${i}.n`,m.n)}<textarea class="in" style="min-height:44px;margin-top:4px" data-p="maneuvers.${i}.eff" placeholder="Effet">${esc(m.eff)}</textarea></td><td style="width:64px">${inp(`maneuvers.${i}.cost`,m.cost,"number",'min="0" data-n')}</td><td style="width:50px"><input type="checkbox" data-pc="maneuvers.${i}.rep" ${m.rep?"checked":""} aria-label="Cumulable"></td><td><button class="x" data-act="del" data-list="maneuvers" data-i="${i}" aria-label="Supprimer">×</button></td></tr>`).join("")}</tbody></table></div><button class="btn sm" data-act="add" data-list="maneuvers">+ Manœuvre</button>`
+          : `<div class="tbl"><table><tbody>${mans().map(m=>`<tr><td><b>${esc(m.n)}</b><div class="muted" style="font-size:12.5px">${esc(m.eff)}</div></td><td class="pool" style="white-space:nowrap">${num(m.cost)} augm.${m.rep?" / fois":""}</td></tr>`).join("")}</tbody></table></div>`}</div>
+      </div>
+    </div>
+    <div class="panel"><h2>Avantages, désavantages, notes</h2><div class="grid cols-2">${txt("advantages","Avantages")}${txt("disadvantages","Désavantages")}</div><div style="margin-top:14px">${txt("notes","Notes de campagne")}</div></div>
+    ${edit?`<p><button class="btn" data-act="reset">Supprimer ce personnage…</button> <span id="confirm-reset"></span></p>`:""}
+  </div>`;
+}
+
+/* ---------- Aide de jeu : situations ---------- */
+function A(o){return Object.assign({type:"skill",tn:15,emph:""},o)}
+function weaponActs(w,useTN){const dr=parseDR(w.dr),rg=isRanged(w);return[
+  A({id:"atk-"+w.name,label:`${rg?"Tir":"Attaque"} · ${w.name}`,skill:w.skill,trait:wTrait(w),tn:useTN??"target",attack:true,desc:`${w.skill} (${TRAITS[wTrait(w)]}) contre le ND d'armure de la cible. Choisis tes manœuvres dans le lanceur.`}),
+  A({id:"dmg-"+w.name,parent:"atk-"+w.name,label:`Dégâts · ${w.name}`,type:"damage",dr,bow:rg?num(w.bow):null,tn:null,desc:rg?`Force de l'arc ${num(w.bow)} + VD de la flèche ${w.dr}.`:`Force + VD ${w.dr}. Les augmentations de dégâts s'ajoutent en dés lancés.`})]}
+const UNARMED=()=>[
+  A({id:"unarmed",label:"Attaque à mains nues",skill:"Jiujutsu",trait:"agility",tn:"target",attack:true,desc:"Jiujutsu (Agilité) contre le ND d'armure. Dégâts : Force + 0g1."}),
+  A({id:"unarmed-dmg",parent:"unarmed",label:"Dégâts · mains nues",type:"damage",dr:{r:0,k:1},tn:null,desc:"Force + 0g1."}),
+  A({id:"grapple",label:"Lutte (saisie)",skill:"Jiujutsu",trait:"agility",tn:"target",attack:true,desc:"Attaque Jiujutsu ; si elle touche, jets de Force en opposition pour établir et tenir la prise."})];
+function situations(){
+  const W=C.weapons||[];
+  const S={
+    enquete:{n:"Enquête",acts:[
+      A({id:"notice",label:"Remarquer un détail",skill:"Investigation",trait:"perception",emph:"Remarquer",tn:15,desc:"Indice discret, objet dissimulé à la vue, comportement suspect. ND 10 évident, 20 bien caché."}),
+      A({id:"search",label:"Fouiller un lieu",skill:"Investigation",trait:"perception",emph:"Fouille",tn:15,desc:"Fouille méthodique d'une pièce ou d'un corps. Prends du temps : le MJ peut accorder des augmentations gratuites."}),
+      A({id:"interro",label:"Interroger un témoin",skill:"Investigation",trait:"awareness",emph:"Interrogatoire",tn:15,desc:"Questionner pour obtenir des faits. Un témoin réticent oppose sa Volonté ou Étiquette."}),
+      A({id:"lie",label:"Percer un mensonge",skill:"Investigation",trait:"awareness",emph:"Interrogatoire",tn:"opp",desc:"Jet en opposition contre Sincérité (Intuition) de l'interlocuteur."}),
+      A({id:"court",label:"Obtenir des informations en cour",skill:"Courtoisie",trait:"awareness",tn:15,desc:"Conversation polie, rumeurs, faveurs. Chaque augmentation donne un détail de plus."}),
+      A({id:"etiq",label:"Garder contenance",skill:"Étiquette",trait:"awareness",tn:15,desc:"Ne rien laisser paraître, éviter un faux pas qui coûte de l'Honneur."}),
+      A({id:"lore",label:"Se souvenir (Connaissance)",skill:"Connaissance",trait:"intelligence",tn:15,desc:"Nomme ta Connaissance précise dans la fiche (ex. « Connaissance : Héraldique »). Sinon, jet sans compétence."}),
+    ]},
+    deplacement:{n:"Déplacement",acts:[
+      A({id:"move",type:"move",label:"Se déplacer en combat"}),
+      A({id:"athl",label:"Courir, grimper, sauter",skill:"Athlétisme",trait:"strength",tn:15,desc:"Escalade d'un mur 15, falaise 25. Course prolongée : Constitution au lieu de Force."}),
+      A({id:"ride",label:"Chevaucher en terrain difficile",skill:"Équitation",trait:"agility",tn:15,desc:"Poursuite, saut d'obstacle, combat monté. Garder le contrôle d'une monture effrayée : ND 20."}),
+      A({id:"stealth",label:"Se déplacer discrètement",skill:"Furtivité",trait:"agility",tn:"opp",desc:"En opposition contre Investigation (Perception) des gardes."}),
+      A({id:"track",label:"Pister, s'orienter",skill:"Chasse",trait:"perception",tn:15,desc:"Suivre une piste, trouver un abri ou de l'eau. Piste fraîche 10, sous la pluie 25."}),
+      A({id:"march",label:"Endurer une marche forcée",type:"trait",trait:"stamina",tn:15,desc:"Jet de Trait pur : Constitution gardée Constitution. Échec : fatigue (+5 au ND des jets suivants)."}),
+    ]},
+    combat:{n:"Combat",subs:{
+      escarmouche:{n:"Escarmouche",acts:[
+        A({id:"init",label:"Initiative",type:"init",tn:null,desc:"Rang + Réflexes, gardé Réflexes. Ordre du round."}),
+        ...W.flatMap(w=>weaponActs(w)),
+        ...UNARMED(),
+        A({id:"fulldef",label:"Défense totale",skill:"Défense",trait:"reflexes",tn:null,fulldef:true,desc:"Posture Défense totale : la moitié du résultat s'ajoute à ton ND d'armure ce round."}),
+      ]},
+      duel:{n:"Duel iaijutsu",acts:[
+        A({id:"assess",label:"1 · Évaluation",skill:"Iaijutsu",trait:"awareness",tn:"assess",desc:"ND 10 + 5 × Rang de l'adversaire. Réussite : tu apprends des informations sur lui (Rang, Anneaux…), chaque augmentation en plus."}),
+        A({id:"focus",label:"2 · Concentration",skill:"Iaijutsu",trait:"void",tn:"opp",desc:"Jets en opposition à chaque échange. Le vainqueur frappe en premier ; l'écart se convertit en augmentations gratuites pour la Frappe."}),
+        A({id:"strike",label:"3 · Frappe",skill:"Iaijutsu",trait:"reflexes",tn:"target",attack:true,desc:"Iaijutsu (Réflexes) contre le ND d'armure. Ajoute tes augmentations gratuites de la Concentration."}),
+        ...W.filter(w=>/katana|wakizashi|ken|sabre/i.test(w.name)).map(w=>A({id:"dmg-"+w.name,parent:"strike",label:`Dégâts · ${w.name}`,type:"damage",dr:parseDR(w.dr),tn:null,desc:"Les augmentations de la Frappe ajoutent +1g0 chacune."})),
+      ]},
+      bataille:{n:"Bataille",acts:[
+        A({id:"tactic",label:"Commander / lire le champ",skill:"Bataille",trait:"perception",tn:"opp",desc:"Commandants : jets en opposition chaque tour. Le vainqueur infléchit le cours de la bataille."}),
+        A({id:"battle",label:"Jet de bataille personnel",skill:"Bataille",trait:"perception",tn:15,desc:"Selon ton niveau d'engagement, le résultat détermine ta ligne sur la table de bataille de masse (gloire, blessures, opportunités)."}),
+        A({id:"eng",label:"Niveau d'engagement",type:"info",desc:"Réserve → Désengagé → Engagé → Fortement engagé. Plus tu t'engages, plus tu gagnes de Gloire et d'opportunités, plus tu risques de blessures."}),
+        ...W.flatMap(w=>weaponActs(w)),
+      ]},
+    }},
+    stats:{n:"Statistiques",acts:[]},
+  };
+  return S;
+}
+function currentActs(){const S=situations();return sit==="combat"?S.combat.subs[sub].acts:(S[sit].acts||[])}
+
+/* ---------- Statistiques (Monte-Carlo, mis en cache par réserve) ---------- */
+const STAT_N=4000, simCache=new Map();
+function simulate(p,emph){
+  const key=[p.r,p.k,p.skilled?1:0,emph?1:0].join("|");
+  if(simCache.has(key))return simCache.get(key);
+  const tots=new Int32Array(STAT_N), d=new Array(p.r);
+  for(let n=0;n<STAT_N;n++){
+    for(let i=0;i<p.r;i++){let v=d10();if(emph&&v===1)v=d10();let t=v;while(p.skilled&&v===10){v=d10();t+=v}d[i]=t}
+    d.sort((a,b)=>b-a);let s=0;for(let i=0;i<p.k;i++)s+=d[i];tots[n]=s;
+  }
+  tots.sort();let sum=0;for(let i=0;i<STAT_N;i++)sum+=tots[i];
+  const r={tots,mean:sum/STAT_N};simCache.set(key,r);return r;
+}
+function pAtLeast(sim,need){let lo=0,hi=sim.tots.length;while(lo<hi){const m=(lo+hi)>>1;if(sim.tots[m]>=need)hi=m;else lo=m+1}return (sim.tots.length-lo)/sim.tots.length}
+function statsFor(p,emph,flat=0){
+  if(!p||p.r<1)return null;
+  const sim=simulate(p,emph&&p.skilled), add=p.bonus+num(flat);
+  return{min:p.k+add,mean:sim.mean+add,max:10*p.k+add,open:p.skilled,chance:tn=>pAtLeast(sim,tn-add)};
+}
+const pct=x=>x>=0.995?"≥99 %":x<0.005?"<1 %":Math.round(x*100)+" %";
+const statOpt={voidp:false,emph:true,pen:true};
+function renderStats(){
+  const TNS=[10,15,20,25,30,40], pen=statOpt.pen?(woundState().pen||0):0;
+  const o={voidp:statOpt.voidp,dmod:0,voidSkill:false};
+  const rows=[];
+  const add=(label,a,cls="")=>{const p=pool(a,o,"attaque");const st=statsFor(p,statOpt.emph&&a.type==="skill"&&hasEmph(a.skill,a.emph||""));rows.push({label,a,p,st,cls})};
+  add("Initiative",A({type:"init",tn:null}));
+  (C.weapons||[]).forEach(w=>{const [at,dm]=weaponActs(w);add(at.label,at);add(dm.label,dm,"child")});
+  (C.skills||[]).slice().sort((x,y)=>x.name.localeCompare(y.name,"fr")).forEach(sk=>add(`${sk.name} (${TRAITS[sk.trait]})`,A({type:"skill",skill:sk.name,trait:sk.trait,emph:sk.emph||""})));
+  const cell=(st,tn)=>{const v=st.chance(tn+pen);return `<td class="pc" style="--p:${Math.round(v*60)}%">${pct(v)}</td>`};
+  const body=rows.map(r=>{const st=r.st;if(!st)return "";const hasTN=r.a.type==="skill"||r.a.type==="trait";
+    return `<tr class="${r.cls}"><td class="jl">${r.cls?"└ ":""}${esc(r.label)}</td><td class="pool">${fmt(r.p.r,r.p.k)}</td><td class="mono">${st.min}</td><td class="mono"><b>${Math.round(st.mean)}</b></td><td class="mono">${st.max}${st.open?"+":""}</td>${hasTN?TNS.map(t=>cell(st,t)).join(""):`<td class="muted" style="text-align:center" colspan="${TNS.length}">sans ND</td>`}</tr>`}).join("");
+  return `<div class="panel">
+    <div class="panel-head"><h2>Statistiques de tes jets</h2><span class="muted" style="font-size:13px">${STAT_N.toLocaleString("fr-FR")} lancers simulés par réserve</span></div>
+    <div class="statopts">
+      <label class="chk"><input type="checkbox" data-st="voidp" ${statOpt.voidp?"checked":""}> Avec un point de Vide (+1g1)</label>
+      <label class="chk"><input type="checkbox" data-st="emph" ${statOpt.emph?"checked":""}> Spécialisations appliquées</label>
+      <label class="chk"><input type="checkbox" data-st="pen" ${statOpt.pen?"checked":""}> Pénalité de blessure actuelle (+${woundState().pen||0})</label>
+    </div>
+    <div class="tbl"><table class="stats"><thead><tr><th>Jet</th><th>Réserve</th><th>Min</th><th>Moy.</th><th>Max</th>${TNS.map(t=>`<th>ND ${t}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table></div>
+    <p class="hint">Chances de réussite sans augmentation. Chaque augmentation annoncée ajoute +5 au ND : décale-toi d'une colonne vers la droite. Un maximum suivi de « + » peut être dépassé grâce aux explosions.</p>
+  </div>`;
+}
+
+function pool(a,o=opt,st=stance){
+  if(!a||a.type==="info"||a.type==="move")return null;
+  let r=0,k=0,skilled=true,canRaise=true,note="";
+  if(a.type==="skill"){const t=tv(a.trait);let s=skillRank(a.skill);
+    if(!s&&o.voidSkill){s=1;note="Point de Vide : compétence jouée au rang 1."}
+    r=t+s;k=t;if(!s){skilled=false;canRaise=false;note="Sans compétence : pas d'explosion, pas d'augmentation."}}
+  else if(a.type==="trait"){r=k=tv(a.trait)}
+  else if(a.type==="damage"){r=(a.bow!=null?num(a.bow):tv("strength"))+a.dr.r;k=a.dr.k;canRaise=false}
+  else if(a.type==="init"){r=num(C.insight)+tv("reflexes");k=tv("reflexes");canRaise=false}
+  if(a.attack&&st==="totale"){r+=2;k+=1}
+  r+=num(o.dmod);
+  if(o.voidp){r+=1;k+=1}
+  let bonus=0;
+  if(r>10){k+=r-10;r=10}
+  if(k>10){bonus+=2*(k-10);k=10}
+  k=Math.min(k,r);
+  return{r,k,skilled,canRaise,bonus,note};
+}
+function baseTN(a){
+  if(a.tn===null)return null;
+  if(a.tn==="target")return num(opt.targetTN);
+  if(a.tn==="assess")return 10+5*num(opt.oppInsight);
+  if(a.tn==="opp")return "opp";
+  return num(opt.tn);
+}
+function finalTN(a){
+  const b=baseTN(a); if(b===null||b==="opp")return b;
+  const pen=woundState().pen||0;
+  return b+5*calledRaises(a)+pen;
+}
+
+function voidPanel(){
+  const vp=num(C.voidPoints), none=vp<1;
+  return `<div class="panel" style="padding:12px"><div class="panel-head" style="margin-bottom:8px"><span class="label">Dépenser du Vide · reste ${vp}</span><button class="btn sm" data-act="new-round">Nouveau round</button></div>
+    ${voidRound?`<p class="hint" style="color:var(--bad);margin:0 0 8px">Déjà un point de Vide dépensé ce round (limite normale : 1 par round).</p>`:""}
+    <div class="stance">
+      <button data-act="void-roll" aria-pressed="${opt.voidp}" ${none&&!opt.voidp?"disabled":""}><b>+1g1 au jet</b><span class="muted">Dépensé au prochain jet lancé.</span></button>
+      <button data-act="void-armor" aria-pressed="${voidArmor}" ${none&&!voidArmor?"disabled":""}><b>+10 ND d'armure</b><span class="muted">Jusqu'au prochain round.</span></button>
+      <button data-act="void-skill" aria-pressed="${opt.voidSkill}" ${none&&!opt.voidSkill?"disabled":""}><b>Compétence au rang 1</b><span class="muted">Jouer une compétence que tu n'as pas.</span></button>
+      <button data-act="void-tech" ${none?"disabled":""}><b>Activer une capacité</b><span class="muted">Technique, kata ou avantage payé en Vide.</span></button>
+    </div></div>`;
+}
+
+function movePanel(){
+  const m=moveFt(), w=ringVal("water");
+  return `<div class="panel movebox"><div class="panel-head" style="margin-bottom:8px"><h2 style="font-size:17px">Se déplacer en combat</h2><span class="muted" style="font-size:13px">Anneau d'Eau ${w}</span></div>
+    <div class="moves">
+      <div><span class="label">Action libre</span><b class="mono">${m.free} pi</b><span class="muted">${toM(m.free)} · 1 fois par round</span></div>
+      <div><span class="label">Action simple</span><b class="mono">${m.simple} pi</b><span class="muted">${toM(m.simple)} · Eau × 10</span></div>
+      <div><span class="label">Maximum / round</span><b class="mono">${m.max} pi</b><span class="muted">${toM(m.max)} · Eau × 20</span></div>
+    </div>
+    <p class="hint" style="margin-bottom:0">Terrain difficile (eau, foule, escaliers) : distances divisées par deux. Valeurs 4e à vérifier dans ton livre.</p></div>`;
+}
+
+function selectAct(id){
+  const a=currentActs().find(x=>x.id===id); if(!a||a.type==="info"||a.type==="move")return;
+  sel=a.id; lastRoll=null; man={};
+  opt.raises=0;opt.free=0;opt.flat=0;opt.dmod=0;
+  if(a.type==="damage"&&pendingDmg){opt.dmod=pendingDmg;pendingDmg=0}
+  opt.emph=a.type==="skill"&&hasEmph(a.skill,a.emph);
+  if(typeof a.tn==="number")opt.tn=a.tn;
+}
+
+function renderAid(){
+  const S=situations(), acts=currentActs();
+  if(!sel||!acts.find(a=>a.id===sel)){const f=acts.find(a=>a.type!=="info"&&a.type!=="move");if(f)selectAct(f.id)}
+  const a=acts.find(x=>x.id===sel);
+  const sitBtns=Object.entries(S).map(([k,v])=>`<button data-act="sit" data-k="${k}" aria-pressed="${sit===k}">${v.n}</button>`).join("");
+  if(sit==="stats")return `<div class="sit">${sitBtns}</div>${renderStats()}`;
+  const subBtns=sit==="combat"?`<div class="sit sub">${Object.entries(S.combat.subs).map(([k,v])=>`<button data-act="sub" data-k="${k}" aria-pressed="${sub===k}">${v.n}</button>`).join("")}</div>`:"";
+  const stanceHtml=(sit==="combat"&&sub!=="duel"?`<div class="panel" style="padding:12px"><div class="panel-head" style="margin-bottom:8px"><span class="label">Posture</span><span class="muted" style="font-size:13px">ND d'armure <b class="mono" style="color:var(--ink);font-size:16px">${armorTN()}</b>${voidArmor?` <span class="tag">+10 Vide</span>`:""}</span></div><div class="stance">${Object.entries(STANCES).map(([k,v])=>`<button data-act="stance" data-k="${k}" aria-pressed="${stance===k}"><b>${v.n}</b><span class="muted">${v.d}</span></button>`).join("")}</div></div>`:"")+(sit==="combat"?voidPanel():"");
+  const initAct=acts.find(x=>x.type==="init");
+  const initHtml=initAct?(()=>{const p=pool(initAct);return `<button class="act" data-act="pick" data-id="init" aria-pressed="${sel==="init"}"><span class="t">Initiative <span class="muted" style="font-weight:500">· une fois par combat</span></span><span class="p">${initVal!=null?`<span style="color:var(--ink);font-size:20px">${initVal}</span>`:fmt(p.r,p.k)}</span><span class="d">${initVal!=null?`Ton rang dans l'ordre du combat. Clique pour relancer si un nouveau combat commence (${fmt(p.r,p.k)}).`:`Rang ${num(C.insight)} + Réflexes ${tv("reflexes")}, gardé Réflexes. À lancer au début du combat.`}</span></button>`})():"";
+  const list=acts.filter(x=>x.type!=="init").map(x=>{const p=pool(x);if(x.type==="move")return movePanel();return x.type==="info"
+    ?`<div class="act info"><span class="t">${esc(x.label)}</span><span></span><span class="d">${esc(x.desc)}</span></div>`
+    :`<button class="act ${x.type==="damage"?"child":""} ${x.type==="damage"&&pendingDmg&&lastAtk&&x.parent===lastAtk?"linked":""}" data-act="pick" data-id="${esc(x.id)}" aria-pressed="${x.id===sel}"><span class="t">${esc(x.label)}${x.type==="damage"&&pendingDmg&&x.parent===lastAtk?` <span class="pend">+${pendingDmg}g0 en attente</span>`:""}</span><span class="p">${p?fmt(p.r,p.k):""}</span><span class="d">${esc(x.desc)}</span></button>`}).join("")
+    || `<p class="muted">Ajoute des armes dans la fiche pour voir les attaques.</p>`;
+  return `<div class="sit">${sitBtns}</div>${subBtns}
+    <div class="aid"><div class="grid" style="gap:12px">${initHtml}${stanceHtml}<div class="actions">${list}</div></div>
+    <div class="backdrop ${sheetOpen?"open":""}" data-act="sheet-close"></div><div class="panel roller ${sheetOpen?"open":""}" id="roller" role="dialog" aria-label="Lanceur de dés">${a?renderRoller(a):`<p class="muted">Choisis une action.</p>`}</div></div>`;
+}
+
+function renderRoller(a){
+  const p=pool(a), b=baseTN(a), ft=finalTN(a), ws=woundState(), vp=num(C.voidPoints);
+  const isSkill=a.type==="skill";
+  const tnField = b===null?"":
+    a.tn==="target"?`<label class="field"><span class="label">ND d'armure cible</span><input class="in mono" type="number" id="o-targetTN" value="${opt.targetTN}"></label>`:
+    a.tn==="assess"?`<label class="field"><span class="label">Rang adverse</span><input class="in mono" type="number" min="1" id="o-oppInsight" value="${opt.oppInsight}"></label>`:
+    a.tn==="opp"?`<div class="field"><span class="label">ND</span><span class="muted" style="font-size:13px;padding-top:6px">Opposition : compare au jet adverse</span></div>`:
+    `<label class="field"><span class="label">ND de base</span><select class="in mono" id="o-tn">${[[5,"Trivial"],[10,"Facile"],[15,"Moyen"],[20,"Difficile"],[25,"Très difficile"],[30,"Ardu"],[40,"Héroïque"],[50,"Légendaire"]].map(([v,n])=>`<option value="${v}" ${num(opt.tn)===v?"selected":""}>${v} · ${n}</option>`).join("")}</select></label>`;
+  const raiseMax=num(C.void);
+  const res=lastRoll&&lastRoll.id===a.id?renderResult(lastRoll):"";
+  return `<div class="sheet-head"><span class="grip"></span><button class="close" data-act="sheet-close" aria-label="Fermer">×</button></div><div class="label">${esc(sit==="combat"?situations().combat.subs[sub].n:situations()[sit].n)}</div>
+    <h2 style="margin:2px 0 8px">${esc(a.label)}</h2>
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><span class="poolbig">${fmt(p.r,p.k)}</span><span class="muted" style="font-size:13px">${
+      a.type==="skill"?`${esc(a.skill)} ${skillRank(a.skill)} + ${TRAITS[a.trait]} ${tv(a.trait)}`:a.type==="trait"?`${TRAITS[a.trait]} pur`:a.type==="damage"?`${a.bow!=null?"Arc "+num(a.bow):"Force "+tv("strength")} + VD ${fmt(a.dr.r,a.dr.k)}${num(opt.dmod)?` + ${num(opt.dmod)} dé(s)`:""}`:`Rang ${num(C.insight)} + Réflexes ${tv("reflexes")}`}${p.bonus?` · +${p.bonus} (règle des dix dés)`:""}</span></div>
+    ${(()=>{const st=statsFor(p,opt.emph&&isSkill&&p.skilled,opt.flat);if(!st)return "";const ch=typeof ft==="number"?st.chance(ft):null;
+      return `<div class="statline"><span>Min <b>${st.min}</b></span><span>Moy. <b>${Math.round(st.mean)}</b></span><span>Max <b>${st.max}${st.open?"+":""}</b></span>${ch!=null?`<span class="ch">Réussite <b>${pct(ch)}</b></span>`:""}</div>`})()}
+    ${p.note?`<div class="hint" style="color:var(--bad)">${p.note}</div>`:""}
+    <div class="opts">
+      ${tnField}
+      ${p.canRaise?`<label class="field"><span class="label">${a.attack?"Augm. libres":"Augmentations"}</span><input class="in mono" type="number" min="0" id="o-raises" value="${opt.raises}"></label>`:`<div></div>`}
+      ${p.canRaise?`<label class="field"><span class="label">Augm. gratuites</span><input class="in mono" type="number" min="0" id="o-free" value="${opt.free}"></label>`:""}
+      <label class="field"><span class="label">Dés lancés ±</span><input class="in mono" type="number" id="o-dmod" value="${opt.dmod}"></label>
+      <label class="field"><span class="label">Bonus fixe</span><input class="in mono" type="number" id="o-flat" value="${opt.flat}"></label>
+    </div>
+    <div class="grid" style="gap:6px;margin-bottom:12px">
+      <label class="chk"><input type="checkbox" id="o-voidp" ${opt.voidp?"checked":""} ${vp<1&&!opt.voidp?"disabled":""}> Dépenser 1 point de Vide (+1g1) <span class="muted">· reste ${vp}</span></label>
+      ${isSkill&&!skillRank(a.skill)?`<label class="chk"><input type="checkbox" id="o-voidSkill" ${opt.voidSkill?"checked":""} ${vp<1&&!opt.voidSkill?"disabled":""}> Dépenser 1 point de Vide : jouer ${esc(a.skill)} au rang 1</label>`:""}
+      ${isSkill&&p.skilled?`<label class="chk"><input type="checkbox" id="o-emph" ${opt.emph?"checked":""}> Spécialisation : relancer les 1 ${a.emph?`<span class="muted">(${esc(a.emph)})</span>`:""}</label>`:""}
+    </div>
+    ${a.attack&&p.canRaise?`<div class="label">Manœuvres <span style="text-transform:none;letter-spacing:0;font-weight:500">· coût en augmentations</span></div>
+      <div class="mans">${mans().map(m=>{const c=num(man[m.k]);return m.rep
+        ?`<div class="man ${c?"on":""}"><button data-act="man-" data-k="${esc(m.k)}" aria-label="Retirer">−</button><span title="${esc(m.eff)}">${esc(m.n)} <b class="mono">${c}</b></span><button data-act="man+" data-k="${esc(m.k)}" aria-label="Ajouter">+</button></div>`
+        :`<button class="man ${c?"on":""}" data-act="man" data-k="${esc(m.k)}" aria-pressed="${!!c}" title="${esc(m.eff)}">${esc(m.n)} <b class="mono">${num(m.cost)}</b></button>`}).join("")}</div>
+      ${mans().filter(m=>num(man[m.k])).map(m=>`<div class="hint" style="margin-top:4px">• <b>${esc(m.n)}</b> : ${esc(m.eff)}</div>`).join("")}`:""}
+    ${p.canRaise&&calledRaises(a)?`<div class="tnline" style="margin-top:10px;${calledRaises(a)>raiseMax?"color:var(--bad)":""}"><span>Augmentations annoncées</span><span class="mono"><b>${calledRaises(a)}</b> / max ${raiseMax}${calledRaises(a)>raiseMax?" · dépasse ton Vide":""}</span></div>`:""}
+    ${ft!==null&&ft!=="opp"?`<div class="tnline"><span>ND final</span><span class="mono"><b style="font-size:18px">${ft}</b> <span class="muted">= ${baseTN(a)}${calledRaises(a)?` + ${5*calledRaises(a)} augm.`:""}${ws.pen?` + ${ws.pen} blessures`:""}</span></span></div>`:""}
+    ${ws.pen===null?`<div class="hint" style="color:var(--bad)">Ton personnage est hors de combat.</div>`:""}
+    <button class="btn primary rollbtn" style="width:100%;margin-top:12px;padding:12px" data-act="roll">Lancer ${fmt(p.r,p.k)}</button>
+    <div id="res">${res}</div>
+    ${hist.length?`<div class="hist"><span class="label">Derniers jets</span>${hist.map(h=>`<div><span>${esc(h.label)}</span><span class="mono">${h.total}${h.tn!=null&&h.tn!=="opp"?(h.total>=h.tn?" ✓":" ✗"):""}</span></div>`).join("")}</div>`:""}`;
+}
+
+function d10(){return 1+Math.floor(Math.random()*10)}
+function doRoll(){
+  const a=currentActs().find(x=>x.id===sel); const p=pool(a);
+  const explode=p.skilled, emph=opt.emph&&a.type==="skill"&&p.skilled;
+  const dice=[];
+  for(let i=0;i<p.r;i++){
+    let v=d10(), faces=[], re=false;
+    if(emph&&v===1){re=true;v=d10()}
+    faces.push(v); let tot=v;
+    while(explode&&v===10){v=d10();faces.push(v);tot+=v}
+    dice.push({tot,faces,re});
+  }
+  const sorted=dice.map((d,i)=>({...d,i})).sort((x,y)=>y.tot-x.tot);
+  sorted.forEach((d,j)=>d.kept=j<p.k);
+  const total=sorted.filter(d=>d.kept).reduce((s,d)=>s+d.tot,0)+p.bonus+num(opt.flat);
+  const tn=finalTN(a);
+  if(opt.voidp){spendVoid();opt.voidp=false}
+  if(opt.voidSkill&&a.type==="skill"&&!skillRank(a.skill)){spendVoid();opt.voidSkill=false}
+  if(a.fulldef){fullDefBonus=Math.floor(total/2);stance="totaldef"}
+  if(a.type==="init")initVal=total;
+  const usedMans=a.attack?mans().filter(m=>num(man[m.k])).map(m=>m.rep?`${m.n} ×${num(man[m.k])}`:m.n):[];
+  const ok=tn!=null&&tn!=="opp"&&total>=tn;
+  const dmgUp=a.attack&&ok?num(man.dmg):0;
+  if(a.attack){pendingDmg=dmgUp;lastAtk=a.id}
+  lastRoll={id:a.id,label:a.label,dice:sorted,total,tn,raises:calledRaises(a),free:num(opt.free),type:a.type,fulldef:a.fulldef,mans:usedMans,dmgUp};
+  hist.unshift({label:a.label,total,tn}); hist=hist.slice(0,6);
+  render();
+  const res=$("#res"); if(res&&sheetOpen&&res.scrollIntoView)res.scrollIntoView({block:"center"});
+}
+function renderResult(L){
+  const dice=L.dice.map(d=>`<span class="die ${d.kept?"kept":""} ${d.faces.length>1?"ex":""}" title="${d.faces.join(" + ")}${d.re?" (1 relancé)":""}">${d.tot}</span>`).join("");
+  let v="";
+  if(L.tn!=null&&L.tn!=="opp"){const ok=L.total>=L.tn;const m=L.total-L.tn;
+    v=`<div class="verdict ${ok?"ok":"ko"}">${ok?"Réussite":"Échec"} <span class="mono" style="font-size:16px">${L.total} / ${L.tn} (${m>=0?"+":""}${m})</span></div>`;
+    if(ok&&(L.raises||L.free))v+=`<div class="hint">${L.raises+L.free} augmentation(s) à appliquer${L.free?` dont ${L.free} gratuite(s)`:""}.</div>`;
+    if(L.mans&&L.mans.length)v+=`<div class="hint">${ok?"Manœuvres réussies":"Manœuvres perdues"} : ${esc(L.mans.join(", "))}.</div>`;
+    if(L.dmgUp)v+=`<div class="hint">+${L.dmgUp}g0 pré-rempli sur le prochain jet de dégâts.</div>`;
+    if(ok&&!L.raises&&m>=5&&L.type!=="damage")v+=`<div class="hint">Marge de ${m} : tu aurais pu annoncer ${Math.floor(m/5)} augmentation(s).</div>`;
+  } else if(L.tn==="opp"){v=`<div class="verdict">${L.total} <span class="muted" style="font-size:15px;font-family:var(--f-body)">à comparer au jet adverse</span></div>`}
+  else {v=`<div class="verdict">${L.total} <span class="muted" style="font-size:15px;font-family:var(--f-body)">${L.type==="damage"?"blessures infligées":L.type==="init"?"initiative":""}</span></div>`}
+  if(L.fulldef)v+=`<div class="hint">+${Math.floor(L.total/2)} au ND d'armure ce round (posture Défense totale activée).</div>`;
+  return `<div class="dice" aria-label="Dés">${dice}</div>${v}`;
+}
+
+/* ---------- Évènements ---------- */
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-act]"); if(!b)return;
+  const act=b.dataset.act;
+  if(act==="create"){C=blank();edit=true;view="sheet";save();render();return}
+  if(!C)return;
+  switch(act){
+    case "edit":edit=!edit;if(edit&&!(C.maneuvers&&C.maneuvers.length))C.maneuvers=JSON.parse(JSON.stringify(DEF_MANS));break;
+    case "add":{const L=b.dataset.list;C[L]=C[L]||[];C[L].push(L==="skills"?{name:"",rank:1,trait:"agility",emph:""}:L==="weapons"?{name:"",skill:"Kenjutsu",dr:"3g2"}:L==="maneuvers"?{k:"m"+Date.now(),n:"",cost:1,eff:""}:{name:"",text:""});save();break}
+    case "new-round":voidArmor=false;voidRound=false;fullDefBonus=0;if(stance==="totaldef")stance="defense";toast("Nouveau round");break;
+    case "void-roll":opt.voidp=!opt.voidp;break;
+    case "void-skill":opt.voidSkill=!opt.voidSkill;break;
+    case "void-armor":if(voidArmor){voidArmor=false;C.voidPoints=num(C.voidPoints)+1;voidRound=false;save()}else if(spendVoid()){voidArmor=true}break;
+    case "void-tech":if(spendVoid())toast("Point de Vide dépensé");break;
+    case "man":man[b.dataset.k]=man[b.dataset.k]?0:1;break;
+    case "man+":man[b.dataset.k]=num(man[b.dataset.k])+1;break;
+    case "man-":man[b.dataset.k]=Math.max(0,num(man[b.dataset.k])-1);break;
+    case "del":C[b.dataset.list].splice(+b.dataset.i,1);save();break;
+    case "reset":$("#confirm-reset").innerHTML=`<button class="btn" style="color:var(--bad)" data-act="reset-ok">Confirmer la suppression</button>`;return;
+    case "reset-ok":C=null;if(ref)ref.delete().catch(()=>{});try{localStorage.removeItem("l5r-char")}catch(e){};edit=false;break;
+    case "w+":C.wounds=num(C.wounds)+1;save();break;
+    case "w-":C.wounds=Math.max(0,num(C.wounds)-1);save();break;
+    case "vp":{const i=+b.dataset.i;C.voidPoints=num(C.voidPoints)===i+1?i:i+1;save();break}
+    case "sit":sit=b.dataset.k;sel=null;lastRoll=null;sheetOpen=false;break;
+    case "sub":sub=b.dataset.k;sel=null;lastRoll=null;sheetOpen=false;break;
+    case "stance":stance=b.dataset.k;if(stance!=="totaldef")fullDefBonus=0;break;
+    case "pick":selectAct(b.dataset.id);sheetOpen=true;break;
+    case "sheet-close":sheetOpen=false;break;
+    case "wexp":wExp=!wExp;break;
+    case "roll":doRoll();return;
+  }
+  render();
+});
+$("#tab-sheet").onclick=()=>{view="sheet";sheetOpen=false;render()};
+$("#tab-aid").onclick=()=>{view="aid";edit=false;render()};
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&sheetOpen){sheetOpen=false;render()}});
+
+document.addEventListener("input",e=>{
+  const t=e.target;
+  if(t.dataset&&t.dataset.p){setPath(t.dataset.p,t.hasAttribute("data-n")?num(t.value):t.value);save();return}
+  if(t.id==="wounds"){C.wounds=Math.max(0,num(t.value));save();return}
+});
+document.addEventListener("change",e=>{
+  const t=e.target;
+  if(t.dataset&&t.dataset.st){statOpt[t.dataset.st]=t.checked;render();return}
+  if(t.dataset&&t.dataset.pc){setPath(t.dataset.pc,t.checked);save();render();return}
+  if(t.dataset&&t.dataset.p){render();return}
+  if(t.id==="wounds"){render();return}
+  if(t.id&&t.id.startsWith("o-")){const k=t.id.slice(2);opt[k]=t.type==="checkbox"?t.checked:t.value;
+    if(k==="raises")opt.raises=Math.max(0,num(t.value));
+    render();}
+});
+
+/* ---------- Démarrage ---------- */
+async function start(){
+  try{db=window.claude?.use?await window.claude.use("db"):null}catch(e){db=null}
+  if(db){
+    ref=db.doc("sheets/main"); store="db";
+    let first=true;
+    ref.onSnapshot(s=>{
+      const busy=document.activeElement&&document.activeElement.matches("input,textarea,select");
+      if(s.metadata.hasPendingWrites)return;
+      if(first||!busy){C=s.exists?JSON.parse(JSON.stringify(s.data())):null;first=false;render()}
+    },()=>{toast("Synchronisation interrompue, recharge la page")});
+  } else {
+    store="local";
+    try{const raw=localStorage.getItem("l5r-char");C=raw?JSON.parse(raw):null}catch(e){C=null}
+    render();
+  }
+}
+start();
+</script>
