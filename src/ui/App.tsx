@@ -1,11 +1,12 @@
-import { useMemo, useReducer } from "react";
+import { useCallback, useMemo, useReducer, useState, type DragEvent } from "react";
 import type { Storage } from "../storage";
 import { Aid } from "./components/Aid";
 import { Header } from "./components/Header";
+import { ImportDialog } from "./components/ImportDialog";
 import { Library } from "./components/Library";
 import { Sheet } from "./components/Sheet";
 import { StatusBar } from "./components/StatusBar";
-import { initialState, reducer, StoreContext, type Store } from "./store";
+import { initialState, reducer, StoreContext, type PendingImport, type Store } from "./store";
 import { useThemeAndClan } from "./theme";
 import { useLibrary, type LibraryOptions } from "./useLibrary";
 
@@ -20,13 +21,28 @@ export interface AppProps extends LibraryOptions {
 export function App({ storage, rng = d10, ...libraryOptions }: AppProps) {
   const [state, dispatch] = useReducer(reducer, undefined, initialState);
   const { ready, api } = useLibrary(storage, state, dispatch, libraryOptions);
-  const store = useMemo<Store>(() => ({ state, dispatch, rng, library: api }), [state, rng, api]);
+  const [pending, setPending] = useState<PendingImport | null>(null);
+  const startImport = useCallback((file: File) => {
+    void file.text().then((text) => setPending({ fileName: file.name, text }));
+  }, []);
+  const store = useMemo<Store>(() => ({ state, dispatch, rng, library: api, startImport }), [state, rng, api, startImport]);
   const { character: c, ui } = state;
   useThemeAndClan(ui.theme, c?.clan);
 
+  // Glisser-déposer d'un fichier JSON n'importe où sur la page (HANDOFF §8).
+  const onDragOver = (e: DragEvent) => {
+    if (ready && e.dataTransfer.types.includes("Files")) e.preventDefault();
+  };
+  const onDrop = (e: DragEvent) => {
+    const file = e.dataTransfer.files[0];
+    if (!ready || !file) return;
+    e.preventDefault();
+    startImport(file);
+  };
+
   return (
     <StoreContext.Provider value={store}>
-      <div className="wrap">
+      <div className="wrap" onDragOver={onDragOver} onDrop={onDrop}>
         {api.degraded && (
           <p className="banner" role="alert">Sauvegarde impossible dans ce navigateur : exporte ta fiche avant de fermer.</p>
         )}
@@ -47,6 +63,7 @@ export function App({ storage, rng = d10, ...libraryOptions }: AppProps) {
           {api.saveStatus === "error" && <span className="save-error" role="alert">Échec de l'enregistrement dans ce navigateur · </span>}
           Carnet de Rokugan v{__APP_VERSION__}
         </footer>
+        {pending && <ImportDialog pending={pending} onClose={() => setPending(null)} />}
       </div>
     </StoreContext.Provider>
   );

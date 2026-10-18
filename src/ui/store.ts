@@ -97,6 +97,8 @@ export function initialState(): AppState {
 export type AppAction =
   | { type: "open"; id: string; character: Character; mode: EntryMode; edit?: boolean }
   | { type: "library" }
+  /** Fusion d'un import appliquée (HANDOFF §8). */
+  | { type: "replaceCharacter"; character: Character }
   | { type: "set"; path: Path; value: unknown }
   | { type: "add"; list: ListKey; item: unknown }
   | { type: "remove"; list: ListKey; index: number }
@@ -198,7 +200,7 @@ function uiReducer(state: AppState, action: AppAction): AppState {
 }
 
 /** Actions qui modifient la fiche : refusées en consultation. */
-const EDITING = new Set<AppAction["type"]>(["set", "add", "remove", "wounds", "pip", "toggleEdit"]);
+const EDITING = new Set<AppAction["type"]>(["set", "add", "remove", "wounds", "pip", "toggleEdit", "replaceCharacter"]);
 
 export function reducer(state: AppState, action: AppAction): AppState {
   const { character: c, ui } = state;
@@ -218,6 +220,8 @@ export function reducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
     case "set":
       return { ...state, character: setIn(c, action.path, action.value) };
+    case "replaceCharacter":
+      return { ...state, character: action.character };
     case "add":
       return { ...state, character: { ...c, [action.list]: [...c[action.list], action.item] } };
     case "remove":
@@ -307,6 +311,14 @@ export interface LibraryApi {
   showLibrary(): Promise<void>;
   /** Fiche en consultation → copie modifiable, ouverte aussitôt. */
   makeEditableCopy(): Promise<void>;
+  /** Import « Nouvelle fiche » ou « Consultation » : nouvelle entrée, ouverte aussitôt. */
+  importEntry(character: Character, mode: EntryMode): Promise<void>;
+}
+
+/** Import en cours : fichier choisi ou déposé, en attente d'une destination. */
+export interface PendingImport {
+  fileName: string;
+  text: string;
 }
 
 export interface Store {
@@ -315,6 +327,8 @@ export interface Store {
   /** Tirage d'un d10 (1..10), injectable pour les tests. */
   rng: () => number;
   library: LibraryApi;
+  /** Ouvre la fenêtre d'import pour un fichier choisi ou déposé. */
+  startImport(file: File): void;
 }
 
 export const StoreContext = createContext<Store | null>(null);

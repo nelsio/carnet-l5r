@@ -7,6 +7,7 @@ import { RINGS, TRAIT_LABELS, type RingKey } from "../../rules/l5r4e";
 import { decimal } from "../format";
 import { effectiveManeuvers } from "../rolls";
 import { useCharacter, useStore, type ListKey } from "../store";
+import { FileActions } from "./FileActions";
 import { ListField, NumberField } from "./fields";
 
 const CLAN_SUGGESTIONS = ["Crabe", "Grue", "Dragon", "Licorne", "Lion", "Mante", "Phénix", "Scorpion", "Araignée", "Impérial"];
@@ -67,6 +68,7 @@ export function Sheet() {
         </div>
         <div style={{ marginTop: 14 }}><LongText field="notes" label="Notes de campagne" /></div>
       </div>
+      <FileActions />
       {edit && <DeleteCharacter />}
     </div>
   );
