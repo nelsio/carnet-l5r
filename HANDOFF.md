@@ -494,7 +494,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 | P3 | Récupération des points de Vide (repos, Méditation) | Saisie manuelle |
 | P5 | Déplacement 4e : Eau × 5 (libre) / × 10 (simple) / × 20 (max par round), unité pieds ou mètres selon l'édition française | Valeurs actuelles, pieds + conversion en mètres |
 | P4 | Nom du dépôt et de la page | `carnet-l5r` |
-| P6 | Bonus de jet (annexe B) ajoutés comme champ **facultatif** du format v1, sans incrémenter `schemaVersion` : la spécification fournie attend `schemaVersion: 1`. Acceptable tant que la v1.0.0 n'est pas publiée. | Champ facultatif en v1 ; passer en v2 (et mettre à jour la spécification) si le format évolue après la v1.0.0 |
+| P6 | **Tranché le 18/10/2026 (v1.0.0)** : les bonus de jet (annexe B) sont un champ **facultatif** du format v1 (`modifiers?`), sans incrémenter `schemaVersion`, la spécification fournie attendant `schemaVersion: 1`. Rétrocompatible : une fiche sans bonus est inchangée. | Décision retenue. Toute évolution du format **après** la v1.0.0 suit le §9.2 : `schemaVersion` 2, migration testée, et mise à jour de la spécification du moteur. |
 
 ---
 
