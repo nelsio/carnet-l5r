@@ -1,0 +1,328 @@
+{
+  "version": 1,
+  "note": "Catalogue des techniques d'école (bushi, lot 10). Effets chiffrés et résumés rédigés pour l'outil : aucun texte du livre. Format décrit dans HANDOFF.md, annexe C.",
+  "schools": [
+    {
+      "id": "hida-bushi", "clan": "Crabe", "name": "École de bushi Hida", "class": "Bushi",
+      "ranks": [
+        { "rank": 1, "name": "La Voie du Crabe",
+          "summary": "Pas de pénalité de ND d'armure lourde (sauf Discrétion). +1g0 aux dégâts avec une arme lourde.",
+          "effects": [ { "kind": "roll", "on": ["damage"], "rolled": 1, "when": { "weapon": { "keywordsAny": ["lourde"] } }, "mode": "auto" } ] },
+        { "rank": 2, "name": "La Montagne ne bouge pas",
+          "summary": "Réduction augmentée de l'Anneau de Terre.",
+          "effects": [ { "kind": "reduction", "value": { "ref": "ring:earth" }, "mode": "auto" } ] },
+        { "rank": 3, "name": "Deux pinces, un seul esprit",
+          "summary": "Attaque en Action simple avec une arme lourde ou Samouraï.",
+          "effects": [ { "kind": "simpleAttack", "when": { "weapon": { "keywordsAny": ["lourde", "samourai"] } } } ] },
+        { "rank": 4, "name": "Coup dévastateur",
+          "summary": "1 fois par rencontre, arme lourde : Réduction de la cible −4 ; si l'attaque touche, la cible est Hébétée (jet de Terre contre tes dégâts, ND −5 par échec).",
+          "effects": [ { "kind": "reminder", "context": "combat" } ] },
+        { "rank": 5, "name": "La Montagne ne tombe pas",
+          "summary": "1 point de Vide (phase de réaction) : jusqu'à la réaction suivante, tu agis comme Indemne et ignores Hébété, Fatigué, Étourdi.",
+          "effects": [ { "kind": "wounds", "ignorePenalty": "all", "mode": "optional", "void": 1, "label": "Montagne ne tombe pas (agir comme Indemne)" } ] }
+      ]
+    },
+    {
+      "id": "hiruma-bushi", "clan": "Crabe", "name": "École de bushi Hiruma", "class": "Bushi",
+      "ranks": [
+        { "rank": 1, "name": "La Flamme de la torche vacille",
+          "summary": "+1g0 aux attaques en posture Attaque. Nourriture, eau et jade durent deux fois plus longtemps (personnes = rang de Chasse).",
+          "effects": [ { "kind": "roll", "on": ["attack"], "rolled": 1, "when": { "stance": ["attack"] }, "mode": "auto" } ] },
+        { "rank": 2, "name": "La Petite Leçon du loup",
+          "summary": "En posture Attaque, +5 au ND d'armure par touche au corps à corps, cumulable jusqu'au Rang d'école, jusqu'à la fin de l'escarmouche.",
+          "effects": [ { "kind": "armor", "value": 5, "stack": { "max": { "ref": "schoolRank" }, "label": "Touches au corps à corps" }, "when": { "stance": ["attack"] }, "mode": "optional" } ] },
+        { "rank": 3, "name": "Les Ailes du colibri",
+          "summary": "1 fois par round, quand tu es pris pour cible : + 2 × Rang d'école au ND d'armure contre cette attaque (cumulable avec le Vide).",
+          "effects": [ { "kind": "armor", "value": { "ref": "schoolRank", "mult": 2 }, "mode": "optional", "label": "Ailes du colibri (1 fois par round)" } ] },
+        { "rank": 4, "name": "Le Requin sent le sang",
+          "summary": "Attaque en Action simple avec une arme Samouraï.",
+          "effects": [ { "kind": "simpleAttack", "when": { "weapon": { "keywordsAny": ["samourai"] } } } ] },
+        { "rank": 5, "name": "La Lumière du jour ne gaspille aucun mouvement",
+          "summary": "Les blessures en excès sur une cible tuée se reportent sur la prochaine cible touchée (pas deux attaques de suite, jusqu'à la fin de l'escarmouche).",
+          "effects": [ { "kind": "reminder", "context": "combat" } ] }
+      ]
+    },
+    {
+      "id": "kakita-bushi", "clan": "Grue", "name": "École de bushi Kakita", "class": "Bushi",
+      "ranks": [
+        { "rank": 1, "name": "La Voie de la Grue",
+          "summary": "Initiative + 2 × rang d'Iaijutsu. En posture Centre (et au round suivant) : +1g1 et + Rang d'école aux attaques et à la Concentration.",
+          "effects": [
+            { "kind": "roll", "on": ["initiative"], "flat": { "ref": "skill:Iaijutsu", "mult": 2 }, "mode": "auto" },
+            { "kind": "roll", "on": ["attack", "focus"], "rolled": 1, "kept": 1, "flat": { "ref": "schoolRank" }, "when": { "centerOrAfter": true }, "mode": "auto" } ] },
+        { "rank": 2, "name": "La Vitesse de l'éclair",
+          "summary": "+2g0 aux attaques contre un adversaire dont l'Initiative est plus basse.",
+          "effects": [ { "kind": "roll", "on": ["attack"], "rolled": 2, "mode": "optional", "label": "Cible à l'Initiative plus basse" } ] },
+        { "rank": 3, "name": "Premier et dernier coup",
+          "summary": "En duel, tu frappes en premier avec 3 de marge à la Concentration, et gagnes une augmentation gratuite par tranche de 3 (au lieu de 5).",
+          "effects": [ { "kind": "reminder", "context": "duel" } ] },
+        { "rank": 4, "name": "Un coup, deux entailles",
+          "summary": "Attaque en Action simple avec une arme Samouraï.",
+          "effects": [ { "kind": "simpleAttack", "when": { "weapon": { "keywordsAny": ["samourai"] } } } ] },
+        { "rank": 5, "name": "Frapper sans penser",
+          "summary": "En posture Centre : une Action simple par tour (déplacement compris), bénéfices immédiats, Centre tenable plusieurs tours.",
+          "effects": [] }
+      ]
+    },
+    {
+      "id": "daidoji-bushi", "clan": "Grue", "name": "Guerriers de fer Daidoji", "class": "Bushi",
+      "ranks": [
+        { "rank": 1, "name": "La Force de l'honneur",
+          "summary": "+ (Honneur arrondi − 4, minimum 1) blessures par niveau de blessure. +1g0 aux attaques en posture Attaque.",
+          "effects": [
+            { "kind": "wounds", "perLevel": { "ref": "honor", "add": -4, "min": 1 }, "mode": "auto" },
+            { "kind": "roll", "on": ["attack"], "rolled": 1, "when": { "stance": ["attack"] }, "mode": "auto" } ] },
+        { "rank": 2, "name": "Le Bouclier de la foi",
+          "summary": "Manœuvre de garde : dure un round de plus, +5 au bonus de ND (ta cible +15, aucune pénalité pour toi).",
+          "effects": [] },
+        { "rank": 3, "name": "Frapper sous le voile",
+          "summary": "Attaque au corps à corps en Action simple en posture Attaque.",
+          "effects": [ { "kind": "simpleAttack", "when": { "stance": ["attack"], "weapon": { "melee": true } } } ] },
+        { "rank": 4, "name": "La Vigilance de l'esprit",
+          "summary": "1 point de Vide (réaction) : +2g1 aux attaques et dégâts au round suivant contre un adversaire qui t'a attaqué, toi ou ton protégé.",
+          "effects": [ { "kind": "roll", "on": ["attack", "damage"], "rolled": 2, "kept": 1, "mode": "optional", "void": 1, "label": "Vigilance de l'esprit (cible désignée)" } ] },
+        { "rank": 5, "name": "Marcher sur le sabre",
+          "summary": "2 points de Vide (action gratuite) : tu deviens la cible d'une action visant ton protégé et peux te déplacer vers lui.",
+          "effects": [ { "kind": "reminder", "context": "combat" } ] }
+      ]
+    },
+    {
+      "id": "mirumoto-bushi", "clan": "Dragon", "name": "École de bushi Mirumoto", "class": "Bushi",
+      "ranks": [
+        { "rank": 1, "name": "La Voie du Dragon",
+          "summary": "Katana + wakizashi : aucune pénalité de combat à deux armes et + Rang d'école au ND d'armure. Ciblé par un sort : ND du sort ±5.",
+          "effects": [ { "kind": "armor", "value": { "ref": "schoolRank" }, "mode": "optional", "label": "Katana et wakizashi en main" } ] },
+        { "rank": 2, "name": "Le Calme au cœur du tonnerre",
+          "summary": "En posture Centre : + rang de Kenjutsu au total des jets d'Iaijutsu.",
+          "effects": [ { "kind": "roll", "on": ["skill:Iaijutsu"], "flat": { "ref": "skill:Kenjutsu" }, "mode": "optional", "label": "En posture Centre" } ] },
+        { "rank": 3, "name": "Fort et rapide",
+          "summary": "Attaque en Action simple avec une arme Samouraï.",
+          "effects": [ { "kind": "simpleAttack", "when": { "weapon": { "keywordsAny": ["samourai"] } } } ] },
+        { "rank": 4, "name": "Riposte furieuse",
+          "summary": "+3g0 aux attaques contre un adversaire qui t'a attaqué au round précédent.",
+          "effects": [ { "kind": "roll", "on": ["attack"], "rolled": 3, "mode": "optional", "label": "Riposte (il t'a attaqué ce round)" } ] },
+        { "rank": 5, "name": "Le Cœur du Dragon",
+          "summary": "Deux attaques dans le tour à deux armes : une attaque de plus avec la main secondaire (action gratuite).",
+          "effects": [ { "kind": "reminder", "context": "combat" } ] }
+      ]
+    },
+    {
+      "id": "togashi-moine", "clan": "Dragon", "name": "Ordre des tatoués Togashi", "class": "Moine",
+      "ranks": [
+        { "rank": 1, "name": "Le Sang des Kami", "summary": "Deux tatouages.", "effects": [] },
+        { "rank": 2, "name": "Corps de pierre",
+          "summary": "+1g1 aux attaques et dégâts à mains nues.",
+          "effects": [ { "kind": "roll", "on": ["attack", "damage"], "rolled": 1, "kept": 1, "when": { "weapon": { "unarmed": true } }, "mode": "auto" } ] },
+        { "rank": 3, "name": "La Bénédiction des Kami", "summary": "Deux tatouages de plus.", "effects": [] },
+        { "rank": 4, "name": "Volonté de pierre",
+          "summary": "Attaque à mains nues en Action simple.",
+          "effects": [ { "kind": "simpleAttack", "when": { "weapon": { "unarmed": true } } } ] },
+        { "rank": 5, "name": "Le Toucher des Kami", "summary": "Deux tatouages de plus.", "effects": [] }
+      ]
+    },
+    {
+      "id": "akodo-bushi", "clan": "Lion", "name": "École de bushi Akodo", "class": "Bushi",
+      "ranks": [
+        { "rank": 1, "name": "La Voie du Lion",
+          "summary": "En attaque : ignorer la part Armure du ND adverse (pas sa Réduction) ou gagner une augmentation gratuite. +1g0 à la première attaque au corps à corps contre un adversaire, ou contre celui qui a annoncé des augmentations contre toi.",
+          "effects": [
+            { "kind": "roll", "on": ["attack"], "freeRaises": 1, "mode": "optional", "label": "Augmentation gratuite (au lieu d'ignorer l'armure)" },
+            { "kind": "roll", "on": ["attack"], "rolled": 1, "when": { "weapon": { "melee": true } }, "mode": "optional", "label": "Première attaque sur cet adversaire / il a annoncé des augmentations" },
+            { "kind": "reminder", "context": "combat", "text": "Option : ignorer la part Armure du ND de la cible (pas sa Réduction)." } ] },
+        { "rank": 2, "name": "La Force de la pureté",
+          "summary": "En escarmouche, 1 fois par tour : + Rang d'Honneur au total d'un jet (pas les dégâts, pas en posture Centre).",
+          "effects": [ { "kind": "roll", "on": ["attack", "skill", "trait"], "flat": { "ref": "honor" }, "when": { "stanceNot": ["center"] }, "mode": "optional", "label": "Force de la pureté (1 fois par tour)" } ] },
+        { "rank": 3, "name": "La Force de mes ancêtres",
+          "summary": "Attaque en Action simple avec une arme Samouraï.",
+          "effects": [ { "kind": "simpleAttack", "when": { "weapon": { "keywordsAny": ["samourai"] } } } ] },
+        { "rank": 4, "name": "Le Triomphe avant la bataille",
+          "summary": "1 fois par escarmouche (réaction) : au round suivant, ignorer les bonus de ND d'armure de posture de la cible désignée.",
+          "effects": [ { "kind": "reminder", "context": "combat" } ] },
+        { "rank": 5, "name": "L'Ultime Leçon d'Akodo",
+          "summary": "Compétences Bugei : si tu atteins le ND sans les augmentations, tu réussis quand même, sans leurs effets.",
+          "effects": [ { "kind": "verdict", "rule": "baseTnSuccess", "when": { "skillGroup": "bugei" } } ] }
+      ]
+    },
+    {
+      "id": "matsu-berserker", "clan": "Lion", "name": "École des berserkers Matsu", "class": "Bushi",
+      "ranks": [
+        { "rank": 1, "name": "Le Rugissement du Lion",
+          "summary": "+ Rang d'Honneur à tous les dégâts. En posture Assaut, +5 pieds de déplacement par tour (sans dépasser le maximum).",
+          "effects": [
+            { "kind": "roll", "on": ["damage"], "flat": { "ref": "honor" }, "mode": "auto" },
+            { "kind": "move", "value": 5, "when": { "stance": ["fullAttack"] }, "mode": "auto" } ] },
+        { "rank": 2, "name": "La Fureur des Matsu",
+          "summary": "En Assaut, une cible à 9 m touchée ce tour ne peut plus quitter sa position (jet de Volonté contre tes derniers dégâts pour s'en libérer).",
+          "effects": [ { "kind": "reminder", "context": "combat" } ] },
+        { "rank": 3, "name": "La Charge du Lion",
+          "summary": "Attaque au corps à corps en Action simple.",
+          "effects": [ { "kind": "simpleAttack", "when": { "weapon": { "melee": true } } } ] },
+        { "rank": 4, "name": "Le Courage des Matsu",
+          "summary": "Pénalités de blessure ignorées jusqu'au Rang d'Honneur, le double en posture Assaut.",
+          "effects": [
+            { "kind": "wounds", "ignorePenalty": { "ref": "honor" }, "when": { "stanceNot": ["fullAttack"] }, "mode": "auto" },
+            { "kind": "wounds", "ignorePenalty": { "ref": "honor", "mult": 2 }, "when": { "stance": ["fullAttack"] }, "mode": "auto" } ] },
+        { "rank": 5, "name": "La Victoire du Lion",
+          "summary": "1 fois par rencontre, après les dégâts, 1 point de Vide : les dés gardés explosent (relance et ajoute).",
+          "effects": [ { "kind": "reminder", "context": "damage" } ] }
+      ]
+    },
+    {
+      "id": "yoritomo-bushi", "clan": "Mante", "name": "École de bushi Yoritomo", "class": "Bushi",
+      "ranks": [
+        { "rank": 1, "name": "La Voie de la Mante",
+          "summary": "+1g0 à toutes les attaques. Pas de pénalité de terrain. Armes improvisées et Paysan sans perte d'Honneur ni de Gloire, main secondaire Paysan sans pénalité.",
+          "effects": [ { "kind": "roll", "on": ["attack"], "rolled": 1, "mode": "auto" } ] },
+        { "rank": 2, "name": "La Voix de la tempête",
+          "summary": "Chaque touche au corps à corps réduit de 5 le ND d'armure de la cible pour tes attaques (2 rounds, cumulable jusqu'au Rang d'école).",
+          "effects": [ { "kind": "targetTn", "value": -5, "stack": { "max": { "ref": "schoolRank" }, "label": "Touches sur la cible" }, "mode": "optional" } ] },
+        { "rank": 3, "name": "La Frappe de la Mante",
+          "summary": "Attaque en Action simple avec une arme Samouraï ou Paysan.",
+          "effects": [ { "kind": "simpleAttack", "when": { "weapon": { "keywordsAny": ["samourai", "paysan"] } } } ] },
+        { "rank": 4, "name": "La Vague déferlante",
+          "summary": "Après un déplacement d'au moins 5 pieds : +10 au ND d'armure jusqu'au prochain tour, ou sacrifié pour 2 augmentations gratuites réservées au Renversement.",
+          "effects": [
+            { "kind": "armor", "value": 10, "mode": "optional", "label": "Vague déferlante (déplacé d'au moins 5 pieds)" },
+            { "kind": "maneuver", "freeRaisesFor": { "maneuver": "knock", "count": 2 }, "mode": "optional", "label": "Vague sacrifiée : 2 augm. gratuites pour Renversement" } ] },
+        { "rank": 5, "name": "La Main d'Osano-Wo",
+          "summary": "1 point de Vide : tu gardes autant de dés de dégâts en plus que ta Force ; +0g2 contre une cible À terre.",
+          "effects": [
+            { "kind": "roll", "on": ["damage"], "kept": { "ref": "trait:strength" }, "mode": "optional", "void": 1, "label": "Main d'Osano-Wo" },
+            { "kind": "roll", "on": ["damage"], "kept": 2, "mode": "optional", "label": "Cible À terre (avec Osano-Wo)" } ] }
+      ]
+    },
+    {
+      "id": "tsuruchi-archer", "clan": "Mante", "name": "École d'archers Tsuruchi", "class": "Bushi",
+      "ranks": [
+        { "rank": 1, "name": "Toujours prêt",
+          "summary": "+1g0 aux attaques à l'arc. +3 à l'Initiative.",
+          "effects": [
+            { "kind": "roll", "on": ["attack"], "rolled": 1, "when": { "weapon": { "keywordsAny": ["arc"] } }, "mode": "auto" },
+            { "kind": "roll", "on": ["initiative"], "flat": 3, "mode": "auto" } ] },
+        { "rank": 2, "name": "La Flèche connaît le chemin",
+          "summary": "Une augmentation gratuite réservée au Coup ciblé. +2g0 aux dégâts à l'arc.",
+          "effects": [
+            { "kind": "maneuver", "freeRaisesFor": { "maneuver": "called", "count": 1 }, "when": { "weapon": { "keywordsAny": ["arc"] } }, "mode": "auto" },
+            { "kind": "roll", "on": ["damage"], "rolled": 2, "when": { "weapon": { "keywordsAny": ["arc"] } }, "mode": "auto" } ] },
+        { "rank": 3, "name": "Le Dard de la guêpe",
+          "summary": "Attaque à l'arc en Action simple.",
+          "effects": [ { "kind": "simpleAttack", "when": { "weapon": { "keywordsAny": ["arc"] } } } ] },
+        { "rank": 4, "name": "Le Vol du non-esprit",
+          "summary": "1 fois par escarmouche, 1 point de Vide, action complexe : le tir ignore l'armure, les pénalités de blessure et de visibilité ; pas d'Attaque supplémentaire, portée normale.",
+          "effects": [
+            { "kind": "wounds", "ignorePenalty": "all", "on": ["attack"], "when": { "weapon": { "keywordsAny": ["arc"] } }, "mode": "optional", "void": 1, "label": "Vol du non-esprit" },
+            { "kind": "reminder", "context": "combat", "text": "Vol du non-esprit : le ND de la cible ne compte pas son armure." } ] },
+        { "rank": 5, "name": "L'Œil de Tsuruchi",
+          "summary": "Attaque à distance en action complexe : +4g1 à l'attaque et aux dégâts (pas avec le Vol du non-esprit).",
+          "effects": [ { "kind": "roll", "on": ["attack", "damage"], "rolled": 4, "kept": 1, "when": { "weapon": { "ranged": true } }, "mode": "optional", "label": "Œil de Tsuruchi (action complexe)" } ] }
+      ]
+    },
+    {
+      "id": "shiba-bushi", "clan": "Phénix", "name": "École de bushi Shiba", "class": "Bushi",
+      "ranks": [
+        { "rank": 1, "name": "La Voie du Phénix",
+          "summary": "Tu peux dépenser 2 points de Vide pour +2g2 sur un jet. Garde en action gratuite (ta cible n'a que +5 au ND).",
+          "effects": [ { "kind": "void", "points": 2, "rolled": 2, "kept": 2, "label": "+2g2 au jet (2 points)" } ] },
+        { "rank": 2, "name": "Danser avec les éléments",
+          "summary": "Une cible à 9 m : ND de ses sorts (lancés ou subis) ±5 ; idem pour les sorts qui te visent.",
+          "effects": [] },
+        { "rank": 3, "name": "Ne faire qu'un avec le Vide",
+          "summary": "Quand un autre personnage dépense du Vide dans le round, tu en regagnes un (au-delà du maximum jusqu'à la fin du combat), 2 fois par escarmouche.",
+          "effects": [ { "kind": "reminder", "context": "combat" } ] },
+        { "rank": 4, "name": "Se mouvoir avec le monde",
+          "summary": "Attaque en Action simple avec une arme d'hast, une lance ou une arme Samouraï.",
+          "effects": [ { "kind": "simpleAttack", "when": { "weapon": { "keywordsAny": ["hast", "lance", "samourai"] } } } ] },
+        { "rank": 5, "name": "Le Toucher du Vide",
+          "summary": "Chaque point de Vide compte double quand c'est applicable ; améliorations par le Vide deux fois par tour.",
+          "effects": [ { "kind": "voidDouble" } ] }
+      ]
+    },
+    {
+      "id": "bayushi-bushi", "clan": "Scorpion", "name": "École de bushi Bayushi", "class": "Bushi",
+      "ranks": [
+        { "rank": 1, "name": "La Voie du Scorpion",
+          "summary": "+1g1 à l'Initiative. +5 au ND d'armure contre un adversaire à l'Initiative plus basse.",
+          "effects": [
+            { "kind": "roll", "on": ["initiative"], "rolled": 1, "kept": 1, "mode": "auto" },
+            { "kind": "armor", "value": 5, "mode": "optional", "label": "Adversaire à l'Initiative plus basse" } ] },
+        { "rank": 2, "name": "Pinces et queue",
+          "summary": "La Feinte coûte 1 augmentation au lieu de 2.",
+          "effects": [ { "kind": "maneuver", "cost": { "maneuver": "feint", "value": 1 }, "mode": "auto" } ] },
+        { "rank": 3, "name": "Frapper la queue",
+          "summary": "Cible désignée en début de tour (9 m) : si tu la touches, elle est Fatiguée (jet de Terre ND 25 en réaction pour s'en libérer).",
+          "effects": [ { "kind": "reminder", "context": "combat" } ] },
+        { "rank": 4, "name": "Frapper d'en haut, frapper d'en bas",
+          "summary": "Attaque au corps à corps en Action simple.",
+          "effects": [ { "kind": "simpleAttack", "when": { "weapon": { "melee": true } } } ] },
+        { "rank": 5, "name": "Les Pinces tiennent, la queue frappe",
+          "summary": "1 fois par rencontre, 1 point de Vide, action complexe au corps à corps : si elle touche, la cible est Étourdie (jet de Terre contre tes dégâts).",
+          "effects": [ { "kind": "reminder", "context": "combat" } ] }
+      ]
+    },
+    {
+      "id": "moto-bushi", "clan": "Licorne", "name": "École de bushi Moto", "class": "Bushi",
+      "ranks": [
+        { "rank": 1, "name": "La Voie de la Licorne",
+          "summary": "Armes à deux mains maniables à une main (sauf arcs). +1g0 aux dégâts monté, au cimeterre ou avec une arme de corps à corps à deux mains (non cumulable). Le cimeterre compte comme Samouraï.",
+          "effects": [
+            { "kind": "roll", "on": ["damage"], "rolled": 1, "when": { "anyOf": [ { "mounted": true }, { "weapon": { "keywordsAny": ["cimeterre"] } }, { "weapon": { "keywordsAny": ["deux-mains"], "melee": true } } ] }, "mode": "auto" },
+            { "kind": "keyword", "weaponKeyword": "cimeterre", "adds": "samourai" } ] },
+        { "rank": 2, "name": "Le Sourire de Shinsei",
+          "summary": "+ moitié (arrondie en dessous) de la pénalité de blessure de l'adversaire au total des attaques.",
+          "effects": [ { "kind": "roll", "on": ["attack"], "flat": { "ref": "input", "div": 2 }, "mode": "optional", "input": "Pénalité de blessure de l'adversaire", "label": "Sourire de Shinsei" } ] },
+        { "rank": 3, "name": "La Frappe du vent du désert",
+          "summary": "Attaque au corps à corps en Action simple.",
+          "effects": [ { "kind": "simpleAttack", "when": { "weapon": { "melee": true } } } ] },
+        { "rank": 4, "name": "La Charge de la folie",
+          "summary": "1 fois par escarmouche, quand tu mets une cible Hors de combat : attaque gratuite sur une autre cible, sans augmentation.",
+          "effects": [ { "kind": "reminder", "context": "combat" } ] },
+        { "rank": 5, "name": "Un Moto ne cède jamais",
+          "summary": "Monté ou en posture Assaut, avec une arme à deux mains ou Samouraï : + moitié de ta Force (arrondie en dessous) en dés de dégâts gardés.",
+          "effects": [ { "kind": "roll", "on": ["damage"], "kept": { "ref": "trait:strength", "div": 2 }, "when": { "anyOf": [ { "mounted": true }, { "stance": ["fullAttack"] } ], "weapon": { "keywordsAny": ["deux-mains", "samourai"] } }, "mode": "auto" } ] }
+      ]
+    },
+    {
+      "id": "utaku-battle-maiden", "clan": "Licorne", "name": "Vierges de bataille Utaku", "class": "Bushi",
+      "ranks": [
+        { "rank": 1, "name": "Chevaucher en harmonie",
+          "summary": "+ Rang d'Honneur à un jet d'attaque par round (ou à un jet de dégâts si montée). + Rang d'Honneur à tous les jets d'Équitation.",
+          "effects": [
+            { "kind": "roll", "on": ["attack"], "flat": { "ref": "honor" }, "mode": "optional", "label": "Chevaucher en harmonie (1 attaque par round)" },
+            { "kind": "roll", "on": ["damage"], "flat": { "ref": "honor" }, "when": { "mounted": true }, "mode": "optional", "label": "Chevaucher en harmonie sur les dégâts (montée)" },
+            { "kind": "roll", "on": ["skill:Équitation"], "flat": { "ref": "honor" }, "mode": "auto" } ] },
+        { "rank": 2, "name": "Le Vide de la guerre",
+          "summary": "En phase 1 de chaque round : +5 à l'Initiative ou au ND d'armure, jusqu'à la prochaine utilisation ou la fin de l'escarmouche.",
+          "effects": [
+            { "kind": "roll", "on": ["initiative"], "flat": 5, "mode": "optional", "label": "Vide de la guerre : +5 Initiative" },
+            { "kind": "armor", "value": 5, "mode": "optional", "label": "Vide de la guerre : +5 ND d'armure" } ] },
+        { "rank": 3, "name": "Sentir la brise",
+          "summary": "Montée : attaque en Action simple.",
+          "effects": [ { "kind": "simpleAttack", "when": { "mounted": true } } ] },
+        { "rank": 4, "name": "Le Vent ne s'arrête jamais",
+          "summary": "Montée, 1 point de Vide : charge et attaque dans la même Action simple ; si elle touche, +2g1 aux dégâts ce tour.",
+          "effects": [ { "kind": "roll", "on": ["damage"], "rolled": 2, "kept": 1, "when": { "mounted": true }, "mode": "optional", "void": 1, "label": "Charge réussie (Vent ne s'arrête jamais)" } ] },
+        { "rank": 5, "name": "La Bénédiction d'Otaku",
+          "summary": "1 point de Vide en début de tour : + Rang d'Honneur aux dégâts et aux compétences Bugei ce tour (cumulable avec le rang 1).",
+          "effects": [ { "kind": "roll", "on": ["damage", "bugei"], "flat": { "ref": "honor" }, "mode": "optional", "void": 1, "label": "Bénédiction d'Otaku (ce tour)" } ] }
+      ]
+    }
+  ],
+  "weaponCatalog": [
+    { "name": "Katana", "keywords": ["samourai", "moyenne"], "skill": "Kenjutsu", "dr": "3k2" },
+    { "name": "Wakizashi", "keywords": ["samourai", "petite"], "skill": "Kenjutsu", "dr": "2k2" },
+    { "name": "No-dachi", "keywords": ["samourai", "grande", "deux-mains"], "skill": "Kenjutsu", "dr": "3k3" },
+    { "name": "Tanto", "keywords": ["petite"], "skill": "Couteaux", "dr": "1k1" },
+    { "name": "Cimeterre", "keywords": ["cimeterre", "moyenne"], "skill": "Kenjutsu", "dr": "3k2" },
+    { "name": "Tetsubo", "keywords": ["lourde", "grande", "deux-mains"], "skill": "Armes lourdes", "dr": "3k3" },
+    { "name": "Ono", "keywords": ["lourde", "grande", "deux-mains"], "skill": "Armes lourdes", "dr": "0k4" },
+    { "name": "Yari", "keywords": ["lance", "grande"], "skill": "Lances", "dr": "2k2" },
+    { "name": "Naginata", "keywords": ["hast", "samourai", "grande", "deux-mains"], "skill": "Armes d'hast", "dr": "3k3" },
+    { "name": "Bo", "keywords": ["paysan", "grande", "deux-mains"], "skill": "Bâtons", "dr": "2k1" },
+    { "name": "Kama", "keywords": ["paysan", "petite"], "skill": "Armes paysannes", "dr": "2k1" },
+    { "name": "Yumi", "keywords": ["arc", "distance", "samourai"], "skill": "Kyujutsu", "dr": "2k2", "bowStrength": 3 },
+    { "name": "Dai-kyu", "keywords": ["arc", "distance", "samourai"], "skill": "Kyujutsu", "dr": "2k2", "bowStrength": 4 }
+  ],
+  "skillGroups": {
+    "bugei": ["Athlétisme", "Bataille", "Défense", "Équitation", "Chasse", "Iaijutsu", "Jiujutsu", "Kenjutsu", "Kyujutsu", "Armes à chaîne", "Armes lourdes", "Couteaux", "Ninjutsu", "Armes d'hast", "Lances", "Bâtons", "Éventail de guerre", "Armes paysannes"]
+  }
+}

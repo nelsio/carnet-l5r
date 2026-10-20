@@ -29,7 +29,9 @@ header.top{border-bottom:3px solid var(--gold)}
 .mon{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
 .mon::before{content:"";width:12px;height:12px;border-radius:50%;background:var(--gold)}
 .top-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.theme-btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 12px;font-weight:700;font-size:13px;color:var(--muted)}
+.theme-btn.on{border-color:var(--gold);background:var(--gold-soft);color:var(--ink)}
+.theme-btn .ico{width:16px;height:16px;flex:none}
+.theme-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 12px;font-weight:700;font-size:13px;color:var(--muted)}
 
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--f-body);
@@ -61,6 +63,10 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
 .cstats b{font-family:var(--f-mono);font-size:15px;white-space:nowrap}
 .cstats small{font-size:11px;color:var(--muted);font-weight:500}
 .cstats .pen{border-color:var(--bad)}
+.cstats .ct{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:3px 8px;min-width:0;display:grid;line-height:1.2;text-align:inherit;color:inherit;cursor:pointer}
+.cstats .ct.on{border-color:var(--gold);background:var(--gold-soft)}
+.armedit{grid-column:1/-1;display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;background:var(--surface);border:1px solid var(--gold);border-radius:8px;padding:10px;margin-top:6px}
+@media (max-width:720px){.armedit{grid-template-columns:1fr 1fr}.armedit label:first-child{grid-column:1/-1}.cstats .ct{text-align:center}}
 .cstats .pen b{color:var(--bad)}
 .wtrack{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:3px;min-width:0}
 .wl{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:3px 4px;font-size:10.5px;line-height:1.2;min-width:0;overflow:hidden}
@@ -146,10 +152,34 @@ textarea.in{min-height:80px;resize:vertical}
 .act.child.linked::before{border-color:var(--gold)}
 .act.child .pend{font-family:var(--f-mono);font-size:12px;color:var(--gold);font-weight:700}
 .stance{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px}
-.stance button{border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:7px 8px;text-align:left;font-size:13px}
-.stance button b{display:block;font-size:14px}
-.stance button[aria-pressed="true"]{border-color:var(--gold);background:var(--gold-soft)}
-.stance button:disabled{opacity:.45;cursor:not-allowed}
+.stance .om{border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:7px 8px;text-align:left;font-size:13px}
+.stance .om b{display:block;font-size:14px}
+.stance .om[aria-pressed="true"]{border-color:var(--gold);background:var(--gold-soft)}
+.stance .om:disabled{opacity:.45;cursor:not-allowed}
+.optw{position:relative;display:grid;min-width:0}
+.stance .om{width:100%}
+.stance .om .muted{display:block;margin-top:2px}
+.ib{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;border:1px solid var(--line);background:var(--bg);
+  color:var(--muted);font:italic 700 13px/1 Georgia,"Times New Roman",serif;padding:0;display:grid;place-items:center}
+.ib::after{content:"";position:absolute;inset:-9px}
+.ib.on{background:var(--gold);border-color:var(--gold);color:var(--surface)}
+.ib.inline{position:relative;top:auto;right:auto}
+.manual{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.45}
+.manual b{color:var(--ink);font-family:var(--f-mono);font-weight:700}
+.tchips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.tchip{font-size:12px;padding:2px 8px;border-radius:999px;background:var(--gold-soft);color:var(--ink);border:1px solid color-mix(in srgb,var(--gold) 40%,transparent)}
+.tag.sa{background:var(--gold-soft);color:var(--ink)}
+.techbox{display:grid;gap:6px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.stackrow{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13.5px}
+.stackrow .stepper button{width:30px;height:30px}
+.rems{display:grid;gap:6px;font-size:13.5px}
+.schoolhead{margin-bottom:8px}
+.tech.locked{opacity:.5}
+.techtop{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
+.badge{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;padding:1px 7px;border-radius:999px;background:var(--sunk);color:var(--muted);margin-left:4px;white-space:nowrap}
+.badge.b-auto{background:var(--gold-soft);color:var(--ink)}
+.badge.b-cocher{background:color-mix(in srgb,var(--water) 18%,var(--surface));color:var(--ink)}
+.badge.b-rappel{background:color-mix(in srgb,var(--fire) 14%,var(--surface));color:var(--ink)}
 .statline{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .statline span{background:var(--bg);border-radius:6px;padding:4px 9px;font-size:13px;color:var(--muted)}
 .statline b{font-family:var(--f-mono);color:var(--ink);font-size:14px}
@@ -178,7 +208,8 @@ div.man button{border:0;background:var(--surface);width:24px;height:24px;border-
 .chk input{width:17px;height:17px;accent-color:var(--gold)}
 .tnline{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:13.5px}
 .dice{display:flex;flex-wrap:wrap;gap:5px;margin-block:10px}
-.die{min-width:34px;height:34px;padding:0 6px;border-radius:6px;display:grid;place-items:center;font-family:var(--f-mono);font-weight:700;border:1.5px solid var(--line);color:var(--muted);background:var(--bg)}
+.die small{display:block;font-size:9.5px;font-weight:500;line-height:1;opacity:.85}
+.die{min-width:34px;min-height:34px;padding:2px 6px;align-content:center;line-height:1.1;border-radius:6px;display:grid;place-items:center;font-family:var(--f-mono);font-weight:700;border:1.5px solid var(--line);color:var(--muted);background:var(--bg)}
 .die.kept{border-color:var(--ink);color:var(--ink);background:var(--surface)}
 .die.ex{border-color:var(--fire);color:var(--fire)}
 .die.kept.ex{background:color-mix(in srgb,var(--fire) 12%,var(--surface))}
@@ -202,7 +233,13 @@ div.man button{border:0;background:var(--surface);width:24px;height:24px;border-
     padding:6px max(12px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
   .tabs button{padding:12px;border-radius:8px;font-size:15px}
   .tabs button[aria-pressed="true"]{background:var(--gold-soft);color:var(--ink);box-shadow:none}
-  .theme-btn{padding:6px 10px;font-size:12px}
+  .theme-btn{width:40px;height:40px;padding:0;justify-content:center;border-radius:50%}
+  .theme-btn .txt{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .theme-btn .ico{width:20px;height:20px}
+  .top-right{flex-wrap:nowrap;gap:6px}
+  header.top{flex-wrap:nowrap;align-items:center}
+  .who{min-width:0}
+  .who h1{overflow-wrap:anywhere}
 
   .status{margin-bottom:12px;padding-block:6px 8px}
   .status-in{grid-template-columns:minmax(0,1fr) auto;gap:8px 12px}
@@ -226,7 +263,8 @@ div.man button{border:0;background:var(--surface);width:24px;height:24px;border-
   .sit button{flex:0 0 auto;padding:10px 16px}
   .act{padding:12px}
   .stance{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .stance button{padding:10px}
+  .stance .om{padding:10px}
+  .ib{width:26px;height:26px}
 
   /* Lanceur = panneau glissant depuis le bas */
   .roller{display:none}
@@ -253,7 +291,9 @@ div.man button{border:0;background:var(--surface);width:24px;height:24px;border-
   <header class="top">
     <div class="who" id="who"><h1>Carnet de Rokugan</h1><div class="sub">Chargement de la fiche…</div></div>
     <div class="top-right">
-      <button class="theme-btn" id="theme-btn" title="Changer de thème">Thème : auto</button>
+      <button class="theme-btn" id="lib-btn" title="Bibliothèque" aria-label="Bibliothèque"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h4v16H4zM10 4h4v16h-4zM16.2 5.2l3.8-1 3 15.6-3.8 1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span class="txt">Bibliothèque</span></button>
+      <button class="theme-btn" id="roll-btn" aria-pressed="false" title="Lanceur de dés"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="8.5" cy="8.5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.6" fill="currentColor"/></svg><span class="txt">Lanceur de dés : masqué</span></button>
+      <button class="theme-btn" id="theme-btn" title="Thème"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg><span class="txt">Thème : auto</span></button>
       <div class="tabs" role="group" aria-label="Vue">
         <button id="tab-sheet" aria-pressed="true">Fiche</button>
         <button id="tab-aid" aria-pressed="false">Aide de jeu</button>
@@ -272,7 +312,7 @@ const TRAITS={stamina:"Constitution",willpower:"Volonté",strength:"Force",perce
 const WOUNDS=[["Indemne",0],["Égratigné",3],["Éraflé",5],["Blessé",10],["Grav. blessé",15],["Estropié",20],["À terre",40],["Hors de combat",null]];
 const STANCES={
   attaque:{n:"Attaque",d:"Posture normale."},
-  totale:{n:"Attaque totale",d:"+2g1 à l'attaque, −10 au ND d'armure."},
+  totale:{n:"Assaut",d:"+2g1 à l'attaque, −10 au ND d'armure."},
   defense:{n:"Défense",d:"Ajoute Air + Défense au ND d'armure."},
   totaldef:{n:"Défense totale",d:"Jet Défense (Réflexes), + moitié au ND d'armure."},
   centre:{n:"Centre",d:"Aucune action ; bonus au round suivant (voir livre)."}
@@ -280,8 +320,15 @@ const STANCES={
 
 let C=null, db=null, ref=null, saveTimer=null, view="sheet", edit=false, sit="enquete", sub="escarmouche", stance="attaque";
 let sel=null, fullDefBonus=0, hist=[], lastRoll=null, store="none";
+const infoOpen=new Set();
+function optBtn(attrs,key,title,desc,pressed,disabled){
+  const o=infoOpen.has(key);   // key = clé du panneau : un seul « i » par panneau
+  return `<button class="om" ${attrs} ${pressed!=null?`aria-pressed="${pressed}"`:""} ${disabled?"disabled":""}><b>${title}</b>${o?`<span class="muted">${desc}</span>`:""}</button>`;
+}
+const infoBtn=(key,label)=>{const o=infoOpen.has(key);return `<button class="ib inline ${o?"on":""}" data-act="info" data-k="${key}" aria-expanded="${o}" aria-label="${o?"Masquer":"Afficher"} le détail : ${label}">i</button>`};
+let armEdit=false;
 let lastAtk=null, voidArmor=false, voidRound=false, man={}, pendingDmg=0, initVal=null, wExp=false, sheetOpen=false;
-const opt={tn:15,raises:0,free:0,voidp:false,voidSkill:false,emph:false,flat:0,dmod:0,targetTN:20,oppInsight:2};
+const opt={modSel:{},void2:false,tn:15,raises:0,free:0,voidp:false,voidSkill:false,emph:false,flat:0,dmod:0,targetTN:20,oppInsight:2};
 const DEF_MANS=[
   {k:"dmg",n:"Augmentation des dégâts",cost:1,eff:"+1g0 aux dégâts par augmentation (cumulable).",rep:true},
   {k:"called",n:"Coup ciblé",cost:1,eff:"Viser une zone précise (main, jambe, tête…). Coût selon la zone, à fixer avec le MJ."},
@@ -292,8 +339,10 @@ const DEF_MANS=[
 const mans=()=>C.maneuvers&&C.maneuvers.length?C.maneuvers:DEF_MANS;
 const isRanged=w=>/kyujutsu|arc|yumi/i.test((w.skill||"")+" "+(w.name||""));
 const wTrait=w=>isRanged(w)?"reflexes":"agility";
-function manRaises(){return mans().reduce((s,m)=>s+(m.rep?num(man[m.k])*num(m.cost):(man[m.k]?num(m.cost):0)),0)}
-function calledRaises(a){return num(opt.raises)+(a&&a.attack?manRaises():0)}
+function manRaises(a){return mans().reduce((s,m)=>{const c=m.rep?num(man[m.k])*mcost(m):(man[m.k]?mcost(m):0);
+  const fr=a?rollEffects(a,ctxNow()).filter(e=>e.freeRaisesFor&&e.freeRaisesFor.maneuver===m.k&&(e.mode==="auto"||opt.modSel[e.key])).reduce((t,e)=>t+e.freeRaisesFor.count,0):0;
+  return s+Math.max(0,c-fr)},0)}
+function calledRaises(a){return num(opt.raises)+(a&&a.attack?manRaises(a):0)}
 function spendVoid(){if(num(C.voidPoints)<1)return false;C.voidPoints=num(C.voidPoints)-1;voidRound=true;save();return true}
 
 const $=s=>document.querySelector(s);
@@ -304,29 +353,96 @@ function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");cl
 /* ---------- Règles ---------- */
 const tv=k=>k==="void"?num(C.void):num(C.traits?.[k]);
 function ringVal(r){return r==="void"?num(C.void):Math.min(tv(RINGS[r].t[0]),tv(RINGS[r].t[1]))}
-function skill(name){return (C.skills||[]).find(s=>s.name.trim().toLowerCase()===String(name).toLowerCase())}
+const nk=s=>String(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").trim();
+function skill(name){return (C.skills||[]).find(s=>nk(s.name)===nk(name))}
 function skillRank(name){return num(skill(name)?.rank)}
 function hasEmph(name,e){if(!e)return false;const s=skill(name);return !!s&&String(s.emph||"").toLowerCase().split(/[,;]/).map(x=>x.trim()).some(x=>x&&e.toLowerCase().includes(x)||x&&x.includes(e.toLowerCase()))}
 function woundState(){
-  const E=ringVal("earth"), w=num(C.wounds); let cap=0;
-  for(let i=0;i<WOUNDS.length;i++){cap+= i===0?E*5:E*2; if(w<=cap||i===WOUNDS.length-1)return{i,pen:WOUNDS[i][1],dead:WOUNDS[i][1]===null&&w>=cap,cap}}
+  const E=ringVal("earth"), w=num(C.wounds), wm=woundMods(); let cap=0;
+  for(let i=0;i<WOUNDS.length;i++){cap+=(i===0?E*5:E*2)+wm.per; if(w<=cap||i===WOUNDS.length-1){let pen=WOUNDS[i][1];if(pen!=null)pen=Math.max(0,pen-wm.ign);return{i,pen,dead:WOUNDS[i][1]===null&&w>cap,cap}}}
 }
-function woundCaps(){const E=ringVal("earth");let cap=0;return WOUNDS.map((w,i)=>cap+=(i===0?E*5:E*2))}
+function woundCaps(){const E=ringVal("earth"),wm=woundMods();let cap=0;return WOUNDS.map((w,i)=>cap+=(i===0?E*5:E*2)+wm.per)}
 function armorTN(){
   let tn=5*tv("reflexes")+5+num(C.armor?.bonus);
   if(stance==="totale")tn-=10;
   if(stance==="defense")tn+=ringVal("air")+skillRank("Défense");
   if(stance==="totaldef")tn+=fullDefBonus;
-  if(voidArmor)tn+=10;
+  if(voidArmor)tn+=10*voidMult();
+  tn+=armorBonus();
   return tn;
 }
+
+/* ---------- Techniques d'école (catalogue + moteur d'effets) ---------- */
+const SCHOOLS_DATA={"version":1,"note":"Catalogue des techniques d'école (bushi, lot 10). Effets chiffrés et résumés rédigés pour l'outil : aucun texte du livre. Format décrit dans HANDOFF.md, annexe C.","schools":[{"id":"hida-bushi","clan":"Crabe","name":"École de bushi Hida","class":"Bushi","ranks":[{"rank":1,"name":"La Voie du Crabe","summary":"Pas de pénalité de ND d'armure lourde (sauf Discrétion). +1g0 aux dégâts avec une arme lourde.","effects":[{"kind":"roll","on":["damage"],"rolled":1,"when":{"weapon":{"keywordsAny":["lourde"]}},"mode":"auto"}]},{"rank":2,"name":"La Montagne ne bouge pas","summary":"Réduction augmentée de l'Anneau de Terre.","effects":[{"kind":"reduction","value":{"ref":"ring:earth"},"mode":"auto"}]},{"rank":3,"name":"Deux pinces, un seul esprit","summary":"Attaque en Action simple avec une arme lourde ou Samouraï.","effects":[{"kind":"simpleAttack","when":{"weapon":{"keywordsAny":["lourde","samourai"]}}}]},{"rank":4,"name":"Coup dévastateur","summary":"1 fois par rencontre, arme lourde : Réduction de la cible −4 ; si l'attaque touche, la cible est Hébétée (jet de Terre contre tes dégâts, ND −5 par échec).","effects":[{"kind":"reminder","context":"combat"}]},{"rank":5,"name":"La Montagne ne tombe pas","summary":"1 point de Vide (phase de réaction) : jusqu'à la réaction suivante, tu agis comme Indemne et ignores Hébété, Fatigué, Étourdi.","effects":[{"kind":"wounds","ignorePenalty":"all","mode":"optional","void":1,"label":"Montagne ne tombe pas (agir comme Indemne)"}]}]},{"id":"hiruma-bushi","clan":"Crabe","name":"École de bushi Hiruma","class":"Bushi","ranks":[{"rank":1,"name":"La Flamme de la torche vacille","summary":"+1g0 aux attaques en posture Attaque. Nourriture, eau et jade durent deux fois plus longtemps (personnes = rang de Chasse).","effects":[{"kind":"roll","on":["attack"],"rolled":1,"when":{"stance":["attack"]},"mode":"auto"}]},{"rank":2,"name":"La Petite Leçon du loup","summary":"En posture Attaque, +5 au ND d'armure par touche au corps à corps, cumulable jusqu'au Rang d'école, jusqu'à la fin de l'escarmouche.","effects":[{"kind":"armor","value":5,"stack":{"max":{"ref":"schoolRank"},"label":"Touches au corps à corps"},"when":{"stance":["attack"]},"mode":"optional"}]},{"rank":3,"name":"Les Ailes du colibri","summary":"1 fois par round, quand tu es pris pour cible : + 2 × Rang d'école au ND d'armure contre cette attaque (cumulable avec le Vide).","effects":[{"kind":"armor","value":{"ref":"schoolRank","mult":2},"mode":"optional","label":"Ailes du colibri (1 fois par round)"}]},{"rank":4,"name":"Le Requin sent le sang","summary":"Attaque en Action simple avec une arme Samouraï.","effects":[{"kind":"simpleAttack","when":{"weapon":{"keywordsAny":["samourai"]}}}]},{"rank":5,"name":"La Lumière du jour ne gaspille aucun mouvement","summary":"Les blessures en excès sur une cible tuée se reportent sur la prochaine cible touchée (pas deux attaques de suite, jusqu'à la fin de l'escarmouche).","effects":[{"kind":"reminder","context":"combat"}]}]},{"id":"kakita-bushi","clan":"Grue","name":"École de bushi Kakita","class":"Bushi","ranks":[{"rank":1,"name":"La Voie de la Grue","summary":"Initiative + 2 × rang d'Iaijutsu. En posture Centre (et au round suivant) : +1g1 et + Rang d'école aux attaques et à la Concentration.","effects":[{"kind":"roll","on":["initiative"],"flat":{"ref":"skill:Iaijutsu","mult":2},"mode":"auto"},{"kind":"roll","on":["attack","focus"],"rolled":1,"kept":1,"flat":{"ref":"schoolRank"},"when":{"centerOrAfter":true},"mode":"auto"}]},{"rank":2,"name":"La Vitesse de l'éclair","summary":"+2g0 aux attaques contre un adversaire dont l'Initiative est plus basse.","effects":[{"kind":"roll","on":["attack"],"rolled":2,"mode":"optional","label":"Cible à l'Initiative plus basse"}]},{"rank":3,"name":"Premier et dernier coup","summary":"En duel, tu frappes en premier avec 3 de marge à la Concentration, et gagnes une augmentation gratuite par tranche de 3 (au lieu de 5).","effects":[{"kind":"reminder","context":"duel"}]},{"rank":4,"name":"Un coup, deux entailles","summary":"Attaque en Action simple avec une arme Samouraï.","effects":[{"kind":"simpleAttack","when":{"weapon":{"keywordsAny":["samourai"]}}}]},{"rank":5,"name":"Frapper sans penser","summary":"En posture Centre : une Action simple par tour (déplacement compris), bénéfices immédiats, Centre tenable plusieurs tours.","effects":[]}]},{"id":"daidoji-bushi","clan":"Grue","name":"Guerriers de fer Daidoji","class":"Bushi","ranks":[{"rank":1,"name":"La Force de l'honneur","summary":"+ (Honneur arrondi − 4, minimum 1) blessures par niveau de blessure. +1g0 aux attaques en posture Attaque.","effects":[{"kind":"wounds","perLevel":{"ref":"honor","add":-4,"min":1},"mode":"auto"},{"kind":"roll","on":["attack"],"rolled":1,"when":{"stance":["attack"]},"mode":"auto"}]},{"rank":2,"name":"Le Bouclier de la foi","summary":"Manœuvre de garde : dure un round de plus, +5 au bonus de ND (ta cible +15, aucune pénalité pour toi).","effects":[]},{"rank":3,"name":"Frapper sous le voile","summary":"Attaque au corps à corps en Action simple en posture Attaque.","effects":[{"kind":"simpleAttack","when":{"stance":["attack"],"weapon":{"melee":true}}}]},{"rank":4,"name":"La Vigilance de l'esprit","summary":"1 point de Vide (réaction) : +2g1 aux attaques et dégâts au round suivant contre un adversaire qui t'a attaqué, toi ou ton protégé.","effects":[{"kind":"roll","on":["attack","damage"],"rolled":2,"kept":1,"mode":"optional","void":1,"label":"Vigilance de l'esprit (cible désignée)"}]},{"rank":5,"name":"Marcher sur le sabre","summary":"2 points de Vide (action gratuite) : tu deviens la cible d'une action visant ton protégé et peux te déplacer vers lui.","effects":[{"kind":"reminder","context":"combat"}]}]},{"id":"mirumoto-bushi","clan":"Dragon","name":"École de bushi Mirumoto","class":"Bushi","ranks":[{"rank":1,"name":"La Voie du Dragon","summary":"Katana + wakizashi : aucune pénalité de combat à deux armes et + Rang d'école au ND d'armure. Ciblé par un sort : ND du sort ±5.","effects":[{"kind":"armor","value":{"ref":"schoolRank"},"mode":"optional","label":"Katana et wakizashi en main"}]},{"rank":2,"name":"Le Calme au cœur du tonnerre","summary":"En posture Centre : + rang de Kenjutsu au total des jets d'Iaijutsu.","effects":[{"kind":"roll","on":["skill:Iaijutsu"],"flat":{"ref":"skill:Kenjutsu"},"mode":"optional","label":"En posture Centre"}]},{"rank":3,"name":"Fort et rapide","summary":"Attaque en Action simple avec une arme Samouraï.","effects":[{"kind":"simpleAttack","when":{"weapon":{"keywordsAny":["samourai"]}}}]},{"rank":4,"name":"Riposte furieuse","summary":"+3g0 aux attaques contre un adversaire qui t'a attaqué au round précédent.","effects":[{"kind":"roll","on":["attack"],"rolled":3,"mode":"optional","label":"Riposte (il t'a attaqué ce round)"}]},{"rank":5,"name":"Le Cœur du Dragon","summary":"Deux attaques dans le tour à deux armes : une attaque de plus avec la main secondaire (action gratuite).","effects":[{"kind":"reminder","context":"combat"}]}]},{"id":"togashi-moine","clan":"Dragon","name":"Ordre des tatoués Togashi","class":"Moine","ranks":[{"rank":1,"name":"Le Sang des Kami","summary":"Deux tatouages.","effects":[]},{"rank":2,"name":"Corps de pierre","summary":"+1g1 aux attaques et dégâts à mains nues.","effects":[{"kind":"roll","on":["attack","damage"],"rolled":1,"kept":1,"when":{"weapon":{"unarmed":true}},"mode":"auto"}]},{"rank":3,"name":"La Bénédiction des Kami","summary":"Deux tatouages de plus.","effects":[]},{"rank":4,"name":"Volonté de pierre","summary":"Attaque à mains nues en Action simple.","effects":[{"kind":"simpleAttack","when":{"weapon":{"unarmed":true}}}]},{"rank":5,"name":"Le Toucher des Kami","summary":"Deux tatouages de plus.","effects":[]}]},{"id":"akodo-bushi","clan":"Lion","name":"École de bushi Akodo","class":"Bushi","ranks":[{"rank":1,"name":"La Voie du Lion","summary":"En attaque : ignorer la part Armure du ND adverse (pas sa Réduction) ou gagner une augmentation gratuite. +1g0 à la première attaque au corps à corps contre un adversaire, ou contre celui qui a annoncé des augmentations contre toi.","effects":[{"kind":"roll","on":["attack"],"freeRaises":1,"mode":"optional","label":"Augmentation gratuite (au lieu d'ignorer l'armure)"},{"kind":"roll","on":["attack"],"rolled":1,"when":{"weapon":{"melee":true}},"mode":"optional","label":"Première attaque sur cet adversaire / il a annoncé des augmentations"},{"kind":"reminder","context":"combat","text":"Option : ignorer la part Armure du ND de la cible (pas sa Réduction)."}]},{"rank":2,"name":"La Force de la pureté","summary":"En escarmouche, 1 fois par tour : + Rang d'Honneur au total d'un jet (pas les dégâts, pas en posture Centre).","effects":[{"kind":"roll","on":["attack","skill","trait"],"flat":{"ref":"honor"},"when":{"stanceNot":["center"]},"mode":"optional","label":"Force de la pureté (1 fois par tour)"}]},{"rank":3,"name":"La Force de mes ancêtres","summary":"Attaque en Action simple avec une arme Samouraï.","effects":[{"kind":"simpleAttack","when":{"weapon":{"keywordsAny":["samourai"]}}}]},{"rank":4,"name":"Le Triomphe avant la bataille","summary":"1 fois par escarmouche (réaction) : au round suivant, ignorer les bonus de ND d'armure de posture de la cible désignée.","effects":[{"kind":"reminder","context":"combat"}]},{"rank":5,"name":"L'Ultime Leçon d'Akodo","summary":"Compétences Bugei : si tu atteins le ND sans les augmentations, tu réussis quand même, sans leurs effets.","effects":[{"kind":"verdict","rule":"baseTnSuccess","when":{"skillGroup":"bugei"}}]}]},{"id":"matsu-berserker","clan":"Lion","name":"École des berserkers Matsu","class":"Bushi","ranks":[{"rank":1,"name":"Le Rugissement du Lion","summary":"+ Rang d'Honneur à tous les dégâts. En posture Assaut, +5 pieds de déplacement par tour (sans dépasser le maximum).","effects":[{"kind":"roll","on":["damage"],"flat":{"ref":"honor"},"mode":"auto"},{"kind":"move","value":5,"when":{"stance":["fullAttack"]},"mode":"auto"}]},{"rank":2,"name":"La Fureur des Matsu","summary":"En Assaut, une cible à 9 m touchée ce tour ne peut plus quitter sa position (jet de Volonté contre tes derniers dégâts pour s'en libérer).","effects":[{"kind":"reminder","context":"combat"}]},{"rank":3,"name":"La Charge du Lion","summary":"Attaque au corps à corps en Action simple.","effects":[{"kind":"simpleAttack","when":{"weapon":{"melee":true}}}]},{"rank":4,"name":"Le Courage des Matsu","summary":"Pénalités de blessure ignorées jusqu'au Rang d'Honneur, le double en posture Assaut.","effects":[{"kind":"wounds","ignorePenalty":{"ref":"honor"},"when":{"stanceNot":["fullAttack"]},"mode":"auto"},{"kind":"wounds","ignorePenalty":{"ref":"honor","mult":2},"when":{"stance":["fullAttack"]},"mode":"auto"}]},{"rank":5,"name":"La Victoire du Lion","summary":"1 fois par rencontre, après les dégâts, 1 point de Vide : les dés gardés explosent (relance et ajoute).","effects":[{"kind":"reminder","context":"damage"}]}]},{"id":"yoritomo-bushi","clan":"Mante","name":"École de bushi Yoritomo","class":"Bushi","ranks":[{"rank":1,"name":"La Voie de la Mante","summary":"+1g0 à toutes les attaques. Pas de pénalité de terrain. Armes improvisées et Paysan sans perte d'Honneur ni de Gloire, main secondaire Paysan sans pénalité.","effects":[{"kind":"roll","on":["attack"],"rolled":1,"mode":"auto"}]},{"rank":2,"name":"La Voix de la tempête","summary":"Chaque touche au corps à corps réduit de 5 le ND d'armure de la cible pour tes attaques (2 rounds, cumulable jusqu'au Rang d'école).","effects":[{"kind":"targetTn","value":-5,"stack":{"max":{"ref":"schoolRank"},"label":"Touches sur la cible"},"mode":"optional"}]},{"rank":3,"name":"La Frappe de la Mante","summary":"Attaque en Action simple avec une arme Samouraï ou Paysan.","effects":[{"kind":"simpleAttack","when":{"weapon":{"keywordsAny":["samourai","paysan"]}}}]},{"rank":4,"name":"La Vague déferlante","summary":"Après un déplacement d'au moins 5 pieds : +10 au ND d'armure jusqu'au prochain tour, ou sacrifié pour 2 augmentations gratuites réservées au Renversement.","effects":[{"kind":"armor","value":10,"mode":"optional","label":"Vague déferlante (déplacé d'au moins 5 pieds)"},{"kind":"maneuver","freeRaisesFor":{"maneuver":"knock","count":2},"mode":"optional","label":"Vague sacrifiée : 2 augm. gratuites pour Renversement"}]},{"rank":5,"name":"La Main d'Osano-Wo","summary":"1 point de Vide : tu gardes autant de dés de dégâts en plus que ta Force ; +0g2 contre une cible À terre.","effects":[{"kind":"roll","on":["damage"],"kept":{"ref":"trait:strength"},"mode":"optional","void":1,"label":"Main d'Osano-Wo"},{"kind":"roll","on":["damage"],"kept":2,"mode":"optional","label":"Cible À terre (avec Osano-Wo)"}]}]},{"id":"tsuruchi-archer","clan":"Mante","name":"École d'archers Tsuruchi","class":"Bushi","ranks":[{"rank":1,"name":"Toujours prêt","summary":"+1g0 aux attaques à l'arc. +3 à l'Initiative.","effects":[{"kind":"roll","on":["attack"],"rolled":1,"when":{"weapon":{"keywordsAny":["arc"]}},"mode":"auto"},{"kind":"roll","on":["initiative"],"flat":3,"mode":"auto"}]},{"rank":2,"name":"La Flèche connaît le chemin","summary":"Une augmentation gratuite réservée au Coup ciblé. +2g0 aux dégâts à l'arc.","effects":[{"kind":"maneuver","freeRaisesFor":{"maneuver":"called","count":1},"when":{"weapon":{"keywordsAny":["arc"]}},"mode":"auto"},{"kind":"roll","on":["damage"],"rolled":2,"when":{"weapon":{"keywordsAny":["arc"]}},"mode":"auto"}]},{"rank":3,"name":"Le Dard de la guêpe","summary":"Attaque à l'arc en Action simple.","effects":[{"kind":"simpleAttack","when":{"weapon":{"keywordsAny":["arc"]}}}]},{"rank":4,"name":"Le Vol du non-esprit","summary":"1 fois par escarmouche, 1 point de Vide, action complexe : le tir ignore l'armure, les pénalités de blessure et de visibilité ; pas d'Attaque supplémentaire, portée normale.","effects":[{"kind":"wounds","ignorePenalty":"all","on":["attack"],"when":{"weapon":{"keywordsAny":["arc"]}},"mode":"optional","void":1,"label":"Vol du non-esprit"},{"kind":"reminder","context":"combat","text":"Vol du non-esprit : le ND de la cible ne compte pas son armure."}]},{"rank":5,"name":"L'Œil de Tsuruchi","summary":"Attaque à distance en action complexe : +4g1 à l'attaque et aux dégâts (pas avec le Vol du non-esprit).","effects":[{"kind":"roll","on":["attack","damage"],"rolled":4,"kept":1,"when":{"weapon":{"ranged":true}},"mode":"optional","label":"Œil de Tsuruchi (action complexe)"}]}]},{"id":"shiba-bushi","clan":"Phénix","name":"École de bushi Shiba","class":"Bushi","ranks":[{"rank":1,"name":"La Voie du Phénix","summary":"Tu peux dépenser 2 points de Vide pour +2g2 sur un jet. Garde en action gratuite (ta cible n'a que +5 au ND).","effects":[{"kind":"void","points":2,"rolled":2,"kept":2,"label":"+2g2 au jet (2 points)"}]},{"rank":2,"name":"Danser avec les éléments","summary":"Une cible à 9 m : ND de ses sorts (lancés ou subis) ±5 ; idem pour les sorts qui te visent.","effects":[]},{"rank":3,"name":"Ne faire qu'un avec le Vide","summary":"Quand un autre personnage dépense du Vide dans le round, tu en regagnes un (au-delà du maximum jusqu'à la fin du combat), 2 fois par escarmouche.","effects":[{"kind":"reminder","context":"combat"}]},{"rank":4,"name":"Se mouvoir avec le monde","summary":"Attaque en Action simple avec une arme d'hast, une lance ou une arme Samouraï.","effects":[{"kind":"simpleAttack","when":{"weapon":{"keywordsAny":["hast","lance","samourai"]}}}]},{"rank":5,"name":"Le Toucher du Vide","summary":"Chaque point de Vide compte double quand c'est applicable ; améliorations par le Vide deux fois par tour.","effects":[{"kind":"voidDouble"}]}]},{"id":"bayushi-bushi","clan":"Scorpion","name":"École de bushi Bayushi","class":"Bushi","ranks":[{"rank":1,"name":"La Voie du Scorpion","summary":"+1g1 à l'Initiative. +5 au ND d'armure contre un adversaire à l'Initiative plus basse.","effects":[{"kind":"roll","on":["initiative"],"rolled":1,"kept":1,"mode":"auto"},{"kind":"armor","value":5,"mode":"optional","label":"Adversaire à l'Initiative plus basse"}]},{"rank":2,"name":"Pinces et queue","summary":"La Feinte coûte 1 augmentation au lieu de 2.","effects":[{"kind":"maneuver","cost":{"maneuver":"feint","value":1},"mode":"auto"}]},{"rank":3,"name":"Frapper la queue","summary":"Cible désignée en début de tour (9 m) : si tu la touches, elle est Fatiguée (jet de Terre ND 25 en réaction pour s'en libérer).","effects":[{"kind":"reminder","context":"combat"}]},{"rank":4,"name":"Frapper d'en haut, frapper d'en bas","summary":"Attaque au corps à corps en Action simple.","effects":[{"kind":"simpleAttack","when":{"weapon":{"melee":true}}}]},{"rank":5,"name":"Les Pinces tiennent, la queue frappe","summary":"1 fois par rencontre, 1 point de Vide, action complexe au corps à corps : si elle touche, la cible est Étourdie (jet de Terre contre tes dégâts).","effects":[{"kind":"reminder","context":"combat"}]}]},{"id":"moto-bushi","clan":"Licorne","name":"École de bushi Moto","class":"Bushi","ranks":[{"rank":1,"name":"La Voie de la Licorne","summary":"Armes à deux mains maniables à une main (sauf arcs). +1g0 aux dégâts monté, au cimeterre ou avec une arme de corps à corps à deux mains (non cumulable). Le cimeterre compte comme Samouraï.","effects":[{"kind":"roll","on":["damage"],"rolled":1,"when":{"anyOf":[{"mounted":true},{"weapon":{"keywordsAny":["cimeterre"]}},{"weapon":{"keywordsAny":["deux-mains"],"melee":true}}]},"mode":"auto"},{"kind":"keyword","weaponKeyword":"cimeterre","adds":"samourai"}]},{"rank":2,"name":"Le Sourire de Shinsei","summary":"+ moitié (arrondie en dessous) de la pénalité de blessure de l'adversaire au total des attaques.","effects":[{"kind":"roll","on":["attack"],"flat":{"ref":"input","div":2},"mode":"optional","input":"Pénalité de blessure de l'adversaire","label":"Sourire de Shinsei"}]},{"rank":3,"name":"La Frappe du vent du désert","summary":"Attaque au corps à corps en Action simple.","effects":[{"kind":"simpleAttack","when":{"weapon":{"melee":true}}}]},{"rank":4,"name":"La Charge de la folie","summary":"1 fois par escarmouche, quand tu mets une cible Hors de combat : attaque gratuite sur une autre cible, sans augmentation.","effects":[{"kind":"reminder","context":"combat"}]},{"rank":5,"name":"Un Moto ne cède jamais","summary":"Monté ou en posture Assaut, avec une arme à deux mains ou Samouraï : + moitié de ta Force (arrondie en dessous) en dés de dégâts gardés.","effects":[{"kind":"roll","on":["damage"],"kept":{"ref":"trait:strength","div":2},"when":{"anyOf":[{"mounted":true},{"stance":["fullAttack"]}],"weapon":{"keywordsAny":["deux-mains","samourai"]}},"mode":"auto"}]}]},{"id":"utaku-battle-maiden","clan":"Licorne","name":"Vierges de bataille Utaku","class":"Bushi","ranks":[{"rank":1,"name":"Chevaucher en harmonie","summary":"+ Rang d'Honneur à un jet d'attaque par round (ou à un jet de dégâts si montée). + Rang d'Honneur à tous les jets d'Équitation.","effects":[{"kind":"roll","on":["attack"],"flat":{"ref":"honor"},"mode":"optional","label":"Chevaucher en harmonie (1 attaque par round)"},{"kind":"roll","on":["damage"],"flat":{"ref":"honor"},"when":{"mounted":true},"mode":"optional","label":"Chevaucher en harmonie sur les dégâts (montée)"},{"kind":"roll","on":["skill:Équitation"],"flat":{"ref":"honor"},"mode":"auto"}]},{"rank":2,"name":"Le Vide de la guerre","summary":"En phase 1 de chaque round : +5 à l'Initiative ou au ND d'armure, jusqu'à la prochaine utilisation ou la fin de l'escarmouche.","effects":[{"kind":"roll","on":["initiative"],"flat":5,"mode":"optional","label":"Vide de la guerre : +5 Initiative"},{"kind":"armor","value":5,"mode":"optional","label":"Vide de la guerre : +5 ND d'armure"}]},{"rank":3,"name":"Sentir la brise","summary":"Montée : attaque en Action simple.","effects":[{"kind":"simpleAttack","when":{"mounted":true}}]},{"rank":4,"name":"Le Vent ne s'arrête jamais","summary":"Montée, 1 point de Vide : charge et attaque dans la même Action simple ; si elle touche, +2g1 aux dégâts ce tour.","effects":[{"kind":"roll","on":["damage"],"rolled":2,"kept":1,"when":{"mounted":true},"mode":"optional","void":1,"label":"Charge réussie (Vent ne s'arrête jamais)"}]},{"rank":5,"name":"La Bénédiction d'Otaku","summary":"1 point de Vide en début de tour : + Rang d'Honneur aux dégâts et aux compétences Bugei ce tour (cumulable avec le rang 1).","effects":[{"kind":"roll","on":["damage","bugei"],"flat":{"ref":"honor"},"mode":"optional","void":1,"label":"Bénédiction d'Otaku (ce tour)"}]}]}],"weaponCatalog":[{"name":"Katana","keywords":["samourai","moyenne"],"skill":"Kenjutsu","dr":"3k2"},{"name":"Wakizashi","keywords":["samourai","petite"],"skill":"Kenjutsu","dr":"2k2"},{"name":"No-dachi","keywords":["samourai","grande","deux-mains"],"skill":"Kenjutsu","dr":"3k3"},{"name":"Tanto","keywords":["petite"],"skill":"Couteaux","dr":"1k1"},{"name":"Cimeterre","keywords":["cimeterre","moyenne"],"skill":"Kenjutsu","dr":"3k2"},{"name":"Tetsubo","keywords":["lourde","grande","deux-mains"],"skill":"Armes lourdes","dr":"3k3"},{"name":"Ono","keywords":["lourde","grande","deux-mains"],"skill":"Armes lourdes","dr":"0k4"},{"name":"Yari","keywords":["lance","grande"],"skill":"Lances","dr":"2k2"},{"name":"Naginata","keywords":["hast","samourai","grande","deux-mains"],"skill":"Armes d'hast","dr":"3k3"},{"name":"Bo","keywords":["paysan","grande","deux-mains"],"skill":"Bâtons","dr":"2k1"},{"name":"Kama","keywords":["paysan","petite"],"skill":"Armes paysannes","dr":"2k1"},{"name":"Yumi","keywords":["arc","distance","samourai"],"skill":"Kyujutsu","dr":"2k2","bowStrength":3},{"name":"Dai-kyu","keywords":["arc","distance","samourai"],"skill":"Kyujutsu","dr":"2k2","bowStrength":4}],"skillGroups":{"bugei":["Athlétisme","Bataille","Défense","Équitation","Chasse","Iaijutsu","Jiujutsu","Kenjutsu","Kyujutsu","Armes à chaîne","Armes lourdes","Couteaux","Ninjutsu","Armes d'hast","Lances","Bâtons","Éventail de guerre","Armes paysannes"]}};
+const SCHOOLS=SCHOOLS_DATA.schools, WCAT=SCHOOLS_DATA.weaponCatalog;
+const BUGEI=new Set(SCHOOLS_DATA.skillGroups.bugei.map(x=>nk(x)));
+const STANCE_KEY={attack:"attaque",fullAttack:"totale",defense:"defense",fullDefense:"totaldef",center:"centre"};
+let mounted=false, centerLast=false;
+const armorSel={}, stacks={}, modInput={};
+function schoolOf(){return C&&SCHOOLS.find(s=>s.id===C.schoolId)||null}
+function schoolRank(){return num(C.schoolRank)||num(C.insight)||1}
+function honorRank(){return Math.floor(parseFloat(String(C.honor??"").replace(",","."))||0)}
+const shortSchool=s=>s.name.split(" ").pop();
+function activeEffects(){const s=schoolOf();if(!s)return[];const out=[];
+  s.ranks.filter(r=>r.rank<=schoolRank()).forEach(r=>r.effects.forEach((e,i)=>out.push({...e,key:`${s.id}-${r.rank}-${i}`,src:`${shortSchool(s)} R${r.rank}`,tname:r.name,tsum:r.summary})));return out}
+const hasEff=k=>activeEffects().some(e=>e.kind===k);
+function val(v,input){if(v==null)return 0;if(typeof v==="number")return v;const r=v.ref||"";let b=0;
+  if(r==="schoolRank")b=schoolRank();else if(r==="honor")b=honorRank();else if(r.startsWith("ring:"))b=ringVal(r.slice(5));
+  else if(r.startsWith("trait:"))b=tv(r.slice(6));else if(r.startsWith("skill:"))b=skillRank(r.slice(6));else if(r==="input")b=num(input);
+  b*=v.mult??1;if(v.div)b=Math.floor(b/v.div);b+=v.add??0;if(v.min!=null)b=Math.max(v.min,b);return b}
+function wkw(w){if(!w)return new Set();let k=Array.isArray(w.keywords)?w.keywords:String(w.keywords||"").split(/[,;]/);
+  k=k.map(x=>nk(x).replace(/\s+/g,"-")).filter(Boolean);
+  if(!k.length){const c=WCAT.find(c=>nk(c.name)===nk(w.name));if(c)k=c.keywords.slice()}
+  const s=new Set(k);activeEffects().filter(e=>e.kind==="keyword").forEach(e=>{if(s.has(e.weaponKeyword))s.add(e.adds)});return s}
+const wRanged=w=>!!w&&(isRanged(w)||wkw(w).has("distance")||wkw(w).has("arc"));
+function ctxNow(){return{st:stance,mounted,centerLast}}
+function whenOk(w,a,cx){if(!w)return true;
+  if(w.stance&&!w.stance.map(x=>STANCE_KEY[x]).includes(cx.st))return false;
+  if(w.stanceNot&&w.stanceNot.map(x=>STANCE_KEY[x]).includes(cx.st))return false;
+  if(w.mounted!=null&&w.mounted!==cx.mounted)return false;
+  if(w.centerOrAfter&&!(cx.st==="centre"||cx.centerLast))return false;
+  if(w.skillGroup==="bugei"&&!(a&&a.skill&&BUGEI.has(nk(a.skill))))return false;
+  if(w.weapon){const W=w.weapon;if(!a)return false;const wp=a.weapon,un=!!a.unarmed;
+    if(W.unarmed&&!un)return false;
+    if(W.keywordsAny&&!(wp&&W.keywordsAny.some(x=>wkw(wp).has(x))))return false;
+    if(W.melee&&(!(wp||un)||wRanged(wp)))return false;
+    if(W.ranged&&!wRanged(wp))return false}
+  if(w.anyOf&&!w.anyOf.some(x=>whenOk(x,a,cx)))return false;
+  return true}
+function onMatch(on,a){if(!on)return true;return on.some(o=>o==="attack"?!!a.attack:o==="damage"?a.type==="damage":o==="initiative"?a.type==="init":o==="focus"?a.id==="focus"
+  :o==="skill"?(a.type==="skill"&&!a.attack):o==="trait"?a.type==="trait":o==="bugei"?(a.type==="skill"&&BUGEI.has(nk(a.skill)))
+  :o.startsWith("skill:")?(a.type==="skill"&&nk(a.skill)===nk(o.slice(6))):false)}
+/* bonus de jet applicables à une action : auto (appliqués) et optionnels (à cocher) */
+function rollEffects(a,cx){return activeEffects().filter(e=>{
+  if(e.kind==="roll")return onMatch(e.on,a)&&whenOk(e.when,a,cx);
+  if(e.kind==="wounds"&&e.mode==="optional")return onMatch(e.on,a)&&whenOk(e.when,a,cx);
+  if(e.kind==="maneuver"&&e.freeRaisesFor)return !!a.attack&&whenOk(e.when,a,cx);
+  return false})}
+function effDesc(e){const p=[];const r=val(e.rolled,modInput[e.key]),k=val(e.kept,modInput[e.key]),f=val(e.flat,modInput[e.key]),fr=val(e.freeRaises);
+  if(r||k)p.push(`+${r}g${k}`);if(e.flat!=null&&(f||e.input))p.push(`+${f}`);if(fr)p.push(`+${fr} augm. gratuite`);
+  if(e.kind==="wounds"&&e.ignorePenalty==="all")p.push("pénalité de blessure ignorée");
+  if(e.freeRaisesFor){const m=DEF_MANS.find(m=>m.k===e.freeRaisesFor.maneuver);p.push(`${e.freeRaisesFor.count} augm. gratuite(s) pour ${m?m.n:e.freeRaisesFor.maneuver}`)}
+  return p.join(", ")}
+function effReduction(){return activeEffects().filter(e=>e.kind==="reduction"&&e.mode==="auto").reduce((s,e)=>s+val(e.value),0)}
+function woundMods(cx=ctxNow()){let per=0,ign=0;activeEffects().filter(e=>e.kind==="wounds"&&e.mode==="auto"&&whenOk(e.when,null,cx)).forEach(e=>{if(e.perLevel)per+=val(e.perLevel);if(e.ignorePenalty&&e.ignorePenalty!=="all")ign+=val(e.ignorePenalty)});return{per,ign}}
+function armorEffects(){return activeEffects().filter(e=>e.kind==="armor"&&whenOk(e.when,null,ctxNow()))}
+function armorBonus(){return armorEffects().reduce((s,e)=>s+(e.stack?num(stacks[e.key])*val(e.value):(e.mode==="auto"||armorSel[e.key])?val(e.value):0),0)}
+function targetMod(){return activeEffects().filter(e=>e.kind==="targetTn").reduce((s,e)=>s+(e.stack?num(stacks[e.key]):1)*val(e.value),0)}
+function voidMult(){return hasEff("voidDouble")?2:1}
+function simpleAttack(a){return !!a.attack&&activeEffects().some(e=>e.kind==="simpleAttack"&&whenOk(e.when,a,ctxNow()))}
+function mcost(m){const e=activeEffects().find(e=>e.kind==="maneuver"&&e.cost&&e.cost.maneuver===m.k);return e?e.cost.value:num(m.cost)}
+function techCats(r){const c=new Set();r.effects.forEach(e=>{if(e.kind==="reminder")c.add("rappel");else if(e.mode==="optional"||(e.kind==="armor"&&e.stack))c.add("à cocher");else c.add("auto")});if(!c.size)c.add("texte");return [...c]}
+
+const MASTERY_RANK=7;   // compétence martiale à 7+ : dégâts relancés sur 9
 function moveFt(){const w=ringVal("water");return{free:w*5,simple:w*10,max:w*20}}
+function moveBonus(){return activeEffects().filter(e=>e.kind==="move"&&whenOk(e.when,null,ctxNow())).reduce((s,e)=>s+val(e.value),0)}
 const toM=f=>(f*0.3048).toFixed(1).replace(".",",")+" m";
 function parseDR(s){const m=String(s||"").match(/(\d+)\s*[gk]\s*(\d+)/i);return m?{r:+m[1],k:+m[2]}:{r:0,k:0}}
 const fmt=(r,k)=>`${r}g${k}`;
+const fmtP=p=>fmt(p.r,p.k)+(p.bonus?` +${p.bonus}`:"");
 
 /* ---------- Persistance ---------- */
-function blank(){return{name:"Nouveau samouraï",clan:"",family:"",school:"",insight:1,honor:"",glory:"",status:"",xpTotal:40,xpSpent:0,
+function blank(){return{name:"Nouveau samouraï",clan:"",family:"",school:"",schoolId:"",schoolRank:"",insight:1,honor:"",glory:"",status:"",xpTotal:40,xpSpent:0,
   traits:{stamina:2,willpower:2,strength:2,perception:2,agility:2,intelligence:2,reflexes:2,awareness:2},void:2,voidPoints:2,wounds:0,
   armor:{name:"Aucune",bonus:0,reduction:0},skills:[],weapons:[],techniques:[],advantages:"",disadvantages:"",notes:""}}
 function save(){
@@ -364,10 +480,17 @@ let theme="auto";
 function applyTheme(){
   const r=document.documentElement;
   if(theme==="auto")r.removeAttribute("data-theme");else r.setAttribute("data-theme",theme);
-  $("#theme-btn").textContent="Thème : "+({auto:"auto",light:"clair",dark:"sombre"}[theme]);
+  const tl="Thème : "+({auto:"auto",light:"clair",dark:"sombre"}[theme]);
+  $("#theme-btn .txt").textContent=tl; $("#theme-btn").setAttribute("aria-label",tl); $("#theme-btn").title=tl;
 }
 try{theme=localStorage.getItem("l5r-theme")||"auto"}catch(e){}
 applyTheme();
+let showRoller=false;
+try{showRoller=localStorage.getItem("l5r-dice-roller")==="1"}catch(e){}
+function applyShowRoller(){const b=$("#roll-btn");const rl="Lanceur de dés : "+(showRoller?"affiché":"masqué");b.querySelector(".txt").textContent=rl;b.setAttribute("aria-label",rl);b.title=rl;b.setAttribute("aria-pressed",showRoller);b.classList.toggle("on",showRoller)}
+applyShowRoller();
+$("#lib-btn").onclick=()=>toast("Bibliothèque : disponible dans l'application");
+$("#roll-btn").onclick=()=>{showRoller=!showRoller;try{localStorage.setItem("l5r-dice-roller",showRoller?"1":"0")}catch(e){};applyShowRoller();if(C)render()};
 $("#theme-btn").onclick=()=>{theme={auto:"light",light:"dark",dark:"auto"}[theme];applyTheme();try{localStorage.setItem("l5r-theme",theme)}catch(e){}};
 
 /* ---------- Rendu général ---------- */
@@ -400,7 +523,13 @@ function renderStatus(){
     <div><div class="label">Blessures</div><div class="stepper"><button data-act="w-" aria-label="Retirer 1 blessure">−</button><input class="in mono" style="width:56px;text-align:center" id="wounds" type="number" min="0" value="${num(C.wounds)}" aria-label="Blessures subies"><button data-act="w+" aria-label="Ajouter 1 blessure">+</button></div></div>
     <div><div class="label">Points de Vide ${vp}/${vmax}</div><div class="voidpips">${Array.from({length:vmax},(_,i)=>`<button class="pip ${i<vp?"on":""}" data-act="vp" data-i="${i}" aria-label="Point de Vide ${i+1}"></button>`).join("")}</div>
     </div>
-    <div class="cstats"><div><span class="label">Dépl.</span><b>${moveFt().free}/${moveFt().simple}<small> pi</small></b></div><div><span class="label">ND armure</span><b>${armorTN()}</b></div><div><span class="label">Réduction</span><b>${num(C.armor?.reduction)}</b></div><div class="${ws.pen?"pen":""}"><span class="label">Pénalité</span><b>${ws.pen===null?"—":"+"+ws.pen}</b></div></div>
+    <div class="cstats"><div><span class="label">Dépl.</span><b>${moveFt().free}/${moveFt().simple}<small> pi</small></b></div><button class="ct ${armEdit?"on":""}" data-act="armedit" aria-expanded="${armEdit}" title="Modifier l'armure"><span class="label">ND armure</span><b>${armorTN()}</b></button><button class="ct ${armEdit?"on":""}" data-act="armedit" aria-expanded="${armEdit}" title="Modifier l'armure"><span class="label">Réduction</span><b>${num(C.armor?.reduction)+effReduction()}</b></button><div class="${ws.pen?"pen":""}"><span class="label">Pénalité</span><b>${ws.pen===null?"—":"+"+ws.pen}</b></div></div>
+    ${armEdit?`<div class="armedit">
+      <label class="field"><span class="label">Armure</span><input class="in" data-p="armor.name" value="${esc(C.armor?.name||"")}"></label>
+      <label class="field"><span class="label">Bonus au ND</span><input class="in mono" type="number" data-p="armor.bonus" data-n value="${num(C.armor?.bonus)}"></label>
+      <label class="field"><span class="label">Réduction</span><input class="in mono" type="number" min="0" data-p="armor.reduction" data-n value="${num(C.armor?.reduction)}"></label>
+      <p class="hint" style="grid-column:1/-1;margin:0">ND d'armure = 5 × Réflexes ${tv("reflexes")} + 5 + bonus d'armure${stance!=="attaque"||voidArmor?" ± posture et Vide":""} = <b class="mono">${armorTN()}</b>. La réduction se retire de chaque jet de dégâts reçu.${effReduction()?` Techniques : +${effReduction()} de Réduction (total ${num(C.armor?.reduction)+effReduction()}).`:""}${armorBonus()?` Techniques : +${armorBonus()} au ND.`:""}</p>
+      <button class="btn sm" data-act="armedit" style="justify-self:end;grid-column:1/-1">Fermer</button></div>`:""}
   </div>`;
 }
 
@@ -418,7 +547,9 @@ function renderSheet(){
       <label class="field"><span class="label">Nom</span>${inp("name",C.name)}</label>
       <label class="field"><span class="label">Clan</span>${inp("clan",C.clan,"text",'list="clan-list"')}<datalist id="clan-list">${["Crabe","Grue","Dragon","Licorne","Lion","Mante","Phénix","Scorpion","Araignée","Impérial"].map(c=>`<option value="${c}"></option>`).join("")}</datalist></label>
       <label class="field"><span class="label">Famille</span>${inp("family",C.family)}</label>
-      <label class="field"><span class="label">École</span>${inp("school",C.school)}</label>
+      <label class="field"><span class="label">École (nom affiché)</span>${inp("school",C.school)}</label>
+      <label class="field"><span class="label">Techniques d'école</span><select class="in" data-p="schoolId"><option value="">— Aucune (techniques libres)</option>${[...new Set(SCHOOLS.map(x=>x.clan))].map(cl=>`<optgroup label="${esc(cl)}">${SCHOOLS.filter(x=>x.clan===cl).map(x=>`<option value="${x.id}" ${C.schoolId===x.id?"selected":""}>${esc(x.name)}</option>`).join("")}</optgroup>`).join("")}</select></label>
+      <label class="field"><span class="label">Rang d'école</span>${inp("schoolRank",C.schoolRank??"","number",`min="1" max="5" data-n placeholder="= Insight (${num(C.insight)})"`)}</label>
       <label class="field"><span class="label">Rang (Insight)</span>${inp("insight",C.insight,"number",'min="1" data-n')}</label>
       <label class="field"><span class="label">Honneur</span>${inp("honor",C.honor)}</label>
       <label class="field"><span class="label">Gloire</span>${inp("glory",C.glory)}</label>
@@ -435,7 +566,7 @@ function renderSheet(){
       <div><span class="label">Statut</span><b>${esc(C.status||"—")}</b></div>
       <div><span class="label">XP libre</span><b>${num(C.xpTotal)-num(C.xpSpent)}</b></div>
       <div><span class="label">Armure</span><b style="font-size:15px">${esc(C.armor?.name||"—")} <span class="muted">ND +${num(C.armor?.bonus)} · réd. ${num(C.armor?.reduction)}</span></b></div>
-      <div><span class="label">Initiative</span><b>${fmt(num(C.insight)+tv("reflexes"),tv("reflexes"))}</b></div>
+      <div><span class="label">Initiative</span><b>${fmtP(pool(A({type:"init",tn:null}),{dmod:0,ctx:{st:"attaque",mounted:false,centerLast:false}}))}</b></div>
     </div>`;
 
   const traitOpts=v=>Object.entries(TRAITS).map(([k,n])=>`<option value="${k}" ${k===v?"selected":""}>${n}</option>`).join("");
@@ -444,17 +575,22 @@ function renderSheet(){
     ? `<div class="tbl"><table><thead><tr><th>Compétence</th><th>Rang</th><th>Trait</th><th>Spécialisations</th><th></th></tr></thead><tbody>${
       skills.map(({s,i})=>`<tr><td>${inp(`skills.${i}.name`,s.name)}</td><td style="width:70px">${inp(`skills.${i}.rank`,s.rank,"number",'min="0" max="10" data-n')}</td><td style="width:140px"><select class="in" data-p="skills.${i}.trait">${traitOpts(s.trait)}</select></td><td>${inp(`skills.${i}.emph`,s.emph,"text",'placeholder="ex. Fouille, Remarquer"')}</td><td><button class="x" data-act="del" data-list="skills" data-i="${i}" aria-label="Supprimer">×</button></td></tr>`).join("")}</tbody></table></div><button class="btn sm" data-act="add" data-list="skills">+ Compétence</button>`
     : `<div class="tbl"><table><thead><tr><th>Compétence</th><th>Rang</th><th>Trait</th><th>Jet</th></tr></thead><tbody>${
-      skills.map(({s})=>`<tr><td><b>${esc(s.name)}</b>${s.emph?`<div>${String(s.emph).split(/[,;]/).filter(x=>x.trim()).map(x=>`<span class="tag">${esc(x.trim())}</span>`).join("")}</div>`:""}</td><td class="mono">${num(s.rank)}</td><td class="muted">${TRAITS[s.trait]||"—"}</td><td class="pool">${fmt(num(s.rank)+tv(s.trait),tv(s.trait))}</td></tr>`).join("")||`<tr><td colspan="4" class="muted">Aucune compétence. Passe en mode modification pour en ajouter.</td></tr>`}</tbody></table></div>`;
+      skills.map(({s})=>`<tr><td><b>${esc(s.name)}</b>${s.emph?`<div>${String(s.emph).split(/[,;]/).filter(x=>x.trim()).map(x=>`<span class="tag">${esc(x.trim())}</span>`).join("")}</div>`:""}</td><td class="mono">${num(s.rank)}</td><td class="muted">${TRAITS[s.trait]||"—"}</td><td class="pool">${fmtP(pool(A({type:"skill",skill:s.name,trait:s.trait}),{dmod:0,ctx:{st:"attaque",mounted:false,centerLast:false}}))}</td></tr>`).join("")||`<tr><td colspan="4" class="muted">Aucune compétence. Passe en mode modification pour en ajouter.</td></tr>`}</tbody></table></div>`;
 
   const weaponsHtml = edit
-    ? `<div class="tbl"><table><thead><tr><th>Arme</th><th>Compétence</th><th>VD</th><th>Force arc</th><th></th></tr></thead><tbody>${
-      (C.weapons||[]).map((w,i)=>`<tr><td>${inp(`weapons.${i}.name`,w.name)}</td><td>${inp(`weapons.${i}.skill`,w.skill)}</td><td style="width:80px">${inp(`weapons.${i}.dr`,w.dr,"text",'placeholder="3g2"')}</td><td style="width:70px">${inp(`weapons.${i}.bow`,w.bow??"","number",'data-n placeholder="—"')}</td><td><button class="x" data-act="del" data-list="weapons" data-i="${i}" aria-label="Supprimer">×</button></td></tr>`).join("")}</tbody></table></div><button class="btn sm" data-act="add" data-list="weapons">+ Arme</button>`
+    ? `<div class="tbl"><table><thead><tr><th>Arme</th><th>Compétence</th><th>VD</th><th>Force arc</th><th>Mots-clés</th><th></th></tr></thead><tbody>${
+      (C.weapons||[]).map((w,i)=>`<tr><td>${inp(`weapons.${i}.name`,w.name)}</td><td>${inp(`weapons.${i}.skill`,w.skill)}</td><td style="width:80px">${inp(`weapons.${i}.dr`,w.dr,"text",'placeholder="3g2"')}</td><td style="width:70px">${inp(`weapons.${i}.bow`,w.bow??"","number",'data-n placeholder="—"')}</td><td style="min-width:140px">${inp(`weapons.${i}.keywords`,Array.isArray(w.keywords)?w.keywords.join(", "):(w.keywords||""),"text",`placeholder="${esc([...wkw(w)].join(", ")||"samouraï, lourde…")}"`)}</td><td><button class="x" data-act="del" data-list="weapons" data-i="${i}" aria-label="Supprimer">×</button></td></tr>`).join("")}</tbody></table></div><button class="btn sm" data-act="add" data-list="weapons">+ Arme</button>`
     : `<div class="tbl"><table><thead><tr><th>Arme</th><th>Attaque</th><th>Dégâts</th></tr></thead><tbody>${
-      (C.weapons||[]).map(w=>{const dr=parseDR(w.dr),sr=skillRank(w.skill),t=wTrait(w),rg=isRanged(w);return `<tr><td><b>${esc(w.name)}</b><div class="muted" style="font-size:12.5px">${esc(w.skill)} · VD ${esc(w.dr)}${rg?` · arc ${num(w.bow)}`:""}</div></td><td class="pool">${fmt(sr+tv(t),tv(t))}</td><td class="pool">${fmt((rg?num(w.bow):tv("strength"))+dr.r,dr.k)}</td></tr>`}).join("")||`<tr><td colspan="3" class="muted">Aucune arme.</td></tr>`}</tbody></table></div>`;
+      (C.weapons||[]).map(w=>{const dr=parseDR(w.dr),sr=skillRank(w.skill),t=wTrait(w),rg=isRanged(w);return `<tr><td><b>${esc(w.name)}</b><div class="muted" style="font-size:12.5px">${esc(w.skill)} · VD ${esc(w.dr)}${rg?` · arc ${num(w.bow)}`:""}</div>${wkw(w).size?`<div>${[...wkw(w)].map(k=>`<span class="tag">${esc(k)}</span>`).join("")}</div>`:""}</td>${(()=>{const [at,dm]=weaponActs(w),cx={dmod:0,ctx:{st:"attaque",mounted:false,centerLast:false}};return `<td class="pool">${fmtP(pool(at,cx))}</td><td class="pool">${fmtP(pool(dm,cx))}</td>`})()}</tr>`}).join("")||`<tr><td colspan="3" class="muted">Aucune arme.</td></tr>`}</tbody></table></div>`;
 
-  const techHtml = edit
+  const sc=schoolOf();
+  const schoolHtml = sc?`<div class="schoolhead"><b>${esc(sc.name)}</b> <span class="muted">· ${esc(sc.clan)} · Rang d'école ${schoolRank()}</span></div>
+    ${sc.ranks.map(r=>{const on=r.rank<=schoolRank();return `<div class="tech ${on?"":"locked"}"><div class="techtop"><b>R${r.rank} · ${esc(r.name)}</b><span>${on?techCats(r).map(c=>`<span class="badge b-${c.replace(/\W/g,"")}">${c}</span>`).join(""):`<span class="badge">rang ${r.rank}</span>`}</span></div><div class="muted">${esc(r.summary)}</div></div>`}).join("")}
+    ${(C.techniques||[]).length||edit?`<div class="label" style="margin-top:12px">Autres techniques, kata, sorts</div>`:""}`
+    :(edit?`<p class="hint" style="margin-top:0">Choisis une école dans « Techniques d'école » (bloc Identité) pour ajouter ses techniques automatiquement.</p>`:"");
+  const techHtml = schoolHtml + (edit
     ? (C.techniques||[]).map((t,i)=>`<div class="field" style="margin-bottom:10px"><div style="display:flex;gap:6px">${inp(`techniques.${i}.name`,t.name,"text",'placeholder="Nom de la technique"')}<button class="x" data-act="del" data-list="techniques" data-i="${i}" aria-label="Supprimer">×</button></div><textarea class="in" data-p="techniques.${i}.text" placeholder="Effet">${esc(t.text)}</textarea></div>`).join("")+`<button class="btn sm" data-act="add" data-list="techniques">+ Technique / sort / kata</button>`
-    : (C.techniques||[]).map(t=>`<div class="tech"><b>${esc(t.name)}</b><div class="prose muted">${esc(t.text)}</div></div>`).join("")||`<p class="muted">Aucune technique notée.</p>`;
+    : (C.techniques||[]).map(t=>`<div class="tech"><b>${esc(t.name)}</b><div class="prose muted">${esc(t.text)}</div></div>`).join("")||(sc?"":`<p class="muted">Aucune technique notée.</p>`));
 
   const txt=(p,label)=>edit?`<label class="field"><span class="label">${label}</span><textarea class="in" data-p="${p}">${esc(C[p])}</textarea></label>`:`<div><div class="label">${label}</div><div class="prose">${esc(C[p]||"—")}</div></div>`;
 
@@ -466,10 +602,6 @@ function renderSheet(){
       <div class="grid">
         <div class="panel"><h2>Armes</h2>${weaponsHtml}</div>
         <div class="panel"><h2>Techniques d'école</h2>${techHtml}</div>
-        <div class="panel"><h2>Manœuvres</h2>${edit
-          ? `<p class="hint" style="margin-top:0">Ajuste les coûts à ton livre ou aux règles de ta table. « Cumulable » : on peut la prendre plusieurs fois.</p><div class="tbl"><table><thead><tr><th>Manœuvre</th><th>Coût</th><th>Cumul.</th><th></th></tr></thead><tbody>${
-            (C.maneuvers||[]).map((m,i)=>`<tr><td>${inp(`maneuvers.${i}.n`,m.n)}<textarea class="in" style="min-height:44px;margin-top:4px" data-p="maneuvers.${i}.eff" placeholder="Effet">${esc(m.eff)}</textarea></td><td style="width:64px">${inp(`maneuvers.${i}.cost`,m.cost,"number",'min="0" data-n')}</td><td style="width:50px"><input type="checkbox" data-pc="maneuvers.${i}.rep" ${m.rep?"checked":""} aria-label="Cumulable"></td><td><button class="x" data-act="del" data-list="maneuvers" data-i="${i}" aria-label="Supprimer">×</button></td></tr>`).join("")}</tbody></table></div><button class="btn sm" data-act="add" data-list="maneuvers">+ Manœuvre</button>`
-          : `<div class="tbl"><table><tbody>${mans().map(m=>`<tr><td><b>${esc(m.n)}</b><div class="muted" style="font-size:12.5px">${esc(m.eff)}</div></td><td class="pool" style="white-space:nowrap">${num(m.cost)} augm.${m.rep?" / fois":""}</td></tr>`).join("")}</tbody></table></div>`}</div>
       </div>
     </div>
     <div class="panel"><h2>Avantages, désavantages, notes</h2><div class="grid cols-2">${txt("advantages","Avantages")}${txt("disadvantages","Désavantages")}</div><div style="margin-top:14px">${txt("notes","Notes de campagne")}</div></div>
@@ -480,12 +612,12 @@ function renderSheet(){
 /* ---------- Aide de jeu : situations ---------- */
 function A(o){return Object.assign({type:"skill",tn:15,emph:""},o)}
 function weaponActs(w,useTN){const dr=parseDR(w.dr),rg=isRanged(w);return[
-  A({id:"atk-"+w.name,label:`${rg?"Tir":"Attaque"} · ${w.name}`,skill:w.skill,trait:wTrait(w),tn:useTN??"target",attack:true,desc:`${w.skill} (${TRAITS[wTrait(w)]}) contre le ND d'armure de la cible. Choisis tes manœuvres dans le lanceur.`}),
-  A({id:"dmg-"+w.name,parent:"atk-"+w.name,label:`Dégâts · ${w.name}`,type:"damage",dr,bow:rg?num(w.bow):null,tn:null,desc:rg?`Force de l'arc ${num(w.bow)} + VD de la flèche ${w.dr}.`:`Force + VD ${w.dr}. Les augmentations de dégâts s'ajoutent en dés lancés.`})]}
+  A({id:"atk-"+w.name,weapon:w,label:`${rg?"Tir":"Attaque"} · ${w.name}`,skill:w.skill,trait:wTrait(w),tn:useTN??"target",attack:true,desc:`${w.skill} (${TRAITS[wTrait(w)]}) contre le ND d'armure de la cible. Choisis tes manœuvres dans le lanceur.`}),
+  A({id:"dmg-"+w.name,weapon:w,parent:"atk-"+w.name,mskill:w.skill,label:`Dégâts · ${w.name}`,type:"damage",dr,bow:rg?num(w.bow):null,tn:null,desc:rg?`Force de l'arc ${num(w.bow)} + VD de la flèche ${w.dr}.`:`Force + VD ${w.dr}. Les augmentations de dégâts s'ajoutent en dés lancés.`})]}
 const UNARMED=()=>[
-  A({id:"unarmed",label:"Attaque à mains nues",skill:"Jiujutsu",trait:"agility",tn:"target",attack:true,desc:"Jiujutsu (Agilité) contre le ND d'armure. Dégâts : Force + 0g1."}),
-  A({id:"unarmed-dmg",parent:"unarmed",label:"Dégâts · mains nues",type:"damage",dr:{r:0,k:1},tn:null,desc:"Force + 0g1."}),
-  A({id:"grapple",label:"Lutte (saisie)",skill:"Jiujutsu",trait:"agility",tn:"target",attack:true,desc:"Attaque Jiujutsu ; si elle touche, jets de Force en opposition pour établir et tenir la prise."})];
+  A({id:"unarmed",unarmed:true,label:"Attaque à mains nues",skill:"Jiujutsu",trait:"agility",tn:"target",attack:true,desc:"Jiujutsu (Agilité) contre le ND d'armure. Dégâts : Force + 0g1."}),
+  A({id:"unarmed-dmg",unarmed:true,parent:"unarmed",mskill:"Jiujutsu",label:"Dégâts · mains nues",type:"damage",dr:{r:0,k:1},tn:null,desc:"Force + 0g1."}),
+  A({id:"grapple",unarmed:true,label:"Lutte (saisie)",skill:"Jiujutsu",trait:"agility",tn:"target",attack:true,desc:"Attaque Jiujutsu ; si elle touche, jets de Force en opposition pour établir et tenir la prise."})];
 function situations(){
   const W=C.weapons||[];
   const S={
@@ -516,8 +648,8 @@ function situations(){
       duel:{n:"Duel iaijutsu",acts:[
         A({id:"assess",label:"1 · Évaluation",skill:"Iaijutsu",trait:"awareness",tn:"assess",desc:"ND 10 + 5 × Rang de l'adversaire. Réussite : tu apprends des informations sur lui (Rang, Anneaux…), chaque augmentation en plus."}),
         A({id:"focus",label:"2 · Concentration",skill:"Iaijutsu",trait:"void",tn:"opp",desc:"Jets en opposition à chaque échange. Le vainqueur frappe en premier ; l'écart se convertit en augmentations gratuites pour la Frappe."}),
-        A({id:"strike",label:"3 · Frappe",skill:"Iaijutsu",trait:"reflexes",tn:"target",attack:true,desc:"Iaijutsu (Réflexes) contre le ND d'armure. Ajoute tes augmentations gratuites de la Concentration."}),
-        ...W.filter(w=>/katana|wakizashi|ken|sabre/i.test(w.name)).map(w=>A({id:"dmg-"+w.name,parent:"strike",label:`Dégâts · ${w.name}`,type:"damage",dr:parseDR(w.dr),tn:null,desc:"Les augmentations de la Frappe ajoutent +1g0 chacune."})),
+        A({id:"strike",weapon:W.find(w=>/katana/i.test(w.name))||W[0],label:"3 · Frappe",skill:"Iaijutsu",trait:"reflexes",tn:"target",attack:true,desc:"Iaijutsu (Réflexes) contre le ND d'armure. Ajoute tes augmentations gratuites de la Concentration."}),
+        ...W.filter(w=>/katana|wakizashi|ken|sabre/i.test(w.name)).map(w=>A({id:"dmg-"+w.name,weapon:w,parent:"strike",mskill:w.skill,label:`Dégâts · ${w.name}`,type:"damage",dr:parseDR(w.dr),tn:null,desc:"Les augmentations de la Frappe ajoutent +1g0 chacune."})),
       ]},
       bataille:{n:"Bataille",acts:[
         A({id:"tactic",label:"Commander / lire le champ",skill:"Bataille",trait:"perception",tn:"opp",desc:"Commandants : jets en opposition chaque tour. Le vainqueur infléchit le cours de la bataille."}),
@@ -535,11 +667,11 @@ function currentActs(){const S=situations();return sit==="combat"?S.combat.subs[
 /* ---------- Statistiques (Monte-Carlo, mis en cache par réserve) ---------- */
 const STAT_N=4000, simCache=new Map();
 function simulate(p,emph){
-  const key=[p.r,p.k,p.skilled?1:0,emph?1:0].join("|");
+  const key=[p.r,p.k,p.skilled?1:0,emph?1:0,p.eo].join("|");
   if(simCache.has(key))return simCache.get(key);
   const tots=new Int32Array(STAT_N), d=new Array(p.r);
   for(let n=0;n<STAT_N;n++){
-    for(let i=0;i<p.r;i++){let v=d10();if(emph&&v===1)v=d10();let t=v;while(p.skilled&&v===10){v=d10();t+=v}d[i]=t}
+    for(let i=0;i<p.r;i++){let v=d10();if(emph&&v===1)v=d10();let t=v;while(p.skilled&&v>=p.eo){v=d10();t+=v}d[i]=t}
     d.sort((a,b)=>b-a);let s=0;for(let i=0;i<p.k;i++)s+=d[i];tots[n]=s;
   }
   tots.sort();let sum=0;for(let i=0;i<STAT_N;i++)sum+=tots[i];
@@ -548,14 +680,14 @@ function simulate(p,emph){
 function pAtLeast(sim,need){let lo=0,hi=sim.tots.length;while(lo<hi){const m=(lo+hi)>>1;if(sim.tots[m]>=need)hi=m;else lo=m+1}return (sim.tots.length-lo)/sim.tots.length}
 function statsFor(p,emph,flat=0){
   if(!p||p.r<1)return null;
-  const sim=simulate(p,emph&&p.skilled), add=p.bonus+num(flat);
+  const sim=simulate(p,emph&&p.skilled), add=p.bonus+num(flat);   // p.bonus inclut dix dés + techniques
   return{min:p.k+add,mean:sim.mean+add,max:10*p.k+add,open:p.skilled,chance:tn=>pAtLeast(sim,tn-add)};
 }
 const pct=x=>x>=0.995?"≥99 %":x<0.005?"<1 %":Math.round(x*100)+" %";
 const statOpt={voidp:false,emph:true,pen:true};
 function renderStats(){
   const TNS=[10,15,20,25,30,40], pen=statOpt.pen?(woundState().pen||0):0;
-  const o={voidp:statOpt.voidp,dmod:0,voidSkill:false};
+  const o={voidp:statOpt.voidp,dmod:0,voidSkill:false,ctx:{st:"attaque",mounted:false,centerLast:false}};
   const rows=[];
   const add=(label,a,cls="")=>{const p=pool(a,o,"attaque");const st=statsFor(p,statOpt.emph&&a.type==="skill"&&hasEmph(a.skill,a.emph||""));rows.push({label,a,p,st,cls})};
   add("Initiative",A({type:"init",tn:null}));
@@ -563,7 +695,7 @@ function renderStats(){
   (C.skills||[]).slice().sort((x,y)=>x.name.localeCompare(y.name,"fr")).forEach(sk=>add(`${sk.name} (${TRAITS[sk.trait]})`,A({type:"skill",skill:sk.name,trait:sk.trait,emph:sk.emph||""})));
   const cell=(st,tn)=>{const v=st.chance(tn+pen);return `<td class="pc" style="--p:${Math.round(v*60)}%">${pct(v)}</td>`};
   const body=rows.map(r=>{const st=r.st;if(!st)return "";const hasTN=r.a.type==="skill"||r.a.type==="trait";
-    return `<tr class="${r.cls}"><td class="jl">${r.cls?"└ ":""}${esc(r.label)}</td><td class="pool">${fmt(r.p.r,r.p.k)}</td><td class="mono">${st.min}</td><td class="mono"><b>${Math.round(st.mean)}</b></td><td class="mono">${st.max}${st.open?"+":""}</td>${hasTN?TNS.map(t=>cell(st,t)).join(""):`<td class="muted" style="text-align:center" colspan="${TNS.length}">sans ND</td>`}</tr>`}).join("");
+    return `<tr class="${r.cls}"><td class="jl">${r.cls?"└ ":""}${esc(r.label)}</td><td class="pool">${fmtP(r.p)}</td><td class="mono">${st.min}</td><td class="mono"><b>${Math.round(st.mean)}</b></td><td class="mono">${st.max}${st.open?"+":""}${r.p.eo===9?` <span class="tag" title="Explose sur 9">9+</span>`:""}</td>${hasTN?TNS.map(t=>cell(st,t)).join(""):`<td class="muted" style="text-align:center" colspan="${TNS.length}">sans ND</td>`}</tr>`}).join("");
   return `<div class="panel">
     <div class="panel-head"><h2>Statistiques de tes jets</h2><span class="muted" style="font-size:13px">${STAT_N.toLocaleString("fr-FR")} lancers simulés par réserve</span></div>
     <div class="statopts">
@@ -572,12 +704,13 @@ function renderStats(){
       <label class="chk"><input type="checkbox" data-st="pen" ${statOpt.pen?"checked":""}> Pénalité de blessure actuelle (+${woundState().pen||0})</label>
     </div>
     <div class="tbl"><table class="stats"><thead><tr><th>Jet</th><th>Réserve</th><th>Min</th><th>Moy.</th><th>Max</th>${TNS.map(t=>`<th>ND ${t}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table></div>
-    <p class="hint">Chances de réussite sans augmentation. Chaque augmentation annoncée ajoute +5 au ND : décale-toi d'une colonne vers la droite. Un maximum suivi de « + » peut être dépassé grâce aux explosions.</p>
+    <p class="hint">${schoolOf()?`Techniques automatiques de ton école incluses (posture de référence : Attaque). `:""}Chances de réussite sans augmentation. Chaque augmentation annoncée ajoute +5 au ND : décale-toi d'une colonne vers la droite. Un maximum suivi de « + » peut être dépassé grâce aux explosions.</p>
   </div>`;
 }
 
 function pool(a,o=opt,st=stance){
   if(!a||a.type==="info"||a.type==="move")return null;
+  const cx=o.ctx||{st,mounted,centerLast};
   let r=0,k=0,skilled=true,canRaise=true,note="";
   if(a.type==="skill"){const t=tv(a.trait);let s=skillRank(a.skill);
     if(!s&&o.voidSkill){s=1;note="Point de Vide : compétence jouée au rang 1."}
@@ -587,53 +720,82 @@ function pool(a,o=opt,st=stance){
   else if(a.type==="init"){r=num(C.insight)+tv("reflexes");k=tv("reflexes");canRaise=false}
   if(a.attack&&st==="totale"){r+=2;k+=1}
   r+=num(o.dmod);
-  if(o.voidp){r+=1;k+=1}
-  let bonus=0;
-  if(r>10){k+=r-10;r=10}
-  if(k>10){bonus+=2*(k-10);k=10}
+  const applied=[], optional=[]; let mflat=0, free=0;
+  rollEffects(a,cx).forEach(e=>{const on=e.mode==="auto"||(o.modSel&&o.modSel[e.key]);(e.mode==="auto"?applied:optional).push(e);
+    if(!on||e.kind!=="roll")return; r+=val(e.rolled,modInput[e.key]); k+=val(e.kept,modInput[e.key]); mflat+=val(e.flat,modInput[e.key]); free+=val(e.freeRaises)});
+  r=Math.max(0,r);k=Math.max(0,k);
+  const vm=voidMult();
+  if(o.voidp){r+=vm;k+=vm}
+  if(o.void2){r+=2*vm;k+=2*vm}
+  let bonus=0, extra=Math.max(0,r-10); r=Math.min(r,10);
+  while(extra>=2&&k<10){k++;extra-=2}          // 2 dés lancés en trop = 1 dé gardé
+  if(k>=10)bonus+=2*extra;                     // gardés à 10 : chaque lancé restant = +2
+  if(k>10){bonus+=2*(k-10);k=10}               // chaque gardé au-delà de 10 = +2
   k=Math.min(k,r);
-  return{r,k,skilled,canRaise,bonus,note};
+  let eo=10;
+  if(a.type==="damage"&&a.mskill&&skillRank(a.mskill)>=MASTERY_RANK){eo=9;note=`Maîtrise ${a.mskill} ${skillRank(a.mskill)} : les dés explosent sur 9 et 10.`}
+  const td=bonus; bonus+=mflat;
+  return{r,k,skilled,canRaise,bonus,td,mflat,free,applied,optional,note,eo};
 }
 function baseTN(a){
   if(a.tn===null)return null;
-  if(a.tn==="target")return num(opt.targetTN);
+  if(a.tn==="target")return num(opt.targetTN)+(a.attack?targetMod():0);
   if(a.tn==="assess")return 10+5*num(opt.oppInsight);
   if(a.tn==="opp")return "opp";
   return num(opt.tn);
 }
 function finalTN(a){
   const b=baseTN(a); if(b===null||b==="opp")return b;
-  const pen=woundState().pen||0;
+  const ignoreAll=rollEffects(a,ctxNow()).some(e=>e.kind==="wounds"&&e.ignorePenalty==="all"&&opt.modSel[e.key]);
+  const pen=ignoreAll?0:(woundState().pen||0);
   return b+5*calledRaises(a)+pen;
 }
 
+function techCombatHtml(){
+  if(!schoolOf())return "";
+  const arm=armorEffects(), tg=activeEffects().filter(e=>e.kind==="targetTn");
+  const needMount=activeEffects().some(e=>JSON.stringify(e.when||{}).includes('"mounted"'));
+  const rows=[];
+  if(needMount)rows.push(`<label class="chk"><input type="checkbox" id="o-mounted" ${mounted?"checked":""}> Monté</label>`);
+  if(centerLast)rows.push(`<span class="tag" style="justify-self:start">Bonus de Centre du round précédent actif</span>`);
+  arm.concat(tg).forEach(e=>{
+    if(e.stack){const n=num(stacks[e.key]),mx=val(e.stack.max);rows.push(`<div class="stackrow"><span><b>${esc(e.stack.label)}</b> <span class="muted">· ${e.kind==="armor"?`+${val(e.value)} ND d'armure`:`${val(e.value)} au ND de la cible`} chacune, max ${mx} · ${esc(e.src)}</span></span><span class="stepper"><button data-act="stk-" data-k="${e.key}" aria-label="Retirer">−</button><b class="mono">${n}</b><button data-act="stk+" data-k="${e.key}" data-max="${mx}" aria-label="Ajouter">+</button></span></div>`)}
+    else if(e.mode!=="auto")rows.push(`<label class="chk"><input type="checkbox" data-armsel="${e.key}" ${armorSel[e.key]?"checked":""}> <span><b>${esc(e.label||e.tname)}</b> <span class="muted">· +${val(e.value)} ND d'armure · ${esc(e.src)}</span></span></label>`)});
+  return rows.length?`<div class="techbox"><div class="label">Techniques d'école</div>${rows.join("")}</div>`:"";
+}
+function remindersHtml(){
+  const ctx=sub==="duel"?["combat","duel"]:["combat"];
+  const rem=activeEffects().filter(e=>e.kind==="reminder"&&ctx.includes(e.context));
+  if(!rem.length)return "";
+  const o=infoOpen.has("rem");
+  return `<div class="panel" style="padding:12px"><div class="panel-head" style="margin-bottom:6px"><span style="display:flex;gap:8px;align-items:center"><span class="label">Rappels d'école</span>${infoBtn("rem","rappels d'école")}</span><span class="muted" style="font-size:12px">${rem.length}</span></div>
+    <div class="rems">${rem.map(e=>`<div><b>${esc(e.tname)}</b> <span class="muted">· ${esc(e.src)}</span>${o?`<div class="muted">${esc(e.text||e.tsum)}</div>`:""}</div>`).join("")}</div></div>`;
+}
 function voidPanel(){
   const vp=num(C.voidPoints), none=vp<1;
-  return `<div class="panel" style="padding:12px"><div class="panel-head" style="margin-bottom:8px"><span class="label">Dépenser du Vide · reste ${vp}</span><button class="btn sm" data-act="new-round">Nouveau round</button></div>
+  return `<div class="panel" style="padding:12px"><div class="panel-head" style="margin-bottom:8px"><span style="display:flex;gap:8px;align-items:center"><span class="label" style="white-space:nowrap">Dépenser du Vide</span>${infoBtn("void","dépenses de Vide")}</span><button class="btn sm" data-act="new-round">Nouveau round</button></div>
     ${voidRound?`<p class="hint" style="color:var(--bad);margin:0 0 8px">Déjà un point de Vide dépensé ce round (limite normale : 1 par round).</p>`:""}
     <div class="stance">
-      <button data-act="void-roll" aria-pressed="${opt.voidp}" ${none&&!opt.voidp?"disabled":""}><b>+1g1 au jet</b><span class="muted">Dépensé au prochain jet lancé.</span></button>
-      <button data-act="void-armor" aria-pressed="${voidArmor}" ${none&&!voidArmor?"disabled":""}><b>+10 ND d'armure</b><span class="muted">Jusqu'au prochain round.</span></button>
-      <button data-act="void-skill" aria-pressed="${opt.voidSkill}" ${none&&!opt.voidSkill?"disabled":""}><b>Compétence au rang 1</b><span class="muted">Jouer une compétence que tu n'as pas.</span></button>
-      <button data-act="void-tech" ${none?"disabled":""}><b>Activer une capacité</b><span class="muted">Technique, kata ou avantage payé en Vide.</span></button>
+      ${optBtn(`data-act="void-roll"`,"void",`+${voidMult()}g${voidMult()} au jet`,"Dépensé au prochain jet lancé.",opt.voidp,none&&!opt.voidp)}
+      ${optBtn(`data-act="void-armor"`,"void",`+${10*voidMult()} ND d'armure`,"Jusqu'au prochain round.",voidArmor,none&&!voidArmor)}
+      ${optBtn(`data-act="void-skill"`,"void","Compétence au rang 1","Jouer une compétence que tu n'as pas.",opt.voidSkill,none&&!opt.voidSkill)}
+      ${optBtn(`data-act="void-tech"`,"void","Activer une capacité","Technique, kata ou avantage payé en Vide.",null,none)}
     </div></div>`;
 }
 
 function movePanel(){
-  const m=moveFt(), w=ringVal("water");
-  return `<div class="panel movebox"><div class="panel-head" style="margin-bottom:8px"><h2 style="font-size:17px">Se déplacer en combat</h2><span class="muted" style="font-size:13px">Anneau d'Eau ${w}</span></div>
-    <div class="moves">
-      <div><span class="label">Action libre</span><b class="mono">${m.free} pi</b><span class="muted">${toM(m.free)} · 1 fois par round</span></div>
-      <div><span class="label">Action simple</span><b class="mono">${m.simple} pi</b><span class="muted">${toM(m.simple)} · Eau × 10</span></div>
-      <div><span class="label">Maximum / round</span><b class="mono">${m.max} pi</b><span class="muted">${toM(m.max)} · Eau × 20</span></div>
-    </div>
-    <p class="hint" style="margin-bottom:0">Terrain difficile (eau, foule, escaliers) : distances divisées par deux. Valeurs 4e à vérifier dans ton livre.</p></div>`;
+  const m=moveFt(), w=ringVal("water"), o=infoOpen.has("move");
+  const tile=(l,v,d)=>`<div><span class="label">${l}</span><b class="mono">${v} pi</b>${o?`<span class="muted">${toM(v)} · ${d}</span>`:""}</div>`;
+  return `<div class="panel movebox"><div class="panel-head" style="margin-bottom:8px"><h2 style="font-size:17px">Se déplacer en combat</h2><span style="display:flex;gap:8px;align-items:center"><span class="muted" style="font-size:13px">Eau ${w}</span><button class="ib inline ${o?"on":""}" data-act="info" data-k="move" aria-expanded="${o}" aria-label="Détail du déplacement">i</button></span></div>
+    <div class="moves">${tile("Action libre",m.free,"1 fois par round")}${tile("Action simple",m.simple,"Eau × 10")}${tile("Max / round",m.max,"Eau × 20")}</div>
+    ${moveBonus()?`<p class="hint" style="margin:6px 0 0;color:var(--gold)">+${moveBonus()} pieds par tour (technique d'école), sans dépasser le maximum.</p>`:""}
+    ${o?`<p class="hint" style="margin-bottom:0">Terrain difficile (eau, foule, escaliers) : distances divisées par deux. Valeurs 4e à vérifier dans ton livre.</p>`:""}</div>`;
 }
 
 function selectAct(id){
   const a=currentActs().find(x=>x.id===id); if(!a||a.type==="info"||a.type==="move")return;
   sel=a.id; lastRoll=null; man={};
-  opt.raises=0;opt.free=0;opt.flat=0;opt.dmod=0;
+  opt.raises=0;opt.free=0;opt.flat=0;opt.dmod=0;opt.modSel={};opt.void2=false;
   if(a.type==="damage"&&pendingDmg){opt.dmod=pendingDmg;pendingDmg=0}
   opt.emph=a.type==="skill"&&hasEmph(a.skill,a.emph);
   if(typeof a.tn==="number")opt.tn=a.tn;
@@ -646,12 +808,12 @@ function renderAid(){
   const sitBtns=Object.entries(S).map(([k,v])=>`<button data-act="sit" data-k="${k}" aria-pressed="${sit===k}">${v.n}</button>`).join("");
   if(sit==="stats")return `<div class="sit">${sitBtns}</div>${renderStats()}`;
   const subBtns=sit==="combat"?`<div class="sit sub">${Object.entries(S.combat.subs).map(([k,v])=>`<button data-act="sub" data-k="${k}" aria-pressed="${sub===k}">${v.n}</button>`).join("")}</div>`:"";
-  const stanceHtml=(sit==="combat"&&sub!=="duel"?`<div class="panel" style="padding:12px"><div class="panel-head" style="margin-bottom:8px"><span class="label">Posture</span><span class="muted" style="font-size:13px">ND d'armure <b class="mono" style="color:var(--ink);font-size:16px">${armorTN()}</b>${voidArmor?` <span class="tag">+10 Vide</span>`:""}</span></div><div class="stance">${Object.entries(STANCES).map(([k,v])=>`<button data-act="stance" data-k="${k}" aria-pressed="${stance===k}"><b>${v.n}</b><span class="muted">${v.d}</span></button>`).join("")}</div></div>`:"")+(sit==="combat"?voidPanel():"");
+  const stanceHtml=(sit==="combat"&&sub!=="duel"?`<div class="panel" style="padding:12px"><div class="panel-head" style="margin-bottom:8px"><span style="display:flex;gap:8px;align-items:center"><span class="label">Posture</span>${infoBtn("stance","postures")}</span><span class="muted" style="font-size:13px">ND d'armure <b class="mono" style="color:var(--ink);font-size:16px">${armorTN()}</b>${voidArmor?` <span class="tag">+10 Vide</span>`:""}</span></div><div class="stance">${Object.entries(STANCES).map(([k,v])=>optBtn(`data-act="stance" data-k="${k}"`,"stance",v.n,v.d,stance===k,false)).join("")}</div>${techCombatHtml()}</div>`:"")+(sit==="combat"?voidPanel()+remindersHtml():"");
   const initAct=acts.find(x=>x.type==="init");
-  const initHtml=initAct?(()=>{const p=pool(initAct);return `<button class="act" data-act="pick" data-id="init" aria-pressed="${sel==="init"}"><span class="t">Initiative <span class="muted" style="font-weight:500">· une fois par combat</span></span><span class="p">${initVal!=null?`<span style="color:var(--ink);font-size:20px">${initVal}</span>`:fmt(p.r,p.k)}</span><span class="d">${initVal!=null?`Ton rang dans l'ordre du combat. Clique pour relancer si un nouveau combat commence (${fmt(p.r,p.k)}).`:`Rang ${num(C.insight)} + Réflexes ${tv("reflexes")}, gardé Réflexes. À lancer au début du combat.`}</span></button>`})():"";
+  const initHtml=initAct?(()=>{const p=pool(initAct);return `<button class="act" data-act="pick" data-id="init" aria-pressed="${sel==="init"}"><span class="t">Initiative <span class="muted" style="font-weight:500">· une fois par combat</span></span><span class="p">${initVal!=null?`<span style="color:var(--ink);font-size:20px">${initVal}</span>`:fmtP(p)}</span><span class="d">${initVal!=null?`Ton rang dans l'ordre du combat. Clique pour relancer si un nouveau combat commence (${fmtP(p)}).`:`Rang ${num(C.insight)} + Réflexes ${tv("reflexes")}, gardé Réflexes${p.mflat?`, +${p.mflat} (techniques)`:""}. À lancer au début du combat.`}</span></button>`})():"";
   const list=acts.filter(x=>x.type!=="init").map(x=>{const p=pool(x);if(x.type==="move")return movePanel();return x.type==="info"
     ?`<div class="act info"><span class="t">${esc(x.label)}</span><span></span><span class="d">${esc(x.desc)}</span></div>`
-    :`<button class="act ${x.type==="damage"?"child":""} ${x.type==="damage"&&pendingDmg&&lastAtk&&x.parent===lastAtk?"linked":""}" data-act="pick" data-id="${esc(x.id)}" aria-pressed="${x.id===sel}"><span class="t">${esc(x.label)}${x.type==="damage"&&pendingDmg&&x.parent===lastAtk?` <span class="pend">+${pendingDmg}g0 en attente</span>`:""}</span><span class="p">${p?fmt(p.r,p.k):""}</span><span class="d">${esc(x.desc)}</span></button>`}).join("")
+    :`<button class="act ${x.type==="damage"?"child":""} ${x.type==="damage"&&pendingDmg&&lastAtk&&x.parent===lastAtk?"linked":""}" data-act="pick" data-id="${esc(x.id)}" aria-pressed="${x.id===sel}"><span class="t">${esc(x.label)}${x.type==="damage"&&pendingDmg&&x.parent===lastAtk?` <span class="pend">+${pendingDmg}g0 en attente</span>`:""}</span><span class="p">${p?fmtP(p):""}</span><span class="d">${simpleAttack(x)?`<span class="tag sa">Attaque : Action simple</span> `:""}${esc(x.desc)}</span></button>`}).join("")
     || `<p class="muted">Ajoute des armes dans la fiche pour voir les attaques.</p>`;
   return `<div class="sit">${sitBtns}</div>${subBtns}
     <div class="aid"><div class="grid" style="gap:12px">${initHtml}${stanceHtml}<div class="actions">${list}</div></div>
@@ -670,34 +832,43 @@ function renderRoller(a){
   const res=lastRoll&&lastRoll.id===a.id?renderResult(lastRoll):"";
   return `<div class="sheet-head"><span class="grip"></span><button class="close" data-act="sheet-close" aria-label="Fermer">×</button></div><div class="label">${esc(sit==="combat"?situations().combat.subs[sub].n:situations()[sit].n)}</div>
     <h2 style="margin:2px 0 8px">${esc(a.label)}</h2>
-    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><span class="poolbig">${fmt(p.r,p.k)}</span><span class="muted" style="font-size:13px">${
-      a.type==="skill"?`${esc(a.skill)} ${skillRank(a.skill)} + ${TRAITS[a.trait]} ${tv(a.trait)}`:a.type==="trait"?`${TRAITS[a.trait]} pur`:a.type==="damage"?`${a.bow!=null?"Arc "+num(a.bow):"Force "+tv("strength")} + VD ${fmt(a.dr.r,a.dr.k)}${num(opt.dmod)?` + ${num(opt.dmod)} dé(s)`:""}`:`Rang ${num(C.insight)} + Réflexes ${tv("reflexes")}`}${p.bonus?` · +${p.bonus} (règle des dix dés)`:""}</span></div>
+    <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><span class="poolbig">${fmtP(p)}</span><span class="muted" style="font-size:13px">${
+      a.type==="skill"?`${esc(a.skill)} ${skillRank(a.skill)} + ${TRAITS[a.trait]} ${tv(a.trait)}`:a.type==="trait"?`${TRAITS[a.trait]} pur`:a.type==="damage"?`${a.bow!=null?"Arc "+num(a.bow):"Force "+tv("strength")} + VD ${fmt(a.dr.r,a.dr.k)}${num(opt.dmod)?` + ${num(opt.dmod)} dé(s)`:""}`:`Rang ${num(C.insight)} + Réflexes ${tv("reflexes")}`}${p.td?` · +${p.td} (règle des dix dés)`:""}${p.mflat?` · +${p.mflat} (techniques)`:""}</span></div>
+    ${p.applied.length?`<div class="tchips">${p.applied.filter(e=>e.kind==="roll"||e.freeRaisesFor).map(e=>`<span class="tchip" title="${esc(e.tname)}">${esc(effDesc(e))} · ${esc(e.src)}</span>`).join("")}</div>`:""}
+    ${(()=>{
+      const emphOn=opt.emph&&isSkill&&p.skilled, add=p.bonus+num(opt.flat);
+      const ex=p.skilled?(p.eo===9?"Les <b>9 et 10</b> explosent":"Les <b>10</b> explosent")+` : relance le dé et additionne, tant qu'il retombe sur ${p.eo===9?"9 ou 10":"10"}.`:"Aucun dé n'explose (compétence non maîtrisée).";
+      return `<div class="manual">${ex}${emphOn?" Spécialisation : relance une fois chaque <b>1</b>.":""}${add?` Ajoute <b>${add>0?"+":""}${add}</b> au total${p.td?" (dont règle des dix dés)":""}.`:""}${p.free?` <b>${p.free}</b> augmentation(s) gratuite(s).`:""}</div>`})()}
     ${(()=>{const st=statsFor(p,opt.emph&&isSkill&&p.skilled,opt.flat);if(!st)return "";const ch=typeof ft==="number"?st.chance(ft):null;
       return `<div class="statline"><span>Min <b>${st.min}</b></span><span>Moy. <b>${Math.round(st.mean)}</b></span><span>Max <b>${st.max}${st.open?"+":""}</b></span>${ch!=null?`<span class="ch">Réussite <b>${pct(ch)}</b></span>`:""}</div>`})()}
-    ${p.note?`<div class="hint" style="color:var(--bad)">${p.note}</div>`:""}
+    ${p.note?`<div class="hint" style="color:${p.eo===9?"var(--gold)":"var(--bad)"}">${p.note}</div>`:""}
+    ${a.type==="damage"?activeEffects().filter(e=>e.kind==="reminder"&&e.context==="damage").map(e=>`<div class="hint" style="color:var(--gold)"><b>${esc(e.tname)}</b> · ${esc(e.tsum)}</div>`).join(""):""}
     <div class="opts">
       ${tnField}
-      ${p.canRaise?`<label class="field"><span class="label">${a.attack?"Augm. libres":"Augmentations"}</span><input class="in mono" type="number" min="0" id="o-raises" value="${opt.raises}"></label>`:`<div></div>`}
+      ${p.canRaise?`<label class="field"><span class="label">${a.attack?"Augm. libres":"Augmentations"}</span><input class="in mono" type="number" min="0" id="o-raises" value="${opt.raises}"></label>`:(tnField?`<div></div>`:"")}
       ${p.canRaise?`<label class="field"><span class="label">Augm. gratuites</span><input class="in mono" type="number" min="0" id="o-free" value="${opt.free}"></label>`:""}
       <label class="field"><span class="label">Dés lancés ±</span><input class="in mono" type="number" id="o-dmod" value="${opt.dmod}"></label>
       <label class="field"><span class="label">Bonus fixe</span><input class="in mono" type="number" id="o-flat" value="${opt.flat}"></label>
     </div>
     <div class="grid" style="gap:6px;margin-bottom:12px">
-      <label class="chk"><input type="checkbox" id="o-voidp" ${opt.voidp?"checked":""} ${vp<1&&!opt.voidp?"disabled":""}> Dépenser 1 point de Vide (+1g1) <span class="muted">· reste ${vp}</span></label>
+      ${p.optional.length?`<div class="label" style="margin-top:2px">Techniques à cocher</div>${p.optional.map(e=>`<label class="chk"><input type="checkbox" data-mod="${e.key}" ${opt.modSel[e.key]?"checked":""}> <span><b>${esc(e.label||e.tname)}</b> <span class="muted">· ${esc(effDesc(e))}${e.void?` · ${e.void} pt de Vide`:""} · ${esc(e.src)}</span></span></label>${e.input?`<label class="field" style="margin-left:26px;max-width:220px"><span class="label">${esc(e.input)}</span><input class="in mono" type="number" data-modin="${e.key}" value="${num(modInput[e.key])}"></label>`:""}`).join("")}`:""}
+      <label class="chk"><input type="checkbox" id="o-voidp" ${opt.voidp?"checked":""} ${vp<1&&!opt.voidp?"disabled":""}> Dépenser 1 point de Vide (+${voidMult()}g${voidMult()}) <span class="muted">· reste ${vp}</span></label>
+      ${hasEff("void")?`<label class="chk"><input type="checkbox" id="o-void2" ${opt.void2?"checked":""} ${vp<2&&!opt.void2?"disabled":""}> Dépenser 2 points de Vide (+${2*voidMult()}g${2*voidMult()}) <span class="muted">· ${esc(activeEffects().find(e=>e.kind==="void").src)}</span></label>`:""}
       ${isSkill&&!skillRank(a.skill)?`<label class="chk"><input type="checkbox" id="o-voidSkill" ${opt.voidSkill?"checked":""} ${vp<1&&!opt.voidSkill?"disabled":""}> Dépenser 1 point de Vide : jouer ${esc(a.skill)} au rang 1</label>`:""}
       ${isSkill&&p.skilled?`<label class="chk"><input type="checkbox" id="o-emph" ${opt.emph?"checked":""}> Spécialisation : relancer les 1 ${a.emph?`<span class="muted">(${esc(a.emph)})</span>`:""}</label>`:""}
     </div>
     ${a.attack&&p.canRaise?`<div class="label">Manœuvres <span style="text-transform:none;letter-spacing:0;font-weight:500">· coût en augmentations</span></div>
       <div class="mans">${mans().map(m=>{const c=num(man[m.k]);return m.rep
         ?`<div class="man ${c?"on":""}"><button data-act="man-" data-k="${esc(m.k)}" aria-label="Retirer">−</button><span title="${esc(m.eff)}">${esc(m.n)} <b class="mono">${c}</b></span><button data-act="man+" data-k="${esc(m.k)}" aria-label="Ajouter">+</button></div>`
-        :`<button class="man ${c?"on":""}" data-act="man" data-k="${esc(m.k)}" aria-pressed="${!!c}" title="${esc(m.eff)}">${esc(m.n)} <b class="mono">${num(m.cost)}</b></button>`}).join("")}</div>
+        :`<button class="man ${c?"on":""}" data-act="man" data-k="${esc(m.k)}" aria-pressed="${!!c}" title="${esc(m.eff)}">${esc(m.n)} <b class="mono">${mcost(m)}</b></button>`}).join("")}</div>
+      ${p.optional.concat(p.applied).filter(e=>e.freeRaisesFor&&(e.mode==="auto"||opt.modSel[e.key])).map(e=>`<div class="hint" style="margin-top:4px;color:var(--gold)">${esc(effDesc(e))} · ${esc(e.src)} : déduites du coût de la manœuvre.</div>`).join("")}
       ${mans().filter(m=>num(man[m.k])).map(m=>`<div class="hint" style="margin-top:4px">• <b>${esc(m.n)}</b> : ${esc(m.eff)}</div>`).join("")}`:""}
     ${p.canRaise&&calledRaises(a)?`<div class="tnline" style="margin-top:10px;${calledRaises(a)>raiseMax?"color:var(--bad)":""}"><span>Augmentations annoncées</span><span class="mono"><b>${calledRaises(a)}</b> / max ${raiseMax}${calledRaises(a)>raiseMax?" · dépasse ton Vide":""}</span></div>`:""}
     ${ft!==null&&ft!=="opp"?`<div class="tnline"><span>ND final</span><span class="mono"><b style="font-size:18px">${ft}</b> <span class="muted">= ${baseTN(a)}${calledRaises(a)?` + ${5*calledRaises(a)} augm.`:""}${ws.pen?` + ${ws.pen} blessures`:""}</span></span></div>`:""}
     ${ws.pen===null?`<div class="hint" style="color:var(--bad)">Ton personnage est hors de combat.</div>`:""}
-    <button class="btn primary rollbtn" style="width:100%;margin-top:12px;padding:12px" data-act="roll">Lancer ${fmt(p.r,p.k)}</button>
-    <div id="res">${res}</div>
-    ${hist.length?`<div class="hist"><span class="label">Derniers jets</span>${hist.map(h=>`<div><span>${esc(h.label)}</span><span class="mono">${h.total}${h.tn!=null&&h.tn!=="opp"?(h.total>=h.tn?" ✓":" ✗"):""}</span></div>`).join("")}</div>`:""}`;
+    <button ${showRoller?"":"hidden"} class="btn primary rollbtn" style="width:100%;margin-top:12px;padding:12px" data-act="roll">Lancer ${fmtP(p)}</button>
+    <div id="res" ${showRoller?"":"hidden"}>${res}</div>
+    ${showRoller&&hist.length?`<div class="hist"><span class="label">Derniers jets</span>${hist.map(h=>`<div><span>${esc(h.label)}</span><span class="mono">${h.total}${h.tn!=null&&h.tn!=="opp"?(h.total>=h.tn?" ✓":" ✗"):""}</span></div>`).join("")}</div>`:""}`;
 }
 
 function d10(){return 1+Math.floor(Math.random()*10)}
@@ -709,7 +880,7 @@ function doRoll(){
     let v=d10(), faces=[], re=false;
     if(emph&&v===1){re=true;v=d10()}
     faces.push(v); let tot=v;
-    while(explode&&v===10){v=d10();faces.push(v);tot+=v}
+    while(explode&&v>=p.eo){v=d10();faces.push(v);tot+=v}
     dice.push({tot,faces,re});
   }
   const sorted=dice.map((d,i)=>({...d,i})).sort((x,y)=>y.tot-x.tot);
@@ -717,6 +888,9 @@ function doRoll(){
   const total=sorted.filter(d=>d.kept).reduce((s,d)=>s+d.tot,0)+p.bonus+num(opt.flat);
   const tn=finalTN(a);
   if(opt.voidp){spendVoid();opt.voidp=false}
+  if(opt.void2){spendVoid();spendVoid();opt.void2=false}
+  p.optional.filter(e=>e.void&&opt.modSel[e.key]).forEach(e=>{for(let i=0;i<e.void;i++)spendVoid()});
+  const akodo=activeEffects().some(e=>e.kind==="verdict"&&whenOk(e.when,a,ctxNow()));
   if(opt.voidSkill&&a.type==="skill"&&!skillRank(a.skill)){spendVoid();opt.voidSkill=false}
   if(a.fulldef){fullDefBonus=Math.floor(total/2);stance="totaldef"}
   if(a.type==="init")initVal=total;
@@ -724,16 +898,18 @@ function doRoll(){
   const ok=tn!=null&&tn!=="opp"&&total>=tn;
   const dmgUp=a.attack&&ok?num(man.dmg):0;
   if(a.attack){pendingDmg=dmgUp;lastAtk=a.id}
-  lastRoll={id:a.id,label:a.label,dice:sorted,total,tn,raises:calledRaises(a),free:num(opt.free),type:a.type,fulldef:a.fulldef,mans:usedMans,dmgUp};
+  lastRoll={id:a.id,akodo,baseTn:typeof tn==="number"?tn-5*calledRaises(a):null,label:a.label,dice:sorted,total,tn,raises:calledRaises(a),free:num(opt.free),type:a.type,fulldef:a.fulldef,mans:usedMans,dmgUp};
   hist.unshift({label:a.label,total,tn}); hist=hist.slice(0,6);
   render();
   const res=$("#res"); if(res&&sheetOpen&&res.scrollIntoView)res.scrollIntoView({block:"center"});
 }
 function renderResult(L){
-  const dice=L.dice.map(d=>`<span class="die ${d.kept?"kept":""} ${d.faces.length>1?"ex":""}" title="${d.faces.join(" + ")}${d.re?" (1 relancé)":""}">${d.tot}</span>`).join("");
+  const dice=L.dice.map(d=>`<span class="die ${d.kept?"kept":""} ${d.faces.length>1?"ex":""}" title="${d.faces.join(" + ")}${d.re?" (1 relancé)":""}">${d.tot}${d.faces.length>1?`<small>${d.faces.join("+")}</small>`:""}</span>`).join("");
+  const nEx=L.dice.filter(d=>d.faces.length>1).length;
   let v="";
   if(L.tn!=null&&L.tn!=="opp"){const ok=L.total>=L.tn;const m=L.total-L.tn;
     v=`<div class="verdict ${ok?"ok":"ko"}">${ok?"Réussite":"Échec"} <span class="mono" style="font-size:16px">${L.total} / ${L.tn} (${m>=0?"+":""}${m})</span></div>`;
+    if(!ok&&L.akodo&&L.raises&&L.total>=L.baseTn)v+=`<div class="hint" style="color:var(--ok)"><b>Réussite sans les augmentations</b> (Ultime Leçon d'Akodo) : ND d'origine ${L.baseTn} atteint.</div>`;
     if(ok&&(L.raises||L.free))v+=`<div class="hint">${L.raises+L.free} augmentation(s) à appliquer${L.free?` dont ${L.free} gratuite(s)`:""}.</div>`;
     if(L.mans&&L.mans.length)v+=`<div class="hint">${ok?"Manœuvres réussies":"Manœuvres perdues"} : ${esc(L.mans.join(", "))}.</div>`;
     if(L.dmgUp)v+=`<div class="hint">+${L.dmgUp}g0 pré-rempli sur le prochain jet de dégâts.</div>`;
@@ -753,7 +929,7 @@ document.addEventListener("click",e=>{
   switch(act){
     case "edit":edit=!edit;if(edit&&!(C.maneuvers&&C.maneuvers.length))C.maneuvers=JSON.parse(JSON.stringify(DEF_MANS));break;
     case "add":{const L=b.dataset.list;C[L]=C[L]||[];C[L].push(L==="skills"?{name:"",rank:1,trait:"agility",emph:""}:L==="weapons"?{name:"",skill:"Kenjutsu",dr:"3g2"}:L==="maneuvers"?{k:"m"+Date.now(),n:"",cost:1,eff:""}:{name:"",text:""});save();break}
-    case "new-round":voidArmor=false;voidRound=false;fullDefBonus=0;if(stance==="totaldef")stance="defense";toast("Nouveau round");break;
+    case "new-round":centerLast=stance==="centre";Object.keys(armorSel).forEach(k=>delete armorSel[k]);voidArmor=false;voidRound=false;fullDefBonus=0;if(stance==="totaldef")stance="defense";toast("Nouveau round");break;
     case "void-roll":opt.voidp=!opt.voidp;break;
     case "void-skill":opt.voidSkill=!opt.voidSkill;break;
     case "void-armor":if(voidArmor){voidArmor=false;C.voidPoints=num(C.voidPoints)+1;voidRound=false;save()}else if(spendVoid()){voidArmor=true}break;
@@ -773,6 +949,10 @@ document.addEventListener("click",e=>{
     case "pick":selectAct(b.dataset.id);sheetOpen=true;break;
     case "sheet-close":sheetOpen=false;break;
     case "wexp":wExp=!wExp;break;
+    case "armedit":armEdit=!armEdit;break;
+    case "stk+":stacks[b.dataset.k]=Math.min(num(b.dataset.max),num(stacks[b.dataset.k])+1);break;
+    case "stk-":stacks[b.dataset.k]=Math.max(0,num(stacks[b.dataset.k])-1);break;
+    case "info":{const k=b.dataset.k;infoOpen.has(k)?infoOpen.delete(k):infoOpen.add(k);break}
     case "roll":doRoll();return;
   }
   render();
@@ -789,6 +969,10 @@ document.addEventListener("input",e=>{
 document.addEventListener("change",e=>{
   const t=e.target;
   if(t.dataset&&t.dataset.st){statOpt[t.dataset.st]=t.checked;render();return}
+  if(t.dataset&&t.dataset.mod){opt.modSel[t.dataset.mod]=t.checked;render();return}
+  if(t.dataset&&t.dataset.modin){modInput[t.dataset.modin]=num(t.value);render();return}
+  if(t.dataset&&t.dataset.armsel){armorSel[t.dataset.armsel]=t.checked;render();return}
+  if(t.id==="o-mounted"){mounted=t.checked;render();return}
   if(t.dataset&&t.dataset.pc){setPath(t.dataset.pc,t.checked);save();render();return}
   if(t.dataset&&t.dataset.p){render();return}
   if(t.id==="wounds"){render();return}
