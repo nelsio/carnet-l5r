@@ -5,3 +5,9 @@ test-results/
 playwright-report/
 *.tsbuildinfo
 .DS_Store
+
+# Rapport local d'utilisation de l'IA (non versionné)
+RAPPORT-IA.md
+
+# Scripts temporaires de Claude Code (CLAUDE.md global)
+.tmp/
