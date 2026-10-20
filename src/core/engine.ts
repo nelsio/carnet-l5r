@@ -1,5 +1,5 @@
 import {
-  ARMOR_TN, DEAD_LABEL, MOVEMENT, POOL_BONUS, RANGED_PATTERN, RINGS, TN_PER_RAISE,
+  ARMOR_TN, DEAD_LABEL, MASTERY, MOVEMENT, POOL_BONUS, RANGED_PATTERN, RINGS, TN_PER_RAISE,
   WOUND_FIRST_MULTIPLIER, WOUND_LEVELS, WOUND_NEXT_MULTIPLIER,
   type RingKey, type Stance,
 } from "../rules/l5r4e";
@@ -13,6 +13,8 @@ export interface TenDice extends DiceCode { bonus: number }
 
 export interface Pool extends TenDice {
   explodes: boolean;
+  /** Plus petite face qui explose (10 si absent ; 9 avec la maîtrise d'une compétence martiale). */
+  explodeOn?: number;
   canRaise: boolean;
   notes: string[];
   /** Augmentations gratuites apportées par les bonus de jet. */
@@ -91,16 +93,21 @@ export function attackTrait(w: WeaponLike): TraitKey {
   return isRanged(w) ? "reflexes" : "agility";
 }
 
+/** Règle des dix dés (livre de base 4e, « Special Dice Rules »), HANDOFF §4.7. */
 export function applyTenDiceRule(rolled: number, kept: number): TenDice {
-  let r = rolled;
+  let extra = Math.max(0, rolled - 10);
+  const r = Math.min(rolled, 10);
   let k = kept;
   let bonus = 0;
-  if (r > 10) {
-    k += r - 10;
-    r = 10;
+  // Deux dés lancés en trop valent un dé gardé.
+  while (extra >= 2 && k < 10) {
+    k++;
+    extra -= 2;
   }
+  // Gardés au complet : chaque lancé restant vaut +2 ; sinon le dé impair est perdu.
+  if (k >= 10) bonus += 2 * extra;
   if (k > 10) {
-    bonus = 2 * (k - 10);
+    bonus += 2 * (k - 10);
     k = 10;
   }
   return { rolled: r, kept: Math.min(k, r), bonus };
@@ -111,6 +118,7 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
   let rolled: number;
   let kept: number;
   let explodes = true;
+  let explodeOn = 10;
   let canRaise = true;
 
   switch (action.kind) {
@@ -132,7 +140,7 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
       if (action.attack && mods.stance === "fullAttack") {
         rolled += POOL_BONUS.fullAttack.rolled;
         kept += POOL_BONUS.fullAttack.kept;
-        notes.push("Attaque totale : +2g1");
+        notes.push("Assaut : +2g1");
       }
       break;
     }
@@ -145,6 +153,11 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
       rolled = strength + dr.rolled;
       kept = dr.kept;
       canRaise = false;
+      const mastery = findSkill(c, action.weapon.skill);
+      if (mastery && mastery.rank >= MASTERY.damageExplodeOn9AtRank) {
+        explodeOn = 9;
+        notes.push(`Maîtrise ${mastery.name} ${mastery.rank} : les dés explosent sur 9 et 10`);
+      }
       break;
     }
     case "initiative":
@@ -174,7 +187,7 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
   }
   const ten = applyTenDiceRule(rolled, kept);
   if (ten.bonus) notes.push(`Règle des dix dés : +${ten.bonus}`);
-  const pool: Pool = { ...ten, bonus: ten.bonus + flat, explodes, canRaise, notes };
+  const pool: Pool = { ...ten, bonus: ten.bonus + flat, explodes, explodeOn, canRaise, notes };
   if (freeRaises) pool.freeRaises = freeRaises;
   return pool;
 }
@@ -193,8 +206,8 @@ export interface RollResult {
 
 export interface RollOptions { emphasis: boolean; flatBonus?: number }
 
-/** Un dé : spécialisation (un 1 relancé une fois), puis explosions des 10. */
-export function rollDie(rng: Rng, explodes: boolean, emphasis: boolean): Omit<Die, "kept"> {
+/** Un dé : spécialisation (un 1 relancé une fois), puis explosions (sur 10, ou dès `explodeOn`). */
+export function rollDie(rng: Rng, explodes: boolean, emphasis: boolean, explodeOn = 10): Omit<Die, "kept"> {
   let v = rng();
   let rerolledOne = false;
   if (emphasis && v === 1) {
@@ -202,7 +215,7 @@ export function rollDie(rng: Rng, explodes: boolean, emphasis: boolean): Omit<Di
     rerolledOne = true;
   }
   const faces = [v];
-  while (explodes && v === 10) {
+  while (explodes && v >= explodeOn) {
     v = rng();
     faces.push(v);
   }
@@ -216,7 +229,7 @@ function emphasisApplies(pool: Pool, emphasis: boolean): boolean {
 
 export function rollDice(pool: Pool, opts: RollOptions, rng: Rng): RollResult {
   const emphasis = emphasisApplies(pool, opts.emphasis);
-  const dice: Die[] = Array.from({ length: pool.rolled }, () => ({ ...rollDie(rng, pool.explodes, emphasis), kept: false }));
+  const dice: Die[] = Array.from({ length: pool.rolled }, () => ({ ...rollDie(rng, pool.explodes, emphasis, pool.explodeOn), kept: false }));
   dice.sort((a, b) => b.total - a.total);
   let total = pool.bonus + (opts.flatBonus ?? 0);
   dice.forEach((d, i) => {

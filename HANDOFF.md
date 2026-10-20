@@ -81,6 +81,7 @@ Clés de code en anglais, libellés d'interface en français.
 ```ts
 type TraitKey = "stamina"|"willpower"|"strength"|"perception"|"agility"|"intelligence"|"reflexes"|"awareness";
 type RollTrait = TraitKey | "void";
+type Stance = "attack" | "fullAttack" | "defense" | "fullDefense" | "center";   // Attaque, Assaut, Défense, Défense totale, Centre
 
 interface Character {
   schemaVersion: 1;
@@ -103,7 +104,7 @@ interface Character {
   advantages: string; disadvantages: string; notes: string;
 }
 ```
-- `maneuvers` vide ⇒ manœuvres par défaut des données de règles.
+- `maneuvers` vide ⇒ manœuvres par défaut des données de règles. **v1.1** : la fiche n'a plus d'encadré « Manœuvres » (ni en lecture, ni en modification). Le champ reste dans le format (compatibilité, import/fusion) et les manœuvres restent proposées dans le lanceur sur les attaques ; une fiche qui en contient garde ses valeurs, mais elles ne s'éditent plus que par import JSON.
 - Une arme est **à distance** si `skill` ou `name` contient `kyujutsu`, `arc` ou `yumi` (insensible à la casse) : attaque sur Réflexes, dégâts sur `bowStrength`.
 - Taille max d'une fiche sérialisée : 256 Ko.
 
@@ -117,7 +118,7 @@ interface LibraryEntry {
   linkedFile?: { handle: FileSystemFileHandle; name: string; lastModified: number };  // Chrome/Edge uniquement
 }
 ```
-Préférences, dans un magasin séparé : thème, dernière fiche ouverte.
+Préférences, dans un magasin séparé : thème, **lanceur de dés** (`showDiceRoller`, booléen, **masqué par défaut**), dernière fiche ouverte.
 
 ### 3.3 État non persisté
 Restent en mémoire de l'onglet :
@@ -140,8 +141,8 @@ Toutes les fonctions sont pures. Le hasard est **injecté** (`rng: () => number`
 | `rings(c)` | Terre = min(Constitution, Volonté) ; Eau = min(Force, Perception) ; Feu = min(Agilité, Intelligence) ; Air = min(Réflexes, Intuition) ; Vide = `voidRing`. |
 | `findSkill(c, name)` | Comparaison normalisée : minuscules, sans accents, espaces rognés. |
 | `parseDR(s)` | `"3k2"`/`"3g2"` → `{rolled:3, kept:2}` ; invalide → `{0,0}`. |
-| `applyTenDiceRule(r, k)` | Si r > 10 : k += r − 10, r = 10. Puis si k > 10 : bonus = 2 × (k − 10), k = 10. Enfin k = min(k, r). Renvoie `{rolled, kept, bonus}`. |
-| `computePool(c, action, mods)` | `{rolled, kept, bonus, explodes, canRaise, notes[]}` (§4.2). |
+| `applyTenDiceRule(r, k)` | Règle du livre de base 4e (§4.7). Renvoie `{rolled, kept, bonus}`. |
+| `computePool(c, action, mods)` | `{rolled, kept, bonus, explodes, explodeOn: 9 \| 10, canRaise, notes[]}` (§4.2). |
 | `rollDice(pool, {emphasis, flatBonus}, rng)` | §4.3. |
 | `woundState(c)` | `{level, label, penalty, thresholds, status: "ok"|"out"|"dead"}` (§4.4). |
 | `armorTN(c, combatState)` | §4.5. |
@@ -160,11 +161,11 @@ Toutes les fonctions sont pures. Le hasard est **injecté** (`rng: () => number`
 | `skill`, rang 0 | trait / trait | **non** | **non** |
 | `skill`, rang 0 + Vide « compétence au rang 1 » | trait + 1 / trait | oui | oui |
 | `trait` (jet de trait pur) | trait / trait | oui | oui |
-| `damage` | Force (ou `bowStrength` à distance) + VD lancés / VD gardés | oui | non |
+| `damage` | Force (ou `bowStrength` à distance) + VD lancés / VD gardés | oui, **sur 9 et 10** si maîtrise (§4.8) | non |
 | `initiative` | Rang + Réflexes / Réflexes | oui | non |
 
 Modificateurs, appliqués dans cet ordre :
-1. attaque en posture **Attaque totale** : +2g1 ;
+1. attaque en posture **Assaut** : +2g1 ;
 2. dés lancés ± (saisis par le joueur, ou pré-remplis par les augmentations de dégâts) ;
 3. **point de Vide** : +1g1 ;
 4. règle des dix dés.
@@ -175,7 +176,7 @@ Le bonus fixe s'ajoute au total.
 Pour chaque dé :
 1. tirer une valeur v ;
 2. si la **spécialisation** est active, que la réserve est qualifiée et que v = 1 : retirer **une seule fois** ;
-3. si la réserve explose : tant que le dernier tirage vaut 10, tirer à nouveau et additionner.
+3. si la réserve explose : tant que le dernier tirage est ≥ `explodeOn` (10 par défaut, 9 en cas de maîtrise), tirer à nouveau et additionner.
 
 Ensuite : trier les dés par total décroissant et garder les `kept` premiers. Total = somme des dés gardés + bonus de la règle des dix dés + bonus fixe. Chaque dé expose `faces[]`, `total`, `rerolledOne` et `kept` ; `faces` ne contient pas le 1 écarté.
 
@@ -187,7 +188,7 @@ Ensuite : trier les dés par total décroissant et garder les `kept` premiers. T
 ### 4.5 ND d'armure
 - Base : 5 × Réflexes + 5 + bonus d'armure.
 - Postures :
-  - Attaque totale −10 ;
+  - Assaut −10 ;
   - Défense + Air + rang de Défense ;
   - Défense totale + moitié (arrondie en dessous) du jet Défense (Réflexes) ;
   - Attaque et Centre +0.
@@ -198,10 +199,26 @@ Dépenses possibles : +1g1 à un jet ; +10 au ND d'armure pour le round ; compé
 
 Chaque dépense décrémente `voidPoints` (jamais sous 0). Une seconde dépense dans le même round est permise, avec avertissement. « Nouveau round » efface les effets du round, mais pas l'initiative.
 
-### 4.7 Données de règles (`src/rules/l5r4e.ts`)
+### 4.7 Règle des dix dés (livre de base 4e, « Special Dice Rules »)
+Aucun jet ne dépasse 10 dés lancés ni 10 dés gardés. Algorithme, dans cet ordre :
+1. `extra` = dés lancés au-delà de 10 ; lancés = 10.
+2. Tant que `extra ≥ 2` et gardés < 10 : +1 gardé, `extra −= 2` (deux lancés en trop = un gardé).
+3. Si les gardés atteignent 10 : chaque dé lancé restant donne **+2** au total. Sinon, le dé impair restant est perdu (décision P8).
+4. Chaque dé gardé au-delà de 10 donne **+2** ; gardés = 10.
+5. Gardés = min(gardés, lancés).
+
+Exemples du livre (tous dans la spec) : 12k4 → 10k5 ; 13k9 → 10k10 +2 ; 10k12 → 10k10 +4 ; 14k12 → 10k10 +12.
+
+### 4.8 Maîtrise des compétences martiales
+- Une compétence martiale au **rang 7 ou plus** fait **exploser les dés de dégâts sur 9 et 10** (au lieu de 10 seulement). Les jets d'attaque ne sont pas concernés.
+- S'applique à toutes les compétences martiales (décision P7). La compétence considérée est celle de l'arme (`weapon.skill`) ; Jiujutsu pour les mains nues. Seuil en donnée : `MASTERY.damageExplodeOn9AtRank = 7` dans `src/rules/l5r4e.ts`.
+- `explodeOn` est porté par la réserve et utilisé par `rollDice` et `poolStats` (simulation et cache).
+- Affichage : dans le lanceur, une note en couleur d'accent « Maîtrise Kenjutsu 7 : les dés explosent sur 9 et 10 » ; dans les statistiques, une étiquette « 9+ » à côté du max.
+
+### 4.9 Données de règles (`src/rules/l5r4e.ts`)
 Contenu initial = prototype :
 - **Échelle des ND** : 5 Trivial, 10 Facile, 15 Moyen, 20 Difficile, 25 Très difficile, 30 Ardu, 40 Héroïque, 50 Légendaire.
-- **Postures**.
+- **Postures** — libellés d'interface validés : **Attaque, Assaut, Défense, Défense totale, Centre** (« Assaut » remplace « Attaque totale » ; clé de code `fullAttack` inchangée).
 - **Manœuvres par défaut** (coût en augmentations) : Augmentation des dégâts 1 (cumulable, +1g0), Coup ciblé 1, Feinte 2, Renversement 2, Désarmement 3, Attaque supplémentaire 5.
 - **Clans** (§6.4).
 - **Catalogue d'actions** par situation : Enquête ; Déplacement ; Combat avec trois sous-types (Escarmouche, Duel iaijutsu, Bataille).
@@ -261,19 +278,24 @@ interface LibraryStore {
   - nom du clan en couleur au-dessus du nom ;
   - famille, école et Rang dessous ;
   - bouton de thème (auto, clair, sombre) ;
+  - **boutons d'en-tête** Bibliothèque, Lanceur de dés et Thème : chacun = **icône + texte** sur bureau (livres, dé, demi-cercle), **icône seule** sur mobile (§7) ; le texte reste présent pour les lecteurs d'écran et en info-bulle, avec l'état courant (« Thème : sombre », « Lanceur de dés : masqué ») ;
+  - bouton **« Lanceur de dés : masqué / affiché »**, à côté du thème et de la Bibliothèque (même style ; fond d'accent pâle quand affiché). **Masqué par défaut**, choix mémorisé dans les préférences :
+    - **masqué** : le panneau d'action reste un panneau d'aide (réserve, ligne « lancer à la main », Min · Moy. · Max, chance de réussite, ND final, options, manœuvres) mais **sans** bouton « Lancer », sans dés obtenus, sans verdict et sans historique. Les enchaînements qui dépendent d'un lancer (score d'initiative affiché, bonus de Défense totale, dés de dégâts pré-remplis) ne se déclenchent pas ; les dépenses de Vide se font par les pastilles et le panneau Vide ;
+    - **affiché** : le bouton « Lancer » et les résultats apparaissent dans tous les lanceurs (Enquête, Déplacement, Combat) ;
+    - le changement s'applique immédiatement, sans recharger ;
   - onglets Fiche et Aide de jeu.
 - **Barre d'état collante** :
   - piste des 8 niveaux de blessure, avec le niveau courant ;
   - compteur −/+ ;
   - pastilles de Vide cliquables ;
   - quatre **tuiles compactes** (petit libellé au-dessus, valeur en chiffres) : **Dépl.** (action libre / action simple, ex. « 10/20 pi »), **ND armure**, **Réduction**, **Pénalité** (bordure et chiffre rouges dès que la pénalité dépasse 0). Jamais une ligne de texte unique : elle serait tronquée sur mobile.
+  - les tuiles **ND armure** et **Réduction** sont cliquables, avec le même aspect que les autres tuiles (ni crayon ni pointillés ; bordure d'accent seulement quand l'éditeur est ouvert) : un appui ouvre sous les tuiles un **éditeur d'armure** avec trois champs, Armure (nom), Bonus au ND et Réduction. Il affiche aussi la formule « ND d'armure = 5 × Réflexes + 5 + bonus = N » et un bouton Fermer. Les valeurs sont enregistrées comme toute modification de la fiche. Le ND d'armure lui-même reste calculé (Réflexes + bonus + posture + Vide) et ne se saisit pas directement. Éditeur absent pour une fiche en consultation.
 - **Fiche** :
   - Anneaux et Traits ;
   - identité et réputation ;
   - compétences avec leur réserve ;
   - armes avec les réserves d'attaque et de dégâts ;
   - techniques ;
-  - manœuvres (coûts éditables) ;
   - avantages, désavantages, notes.
 
   Le bouton « Modifier la fiche » bascule en mode édition.
@@ -283,14 +305,20 @@ interface LibraryStore {
   - en Escarmouche : carte **Initiative** en premier (elle affiche le score, et « Nouveau round » ne la réinitialise pas), puis Posture (sauf en Duel), puis le panneau Vide, puis les actions.
 - **Lanceur** :
   - réserve en grand, et juste dessous la ligne **Min · Moy. · Max** (« Max 30+ » si la réserve explose) et la **chance de réussite** contre le ND final quand il y en a un. Elle se recalcule à chaque option (augmentations, Vide, spécialisation, bonus fixe) ;
+  - juste sous la réserve, une ligne **« lancer à la main »** (avant Min · Moy. · Max) qui donne les règles de relance pour jouer avec de vrais dés (pas de phrase « Lance N dés, garde K » : le XgY suffit) :
+    - la règle d'explosion applicable : « Les **10** explosent : relance le dé et additionne, tant qu'il retombe sur 10. », ou « Les **9 et 10** explosent… » en cas de maîtrise, ou « Aucun dé n'explose (compétence non maîtrisée). » ;
+    - « Spécialisation : relance une fois chaque **1**. » si la spécialisation est cochée ;
+    - « Ajoute **+N** au total » si bonus fixe ou règle des dix dés (« dont règle des dix dés ») ;
+    - elle se met à jour avec chaque option (Vide, dés ±, posture, maîtrise) ;
   - ND de base selon l'action ;
   - augmentations libres et gratuites ;
   - dés ± et bonus fixe ;
+  - **disposition des options** en grille de 2 colonnes **sans case vide** : quand une action n'a ni ND ni augmentations (dégâts, initiative), « Dés lancés ± » et « Bonus fixe » partagent la même ligne. Une cellule vide n'est insérée que pour aligner un ND sans augmentations (jet sans compétence) ;
   - cases Vide, Spécialisation (cochée automatiquement si elle correspond) et Vide-compétence ;
   - manœuvres, sur les attaques ;
   - nombre d'augmentations annoncées / maximum ;
   - ND final détaillé ;
-  - dés obtenus (gardés mis en évidence, explosions marquées) ;
+  - dés obtenus (gardés mis en évidence, explosions marquées) ; un dé qui a explosé affiche **sous son total le détail des tirages** (« 13 » avec « 9+4 » en petit), visible sans survol, donc aussi sur mobile ;
   - verdict, marge, augmentations possibles ;
   - historique des 6 derniers jets.
 - **Statistiques** (écran pleine largeur, sans lanceur) : tableau de tous les jets du personnage. Colonnes : Jet, Réserve, Min, Moy., Max, puis chance de réussite contre ND 10, 15, 20, 25, 30 et 40.
@@ -299,6 +327,12 @@ interface LibraryStore {
   - Cellules teintées en vert proportionnellement à la chance de réussite.
   - Trois cases à cocher : « Avec un point de Vide », « Spécialisations appliquées » (cochée par défaut), « Pénalité de blessure actuelle » (cochée par défaut).
   - Mention : chaque augmentation ajoute +5 au ND, il suffit de lire une colonne plus à droite. Sur mobile, le tableau défile horizontalement dans son cadre.
+- **Détails repliables (« i »)** :
+  - les boutons des panneaux **Posture** et **Dépenser du Vide** n'affichent que leur titre ;
+  - **un seul** petit bouton rond « i » par panneau, placé dans l'en-tête à côté du titre (« Posture i », « Dépenser du Vide i » ; pas de compteur « reste » dans cet en-tête, les points de Vide restants sont dans la barre d'état ; en-tête sur une seule ligne, y compris sur mobile) ; il déplie ou replie **toutes** les descriptions du panneau à la fois, sans rien sélectionner ;
+  - le « i » est rempli en couleur d'accent quand les détails sont ouverts ; les deux panneaux sont indépendants ;
+  - l'encart **Se déplacer en combat** affiche par défaut seulement les trois distances en pieds ; son « i », à côté du titre, déplie les mètres, les formules et le rappel « terrain difficile » ;
+  - l'état ouvert ou fermé reste en mémoire de l'onglet (non persisté). Accessibilité : `aria-expanded` et libellé « Afficher / Masquer le détail : <panneau> ». Zone de toucher d'au moins 40 px (pseudo-élément étendu).
 - **Arbre attaque → dégâts** : chaque carte « Dégâts » est rattachée à son attaque (champ `parent` de l'action). Elle est affichée juste sous cette attaque, décalée d'environ 26 px, avec un connecteur en coude (└). Son titre garde l'arme : « Dégâts · Katana ». Le connecteur passe en couleur d'accent quand des dés de dégâts sont en attente pour ce parent, avec la mention « +Ng0 en attente ». Concerne : armes, mains nues, et Frappe → Dégâts en duel.
 - **Enchaînements** :
   - une attaque réussie avec « Augmentation des dégâts » × N pré-remplit +N dés au jet de dégâts suivant ;
@@ -342,11 +376,12 @@ Point de rupture : **largeur ≤ 720 px**. Au-dessus, mise en page bureau inchan
 
 | Élément | Comportement mobile |
 |---|---|
+| En-tête | Bibliothèque, Lanceur de dés et Thème en **boutons ronds de 40 px, icône seule** ; nom du personnage et icônes tiennent **sur une seule ligne** (le nom passe à la ligne si besoin, jamais les icônes). Lanceur affiché = fond d'accent pâle. |
 | Navigation | Onglets Fiche / Aide de jeu dans une **barre fixe en bas**, deux boutons pleine largeur. Marge basse = hauteur de la barre + `env(safe-area-inset-bottom)`. Onglet actif sur fond d'accent pâle. |
-| Barre d'état | Les quatre tuiles Dépl. / ND armure / Réduction / Pénalité occupent **toute la largeur sur 4 colonnes égales**, texte centré. **Résumé sur une ligne** (niveau de blessure, pénalité, `blessures / seuil max`), cliquable. Un appui déplie la piste complète en **2 rangées de 4**. En dessous : compteur −/+ (boutons 40 px) et pastilles de Vide (26 px), ND d'armure et pénalité. Bordure rouge si le personnage est blessé. |
+| Barre d'état | Les quatre tuiles Dépl. / ND armure / Réduction / Pénalité occupent **toute la largeur sur 4 colonnes égales**, texte centré. **Résumé sur une ligne** (niveau de blessure, pénalité, `blessures / seuil max`), cliquable, bordure rouge si le personnage est blessé. Un appui déplie la piste complète en **2 rangées de 4**. En dessous : compteur −/+ (boutons 40 px) et pastilles de Vide (26 px). |
 | Lanceur | **Panneau glissant depuis le bas**, ouvert au choix d'une action (pas à l'ouverture de l'écran). Hauteur max 88 vh, défilement interne, fond assombri derrière. Poignée et bouton × en haut ; fermeture par ×, appui sur le fond ou Échap. Bouton « Lancer » **collé en bas** du panneau. Après un lancer, le résultat est amené à l'écran et le panneau reste ouvert. Changer une option ne remet pas le défilement du panneau à zéro. Le défilement de la page est bloqué pendant l'ouverture. |
 | Situations | Rangées Enquête / Déplacement / Combat et sous-types en **défilement horizontal**, sans retour à la ligne. |
-| Postures et Vide | Grille de 2 colonnes. |
+| Postures et Vide | Grille de 2 colonnes, titres seuls ; un « i » de 26 px dans l'en-tête de chaque panneau, zone de toucher ≥ 40 px. |
 | Saisie | Champs en **16 px** (pas de zoom automatique sur iOS). Cibles tactiles d'au moins 40 px. |
 | Anneaux | 2 colonnes, le Vide sur toute la largeur. |
 | Encoches | Gouttières latérales `max(16px, env(safe-area-inset-left/right))`. Barre du bas et panneau respectent les zones sûres. |
@@ -414,11 +449,29 @@ Depuis un fichier (bouton ou glisser-déposer). Trois destinations :
 
 « Terminé » = tests verts, `tsc --noEmit` sans erreur, lint propre, CI verte.
 
-### 10.1 Moteur (`tests/core.rules.spec.ts`) — fourni, 69 tests
-- C'est la **spécification exécutable** du moteur. Elle a été validée contre une implémentation de référence : 69 tests sur 69 passent.
+### 10.1 Moteur (`tests/core.rules.spec.ts`) — fourni, 80 tests
+- C'est la **spécification exécutable** du moteur. Elle a été validée contre une implémentation de référence : 80 tests sur 80 passent (v1.1 : règle des dix dés du livre, maîtrise 7+).
+- **Changement d'attendus en v1.1** : la règle des dix dés précédente était fausse. Les cas `12k5`, `14k9` et la réserve 14k7 du test « règle des dix dés en dernier » ont des valeurs corrigées, conformes au livre.
 - L'agent implémente `src/core` jusqu'à ce que le fichier passe, **sans modifier les valeurs attendues**. Un désaccord se signale (§12), il ne se corrige pas.
 - Couverture visée : 100 % des lignes de `src/core`.
 - Personnage de référence : `reference/exemple-personnage.json` (Kakita Haruto).
+
+### 10.1 bis Bonus de jet (annexe B) — à écrire par l'agent
+Ces cas complètent la spec fournie. L'agent les écrit dans `tests/core.modifiers.spec.ts` avec la signature réelle de son implémentation, sans changer les attendus.
+
+| # | Scénario | Attendu |
+|---|---|---|
+| B1 | Bonus `skill` Kenjutsu +1g0, `always` | Attaque Kenjutsu 5g3 → 6g3 ; Investigation inchangée |
+| B2 | Bonus `trait` Agilité +0g1 | Kenjutsu et Équitation gagnent +0g1 ; jet de Constitution inchangé |
+| B3 | Bonus `social` +5 au ND | ND final de Courtoisie, Étiquette, Sincérité +5 ; Kenjutsu inchangé |
+| B4 | Hiruma rang 1 : +1g0 aux attaques, `stance: "attack"` | +1g0 en Attaque ; rien en Assaut ni en Défense |
+| B5 | Bonus `armor` +5 avec posture Défense | ND d'armure +5 en Défense seulement |
+| B6 | Bonus `wounds` 3 (Force de la Terre), 11 blessures (Égratigné +3) puis 18 (Éraflé +5) | Pénalité 0, puis 2 ; jamais sous 0 |
+| B7 | Malus −3g0 sur une réserve de 2g2 | 0g0 au minimum, jamais négatif |
+| B8 | Ordre : bonus +6g0 sur 7g3 en Assaut avec Vide | 7+2 → 9g4, +6 → 15g4, +1g1 → 16g5, dix dés → 10g8 |
+| B9 | Bonus `optional` | Absent des réserves de la fiche et des statistiques ; proposé décoché dans le lanceur |
+| B10 | Augmentations gratuites +1 | Ajoutées à celles saisies, sans changer le ND |
+| B11 | Fusion d'un JSON avec un `modifier` de même `id` | Mise à jour, pas de doublon |
 
 ### 10.2 Stockage (Vitest + `fake-indexeddb`)
 | # | Scénario | Attendu |
@@ -447,11 +500,16 @@ Depuis un fichier (bouton ou glisser-déposer). Trois destinations :
 | E3 | Export, puis import en « Nouvelle fiche » | Fiche identique |
 | E4 | Import en « Consultation » | Badge visible, lecture seule, jet de dés possible sans dépense de Vide |
 | E5 | Import par fusion ajoutant Kyujutsu et un arc | Aperçu correct ; après application, tir sur Réflexes et dégâts sur la force de l'arc |
-| E6 | Escarmouche | Initiative en tête ; Attaque totale fait passer le ND d'armure de 20 à 10 ; « Nouveau round » garde l'initiative |
+| E6 | Escarmouche | Initiative en tête ; Assaut fait passer le ND d'armure de 20 à 10 ; « Nouveau round » garde l'initiative |
 | E7 | Attaque réussie avec 2 « Augmentation des dégâts » | Dégâts pré-remplis à +2 dés |
 | E8 | Thème forcé, puis rechargement | Le choix est conservé ; en auto, la page suit le système |
 | E9 | Statistiques | Une ligne par compétence, attaque, dégâts et initiative ; cocher « point de Vide » augmente les réserves de +1g1 et les pourcentages |
 | E10 | Lanceur : ajouter une augmentation | Le ND final monte de 5 et la chance de réussite baisse |
+| E11 | Kenjutsu passé à 7 (dés forcés : 9, 4…) | Les dégâts du katana affichent la note de maîtrise ; le 9 est relancé et le dé affiche « 13 » avec « 9+4 » ; la compétence de l'arme est trouvée même écrite « kenjutsu » ou avec des espaces |
+| E12 | Boutons « i » de Posture, Vide et Déplacement | Descriptions masquées par défaut ; un clic sur le « i » d'un panneau déplie toutes ses descriptions, un second les replie ; aucun effet sur la posture, le Vide ni l'autre panneau |
+| E13 | Lanceur sur Dégâts · Katana | « Dés lancés ± » et « Bonus fixe » sur une seule ligne ; ligne « Les 10 explosent… » sans phrase « Lance… » ; avec Kenjutsu 7, « Les 9 et 10 explosent… » |
+| E14 | Appui sur la tuile ND armure | L'éditeur d'armure s'ouvre ; bonus 5 avec Réflexes 2 → tuile ND 20 ; réduction 3 → tuile Réduction 3 ; valeurs conservées au rechargement |
+| E15 | Option « Lanceur de dés » | Par défaut « masqué » : aucun bouton « Lancer » ni historique dans les lanceurs  ; « affiché » : le bouton apparaît partout ; le choix survit au rechargement |
 
 ### 10.5 Mobile (Playwright, appareils « iPhone 13 » et « Pixel 7 »)
 | # | Scénario | Attendu |
@@ -465,6 +523,8 @@ Depuis un fichier (bouton ou glisser-déposer). Trois destinations :
 | M7 | Champs en mode modification | Taille de police calculée ≥ 16 px |
 | M8 | Cibles tactiles (boutons −/+, pastilles, onglets) | Au moins 40 × 40 px |
 | M9 | Tuiles de la barre d'état à 360 px de large | Les 4 libellés et valeurs sont entièrement visibles, sans troncature ni retour à la ligne |
+| M10 | Boutons « i » | Zone de toucher ≥ 40 × 40 px ; les panneaux Posture et Vide tiennent sur moins d'un écran détails fermés |
+| M11 | En-tête à 360 px de large | Bibliothèque, Lanceur de dés et Thème en icônes de 40 px sur la même ligne que le nom ; libellé accessible avec l'état courant |
 
 ---
 
@@ -475,11 +535,14 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 1. **Socle** : Vite + React + TypeScript strict, ESLint, Vitest, `vite-plugin-singlefile`, workflow `ci.yml`.
 2. **Moteur** : schéma Zod, migrations, données de règles, moteur → `core.rules.spec.ts` vert.
 3. **Interface bureau** : portage du prototype en composants, thème, clans. Revue visuelle par comparaison avec `reference/prototype.html`.
-4. **Mobile** : §7 → tests M1 à M8.
+4. **Mobile** : §7 → tests M1 à M9.
 5. **Stockage** : bibliothèque IndexedDB, écran Bibliothèque, mode consultation → S1, S2, U1.
 6. **Import / export** : fusion avec aperçu, trois destinations → U5, E3 à E5.
 7. **Fichier lié** : File System Access, reprise de permission, conflits → S3 à S5, U6.
 8. **Distribution** : `pages.yml`, `release.yml`, README joueur, premier tag `v1.0.0`.
+9. **v1.1 — règles et ergonomie** : règle des dix dés du livre (§4.7), maîtrise 7+ (§4.8), détails repliables « i » (§6.2), ligne « lancer à la main » et options alignées du lanceur, retrait de l'encadré Manœuvres de la fiche, éditeur d'armure depuis la barre d'état, option « Lanceur de dés » (masqué par défaut), boutons d'en-tête en icônes sur mobile, cas B1 à B11 → spec moteur verte (80 tests), E11 à E15, M10, M11 ; tag `v1.1.0`. Aucun changement de format de fiche (`schemaVersion` reste 1).
+10. **v2.0 — techniques d'école (bushi)** : annexe C. Format de fiche v2 et migration, moteur d'effets, catalogue `reference/ecoles-bushi.json` (14 écoles), choix d'école sur la fiche, effets automatiques et à cocher, mots-clés d'arme, rappels, badge « Action simple » → cas T1 à T24, E16 à E19 ; tag `v2.0.0`.
+11. **v2.1 — techniques des courtisans et de Shosuro** : même moteur, nouvelles entrées de catalogue (compétences sociales, Connaissance, conditions d'Honneur, spécialisations). Spec à valider avant implémentation.
 
 ---
 
@@ -490,11 +553,15 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 | # | Point | Défaut si non tranché |
 |---|---|---|
 | P1 | Dépôt **public ou privé** ? GitHub Pages est gratuit pour un dépôt public ; pour un dépôt privé, il faut un compte payant. Sans Pages, on peut distribuer uniquement le fichier de release. | Dépôt public (l'outil est public, les fiches restent chez chacun) |
-| P2 | Règles à vérifier dans le livre 4e : coûts des manœuvres, effet de la Feinte, posture du Centre, limite d'un point de Vide par round, Concentration → augmentations en duel, table de bataille de masse, règle des dix dés, Hors de combat ou Mort | Valeurs du §4, éditables dans `src/rules/l5r4e.ts` |
+| P2 | Règles à vérifier dans le livre 4e : coûts des manœuvres, effet de la Feinte, posture du Centre, limite d'un point de Vide par round, Concentration → augmentations en duel, table de bataille de masse, Hors de combat ou Mort. (Règle des dix dés : **vérifiée** sur le livre, §4.8.) | Valeurs du §4, éditables dans `src/rules/l5r4e.ts` |
 | P3 | Récupération des points de Vide (repos, Méditation) | Saisie manuelle |
-| P5 | Déplacement 4e : Eau × 5 (libre) / × 10 (simple) / × 20 (max par round), unité pieds ou mètres selon l'édition française | Valeurs actuelles, pieds + conversion en mètres |
 | P4 | Nom du dépôt et de la page | `carnet-l5r` |
+| P5 | Déplacement 4e : Eau × 5 (libre) / × 10 (simple) / × 20 (max par round), unité pieds ou mètres selon l'édition française | Valeurs actuelles, pieds + conversion en mètres |
 | P6 | **Tranché le 18/10/2026 (v1.0.0)** : les bonus de jet (annexe B) sont un champ **facultatif** du format v1 (`modifiers?`), sans incrémenter `schemaVersion`, la spécification fournie attendant `schemaVersion: 1`. Rétrocompatible : une fiche sans bonus est inchangée. | Décision retenue. Toute évolution du format **après** la v1.0.0 suit le §9.2 : `schemaVersion` 2, migration testée, et mise à jour de la spécification du moteur. |
+| P7 | **Tranché le 20/10/2026** : la maîtrise 7+ (dégâts explosant sur 9) s'applique à **toutes** les compétences martiales, via la compétence de l'arme (Jiujutsu pour les mains nues). | Décision retenue |
+| P8 | **Tranché le 20/10/2026** : règle des dix dés, un dé lancé impair en trop alors que les gardés sont sous 10 est **perdu** (11k4 → 10k4). | Décision retenue |
+| P9 | « Rang d'Honneur » utilisé comme bonus (Matsu, Akodo, Utaku, Daidoji) : arrondi à l'inférieur (6,5 → 6) | Arrondi à l'inférieur |
+| P10 | Valeurs de dégâts et force d'arc du catalogue d'armes (`weaponCatalog`) | Valeurs du catalogue, à vérifier dans le livre ; seuls les mots-clés sont pré-remplis |
 
 ---
 
@@ -516,7 +583,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 
 ## Annexe B — Bonus de jet (techniques, avantages, désavantages)
 
-Ajout demandé après le lot 7 : certaines techniques d'école, certains avantages et désavantages modifient les jets.
+Intégré à la v1.0.0 (voir P6) : certaines techniques d'école, certains avantages et désavantages modifient les jets.
 
 ### Données (`Character.modifiers`, facultatif)
 ```ts
@@ -558,4 +625,137 @@ Le **catalogue nommé** (`NAMED_MODIFIERS`) ne contient que des entrées demand�
 | Aspect dérangeant (Disturbing Countenance) | +5 au ND des jets de compétences sociales | magicalsamurai.wikidot.com/disadvantages |
 
 Les rangs 4 et 5 de l'école Hiruma Bushi n'ont pas d'effet sur les jets (attaque en action simple, blessures excédentaires reportées) : ils restent dans le texte des techniques de la fiche.
+
+---
+
+## Annexe C — Techniques d'école (lot 10, bushi)
+
+### C.1 Décisions validées (21/10/2026)
+| Sujet | Décision |
+|---|---|
+| Périmètre v2.0 | 14 écoles bushi : Hida, Hiruma, Kakita, Daidoji, Mirumoto, Togashi, Akodo, Matsu, Yoritomo (bushi), Tsuruchi, Shiba, Bayushi, Moto, Utaku. Courtisans et Shosuro en v2.1. Shugenja exclus (pas de système de sorts). |
+| Textes | **Aucun texte du livre dans le dépôt.** Le catalogue contient les effets chiffrés et un **résumé d'une ligne écrit pour l'outil**. Pas d'import des textes complets. |
+| Postures | Libellés **Attaque, Assaut, Défense, Défense totale, Centre**. |
+| Rang d'école | Égal au Rang d'Insight par défaut, modifiable (`schoolRank`). |
+| Kakita R1 | « +1g1 plus Rang d'école » = **+1g1 aux dés et + Rang d'école au total**. |
+| Effets après le jet | Rappels textuels seulement (Matsu R5, relances, etc.), quel que soit le mode du lanceur. |
+
+### C.2 Format de fiche v2 (`schemaVersion: 2`)
+```ts
+interface Character /* v2 */ {
+  // … tous les champs v1 …
+  schoolId: string;              // "" = aucune école du catalogue (techniques libres seulement)
+  schoolRank: number | null;     // null = Rang d'Insight
+  weapons: { name; skill; dr; bowStrength?; keywords: WeaponKeyword[] }[];
+}
+type WeaponKeyword = "samourai" | "lourde" | "paysan" | "ninja" | "arc" | "hast" | "lance"
+  | "deux-mains" | "petite" | "moyenne" | "grande" | "distance" | "cimeterre";
+```
+- **Migration v1 → v2** : `schoolId: ""`, `schoolRank: null`, `keywords` pré-remplis depuis `weaponCatalog` quand le nom de l'arme y figure (comparaison normalisée), sinon `[]`. Le nom d'école v1 reste dans `school` ; l'interface **suggère** une école du catalogue si ce nom contient le nom de famille d'une école (« Associer à École de bushi Kakita ? »), sans l'appliquer d'office.
+- Une arme est à distance si ses mots-clés contiennent `distance` ou `arc`, ou selon la règle v1 (Kyujutsu, arc, yumi). Mains nues : action marquée `unarmed`.
+- Les `techniques` libres restent (techniques hors catalogue, kata, sorts). L'entrée Hiruma de `NAMED_MODIFIERS` (annexe B) est **retirée** : elle est remplacée par le catalogue.
+- La spec moteur v1 (`core.rules.spec.ts`) reste valable : elle passe `schemaVersion: 1`, que `migrate()` convertit.
+
+### C.3 Catalogue (`reference/ecoles-bushi.json`, à copier dans `src/rules/`)
+Fichier de données fourni et **validé dans le prototype**. Structure :
+```ts
+interface School { id; clan; name; class; ranks: { rank: 1|2|3|4|5; name; summary; effects: Effect[] }[] }
+type Value = number | { ref: "schoolRank" | "honor" | `ring:${Ring}` | `trait:${TraitKey}` | `skill:${string}` | "input";
+                        mult?: number; div?: number /* arrondi inférieur */; add?: number; min?: number };
+interface When {                 // toutes les conditions présentes doivent être vraies
+  stance?: Stance[]; stanceNot?: Stance[]; mounted?: boolean;
+  centerOrAfter?: boolean;       // posture Centre, ou Centre au round précédent
+  skillGroup?: "bugei";
+  weapon?: { keywordsAny?: WeaponKeyword[]; melee?: boolean; ranged?: boolean; unarmed?: boolean };
+  anyOf?: When[];
+}
+type Effect =
+  | { kind: "roll"; on: On[]; rolled?: Value; kept?: Value; flat?: Value; freeRaises?: Value; when?; mode: "auto"|"optional"; void?: number; label?; input?: string }
+  | { kind: "armor"; value: Value; when?; mode: "auto"|"optional"; stack?: { max: Value; label }; label? }
+  | { kind: "reduction"; value: Value; mode: "auto" }
+  | { kind: "wounds"; perLevel?: Value; ignorePenalty?: Value | "all"; on?: On[]; when?; mode; void?; label? }
+  | { kind: "maneuver"; cost?: { maneuver; value }; freeRaisesFor?: { maneuver; count }; when?; mode; label? }
+  | { kind: "move"; value: Value; when?; mode: "auto" }
+  | { kind: "targetTn"; value: Value; stack: { max: Value; label }; mode: "optional" }
+  | { kind: "void"; points: 2; rolled; kept; label }          // option de dépense (Shiba R1)
+  | { kind: "voidDouble" }                                     // chaque point de Vide compte double (Shiba R5)
+  | { kind: "keyword"; weaponKeyword; adds }                   // Moto R1 : cimeterre → samourai
+  | { kind: "simpleAttack"; when? }                            // badge « Attaque : Action simple »
+  | { kind: "verdict"; rule: "baseTnSuccess"; when? }          // Akodo R5
+  | { kind: "reminder"; context: "combat"|"duel"|"damage"; text? };
+type On = "attack" | "damage" | "initiative" | "focus" | "skill" | "trait" | "bugei" | `skill:${string}`;
+```
+Un rang sans effet est purement descriptif (catégorie « texte »).
+
+### C.4 Moteur (`src/core`)
+| Fonction | Contrat |
+|---|---|
+| `activeEffects(c)` | Effets des rangs ≤ `schoolRank ?? insightRank` de l'école `schoolId`, chacun avec `key`, `source` (« Hiruma R1 »). |
+| `resolveValue(v, c, input?)` | `ref` → valeur (`honor` = Honneur arrondi à l'inférieur, P9), puis `× mult`, `÷ div` arrondi inférieur, `+ add`, plancher `min`. |
+| `weaponKeywords(c, w)` | Mots-clés de l'arme, plus ceux ajoutés par un effet `keyword`. |
+| `computePool(c, action, mods)` | `mods` gagne `ctx: {stance, mounted, centerLastRound}`, `selected: Set<key>`, `inputs`. Ordre : posture → dés ± → **effets `roll` auto + sélectionnés** → Vide (× 2 si `voidDouble` ; option 2 points Shiba) → règle des dix dés. Le `flat` des techniques s'ajoute **après** la règle des dix dés. Renvoie aussi `applied[]`, `optional[]`, `freeRaises`, `techFlat`. Réserve jamais négative. |
+| `woundState(c, ctx)` | Seuils + `perLevel` (auto) à chaque niveau ; pénalité − `ignorePenalty` (auto, selon posture), plancher 0. |
+| `armorTN(c, ctx, sel)` | v1 + effets `armor` auto, cochés et cumulés (`stack × value`) + Vide × 10 × (2 si `voidDouble`). |
+| `reduction(c)` | `armor.reduction` + effets `reduction`. |
+| `maneuverCost(c, m)` / `maneuverRaises(...)` | Coût modifié par `maneuver.cost` ; les augmentations gratuites `freeRaisesFor` se déduisent du coût de la manœuvre visée. |
+| `targetNumber(...)` | ND cible des attaques + `targetTn × stack` ; une option `wounds.ignorePenalty: "all"` cochée met la pénalité à 0 pour ce jet. |
+| `verdict(total, tn, baseTn, effects)` | Si échec, qu'Akodo R5 s'applique (Bugei) et que `total ≥ baseTn` : « réussite sans les augmentations ». |
+| `movement(c, ctx)` | v1 + effets `move` (affichés en note, sans dépasser le maximum). |
+
+Contexte de référence **hors lanceur** (fiche, statistiques) : posture Attaque, non monté, pas de Centre au round précédent, aucun effet optionnel coché.
+
+### C.5 Interface
+- **Fiche, bloc Identité** (mode modification) : « École (nom affiché) » libre, liste **« Techniques d'école »** groupée par clan (option « Aucune »), **« Rang d'école »** (indication « = Insight (N) »).
+- **Fiche, bloc Techniques d'école** : titre de l'école, clan et rang ; les 5 rangs avec nom, **résumé** et badges **auto / à cocher / rappel / texte** ; rangs non atteints grisés avec « rang N ». En dessous, « Autres techniques, kata, sorts » (liste libre v1).
+- **Armes** : colonne **Mots-clés** en modification (pré-remplie depuis le catalogue, modifiable), étiquettes en lecture. Réserves d'attaque et de dégâts calculées avec les effets auto.
+- **Barre d'état** : Réduction et ND d'armure incluent les techniques ; l'éditeur d'armure les détaille.
+- **Combat, panneau Posture** : section « Techniques d'école » avec la case **Monté** (si l'école a des effets montés), l'étiquette « Bonus de Centre du round précédent actif », les **compteurs** −/+ (Hiruma R2, Yoritomo R2, plafond = valeur `max`) et les **cases** de ND d'armure (Hiruma R3, Mirumoto R1, Bayushi R1, Yoritomo R4, Utaku R2). « Nouveau round » : mémorise si la posture était Centre, décoche les cases d'armure ; les compteurs restent jusqu'à la fin de l'escarmouche (remise à zéro manuelle).
+- **Combat, panneau « Rappels d'école »** (sous le panneau Vide) : noms des techniques de contexte combat (et duel en Duel iaijutsu), détails par le « i » du panneau.
+- **Cartes d'action** : réserve avec bonus fixe (« 4g3 +6 ») ; badge **« Attaque : Action simple »** quand un effet `simpleAttack` s'applique.
+- **Lanceur** :
+  - étiquettes des effets appliqués sous la réserve (« +1g0 · Hiruma R1 ») ;
+  - section **« Techniques à cocher »** (libellé, effet, coût en Vide, source ; champ de saisie si `input`), remise à zéro à chaque nouvelle action ;
+  - case « 2 points de Vide (+2g2) » si Shiba R1 ; libellés de Vide doublés avec Shiba R5 ;
+  - coût des manœuvres modifié affiché, augmentations gratuites réservées signalées ;
+  - rappels de contexte `damage` sur les jets de dégâts ;
+  - avec le lanceur affiché : les effets cochés avec `void` dépensent leurs points au lancer ; verdict Akodo.
+- **Statistiques** : effets auto inclus (posture Attaque) ; mention en bas du tableau.
+
+### C.6 Tests du moteur (`tests/core.schools.spec.ts`, à écrire par l'agent)
+Personnage : `reference/perso-test-ecoles.json` (Agilité, Réflexes, Intuition 3 ; autres traits 2 ; Vide 2 ; Honneur 6,5 ; Iaijutsu 3, Kenjutsu 2, Défense 1, Kyujutsu 2, Équitation 1 ; Katana, Yumi force 3, Tetsubo). `insightRank` = rang d'école du cas. Posture Attaque sauf mention. **Valeurs vérifiées dans le prototype.**
+
+| # | École, rang | Cas | Attendu |
+|---|---|---|---|
+| T1 | Kakita 1 | Initiative | 4g3 +6 |
+| T2 | Kakita 1 | Attaque katana en Attaque / en Centre | 5g3 / 6g4 +1 |
+| T3 | Kakita 1 | « Nouveau round » en Centre, puis posture Attaque | 6g4 +1 (bonus du round suivant) |
+| T4 | Kakita 2 | Case « Initiative plus basse » cochée | 7g3 |
+| T5 | Hiruma 3 | Attaque katana en Attaque / en Assaut | 6g3 / 7g4 |
+| T6 | Hiruma 3 | ND d'armure ; 2 touches ; + Ailes du colibri | 20 ; 30 ; 36 |
+| T7 | Hiruma 3 | Badge Action simple | absent (rang 4 non atteint) |
+| T8 | Hida 2 | Réduction ; dégâts tetsubo ; dégâts katana | 2 ; 6g3 ; 5g2 |
+| T9 | Daidoji 1 | Seuils de blessure (Honneur 6,5) | 12, 18, 24, 30, 36, 42, 48, 54 |
+| T10 | Daidoji 1 | Seuils avec Honneur 4,0 (minimum 1) | 11, 16, 21, 26, 31, 36, 41, 46 |
+| T11 | Matsu 4 | Dégâts katana | 5g2 +6 |
+| T12 | Matsu 4 | Pénalité à 11 blessures ; à 27 ; à 27 en Assaut | 0 ; 14 ; 8 |
+| T13 | Matsu 4 | Bonus de déplacement en Assaut | +5 pieds |
+| T14 | Tsuruchi 2 | Initiative ; tir yumi ; dégâts yumi ; attaque katana | 5g3 +3 ; 6g3 ; 7g2 ; 5g3 |
+| T15 | Tsuruchi 2 | Coup ciblé annoncé au tir | coût en augmentations 0 (1 gratuite) |
+| T16 | Bayushi 2 | Initiative ; coût de la Feinte | 6g4 ; 1 |
+| T17 | Moto 5 | Dégâts katana en Assaut / en Attaque / monté en Attaque | 5g3 / 5g2 / 6g3 |
+| T18 | Togashi 2 | Mains nues : attaque / dégâts | 4g4 / 3g2 |
+| T19 | Utaku 1 | Équitation | 4g3 +6 |
+| T20 | Shiba 5 | Attaque katana avec 1 point de Vide ; ND d'armure avec Vide en armure | 7g5 ; 40 |
+| T21 | Akodo 5 | ND 20, 2 augmentations (ND 30), total 27 | Échec, « réussite sans les augmentations » |
+| T22 | Akodo 5 | Même cas sur un jet non Bugei | Échec simple |
+| T23 | Aucune école | Toutes les réserves | Identiques à la spec v1 |
+| T24 | Migration | Fiche v1 Kakita (exemple) | `schemaVersion: 2`, `schoolId: ""`, katana `["samourai","moyenne"]`, wakizashi `["samourai","petite"]` |
+
+### C.7 Tests d'interface et de bout en bout
+| # | Parcours | Attendu |
+|---|---|---|
+| E16 | Choisir « École de bushi Hiruma », Rang d'Insight 2 | Bloc Techniques : R1 et R2 avec résumés et badges, R3 à R5 grisés ; attaque katana 6g3 sur la fiche |
+| E17 | Escarmouche, Hiruma 2, compteur « Touches » à 2 | ND d'armure +10 ; passage en Assaut : le bonus disparaît du ND |
+| E18 | Lanceur, Kakita 2, attaque | Étiquette « +1g1 +1 · Kakita R1 » en Centre ; case « Cible à l'Initiative plus basse » décochée par défaut, remise à zéro à l'action suivante |
+| E19 | Fiche v1 importée | Suggestion « Associer à École de bushi Kakita ? » ; rien n'est appliqué sans confirmation |
 

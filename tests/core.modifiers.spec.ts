@@ -2,8 +2,8 @@
 import { describe, expect, it } from "vitest";
 import {
   applicableModifiers, armorModifierBonus, armorTN, CharacterSchema, computePool, defaultModifiers,
-  describeModifier, mergeCharacter, migrate, modifierApplies, modifiersOf, poolStats,
-  type Character, type Modifier, type PoolAction,
+  describeModifier, mergeCharacter, migrate, modifierApplies, modifiersOf, modifierTN, poolStats, woundState,
+  type Character, type Modifier, type PoolAction, type Stance,
 } from "@carnet/core";
 import { MODIFIER_TEMPLATES, NAMED_MODIFIERS } from "../src/rules/l5r4e";
 import kakita from "../reference/exemple-personnage.json";
@@ -48,8 +48,8 @@ describe("Effet sur la réserve", () => {
     expect(computePool(base(), kenjutsu, { modifiers: [m] })).toMatchObject({ rolled: 6, kept: 3 });
     expect(computePool(base(), kenjutsu, { modifiers: [m], voidPoint: true })).toMatchObject({ rolled: 7, kept: 4 });
     const big = { ...base(), traits: { ...base().traits, agility: 9 } };
-    // 9 + 2 + 1 = 12g9 → 10g11 → 10g10 +2
-    expect(computePool(big, kenjutsu, { modifiers: [m] })).toMatchObject({ rolled: 10, kept: 10, bonus: 2 });
+    // 9 + 2 + 1 = 12g9 → 2 lancés en trop = 1 gardé → 10g10
+    expect(computePool(big, kenjutsu, { modifiers: [m] })).toMatchObject({ rolled: 10, kept: 10, bonus: 0 });
   });
   it("bonus fixe ajouté au total, augmentations gratuites remontées, notes lisibles", () => {
     const pool = computePool(base(), notice, { modifiers: [mod({ name: "Avantage", rolled: 1, kept: 1, flat: 3, freeRaises: 1 })] });
@@ -173,5 +173,74 @@ describe("Catalogue nommé (livre de base 4e, résumés à vérifier)", () => {
   });
   it("chaque entrée signale qu'elle est à vérifier dans le livre", () => {
     for (const t of NAMED_MODIFIERS) expect(t.note).toMatch(/À vérifier dans le livre/);
+  });
+});
+
+describe("Cas B1 à B11 (HANDOFF §10.1 bis)", () => {
+  const skill = (name: string, trait: "agility" | "awareness"): PoolAction => ({ kind: "skill", skill: name, trait });
+  const withMods = (...modifiers: Modifier[]) => ({ ...base(), modifiers });
+  const pool = (c: Character, a: PoolAction, extra = {}) => computePool(c, a, { modifiers: defaultModifiers(c, a), ...extra });
+
+  it("B1 : +1g0 à Kenjutsu → attaque 5g3 → 6g3 ; Investigation inchangée", () => {
+    const c = withMods(mod({ appliesTo: "skill", skill: "Kenjutsu", rolled: 1 }));
+    expect(pool(c, kenjutsu)).toMatchObject({ rolled: 6, kept: 3 });
+    expect(pool(c, notice)).toMatchObject({ rolled: 3, kept: 2 });
+  });
+  it("B2 : +0g1 à l'Agilité → Kenjutsu et Équitation +0g1 ; Constitution inchangée", () => {
+    const c = withMods(mod({ appliesTo: "trait", trait: "agility", kept: 1 }));
+    expect(pool(c, kenjutsu)).toMatchObject({ rolled: 5, kept: 4 });
+    expect(pool(c, skill("Équitation", "agility"))).toMatchObject({ rolled: 4, kept: 4 });
+    expect(pool(c, { kind: "trait", trait: "stamina" })).toMatchObject({ rolled: 2, kept: 2 });
+  });
+  it("B3 : social +5 au ND → Courtoisie, Étiquette, Sincérité +5 ; Kenjutsu inchangé", () => {
+    const c = withMods(mod({ appliesTo: "social", tn: 5 }));
+    for (const name of ["Courtoisie", "Étiquette", "Sincérité"]) expect(modifierTN(defaultModifiers(c, skill(name, "awareness")))).toBe(5);
+    expect(modifierTN(defaultModifiers(c, kenjutsu))).toBe(0);
+  });
+  it("B4 : Hiruma rang 1, +1g0 aux attaques en posture Attaque seulement", () => {
+    const c = withMods(mod({ appliesTo: "attack", rolled: 1, stance: "attack" }));
+    const at = (stance: Stance) => computePool(c, kenjutsu, { stance, modifiers: defaultModifiers(c, kenjutsu, stance) });
+    expect(at("attack")).toMatchObject({ rolled: 6, kept: 3 });
+    expect(at("fullAttack")).toMatchObject({ rolled: 7, kept: 4 });
+    expect(at("defense")).toMatchObject({ rolled: 5, kept: 3 });
+  });
+  it("B5 : +5 au ND d'armure en posture Défense seulement", () => {
+    const armor = [mod({ appliesTo: "armor", flat: 5, stance: "defense" })];
+    const c = base();
+    expect(armorTN(c, { stance: "defense", bonus: armorModifierBonus(armor, "defense") }) - armorTN(c, { stance: "defense" })).toBe(5);
+    expect(armorTN(c, { stance: "attack", bonus: armorModifierBonus(armor, "attack") })).toBe(armorTN(c, { stance: "attack" }));
+  });
+  it("B6 : Force de la Terre (3) → pénalité 0 à 11 blessures, 2 à 18", () => {
+    const c = (wounds: number) => ({ ...withMods(mod({ appliesTo: "wounds", flat: 3 })), wounds });
+    expect(woundState(c(11))).toMatchObject({ label: "Égratigné", penalty: 0 });
+    expect(woundState(c(18))).toMatchObject({ label: "Éraflé", penalty: 2 });
+  });
+  it("B7 : −3g0 sur 2g2 → 0g0 au minimum", () => {
+    const c = withMods(mod({ rolled: -3 }));
+    expect(pool(c, { kind: "trait", trait: "stamina" })).toMatchObject({ rolled: 0, kept: 0 });
+  });
+  it("B8 : +6g0 sur 7g3 en Assaut avec Vide → 9g4 → 15g4 → 16g5 → 10g8", () => {
+    const c = base();
+    c.skills.find((s) => s.name === "Kenjutsu")!.rank = 4;
+    const m = mod({ appliesTo: "skill", skill: "Kenjutsu", rolled: 6 });
+    expect(computePool(c, kenjutsu, { modifiers: [m], stance: "fullAttack", voidPoint: true })).toMatchObject({ rolled: 10, kept: 8, bonus: 0 });
+  });
+  it("B9 : bonus situationnel absent des réserves de la fiche, proposé dans le lanceur", () => {
+    const c = withMods(mod({ id: "o", appliesTo: "skill", skill: "Kenjutsu", rolled: 1, mode: "optional" }));
+    expect(defaultModifiers(c, kenjutsu)).toEqual([]);
+    expect(pool(c, kenjutsu)).toMatchObject({ rolled: 5, kept: 3 });
+    expect(applicableModifiers(c, kenjutsu).map((m) => m.id)).toEqual(["o"]);
+  });
+  it("B10 : +1 augmentation gratuite, sans changer le ND", () => {
+    const c = withMods(mod({ freeRaises: 1 }));
+    expect(pool(c, notice).freeRaises).toBe(1);
+    expect(modifierTN(defaultModifiers(c, notice))).toBe(0);
+  });
+  it("B11 : fusion d'un bonus de même id → mise à jour, pas de doublon", () => {
+    const c = withMods(mod({ id: "g", name: "Voie de la Grue", rolled: 1 }));
+    const r = mergeCharacter(c, { schemaVersion: 1, modifiers: [{ id: "g", rolled: 2 }] });
+    if (!r.ok) throw new Error("fusion refusée");
+    expect(r.character.modifiers).toHaveLength(1);
+    expect(r.character.modifiers?.[0]).toMatchObject({ id: "g", name: "Voie de la Grue", rolled: 2 });
   });
 });

@@ -1,5 +1,5 @@
-import { armorTN, movement, woundState } from "@carnet/core";
-import { WOUND_LEVELS } from "../../rules/l5r4e";
+import { armorTN, movement, woundState, type Character } from "@carnet/core";
+import { ARMOR_TN, WOUND_LEVELS } from "../../rules/l5r4e";
 import { armorBonus } from "../rolls";
 import { useCharacter, useStore } from "../store";
 import { NumberField } from "./fields";
@@ -71,11 +71,51 @@ export function StatusBar() {
         </div>
         <div className="cstats">
           <div><span className="label">Dépl.</span><b>{move.free}/{move.simple}<small> pi</small></b></div>
-          <div><span className="label">ND armure</span><b data-testid="armor-tn">{tn}</b></div>
-          <div><span className="label">Réduction</span><b>{c.armor.reduction}</b></div>
+          <ArmorTile label="ND armure" value={tn} testId="armor-tn" readonly={readonly} />
+          <ArmorTile label="Réduction" value={c.armor.reduction} testId="armor-reduction" readonly={readonly} />
           <div className={ws.penalty ? "pen" : ""}><span className="label">Pénalité</span><b>{ws.penalty === null ? "—" : `+${ws.penalty}`}</b></div>
         </div>
+        {ui.armorEdit && !readonly && <ArmorEditor tn={tn} />}
       </div>
     </div>
   );
 }
+
+/** Tuile de combat qui ouvre l'éditeur d'armure ; simple affichage en consultation. */
+function ArmorTile({ label, value, testId, readonly }: { label: string; value: number; testId: string; readonly: boolean }) {
+  const { state, dispatch } = useStore();
+  if (readonly) return <div><span className="label">{label}</span><b data-testid={testId}>{value}</b></div>;
+  const open = state.ui.armorEdit;
+  return (
+    <button type="button" className={`ct${open ? " on" : ""}`} aria-expanded={open} title="Modifier l'armure" onClick={() => dispatch({ type: "toggleArmorEdit" })}>
+      <span className="label">{label}</span><b data-testid={testId}>{value}</b>
+    </button>
+  );
+}
+
+/** Armure, bonus au ND et réduction ; le ND d'armure reste calculé (HANDOFF §6.2). */
+function ArmorEditor({ tn }: { tn: number }) {
+  const { dispatch } = useStore();
+  const c = useCharacter();
+  const set = (field: "name" | "bonus" | "reduction", value: unknown) => dispatch({ type: "set", path: ["armor", field], value });
+  return (
+    <div className="armedit" role="group" aria-label="Armure">
+      <label className="field"><span className="label">Armure</span>
+        <input className="in" type="text" maxLength={80} value={c.armor.name} onChange={(e) => set("name", e.target.value)} />
+      </label>
+      <label className="field"><span className="label">Bonus au ND</span>
+        <NumberField className="in mono" min={0} value={c.armor.bonus} onChange={(n) => set("bonus", n)} />
+      </label>
+      <label className="field"><span className="label">Réduction</span>
+        <NumberField className="in mono" min={0} value={c.armor.reduction} onChange={(n) => set("reduction", n)} />
+      </label>
+      <p className="hint" style={{ gridColumn: "1/-1", margin: 0 }}>
+        ND d'armure = 5 × Réflexes {c.traits.reflexes} + 5 + bonus {c.armor.bonus}{tn !== armorBase(c) ? " ± posture, Vide et bonus" : ""} = <b className="mono">{tn}</b>.
+        {" "}La réduction se retire de chaque jet de dégâts reçu.
+      </p>
+      <button type="button" className="btn sm" style={{ justifySelf: "end", gridColumn: "1/-1" }} onClick={() => dispatch({ type: "toggleArmorEdit" })}>Fermer</button>
+    </div>
+  );
+}
+
+const armorBase = (c: Character) => ARMOR_TN.perReflexes * c.traits.reflexes + ARMOR_TN.base + c.armor.bonus;

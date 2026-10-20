@@ -69,7 +69,7 @@ export function Stats() {
                   <td className="pool">{formatDice(r.pool.rolled, r.pool.kept)}</td>
                   <td className="mono">{st.min}</td>
                   <td className="mono"><b>{Math.round(st.mean)}</b></td>
-                  <td className="mono">{st.max}{st.open ? "+" : ""}</td>
+                  <td className="mono">{st.max}{st.open ? "+" : ""}{r.pool.explodeOn === 9 && <> <span className="tag" title="Explose sur 9">9+</span></>}</td>
                   {r.hasTN ? TNS.map((t) => {
                     const p = st.chance(t + penalty);
                     return <td key={t} className="pc" style={{ ["--p" as string]: `${Math.round(p * 60)}%` }}>{pct(p)}</td>;

@@ -3,7 +3,7 @@ import { armorTN, describeModifier, formatDice, modifiersOf, movement, rings, ty
 import { COMBAT_SUBS, SITUATIONS, STANCES } from "../../rules/l5r4e";
 import { toMeters } from "../format";
 import { armorBonus, DEFAULT_ROLL_OPTIONS, isActive, isRollable, poolFor } from "../rolls";
-import { currentActions, useCharacter, useStore, type AidSituation } from "../store";
+import { currentActions, useCharacter, useStore, type AidSituation, type InfoPanel } from "../store";
 import { Roller } from "./Roller";
 import { Stats } from "./Stats";
 
@@ -98,7 +98,7 @@ function StancePanel() {
   return (
     <div className="panel" style={{ padding: 12 }}>
       <div className="panel-head" style={{ marginBottom: 8 }}>
-        <span className="label">Posture</span>
+        <span className="panel-title"><span className="label">Posture</span><InfoButton panel="stance" label="Posture" /></span>
         <span className="muted" style={{ fontSize: 13 }}>
           ND d'armure <b className="mono" style={{ color: "var(--ink)", fontSize: 16 }}>{tn}</b>
           {ui.voidArmor && <> <span className="tag">+10 Vide</span></>}
@@ -107,7 +107,7 @@ function StancePanel() {
       <div className="stance" role="group" aria-label="Posture">
         {STANCES.map((s) => (
           <button key={s.id} type="button" aria-pressed={ui.stance === s.id} onClick={() => dispatch({ type: "stance", stance: s.id })}>
-            <b>{s.label}</b><span className="muted">{s.description}</span>
+            <b>{s.label}</b>{ui.info.stance && <span className="muted">{s.description}</span>}
           </button>
         ))}
       </div>
@@ -130,10 +130,11 @@ function VoidPanel() {
   const c = useCharacter();
   const { ui } = state;
   const none = c.voidPoints < 1;
+  const details = !!ui.info.void;
   return (
     <div className="panel" style={{ padding: 12 }}>
       <div className="panel-head" style={{ marginBottom: 8 }}>
-        <span className="label">Dépenser du Vide · reste {c.voidPoints}</span>
+        <span className="panel-title"><span className="label">Dépenser du Vide</span><InfoButton panel="void" label="Dépenser du Vide" /></span>
         <button type="button" className="btn sm" onClick={() => dispatch({ type: "newRound" })}>Nouveau round</button>
       </div>
       {ui.voidSpentThisRound && (
@@ -141,16 +142,16 @@ function VoidPanel() {
       )}
       <div className="stance">
         <button type="button" aria-pressed={ui.opts.voidPoint} disabled={none && !ui.opts.voidPoint} onClick={() => dispatch({ type: "option", patch: { voidPoint: !ui.opts.voidPoint } })}>
-          <b>+1g1 au jet</b><span className="muted">Dépensé au prochain jet lancé.</span>
+          <b>+1g1 au jet</b>{details && <span className="muted">Dépensé au prochain jet lancé.</span>}
         </button>
         <button type="button" aria-pressed={ui.voidArmor} disabled={none && !ui.voidArmor} onClick={() => dispatch({ type: "voidArmor" })}>
-          <b>+10 ND d'armure</b><span className="muted">Jusqu'au prochain round.</span>
+          <b>+10 ND d'armure</b>{details && <span className="muted">Jusqu'au prochain round.</span>}
         </button>
         <button type="button" aria-pressed={ui.opts.voidSkill} disabled={none && !ui.opts.voidSkill} onClick={() => dispatch({ type: "option", patch: { voidSkill: !ui.opts.voidSkill } })}>
-          <b>Compétence au rang 1</b><span className="muted">Jouer une compétence que tu n'as pas.</span>
+          <b>Compétence au rang 1</b>{details && <span className="muted">Jouer une compétence que tu n'as pas.</span>}
         </button>
         <button type="button" disabled={none} onClick={() => dispatch({ type: "voidTechnique" })}>
-          <b>Activer une capacité</b><span className="muted">Technique, kata ou avantage payé en Vide.</span>
+          <b>Activer une capacité</b>{details && <span className="muted">Technique, kata ou avantage payé en Vide.</span>}
         </button>
       </div>
     </div>
@@ -158,6 +159,8 @@ function VoidPanel() {
 }
 
 function MovePanel() {
+  const { state } = useStore();
+  const details = !!state.ui.info.move;
   const c = useCharacter();
   const m = movement(c);
   const tiles = [
@@ -169,19 +172,35 @@ function MovePanel() {
     <div className="panel movebox">
       <div className="panel-head" style={{ marginBottom: 8 }}>
         <h2 style={{ fontSize: 17 }}>Se déplacer en combat</h2>
-        <span className="muted" style={{ fontSize: 13 }}>Anneau d'Eau {rings(c).water}</span>
+        <span className="panel-title">
+          <span className="muted" style={{ fontSize: 13 }}>Anneau d'Eau {rings(c).water}</span>
+          <InfoButton panel="move" label="Se déplacer en combat" />
+        </span>
       </div>
       <div className="moves">
         {tiles.map((t) => (
           <div key={t.label}>
             <span className="label">{t.label}</span>
             <b className="mono">{t.ft} pi</b>
-            <span className="muted">{toMeters(t.ft)} · {t.note}</span>
+            {details && <span className="muted">{toMeters(t.ft)} · {t.note}</span>}
           </div>
         ))}
       </div>
-      <p className="hint" style={{ marginBottom: 0 }}>Terrain difficile (eau, foule, escaliers) : distances divisées par deux. Valeurs 4e à vérifier dans ton livre.</p>
+      {details && <p className="hint" style={{ marginBottom: 0 }}>Terrain difficile (eau, foule, escaliers) : distances divisées par deux. Valeurs 4e à vérifier dans ton livre.</p>}
     </div>
+  );
+}
+
+/** Un seul « i » par panneau : déplie ou replie toutes ses descriptions (HANDOFF §6.2). */
+function InfoButton({ panel, label }: { panel: InfoPanel; label: string }) {
+  const { state, dispatch } = useStore();
+  const open = !!state.ui.info[panel];
+  return (
+    <button
+      type="button" className={`ib${open ? " on" : ""}`} aria-expanded={open}
+      aria-label={`${open ? "Masquer" : "Afficher"} le détail : ${label}`}
+      onClick={() => dispatch({ type: "toggleInfo", panel })}
+    >i</button>
   );
 }
 

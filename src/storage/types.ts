@@ -28,9 +28,11 @@ export interface LibraryStore {
   remove(id: string): Promise<void>;
 }
 
-/** Préférences, dans un magasin séparé : thème, dernière fiche ouverte. */
+/** Préférences, dans un magasin séparé : thème, lanceur de dés, dernière fiche ouverte. */
 export interface Prefs {
   theme?: "auto" | "light" | "dark";
+  /** Bouton « Lancer » et résultats dans les lanceurs ; masqué par défaut (HANDOFF §6.2). */
+  showDiceRoller?: boolean;
   lastOpenedId?: string;
   persistRequested?: boolean;
 }

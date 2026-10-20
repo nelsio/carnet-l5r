@@ -44,7 +44,7 @@ const cache = new Map<string, Simulation>();
 
 /** Totaux simulés (sans bonus), triés par ordre croissant. Mis en cache par réserve. */
 function simulate(pool: Pool, emphasis: boolean, samples: number, seed: number): Simulation {
-  const key = [pool.rolled, pool.kept, pool.explodes, pool.canRaise, emphasis, samples, seed].join("|");
+  const key = [pool.rolled, pool.kept, pool.explodes, pool.explodeOn ?? 10, pool.canRaise, emphasis, samples, seed].join("|");
   const hit = cache.get(key);
   if (hit) return hit;
   const rng = seededD10(seed);

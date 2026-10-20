@@ -49,6 +49,7 @@ test("E4 : import en « Consultation » : badge, lecture seule, jet possible san
   await page.getByRole("button", { name: "Aide de jeu" }).click();
   await page.locator("button.act").filter({ hasText: "Remarquer un détail" }).click();
   await page.getByRole("checkbox", { name: /Dépenser 1 point de Vide \(\+1g1\)/ }).check();
+  await page.getByRole("button", { name: "Lanceur de dés : masqué" }).click();
   await page.getByRole("button", { name: "Lancer 4g3" }).click();
   await expect(page.getByLabel("Dés", { exact: true })).toBeVisible();
   await expect(page.getByText("Points de Vide 2/2")).toBeVisible();

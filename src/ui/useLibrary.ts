@@ -71,6 +71,7 @@ export function useLibrary(
       const list = (await storage.library.list()).sort(byDate);
       if (cancelled) return;
       if (prefs.theme) dispatch({ type: "theme", theme: prefs.theme });
+      if (prefs.showDiceRoller) dispatch({ type: "diceRoller", show: true });
       setEntries(list);
       const last = list.find((e) => e.id === prefs.lastOpenedId) ?? list[0];
       if (last) await openEntry(last);
@@ -82,11 +83,11 @@ export function useLibrary(
     };
   }, [storage, dispatch, openEntry]);
 
-  // Thème mémorisé dans les préférences.
-  const theme = state.ui.theme;
+  // Thème et lanceur de dés mémorisés dans les préférences.
+  const { theme, showDiceRoller } = state.ui;
   useEffect(() => {
-    if (ready) void storage.prefs.set({ theme });
-  }, [ready, theme, storage]);
+    if (ready) void storage.prefs.set({ theme, showDiceRoller });
+  }, [ready, theme, showDiceRoller, storage]);
 
   /** Bilan de l'écriture du fichier lié. */
   const applyReport = useCallback((report: SaveReport) => {

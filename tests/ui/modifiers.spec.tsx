@@ -12,6 +12,8 @@ const mod = (patch: Partial<Modifier>): Modifier => ({
   mode: "always", note: "", ...patch,
 });
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
+/** Le bouton « Lancer » n'apparaît qu'avec le lanceur de dés affiché (masqué par défaut). */
+const showDice = () => click("Lanceur de dés : masqué");
 const roller = () => within(screen.getByRole("dialog", { name: "Lanceur de dés" }));
 
 async function mount(modifiers: Modifier[] = [], mode: LibraryEntry["mode"] = "edit", rng = () => 5) {
@@ -95,6 +97,7 @@ describe("Lanceur", () => {
     click(/^Remarquer un détail/);
     expect(roller().getByText("Augm. gratuites (+1 bonus)")).toBeInTheDocument();
     expect(roller().getByText("Investigation 1 + Perception 2 · +3 au total")).toBeInTheDocument();
+    showDice();
     click("Lancer 3g2");
     // 2 dés gardés à 5 + 3 = 13 contre 15 : échec ; ND 10 : réussite avec 1 augmentation gratuite.
     expect(roller().getByText(/Échec/)).toHaveTextContent("13 / 15");
@@ -184,10 +187,10 @@ describe("Catalogue : Crabe Hiruma Bushi, Force de la Terre, Aspect dérangeant"
     click("Combat");
     click(/^Attaque · Katana/);
     expect(screen.getByTestId("pool")).toHaveTextContent("6g3");
-    click(/^Défense\s*Ajoute/);
+    click("Défense");
     expect(screen.getByTestId("pool")).toHaveTextContent("5g3");
     expect(roller().queryByRole("checkbox", { name: /Torch's Flame/ })).toBeNull();
-    click(/^Attaque totale/);
+    click("Assaut");
     expect(screen.getByTestId("pool")).toHaveTextContent("7g4");
   });
 });

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 2,
+  "name": "Personnage de test des écoles",
+  "clan": "", "family": "", "school": "",
+  "schoolId": "", "schoolRank": null,
+  "insightRank": 1,
+  "honor": 6.5, "glory": 1.0, "status": 1.0,
+  "xp": { "total": 0, "spent": 0 },
+  "traits": { "stamina": 2, "willpower": 2, "strength": 2, "perception": 2, "agility": 3, "intelligence": 2, "reflexes": 3, "awareness": 3 },
+  "voidRing": 2, "voidPoints": 2, "wounds": 0,
+  "armor": { "name": "Aucune", "bonus": 0, "reduction": 0 },
+  "skills": [
+    { "name": "Iaijutsu", "rank": 3, "trait": "reflexes", "emphases": [] },
+    { "name": "Kenjutsu", "rank": 2, "trait": "agility", "emphases": [] },
+    { "name": "Défense", "rank": 1, "trait": "reflexes", "emphases": [] },
+    { "name": "Kyujutsu", "rank": 2, "trait": "reflexes", "emphases": [] },
+    { "name": "Équitation", "rank": 1, "trait": "agility", "emphases": [] }
+  ],
+  "weapons": [
+    { "name": "Katana", "skill": "Kenjutsu", "dr": "3k2", "keywords": ["samourai", "moyenne"] },
+    { "name": "Yumi", "skill": "Kyujutsu", "dr": "2k2", "bowStrength": 3, "keywords": ["arc", "distance", "samourai"] },
+    { "name": "Tetsubo", "skill": "Armes lourdes", "dr": "3k3", "keywords": ["lourde", "grande", "deux-mains"] }
+  ],
+  "techniques": [], "maneuvers": [], "advantages": "", "disadvantages": "", "notes": ""
+}

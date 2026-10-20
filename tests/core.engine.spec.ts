@@ -35,7 +35,7 @@ describe("Moteur : cas limites", () => {
     const c = base();
     c.traits.agility = 9;
     const notes = computePool(c, { kind: "skill", skill: "Kenjutsu", trait: "agility", attack: true }, { stance: "fullAttack", voidPoint: true, extraRolled: 1 }).notes;
-    expect(notes).toEqual(["Attaque totale : +2g1", "+1 dé(s) lancé(s)", "Point de Vide : +1g1", "Règle des dix dés : +12"]);
+    expect(notes).toEqual(["Assaut : +2g1", "+1 dé(s) lancé(s)", "Point de Vide : +1g1", "Règle des dix dés : +12"]);
   });
   it("la spécialisation ne s'applique pas à une réserve non qualifiée", () => {
     const pool = { rolled: 1, kept: 1, bonus: 0, explodes: false, canRaise: false, notes: [] };

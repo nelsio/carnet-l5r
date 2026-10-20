@@ -1,4 +1,4 @@
-/** Stockage dans le navigateur, sur le build (HANDOFF §10.4 : E1, E2, E8). */
+/** Stockage dans le navigateur, sur le build (HANDOFF §10.4 : E1, E2, E8, E14, E15). */
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
@@ -66,3 +66,43 @@ for (const t of targets) {
     });
   });
 }
+
+test.describe("Préférences et armure après rechargement (file://)", () => {
+  const url = targets[0]!.url;
+
+  test("E14 : l'éditeur d'armure s'ouvre depuis la tuile ; bonus et réduction conservés", async ({ page }) => {
+    await page.goto(url);
+    await page.getByRole("button", { name: "Créer mon personnage" }).click();
+    await page.getByRole("button", { name: "Terminer" }).click();
+    const armorTile = page.locator(".cstats .ct").filter({ hasText: "ND armure" });
+    await expect(armorTile).toContainText("15");
+    await armorTile.click();
+    const editor = page.getByRole("group", { name: "Armure" });
+    await editor.getByRole("spinbutton", { name: "Bonus au ND" }).fill("5");
+    await editor.getByRole("spinbutton", { name: "Réduction" }).fill("3");
+    await expect(armorTile).toContainText("20");
+    await expect(page.locator(".cstats .ct").filter({ hasText: "Réduction" })).toContainText("3");
+    await expect(page.getByText(/Enregistré dans ce navigateur/)).toBeVisible();
+    await page.reload();
+    await expect(page.locator(".cstats .ct").filter({ hasText: "ND armure" })).toContainText("20");
+    await expect(page.locator(".cstats .ct").filter({ hasText: "Réduction" })).toContainText("3");
+  });
+
+  test("E15 : lanceur de dés masqué par défaut ; affiché partout ; le choix survit au rechargement", async ({ page }) => {
+    await page.goto(url);
+    await page.getByRole("button", { name: "Créer mon personnage" }).click();
+    await page.getByRole("button", { name: "Terminer" }).click();
+    await page.getByRole("button", { name: "Aide de jeu" }).click();
+    await page.locator("button.act").first().click();
+    await expect(page.getByRole("button", { name: /^Lancer/ })).toHaveCount(0);
+    await page.getByRole("button", { name: "Lanceur de dés : masqué" }).click();
+    for (const s of ["Enquête", "Déplacement", "Combat"]) {
+      await page.getByRole("group", { name: "Situation" }).getByRole("button", { name: s, exact: true }).click();
+      await page.locator("button.act").first().click();
+      await expect(page.getByRole("button", { name: /^Lancer/ }), s).toBeVisible();
+    }
+    await page.waitForTimeout(200);
+    await page.reload();
+    await expect(page.getByRole("button", { name: "Lanceur de dés : affiché" })).toBeVisible();
+  });
+});

@@ -5,7 +5,6 @@ import {
 } from "@carnet/core";
 import { RINGS, TRAIT_LABELS, type RingKey } from "../../rules/l5r4e";
 import { decimal } from "../format";
-import { effectiveManeuvers } from "../rolls";
 import { useCharacter, useStore, type ListKey } from "../store";
 import { FileActions } from "./FileActions";
 import { Modifiers } from "./Modifiers";
@@ -61,7 +60,6 @@ export function Sheet() {
         <div className="grid">
           <div className="panel"><h2>Armes</h2><Weapons /></div>
           <div className="panel"><h2>Techniques d'école</h2><Techniques /></div>
-          <div className="panel"><h2>Manœuvres</h2><Maneuvers /></div>
           <div className="panel"><h2>Bonus de jet</h2><Modifiers /></div>
         </div>
       </div>
@@ -314,50 +312,6 @@ function Techniques() {
   return c.techniques.length
     ? <>{c.techniques.map((t, i) => <div key={i} className="tech"><b>{t.name}</b><div className="prose muted">{t.text}</div></div>)}</>
     : <p className="muted">Aucune technique notée.</p>;
-}
-
-function Maneuvers() {
-  const { c, edit, set } = useSheet();
-  if (edit) {
-    return (
-      <>
-        <p className="hint" style={{ marginTop: 0 }}>Ajuste les coûts à ton livre ou aux règles de ta table. « Cumulable » : on peut la prendre plusieurs fois.</p>
-        <div className="tbl">
-          <table>
-            <thead><tr><th>Manœuvre</th><th>Coût</th><th>Cumul.</th><th /></tr></thead>
-            <tbody>
-              {c.maneuvers.map((m, i) => (
-                <tr key={m.id}>
-                  <td>
-                    <input className="in" type="text" aria-label="Nom de la manœuvre" value={m.name} maxLength={80} onChange={(e) => set(["maneuvers", i, "name"], e.target.value)} />
-                    <textarea className="in" style={{ minHeight: 44, marginTop: 4 }} aria-label={`Effet de ${m.name}`} placeholder="Effet" value={m.effect} onChange={(e) => set(["maneuvers", i, "effect"], e.target.value)} />
-                  </td>
-                  <td style={{ width: 64 }}><NumberField aria-label={`Coût de ${m.name}`} min={0} max={10} value={m.cost} onChange={(n) => set(["maneuvers", i, "cost"], n)} /></td>
-                  <td style={{ width: 50 }}><input type="checkbox" aria-label={`${m.name} cumulable`} checked={m.stackable} onChange={(e) => set(["maneuvers", i, "stackable"], e.target.checked)} /></td>
-                  <td><RemoveButton list="maneuvers" index={i} name={m.name} /></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <AddButton list="maneuvers" label="+ Manœuvre" item={() => ({ id: `m-${crypto.randomUUID()}`, name: "", cost: 1, effect: "", stackable: false })} />
-      </>
-    );
-  }
-  return (
-    <div className="tbl">
-      <table>
-        <tbody>
-          {effectiveManeuvers(c).map((m) => (
-            <tr key={m.id}>
-              <td><b>{m.name}</b><div className="muted" style={{ fontSize: 12.5 }}>{m.effect}</div></td>
-              <td className="pool" style={{ whiteSpace: "nowrap" }}>{m.cost} augm.{m.stackable ? " / fois" : ""}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
 }
 
 function LongText({ field, label }: { field: "advantages" | "disadvantages" | "notes"; label: string }) {
