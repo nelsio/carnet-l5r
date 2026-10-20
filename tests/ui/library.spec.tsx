@@ -11,6 +11,8 @@ const entry = (id: string, patch: Partial<LibraryEntry> = {}): LibraryEntry => (
   id, character: base(), mode: "edit", updatedAt: "2026-10-18T10:00:00.000Z", ...patch,
 });
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
+/** Le bouton « Lancer » n'apparaît qu'avec le lanceur de dés affiché (masqué par défaut). */
+const showDice = () => click("Lanceur de dés : masqué");
 let ids = 0;
 const newId = () => `id-${++ids}`;
 
@@ -187,6 +189,7 @@ describe("Fiche en consultation", () => {
     click("Aide de jeu");
     click(/^Remarquer un détail/);
     fireEvent.click(screen.getByRole("checkbox", { name: /Dépenser 1 point de Vide \(\+1g1\)/ }));
+    showDice();
     click("Lancer 4g3");
     expect(screen.getByLabelText("Dés")).toBeInTheDocument();
     expect(screen.getByText("Points de Vide 2/2")).toBeInTheDocument();

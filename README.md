@@ -34,7 +34,7 @@ Les fiches enregistrées hors ligne restent propres à ce fichier sur cet appare
 Importe les fichiers JSON des joueurs en **Consultation** (Bibliothèque → **Importer un JSON…**, ou dépose le fichier sur la page) :
 
 - la fiche est en lecture seule : rien n'y est modifiable ;
-- le lanceur de dés reste utilisable, sans rien dépenser (points de Vide) ;
+- l'aide aux jets reste utilisable, sans rien dépenser (points de Vide) ;
 - **Rendre modifiable** en crée une copie, si besoin.
 
 Pour mettre à jour la fiche d'un joueur, importe son nouveau fichier.
@@ -45,6 +45,14 @@ Pour mettre à jour la fiche d'un joueur, importe son nouveau fichier.
 2. Sur le nouveau : Bibliothèque → **Importer un JSON…** → destination **Nouvelle fiche**.
 
 L'import peut aussi **fusionner** un fichier dans la fiche ouverte : un aperçu liste les modifications, ajouts et avertissements avant d'appliquer. Rien n'est jamais supprimé par une fusion.
+
+## Lancer avec de vrais dés, ou dans l'outil
+
+Par défaut, l'aide de jeu ne lance pas les dés : elle donne la réserve (par exemple `5g2`), les règles de relance pour jouer avec tes propres dés (« Les 10 explosent… », spécialisation, bonus à ajouter), tes chances de réussite et le ND final.
+
+Pour lancer dans l'outil, appuie sur le bouton **Lanceur de dés** de l'en-tête (l'icône de dé sur mobile) : le bouton « Lancer », les résultats et l'historique apparaissent dans toutes les situations. Le choix est mémorisé.
+
+Les tuiles **ND armure** et **Réduction** de la barre d'état ouvrent l'éditeur d'armure. Les boutons « i » de l'aide de jeu affichent ou masquent le détail des postures, des dépenses de Vide et du déplacement.
 
 ## Bonus des techniques et avantages
 

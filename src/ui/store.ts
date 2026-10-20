@@ -4,7 +4,7 @@
  */
 import { createContext, useContext, type Dispatch } from "react";
 import {
-  buildActions, DAMAGE_MANEUVER_ID, DEFAULT_MANEUVERS, emphasisMatches,
+  buildActions, DAMAGE_MANEUVER_ID, emphasisMatches,
   type ActionDef, type Character, type CombatSub, type RollResult, type Situation, type Stance,
 } from "@carnet/core";
 import type { LibraryEntry } from "../storage";
@@ -14,6 +14,8 @@ export type Theme = "auto" | "light" | "dark";
 export type View = "sheet" | "aid";
 export type AidSituation = Situation | "stats";
 export type ListKey = "skills" | "weapons" | "techniques" | "maneuvers" | "modifiers";
+/** Panneaux de l'aide de jeu dotés d'un bouton « i » (HANDOFF §6.2). */
+export type InfoPanel = "stance" | "void" | "move";
 type Path = readonly (string | number)[];
 
 export interface RollRecord {
@@ -32,6 +34,12 @@ export interface RollRecord {
 
 export interface UiState {
   theme: Theme;
+  /** Préférence : bouton « Lancer » et résultats affichés. */
+  showDiceRoller: boolean;
+  /** Détails dépliés par le « i » de chaque panneau (non persisté). */
+  info: Partial<Record<InfoPanel, boolean>>;
+  /** Éditeur d'armure ouvert sous les tuiles de la barre d'état. */
+  armorEdit: boolean;
   view: View;
   edit: boolean;
   situation: AidSituation;
@@ -74,6 +82,9 @@ export const HISTORY_SIZE = 6;
 
 export const initialUi: UiState = {
   theme: "auto",
+  showDiceRoller: false,
+  info: {},
+  armorEdit: false,
   view: "sheet",
   edit: false,
   situation: "investigation",
@@ -111,6 +122,9 @@ export type AppAction =
   | { type: "wounds"; value: number }
   | { type: "pip"; index: number }
   | { type: "theme"; theme: Theme }
+  | { type: "diceRoller"; show: boolean }
+  | { type: "toggleInfo"; panel: InfoPanel }
+  | { type: "toggleArmorEdit" }
   | { type: "view"; view: View }
   | { type: "toggleEdit" }
   | { type: "situation"; situation: AidSituation }
@@ -185,6 +199,9 @@ function uiReducer(state: AppState, action: AppAction): AppState {
 
   switch (action.type) {
     case "theme": return withUi({ theme: action.theme });
+    case "diceRoller": return withUi({ showDiceRoller: action.show });
+    case "toggleInfo": return withUi({ info: { ...ui.info, [action.panel]: !ui.info[action.panel] } });
+    case "toggleArmorEdit": return withUi({ armorEdit: state.mode === "edit" && !ui.armorEdit });
     case "view":
       return action.view === "aid"
         ? { ...state, ui: selectFirst(c, { ...ui, view: "aid", edit: false }) }
@@ -209,6 +226,10 @@ function uiReducer(state: AppState, action: AppAction): AppState {
   }
 }
 
+/** État d'interface conservé d'une fiche à l'autre : préférences et détails dépliés. */
+const kept = (ui: UiState): Pick<UiState, "theme" | "showDiceRoller" | "info"> =>
+  ({ theme: ui.theme, showDiceRoller: ui.showDiceRoller, info: ui.info });
+
 /** Actions qui modifient la fiche : refusées en consultation. */
 const EDITING = new Set<AppAction["type"]>(["set", "add", "remove", "wounds", "pip", "toggleEdit", "replaceCharacter"]);
 
@@ -218,11 +239,11 @@ export function reducer(state: AppState, action: AppAction): AppState {
   if (action.type === "open") {
     return {
       screen: "character", entryId: action.id, mode: action.mode, character: action.character,
-      ui: { ...initialUi, theme: ui.theme, edit: !!action.edit && action.mode === "edit" },
+      ui: { ...initialUi, ...kept(ui), edit: !!action.edit && action.mode === "edit" },
     };
   }
   if (action.type === "library") {
-    return { ...initialState(), ui: { ...initialUi, theme: ui.theme } };
+    return { ...initialState(), ui: { ...initialUi, ...kept(ui) } };
   }
   if (!c) return uiReducer(state, action);
   if (state.mode === "readonly" && EDITING.has(action.type)) return state;
@@ -240,11 +261,8 @@ export function reducer(state: AppState, action: AppAction): AppState {
       return { ...state, character: { ...c, wounds: Math.max(0, Math.floor(action.value) || 0) } };
     case "pip":
       return { ...state, character: { ...c, voidPoints: c.voidPoints === action.index + 1 ? action.index : action.index + 1 } };
-    case "toggleEdit": {
-      // Passer en modification fait apparaître les manœuvres par défaut, pour pouvoir ajuster leurs coûts.
-      const character = !ui.edit && c.maneuvers.length === 0 ? { ...c, maneuvers: DEFAULT_MANEUVERS.map((m) => ({ ...m })) } : c;
-      return { ...state, character, ui: { ...ui, edit: !ui.edit } };
-    }
+    case "toggleEdit":
+      return { ...state, ui: { ...ui, edit: !ui.edit } };
     case "select": {
       const a = currentActions(c, ui).find((x) => x.id === action.id);
       return a && isRollable(a) ? { ...state, ui: select(c, ui, a, true) } : state;

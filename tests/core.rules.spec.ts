@@ -42,15 +42,25 @@ describe("Anneaux et compétences", () => {
   });
 });
 
-describe("Règle des dix dés", () => {
+describe("Règle des dix dés (livre de base 4e, « Special Dice Rules »)", () => {
+  it.each([
+    [12, 4, { rolled: 10, kept: 5, bonus: 0 }],    // 2 dés lancés en trop → 1 dé gardé
+    [13, 9, { rolled: 10, kept: 10, bonus: 2 }],   // 2 lancés → 1 gardé ; le dé impair restant → +2
+    [10, 12, { rolled: 10, kept: 10, bonus: 4 }],  // chaque gardé au-delà de 10 → +2
+    [14, 12, { rolled: 10, kept: 10, bonus: 12 }], // les deux dépassent : 4 lancés × 2 + 2 gardés × 2
+  ])("exemple du livre : %ik%i", (r, k, expected) => {
+    expect(applyTenDiceRule(r, k)).toEqual(expected);
+  });
   it.each([
     [5, 3, { rolled: 5, kept: 3, bonus: 0 }],
-    [12, 5, { rolled: 10, kept: 7, bonus: 0 }],
-    [11, 10, { rolled: 10, kept: 10, bonus: 2 }],
-    [14, 9, { rolled: 10, kept: 10, bonus: 6 }],
     [10, 10, { rolled: 10, kept: 10, bonus: 0 }],
+    [12, 5, { rolled: 10, kept: 6, bonus: 0 }],
+    [11, 4, { rolled: 10, kept: 4, bonus: 0 }],    // dé impair restant perdu tant que les gardés n'atteignent pas 10
+    [11, 10, { rolled: 10, kept: 10, bonus: 2 }],
+    [14, 9, { rolled: 10, kept: 10, bonus: 4 }],   // 2 lancés → 10e gardé, les 2 restants → +4
+    [16, 9, { rolled: 10, kept: 10, bonus: 8 }],
     [3, 5, { rolled: 3, kept: 3, bonus: 0 }],
-  ])("%ig%i", (r, k, expected) => {
+  ])("%ik%i", (r, k, expected) => {
     expect(applyTenDiceRule(r, k)).toEqual(expected);
   });
 });
@@ -98,6 +108,20 @@ describe("Réserves de dés (computePool)", () => {
   it("arc : dégâts sur la force de l'arc, pas sur la Force", () => {
     expect(computePool(base(), { kind: "damage", weapon: bow }, {})).toMatchObject({ rolled: 5, kept: 2 });
   });
+  it("maîtrise : compétence martiale au rang 7+, les dégâts explosent aussi sur 9", () => {
+    const c = base();
+    expect(computePool(c, { kind: "damage", weapon: sword }, {})).toMatchObject({ explodeOn: 10 });
+    c.skills.find((s) => s.name === "Kenjutsu")!.rank = 7;
+    expect(computePool(c, { kind: "damage", weapon: sword }, {})).toMatchObject({ explodes: true, explodeOn: 9 });
+    expect(computePool(c, atk, {})).toMatchObject({ explodeOn: 10 });        // l'attaque n'est pas concernée
+  });
+  it("maîtrise : s'applique à l'arc (Kyujutsu 7) et aux mains nues (Jiujutsu 7)", () => {
+    const c = base();
+    c.skills.push({ name: "Kyujutsu", rank: 7, trait: "reflexes", emphases: [] });
+    c.skills.push({ name: "Jiujutsu", rank: 7, trait: "agility", emphases: [] });
+    expect(computePool(c, { kind: "damage", weapon: bow }, {})).toMatchObject({ explodeOn: 9 });
+    expect(computePool(c, { kind: "damage", weapon: { name: "Mains nues", skill: "Jiujutsu", dr: "0k1" } }, {})).toMatchObject({ explodeOn: 9 });
+  });
   it("initiative : Rang 1 + Réflexes 3 = 4g3", () => {
     expect(computePool(base(), { kind: "initiative" }, {})).toMatchObject({ rolled: 4, kept: 3, canRaise: false });
   });
@@ -105,8 +129,8 @@ describe("Réserves de dés (computePool)", () => {
     const c = base();
     c.traits.agility = 5;
     c.skills.find((s) => s.name === "Kenjutsu")!.rank = 6;
-    // 6 + 5 = 11g5, +2g1 Attaque totale = 13g6, +1g1 Vide = 14g7 → 10g10 +2 (kept 11 → 10, +2)
-    expect(computePool(c, atk, { stance: "fullAttack", voidPoint: true })).toMatchObject({ rolled: 10, kept: 10, bonus: 2 });
+    // 6 + 5 = 11g5, +2g1 Attaque totale = 13g6, +1g1 Vide = 14g7 → 4 lancés en trop = 2 gardés → 10g9
+    expect(computePool(c, atk, { stance: "fullAttack", voidPoint: true })).toMatchObject({ rolled: 10, kept: 9, bonus: 0 });
   });
 });
 
@@ -136,6 +160,18 @@ describe("Lancer (rollDice)", () => {
   });
   it("spécialisation : le dé relancé peut exploser", () => {
     expect(rollDice(pool(2, 1), { emphasis: true }, seq([1, 10, 6, 2])).total).toBe(16);
+  });
+  it("explose sur 9 quand explodeOn = 9", () => {
+    const rng = seq([9, 10, 2, 3]);
+    const r = rollDice({ ...pool(2, 1), explodeOn: 9 }, { emphasis: false }, rng);
+    expect(r.total).toBe(21);
+    expect(r.dice[0]).toMatchObject({ faces: [9, 10, 2], total: 21 });
+    expect(rng.remaining()).toBe(0);
+  });
+  it("explodeOn absent = 10 : un 9 n'explose pas", () => {
+    const rng = seq([9, 3]);
+    expect(rollDice(pool(2, 1), { emphasis: false }, rng).total).toBe(9);
+    expect(rng.remaining()).toBe(0);
   });
   it("explosions en chaîne", () => {
     expect(rollDice(pool(1, 1), { emphasis: false }, seq([10, 10, 3])).total).toBe(23);
@@ -334,6 +370,10 @@ describe("Statistiques de réserve (poolStats)", () => {
   });
   it("est déterministe pour une même graine", () => {
     expect(poolStats(pool(6, 3), opts).mean).toBe(poolStats(pool(6, 3), opts).mean);
+  });
+  it("exploser sur 9 augmente la moyenne", () => {
+    const p = pool(5, 2);
+    expect(poolStats({ ...p, explodeOn: 9 }, opts).mean).toBeGreaterThan(poolStats(p, opts).mean);
   });
   it("la spécialisation augmente la moyenne", () => {
     const sans = poolStats(pool(5, 3), opts).mean;

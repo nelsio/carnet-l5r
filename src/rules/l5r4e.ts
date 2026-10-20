@@ -77,7 +77,7 @@ export const ARMOR_TN = {
 
 export const STANCES: readonly { id: Stance; label: string; description: string }[] = [
   { id: "attack", label: "Attaque", description: "Posture normale." },
-  { id: "fullAttack", label: "Attaque totale", description: "+2g1 à l'attaque, −10 au ND d'armure." },
+  { id: "fullAttack", label: "Assaut", description: "+2g1 à l'attaque, −10 au ND d'armure." },
   { id: "defense", label: "Défense", description: "Ajoute Air + Défense au ND d'armure." },
   { id: "fullDefense", label: "Défense totale", description: "Jet Défense (Réflexes), + moitié au ND d'armure." },
   { id: "center", label: "Centre", description: "Aucune action ; bonus au round suivant (voir livre)." },
@@ -88,6 +88,9 @@ export const POOL_BONUS = {
   fullAttack: { rolled: 2, kept: 1 },
   voidPoint: { rolled: 1, kept: 1 },
 } as const;
+
+/** Maîtrise des compétences martiales (HANDOFF §4.8). */
+export const MASTERY = { damageExplodeOn9AtRank: 7 } as const;
 
 /** Déplacement en pieds, en multiples de l'Anneau d'Eau. */
 export const MOVEMENT = { free: 5, simple: 10, max: 20 } as const;

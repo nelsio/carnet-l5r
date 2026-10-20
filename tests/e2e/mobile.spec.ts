@@ -1,4 +1,4 @@
-/** Version mobile (HANDOFF §7), tests M1 à M9 (§10.5). */
+/** Version mobile (HANDOFF §7), tests M1 à M11 (§10.5). */
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { expect, test, type Locator, type Page } from "@playwright/test";
@@ -14,6 +14,8 @@ async function start(page: Page) {
   await page.getByRole("button", { name: "+ Arme" }).click();
   await page.getByRole("textbox", { name: "Nom de l'arme" }).fill("Katana");
   await page.getByRole("button", { name: "Terminer" }).click();
+  // Le bouton « Lancer » n'apparaît qu'avec le lanceur de dés affiché (masqué par défaut).
+  await page.getByRole("button", { name: "Lanceur de dés : masqué" }).click();
 }
 
 const tab = (page: Page, name: "Fiche" | "Aide de jeu") => page.getByRole("group", { name: "Vue" }).getByRole("button", { name });
@@ -188,7 +190,7 @@ test("M8 : cibles tactiles d'au moins 40 × 40 px (−/+, pastilles, onglets)", 
 test.describe("M9 : à 360 px de large", () => {
   test.use({ viewport: { width: 360, height: 740 } });
   test("les 4 tuiles de la barre d'état sont entièrement visibles, sans troncature ni retour à la ligne", async ({ page }) => {
-    const tiles = page.locator(".cstats > div");
+    const tiles = page.locator(".cstats > *");
     await expect(tiles).toHaveCount(4);
     const report = await tiles.evaluateAll((els) => els.map((tile) => {
       const tileBox = tile.getBoundingClientRect();
@@ -207,5 +209,59 @@ test.describe("M9 : à 360 px de large", () => {
     expect(flat).toHaveLength(8);
     expect(flat.filter((x) => x.truncated || !x.inside || !x.oneLine)).toEqual([]);
     await noHorizontalScroll(page, "360 px");
+  });
+});
+
+/** La zone de toucher (pseudo-élément étendu) couvre au moins 40 × 40 px autour du centre. */
+async function touchArea(el: Locator) {
+  const box = (await el.boundingBox())!;
+  const cx = box.x + box.width / 2;
+  const cy = box.y + box.height / 2;
+  const hits = await el.evaluate((node, { cx, cy }) =>
+    [[-20, 0], [19.5, 0], [0, -20], [0, 19.5]].map(([dx, dy]) => {
+      const hit = document.elementFromPoint(cx + dx!, cy + dy!);
+      return !!hit && (hit === node || node.contains(hit));
+    }), { cx, cy });
+  expect(hits, await el.getAttribute("aria-label") ?? "").toEqual([true, true, true, true]);
+}
+
+test("M10 : boutons « i » touchables sur 40 × 40 px ; Posture et Vide tiennent sur un écran, détails fermés", async ({ page }) => {
+  await tab(page, "Aide de jeu").click();
+  await page.getByRole("group", { name: "Situation" }).getByRole("button", { name: "Combat", exact: true }).click();
+  const vp = page.viewportSize()!;
+  for (const name of ["Posture", "Dépenser du Vide"]) {
+    const info = page.getByRole("button", { name: `Afficher le détail : ${name}` });
+    await info.evaluate((e) => e.scrollIntoView({ block: "center" }));
+    await touchArea(info);
+    const panelBox = (await info.locator("xpath=ancestor::div[contains(@class,'panel')][1]").boundingBox())!;
+    expect(panelBox.height, name).toBeLessThan(vp.height);
+    // En-tête sur une seule ligne : le « i » est aligné sur le titre.
+    const title = (await info.locator("xpath=preceding-sibling::span[1]").boundingBox())!;
+    const ib = (await info.boundingBox())!;
+    expect(Math.abs(title.y + title.height / 2 - (ib.y + ib.height / 2)), name).toBeLessThan(6);
+  }
+});
+
+test.describe("M11 : en-tête à 360 px de large", () => {
+  test.use({ viewport: { width: 360, height: 740 } });
+  test("Bibliothèque, Lanceur de dés et Thème en icônes de 40 px sur la ligne du nom, libellés avec l'état", async ({ page }) => {
+    const buttons = [
+      page.getByRole("button", { name: "Bibliothèque" }),
+      page.getByRole("button", { name: "Lanceur de dés : affiché" }),
+      page.getByRole("button", { name: "Thème : auto" }),
+    ];
+    const name = (await page.getByRole("heading", { level: 1 }).boundingBox())!;
+    for (const b of buttons) {
+      const box = (await b.boundingBox())!;
+      expect(Math.round(box.width)).toBe(40);
+      expect(Math.round(box.height)).toBe(40);
+      expect(box.y).toBeLessThan(name.y + name.height);
+      expect(box.y + box.height).toBeGreaterThan(name.y);
+      await expect(b.locator(".txt")).toHaveCSS("width", "1px");
+    }
+    const tops = await Promise.all(buttons.map(async (b) => (await b.boundingBox())!.y));
+    expect(new Set(tops.map(Math.round)).size).toBe(1);
+    await expect(buttons[1]!).toHaveAttribute("title", "Lanceur de dés : affiché");
+    await noHorizontalScroll(page, "en-tête 360 px");
   });
 });

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import {
   applicableModifiers, describeModifier, findSkill, modifierTN, formatDice, isRanged, poolStats, rollDice, woundState,
-  type ActionDef, type Character,
+  type ActionDef, type Character, type Pool,
 } from "@carnet/core";
 import { COMBAT_SUBS, SITUATIONS, TN_PER_RAISE, TN_SCALE, TRAIT_LABELS } from "../../rules/l5r4e";
 import { pct } from "../format";
@@ -44,6 +44,7 @@ export function Roller() {
   const raises = pool.canRaise ? calledRaises(c, a, opts, ui.maneuvers) : 0;
   const unskilled = isUnskilled(c, a);
   const emphasisOffered = a.kind === "skill" && pool.canRaise;
+  const mastery = pool.explodeOn === 9 ? pool.notes.find((n) => n.startsWith("Maîtrise")) : undefined;
   const stats = pool.rolled > 0 ? poolStats(pool, { emphasis: opts.emphasis && emphasisOffered, flatBonus: opts.flat }) : null;
   const context = ui.situation === "combat"
     ? COMBAT_SUBS.find((s) => s.id === ui.sub)?.label
@@ -66,24 +67,27 @@ export function Roller() {
         <span className="poolbig" data-testid="pool">{formatDice(pool.rolled, pool.kept)}</span>
         <span className="muted" style={{ fontSize: 13 }}>{poolOrigin(c, a, opts)}{pool.bonus ? ` · ${pool.bonus > 0 ? "+" : ""}${pool.bonus} au total` : ""}</span>
       </div>
+      <ManualLine pool={pool} emphasis={opts.emphasis && emphasisOffered} flat={opts.flat} free={bonusFree} />
       {stats && (
         <div className="statline">
           <span>Min <b>{stats.min}</b></span>
           <span>Moy. <b>{Math.round(stats.mean)}</b></span>
-          <span>Max <b>{stats.max}{stats.open ? "+" : ""}</b></span>
+          <span>Max <b>{stats.max}{stats.open ? "+" : ""}</b>{pool.explodeOn === 9 && <> <span className="tag" title="Explose sur 9">9+</span></>}</span>
           {typeof tn === "number" && <span className="ch">Réussite <b data-testid="chance">{pct(stats.chance(tn))}</b></span>}
         </div>
       )}
+      {mastery && <div className="hint" data-testid="mastery" style={{ color: "var(--gold)" }}>{mastery}.</div>}
       {!pool.canRaise && a.kind === "skill" && <div className="hint" style={{ color: "var(--bad)" }}>Sans compétence : pas d'explosion, pas d'augmentation.</div>}
 
       <div className="opts">
         <TnField action={a} opts={opts} set={set} />
+        {/* Grille sans case vide : la cellule d'alignement ne sert qu'à un ND sans augmentations (HANDOFF §6.2). */}
         {pool.canRaise ? (
           <label className="field">
             <span className="label">{a.attack ? "Augm. libres" : "Augmentations"}</span>
             <NumberField className="in mono" min={0} value={opts.raises} onChange={(n) => set({ raises: n })} />
           </label>
-        ) : <div />}
+        ) : a.tn !== null && <div />}
         {pool.canRaise && (
           <label className="field">
             <span className="label">Augm. gratuites{bonusFree ? ` (+${bonusFree} bonus)` : ""}</span>
@@ -153,13 +157,17 @@ export function Roller() {
       )}
       {ws.penalty === null && <div className="hint" style={{ color: "var(--bad)" }}>Ton personnage est hors de combat.</div>}
 
-      <button type="button" className="btn primary rollbtn" style={{ width: "100%", marginTop: 12, padding: 12 }} onClick={roll}>
-        Lancer {formatDice(pool.rolled, pool.kept)}
-      </button>
-      <div ref={resultRef} aria-live="polite">
-        {lastRoll && lastRoll.actionId === a.id && <RollOutcome roll={lastRoll} />}
-      </div>
-      {ui.history.length > 0 && (
+      {ui.showDiceRoller && (
+        <>
+          <button type="button" className="btn primary rollbtn" style={{ width: "100%", marginTop: 12, padding: 12 }} onClick={roll}>
+            Lancer {formatDice(pool.rolled, pool.kept)}
+          </button>
+          <div ref={resultRef} aria-live="polite">
+            {lastRoll && lastRoll.actionId === a.id && <RollOutcome roll={lastRoll} />}
+          </div>
+        </>
+      )}
+      {ui.showDiceRoller && ui.history.length > 0 && (
         <div className="hist">
           <span className="label">Derniers jets</span>
           {ui.history.map((h, i) => (
@@ -171,6 +179,23 @@ export function Roller() {
         </div>
       )}
     </>
+  );
+}
+
+/** Règles de relance pour jouer avec de vrais dés (HANDOFF §6.2). */
+function ManualLine({ pool, emphasis, flat, free }: { pool: Pool; emphasis: boolean; flat: number; free: number }) {
+  const nine = pool.explodeOn === 9;
+  const add = pool.bonus + flat;
+  const tenDice = pool.notes.some((n) => n.startsWith("Règle des dix dés"));
+  return (
+    <div className="manual" data-testid="manual">
+      {pool.explodes
+        ? <>Les <b>{nine ? "9 et 10" : "10"}</b> explosent : relance le dé et additionne, tant qu'il retombe sur {nine ? "9 ou 10" : "10"}.</>
+        : "Aucun dé n'explose (compétence non maîtrisée)."}
+      {emphasis && <> Spécialisation : relance une fois chaque <b>1</b>.</>}
+      {add !== 0 && <> Ajoute <b>{add > 0 ? "+" : ""}{add}</b> au total{tenDice ? " (dont règle des dix dés)" : ""}.</>}
+      {free > 0 && <> <b>{free}</b> augmentation(s) gratuite(s).</>}
+    </div>
   );
 }
 
@@ -267,7 +292,7 @@ function RollOutcome({ roll: r }: { roll: RollRecord }) {
             key={i}
             className={["die", d.kept ? "kept" : "", d.faces.length > 1 ? "ex" : ""].filter(Boolean).join(" ")}
             title={`${d.faces.join(" + ")}${d.rerolledOne ? " (1 relancé)" : ""}`}
-          >{d.total}</span>
+          >{d.total}{d.faces.length > 1 && <small>{d.faces.join("+")}</small>}</span>
         ))}
       </div>
       {hasTN ? (

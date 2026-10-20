@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Character } from "@carnet/core";
 import { memoryStorage, type LibraryEntry } from "../../src/storage";
 import { App } from "../../src/ui/App";
@@ -21,6 +21,8 @@ async function renderApp(character: Character | null = base(), rng = always(5), 
   return { ...view, storage };
 }
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
+/** Le bouton « Lancer » n'apparaît qu'avec le lanceur de dés affiché (masqué par défaut). */
+const showDice = () => click("Lanceur de dés : masqué");
 const goToAid = () => click("Aide de jeu");
 const roller = () => within(screen.getByRole("dialog", { name: "Lanceur de dés" }));
 const chance = () => Number(screen.getByTestId("chance").textContent?.replace(/\D/g, ""));
@@ -97,14 +99,15 @@ describe("Fiche", () => {
     expect(container.querySelector("img")).toBeNull();
   });
 
-  it("ajoute et retire une compétence ; les manœuvres par défaut deviennent modifiables", async () => {
+  it("ajoute et retire une compétence ; plus d'encadré Manœuvres sur la fiche", async () => {
     await renderApp();
     click("Modifier la fiche");
     click("+ Compétence");
     const names = screen.getAllByRole("textbox", { name: "Nom de la compétence" });
     fireEvent.change(names.at(-1)!, { target: { value: "Kyujutsu" } });
     fireEvent.change(screen.getByRole("textbox", { name: "Spécialisations de Kyujutsu" }), { target: { value: "Yumi, Daikyu" } });
-    expect(screen.getByRole("spinbutton", { name: "Coût de Feinte" })).toHaveValue(2);
+    expect(screen.queryByRole("heading", { name: "Manœuvres" })).toBeNull();
+    expect(screen.queryByRole("spinbutton", { name: "Coût de Feinte" })).toBeNull();
     click("Terminer");
     expect(screen.getByTestId("skill-pool-Kyujutsu")).toHaveTextContent("4g3");
     expect(screen.getByText("Daikyu")).toBeInTheDocument();
@@ -135,20 +138,23 @@ describe("Aide de jeu", () => {
     click("Déplacement");
     expect(screen.getByRole("heading", { name: "Se déplacer en combat" })).toBeInTheDocument();
     expect(screen.getByText("10 pi")).toBeInTheDocument();
+    expect(screen.queryByText(/^3,0 m/)).toBeNull();
+    click("Afficher le détail : Se déplacer en combat");
     expect(screen.getByText(/^3,0 m/)).toBeInTheDocument();
     expect(screen.getByText(/^12,2 m/)).toBeInTheDocument();
   });
 
-  it("E6 : Initiative en tête ; Attaque totale passe le ND d'armure de 20 à 10 ; « Nouveau round » garde l'initiative", async () => {
+  it("E6 : Initiative en tête ; Assaut fait passer le ND d'armure de 20 à 10 ; « Nouveau round » garde l'initiative", async () => {
     await renderApp(base(), always(5));
     goToAid();
     click("Combat");
     const cards = screen.getAllByRole("button").filter((b) => b.classList.contains("act"));
     expect(cards[0]).toHaveTextContent("Initiative");
     expect(screen.getByTestId("armor-tn")).toHaveTextContent("20");
-    click(/^Attaque totale/);
+    click("Assaut");
     expect(screen.getByTestId("armor-tn")).toHaveTextContent("10");
     fireEvent.click(cards[0]!);
+    showDice();
     click("Lancer 4g3");
     expect(screen.getByTestId("initiative")).toHaveTextContent("15");
     click("Nouveau round");
@@ -164,12 +170,125 @@ describe("Aide de jeu", () => {
     click("Ajouter Augmentation des dégâts");
     click("Ajouter Augmentation des dégâts");
     expect(screen.getByTestId("final-tn")).toHaveTextContent("20");
+    showDice();
     click("Lancer 5g3");
     expect(roller().getByText(/Réussite/, { selector: ".verdict" })).toHaveTextContent("27 / 20");
     expect(screen.getByText("+2g0 en attente")).toBeInTheDocument();
     click(/^Dégâts · Katana/);
     expect(screen.getByTestId("pool")).toHaveTextContent("7g2");
     expect(screen.queryByText("+2g0 en attente")).toBeNull();
+  });
+
+  it("E11 : Kenjutsu 7 → note de maîtrise ; un 9 en dégâts est relancé (9 + 4 = 13)", async () => {
+    const c = base();
+    c.skills.find((s) => s.name === "Kenjutsu")!.rank = 7;
+    c.weapons[0]!.skill = "  kenjutsu ";
+    const faces = [9, 4];
+    await renderApp(c, () => faces.shift() ?? 5);
+    goToAid();
+    click("Combat");
+    click(/^Dégâts · Katana/);
+    expect(roller().getByTestId("mastery")).toHaveTextContent("Maîtrise Kenjutsu 7 : les dés explosent sur 9 et 10");
+    expect(roller().getByTitle("Explose sur 9")).toHaveTextContent("9+");
+    showDice();
+    click("Lancer 5g2");
+    const die = roller().getByTitle("9 + 4");
+    expect(die).toHaveTextContent(/^13/);
+    expect(within(die).getByText("9+4")).toBeInTheDocument();
+  });
+
+  it("E12 : un « i » par panneau déplie toutes ses descriptions, sans rien sélectionner", async () => {
+    await renderApp();
+    goToAid();
+    click("Combat");
+    const stance = () => screen.getByRole("button", { name: "Afficher le détail : Posture" });
+    expect(screen.queryByText("Posture normale.")).toBeNull();
+    expect(screen.queryByText("Jusqu'au prochain round.")).toBeNull();
+    expect(stance()).toHaveAttribute("aria-expanded", "false");
+    fireEvent.click(stance());
+    expect(screen.getByText("Posture normale.")).toBeInTheDocument();
+    expect(screen.getByText("+2g1 à l'attaque, −10 au ND d'armure.")).toBeInTheDocument();
+    expect(screen.queryByText("Jusqu'au prochain round.")).toBeNull();
+    expect(screen.getByRole("button", { name: "Masquer le détail : Posture" })).toHaveAttribute("aria-expanded", "true");
+    expect(within(screen.getByRole("group", { name: "Posture" })).getByRole("button", { name: /^Attaque/ })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByTestId("armor-tn")).toHaveTextContent("20");
+    click("Afficher le détail : Dépenser du Vide");
+    expect(screen.getByText("Jusqu'au prochain round.")).toBeInTheDocument();
+    expect(screen.getByText("Points de Vide 2/2")).toBeInTheDocument();
+    click("Masquer le détail : Posture");
+    expect(screen.queryByText("Posture normale.")).toBeNull();
+    expect(screen.getByText("Jusqu'au prochain round.")).toBeInTheDocument();
+  });
+
+  it("E13 : dégâts au katana : options sur une ligne, règle d'explosion, puis maîtrise", async () => {
+    const c = base();
+    await renderApp(c);
+    goToAid();
+    click("Combat");
+    click(/^Dégâts · Katana/);
+    const fields = [...roller().getByText("Dés lancés ±").closest(".opts")!.children];
+    expect(fields.map((f) => f.textContent)).toEqual(["Dés lancés ±", "Bonus fixe"]);
+    expect(roller().getByTestId("manual")).toHaveTextContent("Les 10 explosent : relance le dé et additionne, tant qu'il retombe sur 10.");
+    expect(roller().queryByText(/^Lance /)).toBeNull();
+    fireEvent.change(roller().getByRole("spinbutton", { name: "Bonus fixe" }), { target: { value: "2" } });
+    expect(roller().getByTestId("manual")).toHaveTextContent("Ajoute +2 au total.");
+  });
+
+  it("E13 : avec Kenjutsu 7, « Les 9 et 10 explosent » ; sans compétence, aucun dé n'explose", async () => {
+    const c = base();
+    c.skills.find((s) => s.name === "Kenjutsu")!.rank = 7;
+    await renderApp(c);
+    goToAid();
+    click("Combat");
+    click(/^Dégâts · Katana/);
+    expect(roller().getByTestId("manual")).toHaveTextContent("Les 9 et 10 explosent : relance le dé et additionne, tant qu'il retombe sur 9 ou 10.");
+    click("Escarmouche");
+    click(/^Lutte/);
+    expect(roller().getByTestId("manual")).toHaveTextContent("Aucun dé n'explose (compétence non maîtrisée).");
+    // ND sans augmentations : une cellule vide garde l'alignement.
+    const cells = [...roller().getByText("Dés lancés ±").closest(".opts")!.children];
+    expect(cells.map((f) => f.textContent)).toEqual(["ND d'armure cible", "", "Dés lancés ±", "Bonus fixe"]);
+  });
+
+  it("E14 : la tuile ND armure ouvre l'éditeur d'armure ; bonus et réduction mis à jour", async () => {
+    const c = base();
+    c.traits.reflexes = 2;
+    c.armor = { name: "", bonus: 0, reduction: 0 };
+    const { storage } = await renderApp(c);
+    expect(screen.queryByRole("group", { name: "Armure" })).toBeNull();
+    fireEvent.click(screen.getByTestId("armor-tn").closest("button")!);
+    const editor = within(screen.getByRole("group", { name: "Armure" }));
+    expect(screen.getByTestId("armor-tn").closest("button")).toHaveAttribute("aria-expanded", "true");
+    fireEvent.change(editor.getByRole("textbox", { name: "Armure" }), { target: { value: "Armure légère" } });
+    fireEvent.change(editor.getByRole("spinbutton", { name: "Bonus au ND" }), { target: { value: "5" } });
+    fireEvent.change(editor.getByRole("spinbutton", { name: "Réduction" }), { target: { value: "3" } });
+    expect(screen.getByTestId("armor-tn")).toHaveTextContent("20");
+    expect(screen.getByTestId("armor-reduction")).toHaveTextContent("3");
+    expect(editor.getByText(/ND d'armure = 5 × Réflexes 2 \+ 5 \+ bonus 5/)).toHaveTextContent("= 20");
+    fireEvent.click(editor.getByRole("button", { name: "Fermer" }));
+    expect(screen.queryByRole("group", { name: "Armure" })).toBeNull();
+    await vi.waitFor(async () => expect((await storage.library.get("kakita"))?.character.armor).toEqual({ name: "Armure légère", bonus: 5, reduction: 3 }));
+  });
+
+  it("E15 : lanceur de dés masqué par défaut, affiché partout sur demande, mémorisé", async () => {
+    const { storage } = await renderApp();
+    goToAid();
+    click(/^Remarquer un détail/);
+    expect(roller().queryByRole("button", { name: /^Lancer/ })).toBeNull();
+    expect(screen.getByTestId("final-tn")).toBeInTheDocument();
+    const toggle = screen.getByRole("button", { name: "Lanceur de dés : masqué" });
+    expect(toggle).toHaveAttribute("aria-pressed", "false");
+    fireEvent.click(toggle);
+    expect(screen.getByRole("button", { name: "Lanceur de dés : affiché" })).toHaveAttribute("aria-pressed", "true");
+    click("Lancer 3g2");
+    expect(roller().getByText("Derniers jets")).toBeInTheDocument();
+    click("Combat");
+    click(/^Attaque · Katana/);
+    expect(roller().getByRole("button", { name: "Lancer 5g3" })).toBeInTheDocument();
+    await vi.waitFor(async () => expect((await storage.prefs.get()).showDiceRoller).toBe(true));
+    click("Lanceur de dés : affiché");
+    expect(roller().queryByRole("button", { name: /^Lancer/ })).toBeNull();
+    expect(roller().queryByText("Derniers jets")).toBeNull();
   });
 
   it("E10 : ajouter une augmentation monte le ND final de 5 et baisse la chance de réussite", async () => {
@@ -198,6 +317,7 @@ describe("Aide de jeu", () => {
     click(/^Remarquer un détail/);
     fireEvent.click(roller().getByRole("checkbox", { name: /Dépenser 1 point de Vide \(\+1g1\)/ }));
     expect(screen.getByTestId("pool")).toHaveTextContent("4g3");
+    showDice();
     click("Lancer 4g3");
     expect(screen.getByText("Points de Vide 1/2")).toBeInTheDocument();
     expect(screen.getByTestId("pool")).toHaveTextContent("3g2");
@@ -208,10 +328,11 @@ describe("Aide de jeu", () => {
     goToAid();
     click("Combat");
     click(/^Défense totale.*moitié du résultat/);
+    showDice();
     click("Lancer 4g3");
     // 3 dés gardés à 5 = 15 → +7 au ND d'armure (20 + 7)
     expect(screen.getByTestId("armor-tn")).toHaveTextContent("27");
-    expect(screen.getByRole("button", { name: /^Défense totale.*Jet Défense/ })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "Défense totale" })).toHaveAttribute("aria-pressed", "true");
   });
 
   it("Duel : pas de posture, Frappe puis dégâts rattachés", async () => {
@@ -256,5 +377,17 @@ describe("Aide de jeu", () => {
     fireEvent.click(screen.getByRole("checkbox", { name: /Avec un point de Vide/ }));
     expect(kenjutsu()).toHaveTextContent("6g4");
     expect(pctAt20()).toBeGreaterThan(before);
+  });
+
+  it("étiquette « 9+ » sur les dégâts d'une compétence martiale au rang 7", async () => {
+    const c = base();
+    c.skills.find((s) => s.name === "Kenjutsu")!.rank = 7;
+    await renderApp(c);
+    goToAid();
+    click("Statistiques");
+    const row = screen.getAllByRole("row").find((r) => r.textContent?.includes("Dégâts · Katana"))!;
+    expect(within(row).getByTitle("Explose sur 9")).toHaveTextContent("9+");
+    const attack = screen.getAllByRole("row").find((r) => r.textContent?.includes("Attaque · Katana"))!;
+    expect(within(attack).queryByTitle("Explose sur 9")).toBeNull();
   });
 });

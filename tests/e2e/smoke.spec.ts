@@ -15,6 +15,7 @@ test("le build unique s'ouvre en file:// sans aucune requête réseau, polices c
   await page.getByRole("button", { name: "Terminer" }).click();
   await page.getByRole("button", { name: "Aide de jeu" }).click();
   await page.getByRole("button", { name: "Combat", exact: true }).click();
+  await page.getByRole("button", { name: "Lanceur de dés : masqué" }).click();
   await page.getByRole("button", { name: /^Lancer/ }).click();
   await expect(page.locator(".die").first()).toBeVisible();
 
