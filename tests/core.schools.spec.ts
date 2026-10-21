@@ -4,7 +4,7 @@
  */
 import { describe, expect, it } from "vitest";
 import {
-  activeEffects, armorTN, computePool, describeEffect, isSimpleAttack, maneuverRaises, migrate, movementBonus,
+  activeEffects, armorTN, computePool, describeEffect, isSimpleAttack, maneuverFreeRaises, maneuverRaises, migrate, movementBonus,
   nextRoundContext, rollEffects, schoolContext, schoolReduction, suggestSchool, verdict, weaponKeywords, woundState,
   DEFAULT_MANEUVERS, REFERENCE_CONTEXT,
   type Character, type PoolAction, type PoolMods, type Stance, type WeaponLike,
@@ -253,6 +253,39 @@ describe("Moteur d'effets : détails", () => {
     const shot = rollEffects(c, attack(c, "Yumi"), REFERENCE_CONTEXT);
     expect(shot.some((e) => e.kind === "wounds" && e.ignorePenalty === "all")).toBe(true);
     expect(rollEffects(c, attack(c, "Katana"), REFERENCE_CONTEXT).some((e) => e.kind === "wounds")).toBe(false);
+  });
+
+  it("Utaku R5 : option sur les compétences Bugei, pas sur les autres", () => {
+    const c = char("utaku-battle-maiden", 5);
+    const otaku = (a: PoolAction) => rollEffects(c, a, REFERENCE_CONTEXT).some((e) => "label" in e && e.label?.startsWith("Bénédiction"));
+    expect(otaku({ kind: "skill", skill: "Kenjutsu", trait: "agility" })).toBe(true);
+    expect(otaku({ kind: "skill", skill: "Étiquette", trait: "awareness" })).toBe(false);
+  });
+
+  it("augmentations gratuites réservées : d'office (Tsuruchi R2) ou cochées (Yoritomo R4)", () => {
+    const t = char("tsuruchi-archer", 2);
+    expect(maneuverFreeRaises(rollEffects(t, attack(t, "Yumi"), REFERENCE_CONTEXT))).toEqual({ called: 1 });
+    const y = char("yoritomo-bushi", 4);
+    const effects = rollEffects(y, attack(y, "Katana"), REFERENCE_CONTEXT);
+    const wave = effects.find((e) => e.kind === "maneuver")!;
+    expect(maneuverFreeRaises(effects)).toEqual({});
+    expect(maneuverFreeRaises(effects, new Set([wave.key]))).toEqual({ knockdown: 2 });
+  });
+
+  it("résumés des effets : ND d'armure, ND de la cible, blessures, manœuvres, autres", () => {
+    const text = (id: string, rank: number, kind: string) => {
+      const c = char(id, rank);
+      return activeEffects(c).filter((e) => e.kind === kind).map((e) => describeEffect(e, c));
+    };
+    expect(text("hiruma-bushi", 3, "armor")).toEqual(["+5 au ND d'armure par cran", "+6 au ND d'armure"]);
+    expect(text("yoritomo-bushi", 2, "targetTn")).toEqual(["-5 au ND de la cible par cran"]);
+    expect(text("hida-bushi", 5, "wounds")).toEqual(["pénalité de blessure ignorée"]);
+    expect(text("daidoji-bushi", 1, "wounds")).toEqual([""]);
+    expect(text("tsuruchi-archer", 2, "maneuver")).toEqual(["1 augm. gratuite pour Coup ciblé"]);
+    expect(text("yoritomo-bushi", 4, "maneuver")).toEqual(["2 augm. gratuites pour Renversement"]);
+    expect(text("bayushi-bushi", 2, "maneuver")).toEqual([""]);
+    expect(text("hida-bushi", 2, "reduction")).toEqual([""]);
+    expect(text("akodo-bushi", 1, "roll")).toEqual(["1 augm. gratuite", "+1g0"]);
   });
 
   it("la réserve n'est jamais négative", () => {
