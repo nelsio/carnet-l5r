@@ -167,6 +167,8 @@ export interface ActionDef {
   emphasisHint?: string;
   tn: ActionTN;
   attack?: boolean;
+  /** Attaque ou dégâts à mains nues (techniques d'école, annexe C). */
+  unarmed?: boolean;
   fullDefense?: boolean;
   /** Valeur de dégâts, pour les actions `damage`. */
   dr?: string;
@@ -206,9 +208,9 @@ export const FIXED_ACTIONS: readonly ActionDef[] = [
   { id: "march", situation: "movement", label: "Endurer une marche forcée", kind: "trait", trait: "stamina", tn: 15, description: "Jet de Trait pur : Constitution gardée Constitution. Échec : fatigue (+5 au ND des jets suivants)." },
   // Escarmouche
   { id: "initiative", situation: "combat", sub: "skirmish", label: "Initiative", kind: "initiative", tn: null, description: "Rang + Réflexes, gardé Réflexes. Ordre du round." },
-  { id: "unarmed", situation: "combat", sub: "skirmish", label: "Attaque à mains nues", kind: "skill", skill: "Jiujutsu", trait: "agility", tn: "target", attack: true, description: "Jiujutsu (Agilité) contre le ND d'armure. Dégâts : Force + 0g1." },
-  { id: "unarmed-dmg", situation: "combat", sub: "skirmish", parent: "unarmed", label: "Dégâts · mains nues", kind: "damage", dr: "0g1", weapon: { name: "Mains nues", skill: "Jiujutsu", dr: "0g1" }, tn: null, description: "Force + 0g1." },
-  { id: "grapple", situation: "combat", sub: "skirmish", label: "Lutte (saisie)", kind: "skill", skill: "Jiujutsu", trait: "agility", tn: "target", attack: true, description: "Attaque Jiujutsu ; si elle touche, jets de Force en opposition pour établir et tenir la prise." },
+  { id: "unarmed", situation: "combat", sub: "skirmish", label: "Attaque à mains nues", kind: "skill", skill: "Jiujutsu", trait: "agility", tn: "target", attack: true, unarmed: true, description: "Jiujutsu (Agilité) contre le ND d'armure. Dégâts : Force + 0g1." },
+  { id: "unarmed-dmg", situation: "combat", sub: "skirmish", parent: "unarmed", label: "Dégâts · mains nues", kind: "damage", unarmed: true, dr: "0g1", weapon: { name: "Mains nues", skill: "Jiujutsu", dr: "0g1" }, tn: null, description: "Force + 0g1." },
+  { id: "grapple", situation: "combat", sub: "skirmish", label: "Lutte (saisie)", kind: "skill", skill: "Jiujutsu", trait: "agility", tn: "target", attack: true, unarmed: true, description: "Attaque Jiujutsu ; si elle touche, jets de Force en opposition pour établir et tenir la prise." },
   { id: "full-defense", situation: "combat", sub: "skirmish", label: "Défense totale", kind: "skill", skill: "Défense", trait: "reflexes", tn: null, fullDefense: true, description: "Posture Défense totale : la moitié du résultat s'ajoute à ton ND d'armure ce round." },
   // Duel iaijutsu
   { id: "assess", situation: "combat", sub: "duel", label: "1 · Évaluation", kind: "skill", skill: "Iaijutsu", trait: "awareness", tn: "assessment", description: "ND 10 + 5 × Rang de l'adversaire. Réussite : tu apprends des informations sur lui (Rang, Anneaux…), chaque augmentation en plus." },
@@ -300,22 +302,7 @@ export const MODIFIER_TEMPLATES: readonly ModifierTemplate[] = [
  * À vérifier dans le livre avant de s'y fier ; les effets non chiffrables restent dans le texte des techniques.
  */
 export const NAMED_MODIFIERS: readonly ModifierTemplate[] = [
-  // École Hiruma Bushi (Crabe), livre de base 4e.
-  {
-    ...T, id: "hiruma-bushi-1", label: "Hiruma Bushi, rang 1 : Torch's Flame Flickers", source: "technique",
-    appliesTo: "attack", rolled: 1, stance: "attack", mode: "always",
-    note: "+1g0 aux attaques en posture Attaque. Aussi : rations deux fois plus longues pour (rang de Chasse) personnes. À vérifier dans le livre.",
-  },
-  {
-    ...T, id: "hiruma-bushi-2", label: "Hiruma Bushi, rang 2 : Wolf's Little Lesson", source: "technique",
-    appliesTo: "armor", flat: 5, stance: "attack", mode: "optional",
-    note: "+5 au ND d'armure à chaque touche au corps à corps en posture Attaque, cumulable jusqu'au rang d'école, jusqu'à la fin de l'escarmouche : ajuste la valeur (5, 10, 15…). À vérifier dans le livre.",
-  },
-  {
-    ...T, id: "hiruma-bushi-3", label: "Hiruma Bushi, rang 3 : Hummingbird Wings", source: "technique",
-    appliesTo: "armor", flat: 6, mode: "optional",
-    note: "Une fois par round, quand tu es pris pour cible : + (2 × rang d'école) au ND d'armure pour cette attaque. 6 au rang 3 : ajuste au rang 4 (8) et 5 (10). À vérifier dans le livre.",
-  },
+  // Les techniques d'école vivent dans le catalogue d'écoles (ecoles-bushi.json, annexe C).
   // Avantages et désavantages, livre de base 4e.
   {
     ...T, id: "force-de-la-terre", label: "Force de la Terre (Strength of the Earth)", source: "advantage",

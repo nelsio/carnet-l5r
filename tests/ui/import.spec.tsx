@@ -1,7 +1,7 @@
 /** Import et export JSON (HANDOFF §8, U5). */
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { importCharacter, serializeCharacter, type Character } from "@carnet/core";
+import { importCharacter, migrate, serializeCharacter, type Character } from "@carnet/core";
 import { memoryStorage, type LibraryEntry } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../../reference/exemple-personnage.json";
@@ -105,7 +105,7 @@ describe("Nouvelle fiche et consultation", () => {
     fireEvent.click(within(dialog).getByRole("button", { name: "Importer" }));
     expect(await screen.findByRole("heading", { level: 1, name: "Kakita Haruto" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Modifier la fiche" })).toBeInTheDocument();
-    expect((await storage.library.list()).map((e) => [e.mode, e.character])).toEqual([["edit", base()]]);
+    expect((await storage.library.list()).map((e) => [e.mode, e.character])).toEqual([["edit", migrate(base())]]);
   });
 
   it("« Consultation » crée une entrée en lecture seule", async () => {
@@ -179,7 +179,7 @@ describe("Exemple de fiche", () => {
     expect(names).toEqual(["exemple-fiche-l5r.json"]);
     const text = await blobs[0]!.text();
     const json = JSON.parse(text) as Character;
-    expect(json).toMatchObject({ schemaVersion: 1, name: "Kakita Haruto" });
+    expect(json).toMatchObject({ schemaVersion: 2, name: "Kakita Haruto" });
     expect(json.modifiers).toHaveLength(2);
     expect(importCharacter(json)).toEqual({ ok: true, character: json });
 

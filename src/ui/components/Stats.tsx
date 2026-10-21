@@ -1,9 +1,10 @@
 import {
-  attackTrait, computePool, DEFAULT_SAMPLES, defaultModifiers, emphasisMatches, formatDice, poolStats, woundState,
+  attackTrait, computePool, DEFAULT_SAMPLES, defaultModifiers, emphasisMatches, poolStats, schoolOf, woundState,
   type Character, type Pool, type PoolAction,
 } from "@carnet/core";
 import { TRAIT_LABELS } from "../../rules/l5r4e";
 import { pct } from "../format";
+import { poolLabel } from "../rolls";
 import { useCharacter, useStore } from "../store";
 
 const TNS = [10, 15, 20, 25, 30, 40];
@@ -25,7 +26,7 @@ function buildRows(c: Character, voidPoint: boolean, emphasis: boolean): Row[] {
   return [
     row("Initiative", { kind: "initiative" }),
     ...c.weapons.flatMap((w) => [
-      row(`Attaque · ${w.name}`, { kind: "skill", skill: w.skill, trait: attackTrait(w), attack: true }, false, emphasisMatches(c, w.skill, w.name)),
+      row(`Attaque · ${w.name}`, { kind: "skill", skill: w.skill, trait: attackTrait(w), attack: true, weapon: w }, false, emphasisMatches(c, w.skill, w.name)),
       row(`Dégâts · ${w.name}`, { kind: "damage", weapon: w }, true),
     ]),
     ...[...c.skills].sort((a, b) => a.name.localeCompare(b.name, "fr")).map((s) =>
@@ -66,7 +67,7 @@ export function Stats() {
               return (
                 <tr key={r.label} className={r.child ? "child" : undefined}>
                   <td className="jl">{r.child ? "└ " : ""}{r.label}</td>
-                  <td className="pool">{formatDice(r.pool.rolled, r.pool.kept)}</td>
+                  <td className="pool">{poolLabel(r.pool)}</td>
                   <td className="mono">{st.min}</td>
                   <td className="mono"><b>{Math.round(st.mean)}</b></td>
                   <td className="mono">{st.max}{st.open ? "+" : ""}{r.pool.explodeOn === 9 && <> <span className="tag" title="Explose sur 9">9+</span></>}</td>
@@ -81,6 +82,7 @@ export function Stats() {
         </table>
       </div>
       <p className="hint">
+        {schoolOf(c) && "Techniques automatiques de ton école incluses (posture de référence : Attaque). "}
         Chances de réussite sans augmentation. Chaque augmentation annoncée ajoute +5 au ND : décale-toi d'une colonne vers la droite.
         Un maximum suivi de « + » peut être dépassé grâce aux explosions.
       </p>

@@ -1,6 +1,9 @@
-import { armorTN, movement, woundState, type Character } from "@carnet/core";
+import {
+  armorEffects, movement, resolveValue, schoolArmorBonus, schoolReduction, woundState,
+  type Character,
+} from "@carnet/core";
 import { ARMOR_TN, WOUND_LEVELS } from "../../rules/l5r4e";
-import { armorBonus } from "../rolls";
+import { contextOf, currentArmorTN, selectedKeys } from "../rolls";
 import { useCharacter, useStore } from "../store";
 import { NumberField } from "./fields";
 import { LinkBanner } from "./LinkBanner";
@@ -10,9 +13,10 @@ export function StatusBar() {
   const { state, dispatch } = useStore();
   const c = useCharacter();
   const { ui } = state;
-  const ws = woundState(c);
+  const ws = woundState(c, contextOf(ui));
   const move = movement(c);
-  const tn = armorTN(c, { stance: ui.stance, fullDefenseBonus: ui.fullDefenseBonus, voidArmor: ui.voidArmor, bonus: armorBonus(c, ui.armorToggles, ui.stance) });
+  const tn = currentArmorTN(c, ui);
+  const reduction = c.armor.reduction + schoolReduction(c);
   const hurt = c.wounds > 0;
   // Fiche en consultation : blessures et Vide affichés, mais ni modifiables ni cliquables (HANDOFF §6.1).
   const readonly = state.mode === "readonly";
@@ -72,7 +76,7 @@ export function StatusBar() {
         <div className="cstats">
           <div><span className="label">Dépl.</span><b>{move.free}/{move.simple}<small> pi</small></b></div>
           <ArmorTile label="ND armure" value={tn} testId="armor-tn" readonly={readonly} />
-          <ArmorTile label="Réduction" value={c.armor.reduction} testId="armor-reduction" readonly={readonly} />
+          <ArmorTile label="Réduction" value={reduction} testId="armor-reduction" readonly={readonly} />
           <div className={ws.penalty ? "pen" : ""}><span className="label">Pénalité</span><b>{ws.penalty === null ? "—" : `+${ws.penalty}`}</b></div>
         </div>
         {ui.armorEdit && !readonly && <ArmorEditor tn={tn} />}
@@ -95,8 +99,12 @@ function ArmorTile({ label, value, testId, readonly }: { label: string; value: n
 
 /** Armure, bonus au ND et réduction ; le ND d'armure reste calculé (HANDOFF §6.2). */
 function ArmorEditor({ tn }: { tn: number }) {
-  const { dispatch } = useStore();
+  const { state, dispatch } = useStore();
   const c = useCharacter();
+  const { ui } = state;
+  const techReduction = schoolReduction(c);
+  const techArmor = schoolArmorBonus(c, contextOf(ui), selectedKeys(ui.schoolArmor), ui.stacks);
+  const techAuto = armorEffects(c, contextOf(ui)).filter((e) => e.kind === "armor" && e.mode === "auto" && !e.stack);
   const set = (field: "name" | "bonus" | "reduction", value: unknown) => dispatch({ type: "set", path: ["armor", field], value });
   return (
     <div className="armedit" role="group" aria-label="Armure">
@@ -112,6 +120,8 @@ function ArmorEditor({ tn }: { tn: number }) {
       <p className="hint" style={{ gridColumn: "1/-1", margin: 0 }}>
         ND d'armure = 5 × Réflexes {c.traits.reflexes} + 5 + bonus {c.armor.bonus}{tn !== armorBase(c) ? " ± posture, Vide et bonus" : ""} = <b className="mono">{tn}</b>.
         {" "}La réduction se retire de chaque jet de dégâts reçu.
+        {techArmor !== 0 && <> Techniques d'école : +{techArmor} au ND d'armure{techAuto.length ? ` (dont ${techAuto.map((e) => e.kind === "armor" ? `+${resolveValue(e.value, c)} · ${e.source}` : "").join(", ")})` : ""}.</>}
+        {techReduction !== 0 && <> Techniques d'école : +{techReduction} de Réduction (total {c.armor.reduction + techReduction}).</>}
       </p>
       <button type="button" className="btn sm" style={{ justifySelf: "end", gridColumn: "1/-1" }} onClick={() => dispatch({ type: "toggleArmorEdit" })}>Fermer</button>
     </div>

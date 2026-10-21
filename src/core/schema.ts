@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 /** Version courante du format de fiche (HANDOFF §3.1, §9.2). */
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 /** Taille maximale d'une fiche sérialisée, en octets (HANDOFF §3.1). */
 export const MAX_CHARACTER_BYTES = 256 * 1024;
@@ -58,11 +58,21 @@ export const SkillSchema = z.object({
   emphases: z.array(text(80), "doit être une liste de textes").default([]),
 }, "doit être un objet");
 
+/** Mots-clés d'arme (HANDOFF annexe C.2) : conditions des techniques d'école. */
+export const WEAPON_KEYWORDS = [
+  "samourai", "lourde", "paysan", "ninja", "arc", "hast", "lance",
+  "deux-mains", "petite", "moyenne", "grande", "distance", "cimeterre",
+] as const;
+
+export const WeaponKeywordSchema = z.enum(WEAPON_KEYWORDS, "doit être un mot-clé d'arme valide");
+
 export const WeaponSchema = z.object({
   name: text(80).min(1, "ne doit pas être vide"),
   skill: text(80),
   dr: z.string("doit être un texte").regex(/^\s*\d+\s*[kg]\s*\d+\s*$/i, "doit être au format 3g2"),
   bowStrength: int(0, 10).optional(),
+  /** Facultatif dans le type (fiches v1) ; `migrate()` le remplit. */
+  keywords: z.array(WeaponKeywordSchema, "doit être une liste de mots-clés").optional(),
 }, "doit être un objet");
 
 export const TechniqueSchema = z.object({
@@ -121,6 +131,10 @@ export const characterShape = {
   clan: text(80).default(""),
   family: text(80).default(""),
   school: text(120).default(""),
+  /** École du catalogue (annexe C) ; "" = aucune. Facultatifs dans le type (fiches v1) : `migrate()` les remplit. */
+  schoolId: text(60).optional(),
+  /** Rang d'école ; null = Rang d'Insight. */
+  schoolRank: int(1, 10).nullable().optional(),
   insightRank: int(1, 10),
   honor: reputation(),
   glory: reputation(),
@@ -152,6 +166,7 @@ export type TraitKey = z.infer<typeof TraitKeySchema>;
 export type RollTrait = z.infer<typeof RollTraitSchema>;
 export type Skill = z.infer<typeof SkillSchema>;
 export type Weapon = z.infer<typeof WeaponSchema>;
+export type WeaponKeyword = z.infer<typeof WeaponKeywordSchema>;
 export type Technique = z.infer<typeof TechniqueSchema>;
 export type Maneuver = z.infer<typeof ManeuverSchema>;
 export type Modifier = z.infer<typeof ModifierSchema>;

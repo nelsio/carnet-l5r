@@ -9,5 +9,6 @@ export * from "./clan";
 export * from "./character";
 export * from "./io";
 export * from "./modifiers";
+export * from "./schools";
 export { DAMAGE_MANEUVER_ID, DEFAULT_MANEUVERS } from "../rules/l5r4e";
 export type { ActionDef, CombatSub, Situation, Stance } from "../rules/l5r4e";

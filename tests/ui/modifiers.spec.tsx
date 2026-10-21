@@ -137,7 +137,7 @@ describe("Lanceur", () => {
   });
 });
 
-describe("Catalogue : Crabe Hiruma Bushi, Force de la Terre, Aspect dérangeant", () => {
+describe("Catalogue : Force de la Terre, Aspect dérangeant", () => {
   async function addFromCatalogue(...ids: string[]) {
     click("Modifier la fiche");
     for (const id of ids) {
@@ -153,9 +153,6 @@ describe("Catalogue : Crabe Hiruma Bushi, Force de la Terre, Aspect dérangeant"
     const select = screen.getByRole("combobox", { name: "Modèle de bonus" });
     const group = within(select).getByRole("group", { name: "Catalogue (livre de base 4e, à vérifier)" });
     expect(within(group).getAllByRole("option").map((o) => o.textContent)).toEqual([
-      "Hiruma Bushi, rang 1 : Torch's Flame Flickers",
-      "Hiruma Bushi, rang 2 : Wolf's Little Lesson",
-      "Hiruma Bushi, rang 3 : Hummingbird Wings",
       "Force de la Terre (Strength of the Earth)",
       "Aspect dérangeant (Disturbing Countenance)",
     ]);
@@ -178,19 +175,5 @@ describe("Catalogue : Crabe Hiruma Bushi, Force de la Terre, Aspect dérangeant"
     expect(roller().getByText(/= 15 \+ 5 bonus/)).toBeInTheDocument();
     click(/^Remarquer un détail/);
     expect(screen.getByTestId("final-tn")).toHaveTextContent("15");
-  });
-
-  it("Hiruma Bushi rang 1 : +1g0 aux attaques en posture Attaque seulement", async () => {
-    await mount();
-    await addFromCatalogue("hiruma-bushi-1");
-    click("Aide de jeu");
-    click("Combat");
-    click(/^Attaque · Katana/);
-    expect(screen.getByTestId("pool")).toHaveTextContent("6g3");
-    click("Défense");
-    expect(screen.getByTestId("pool")).toHaveTextContent("5g3");
-    expect(roller().queryByRole("checkbox", { name: /Torch's Flame/ })).toBeNull();
-    click("Assaut");
-    expect(screen.getByTestId("pool")).toHaveTextContent("7g4");
   });
 });

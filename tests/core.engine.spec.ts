@@ -125,7 +125,7 @@ describe("Migration : cas limites", () => {
     expect(() => migrate(c)).toThrow("traits.agility : doit être un entier entre 1 et 10");
   });
   it("refuse une version plus récente", () => {
-    expect(() => migrate({ ...base(), schemaVersion: 2 })).toThrow(/version plus récente/);
+    expect(() => migrate({ ...base(), schemaVersion: 3 })).toThrow(/version plus récente/);
   });
   it("v0 : arc vide, manœuvre non cumulable, honneur illisible, éléments non objets", () => {
     const { insightRank, voidRing, xp, ...v1 } = base();
@@ -139,7 +139,7 @@ describe("Migration : cas limites", () => {
     const c = migrate(v0);
     expect(c.honor).toBe(0);
     expect(c.xp).toEqual({ total: 40, spent: 34 });
-    expect(c.weapons[0]).toEqual({ name: "Yumi", skill: "Kyujutsu", dr: "2g2" });
+    expect(c.weapons[0]).toEqual({ name: "Yumi", skill: "Kyujutsu", dr: "2g2", keywords: ["arc", "distance", "samourai"] });
     expect(c.maneuvers[0]?.stackable).toBe(false);
     expect(() => migrate({ ...v0, skills: [1], weapons: [2], maneuvers: [3] })).toThrow(CharacterFormatError);
   });

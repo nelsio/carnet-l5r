@@ -1,11 +1,13 @@
 /** Import et export de fiches (HANDOFF §8). */
 import { describe, expect, it } from "vitest";
 import {
-  exportFileName, importCharacter, MAX_CHARACTER_BYTES, parseCharacterFile, serializeCharacter, type Character,
+  exportFileName, importCharacter, MAX_CHARACTER_BYTES, migrate, parseCharacterFile, serializeCharacter, type Character,
 } from "@carnet/core";
 import kakita from "../reference/exemple-personnage.json";
 
 const base = () => structuredClone(kakita) as Character;
+/** La même fiche au format courant (v2). */
+const v2 = () => migrate(base());
 
 describe("Export", () => {
   it("nomme le fichier d'après le nom normalisé", () => {
@@ -15,11 +17,11 @@ describe("Export", () => {
     expect(exportFileName({ name: "!!!" })).toBe("fiche-l5r.json");
   });
   it("produit un JSON indenté avec schemaVersion, relu à l'identique", () => {
-    const text = serializeCharacter(base());
-    expect(text).toMatch(/^\{\n {2}"schemaVersion": 1,/);
+    const text = serializeCharacter(v2());
+    expect(text).toMatch(/^\{\n {2}"schemaVersion": 2,/);
     expect(text.endsWith("}\n")).toBe(true);
     const parsed = parseCharacterFile(text);
-    expect(parsed.ok && importCharacter(parsed.json)).toEqual({ ok: true, character: base() });
+    expect(parsed.ok && importCharacter(parsed.json)).toEqual({ ok: true, character: v2() });
   });
 });
 
@@ -40,7 +42,7 @@ describe("Import d'une fiche complète", () => {
   it("migre un fichier du prototype", () => {
     const { insightRank, ...rest } = base();
     const r = importCharacter({ ...rest, schemaVersion: undefined, insight: insightRank });
-    expect(r).toEqual({ ok: true, character: base() });
+    expect(r).toEqual({ ok: true, character: v2() });
   });
   it("liste les erreurs par champ", () => {
     const r = importCharacter({ ...base(), traits: { ...base().traits, agility: 12 }, name: "" });
@@ -48,7 +50,7 @@ describe("Import d'une fiche complète", () => {
     if (!r.ok) expect(r.errors.map((e) => e.path).sort()).toEqual(["name", "traits.agility"]);
   });
   it("refuse une version plus récente", () => {
-    const r = importCharacter({ ...base(), schemaVersion: 2 });
+    const r = importCharacter({ ...base(), schemaVersion: 3 });
     expect(!r.ok && r.errors[0]?.message).toMatch(/version plus récente/);
   });
   it("laisse remonter une erreur inattendue", () => {

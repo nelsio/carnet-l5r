@@ -75,8 +75,8 @@ describe("ND d'armure", () => {
 });
 
 describe("Format de fiche", () => {
-  it("champ facultatif : une fiche v1 sans bonus reste identique", () => {
-    expect(migrate(base())).toEqual(base());
+  it("champ facultatif : une fiche sans bonus n'en reçoit pas", () => {
+    expect(migrate(base()).modifiers).toBeUndefined();
   });
   it("valeurs par défaut et validation", () => {
     const c = migrate({ ...base(), modifiers: [{ id: "x", name: "Bien-né", source: "advantage", appliesTo: "all" }] });
@@ -98,7 +98,7 @@ describe("Modèles", () => {
     for (const t of [...MODIFIER_TEMPLATES, ...NAMED_MODIFIERS]) {
       const { id, label, ...effect } = t;
       const m = { id, name: label, skill: effect.appliesTo === "skill" ? "Kenjutsu" : undefined, trait: effect.appliesTo === "trait" ? "agility" as const : undefined, note: "", ...effect };
-      expect(() => CharacterSchema.parse({ ...base(), modifiers: [m] })).not.toThrow();
+      expect(() => CharacterSchema.parse({ ...base(), schemaVersion: 2, modifiers: [m] })).not.toThrow();
     }
   });
   it("résume un effet en clair", () => {
@@ -160,12 +160,8 @@ describe("Compétences sociales, pénalité de blessure, ND, posture", () => {
 
 describe("Catalogue nommé (livre de base 4e, résumés à vérifier)", () => {
   const entry = (id: string) => NAMED_MODIFIERS.find((t) => t.id === id)!;
-  it("Hiruma Bushi rang 1 : +1g0 aux attaques en posture Attaque", () => {
-    expect(entry("hiruma-bushi-1")).toMatchObject({ appliesTo: "attack", rolled: 1, kept: 0, stance: "attack", mode: "always" });
-  });
-  it("Hiruma Bushi rangs 2 et 3 : ND d'armure, à cocher", () => {
-    expect(entry("hiruma-bushi-2")).toMatchObject({ appliesTo: "armor", flat: 5, stance: "attack", mode: "optional" });
-    expect(entry("hiruma-bushi-3")).toMatchObject({ appliesTo: "armor", flat: 6, mode: "optional" });
+  it("les techniques Hiruma sont passées au catalogue d'écoles (annexe C.2)", () => {
+    expect(NAMED_MODIFIERS.map((t) => t.id)).toEqual(["force-de-la-terre", "aspect-derangeant"]);
   });
   it("Force de la Terre : pénalité de blessure −3 ; Aspect dérangeant : +5 au ND des compétences sociales", () => {
     expect(entry("force-de-la-terre")).toMatchObject({ source: "advantage", appliesTo: "wounds", flat: 3, mode: "always" });

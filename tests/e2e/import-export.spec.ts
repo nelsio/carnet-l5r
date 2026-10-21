@@ -31,7 +31,13 @@ test("E3 : export, puis import en « Nouvelle fiche » : fiche identique", async
   await expect(dialog(page)).toBeHidden();
   const [second] = await Promise.all([page.waitForEvent("download"), page.getByRole("button", { name: "Exporter la fiche" }).click()]);
   expect(readFileSync(await second.path()).toString()).toBe(exported.toString());
-  expect(JSON.parse(exported.toString())).toEqual(JSON.parse(readFileSync(kakitaPath, "utf8")));
+  // Fiche v1 de référence, exportée au format v2 (annexe C.2).
+  const v1 = JSON.parse(readFileSync(kakitaPath, "utf8"));
+  const keywords = [["samourai", "moyenne"], ["samourai", "petite"]];
+  expect(JSON.parse(exported.toString())).toEqual({
+    ...v1, schemaVersion: 2, schoolId: "", schoolRank: null,
+    weapons: v1.weapons.map((w: object, i: number) => ({ ...w, keywords: keywords[i] })),
+  });
 
   await page.getByRole("button", { name: "Bibliothèque" }).click();
   await expect(page.getByRole("listitem")).toHaveCount(2);

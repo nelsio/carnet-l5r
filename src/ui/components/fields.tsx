@@ -65,6 +65,34 @@ interface ListFieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "va
 const split = (s: string) => s.split(/[,;]/).map((x) => x.trim()).filter(Boolean);
 const sameList = (a: string[], b: string[]) => a.length === b.length && a.every((x, i) => x === b[i]);
 
+interface TextListFieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "value" | "onChange"> {
+  value: readonly string[];
+  /** Texte saisi → liste retenue (les entrées invalides sont ignorées). */
+  parse: (text: string) => string[];
+  onChange: (items: string[]) => void;
+}
+
+/**
+ * Liste contrôlée (mots-clés d'arme) : le texte reste libre pendant la saisie,
+ * et revient à la forme retenue en quittant le champ.
+ */
+export function TextListField({ value, parse: parseText, onChange, className = "in", ...rest }: TextListFieldProps) {
+  const [text, setText] = useState<string | null>(null);
+  return (
+    <input
+      {...rest}
+      className={className}
+      type="text"
+      value={text ?? value.join(", ")}
+      onChange={(e) => {
+        setText(e.target.value);
+        onChange(parseText(e.target.value));
+      }}
+      onBlur={() => setText(null)}
+    />
+  );
+}
+
 /** Liste saisie en texte, séparée par des virgules (spécialisations). */
 export function ListField({ value, onChange, className = "in", ...rest }: ListFieldProps) {
   const [text, setText] = useDraft(value, (v) => v.join(", "), (t, v) => sameList(split(t), v));

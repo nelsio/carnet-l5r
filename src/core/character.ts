@@ -6,7 +6,7 @@ export function createCharacter(): Character {
   return {
     schemaVersion: SCHEMA_VERSION,
     name: NEW_CHARACTER_NAME,
-    clan: "", family: "", school: "",
+    clan: "", family: "", school: "", schoolId: "", schoolRank: null,
     insightRank: 1,
     honor: 0, glory: 0, status: 0,
     xp: { total: STARTING_XP, spent: 0 },

@@ -1,12 +1,14 @@
 import { useEffect, useRef } from "react";
 import {
-  applicableModifiers, describeModifier, findSkill, modifierTN, formatDice, isRanged, poolStats, rollDice, woundState,
-  type ActionDef, type Character, type Pool,
+  applicableModifiers, describeEffect, describeModifier, effectOn, findSkill, maneuverCost, maneuverFreeRaises, modifierTN,
+  formatDice, isRanged, poolStats, rollDice, schoolReminders, verdict, voidMultiplier, voidSpendOption, woundState,
+  type ActionDef, type ActiveEffect, type Character, type Pool,
 } from "@carnet/core";
 import { COMBAT_SUBS, SITUATIONS, TN_PER_RAISE, TN_SCALE, TRAIT_LABELS } from "../../rules/l5r4e";
 import { pct } from "../format";
 import {
-  activeModifiers, baseTN, calledRaises, effectiveManeuvers, finalTN, isActive, isUnskilled, poolFor, toPoolAction, type RollOptions,
+  activeModifiers, calledRaises, contextOf, effectiveManeuvers, finalTN, isActive, isUnskilled, poolFor, rollWoundPenalty,
+  selectedKeys, targetBaseTN, toPoolAction, type RollOptions,
 } from "../rolls";
 import { selectedAction, useCharacter, useStore, type RollRecord } from "../store";
 import { NumberField } from "./fields";
@@ -32,16 +34,27 @@ export function Roller() {
   if (!a) return <p className="muted">Choisis une action.</p>;
 
   const { opts } = ui;
+  const ctx = contextOf(ui);
+  const selected = selectedKeys(ui.techToggles);
   const active = activeModifiers(c, a, ui.modifierToggles, ui.stance);
-  const pool = poolFor(c, a, opts, ui.stance, active);
+  const pool = poolFor(c, a, opts, ui.stance, active, {
+    mounted: ui.mounted, centerLastRound: ui.centerLastRound, selected, inputs: ui.techInputs,
+  });
+  const effects = [...(pool.applied ?? []), ...(pool.optional ?? [])];
+  const tnContext = { effects, selected, stacks: ui.stacks, ctx };
   const bonuses = applicableModifiers(c, toPoolAction(a), ui.stance);
   const bonusTN = modifierTN(active);
   const bonusFree = pool.canRaise ? (pool.freeRaises ?? 0) : 0;
   const set = (patch: Partial<RollOptions>) => dispatch({ type: "option", patch });
-  const ws = woundState(c);
-  const base = baseTN(a, opts);
-  const tn = finalTN(c, a, opts, ui.maneuvers, active);
-  const raises = pool.canRaise ? calledRaises(c, a, opts, ui.maneuvers) : 0;
+  const ws = woundState(c, ctx);
+  const penalty = rollWoundPenalty(c, tnContext);
+  const base = targetBaseTN(c, a, opts, ui.stacks);
+  const tn = finalTN(c, a, opts, ui.maneuvers, active, tnContext);
+  const raises = pool.canRaise ? calledRaises(c, a, opts, ui.maneuvers, effects, selected) : 0;
+  const vm = voidMultiplier(c);
+  const spend = voidSpendOption(c);
+  const chips = (pool.applied ?? []).filter((e) => e.kind === "roll" || e.kind === "maneuver");
+  const damageReminders = a.kind === "damage" ? schoolReminders(c, ["damage"]) : [];
   const unskilled = isUnskilled(c, a);
   const emphasisOffered = a.kind === "skill" && pool.canRaise;
   const mastery = pool.explodeOn === 9 ? pool.notes.find((n) => n.startsWith("Maîtrise")) : undefined;
@@ -52,7 +65,10 @@ export function Roller() {
 
   const roll = () => {
     const result = rollDice(pool, { emphasis: opts.emphasis && emphasisOffered, flatBonus: opts.flat }, rng);
-    dispatch({ type: "rolled", result, tn, raises, free: opts.free + bonusFree });
+    const baseTn = typeof tn === "number" ? tn - TN_PER_RAISE * raises : undefined;
+    const baseSuccess = baseTn !== undefined && typeof tn === "number"
+      && verdict(c, toPoolAction(a), ctx, result.total, tn, baseTn) === "baseSuccess";
+    dispatch({ type: "rolled", result, tn, raises, free: opts.free + bonusFree, baseTn, baseSuccess });
   };
 
   return (
@@ -67,6 +83,11 @@ export function Roller() {
         <span className="poolbig" data-testid="pool">{formatDice(pool.rolled, pool.kept)}</span>
         <span className="muted" style={{ fontSize: 13 }}>{poolOrigin(c, a, opts)}{pool.bonus ? ` · ${pool.bonus > 0 ? "+" : ""}${pool.bonus} au total` : ""}</span>
       </div>
+      {chips.length > 0 && (
+        <div className="tchips" data-testid="tech-chips">
+          {chips.map((e) => <span key={e.key} className="tchip" title={e.technique}>{describeEffect(e, c, ui.techInputs[e.key])} · {e.source}</span>)}
+        </div>
+      )}
       <ManualLine pool={pool} emphasis={opts.emphasis && emphasisOffered} flat={opts.flat} free={bonusFree} />
       {stats && (
         <div className="statline">
@@ -107,8 +128,17 @@ export function Roller() {
       <div className="grid" style={{ gap: 6, marginBottom: 12 }}>
         <label className="chk">
           <input type="checkbox" checked={opts.voidPoint} disabled={c.voidPoints < 1 && !opts.voidPoint} onChange={(e) => set({ voidPoint: e.target.checked })} />
-          {" "}Dépenser 1 point de Vide (+1g1) <span className="muted">· reste {c.voidPoints}</span>
+          {" "}Dépenser 1 point de Vide (+{vm}g{vm}) <span className="muted">· reste {c.voidPoints}</span>
         </label>
+        {spend && (
+          <label className="chk">
+            <input
+              type="checkbox" checked={opts.voidSpend} disabled={c.voidPoints < spend.points && !opts.voidSpend}
+              onChange={(e) => set({ voidSpend: e.target.checked })}
+            />
+            {" "}Dépenser {spend.points} points de Vide (+{spend.rolled * vm}g{spend.kept * vm}) <span className="muted">· {spend.source}</span>
+          </label>
+        )}
         {unskilled && (
           <label className="chk">
             <input type="checkbox" checked={opts.voidSkill} disabled={c.voidPoints < 1 && !opts.voidSkill} onChange={(e) => set({ voidSkill: e.target.checked })} />
@@ -138,7 +168,13 @@ export function Roller() {
         </div>
       )}
 
-      {a.attack && pool.canRaise && <ManeuverPicker />}
+      {(pool.optional?.length ?? 0) > 0 && <TechniqueOptions effects={pool.optional ?? []} />}
+
+      {a.attack && pool.canRaise && <ManeuverPicker effects={effects} />}
+
+      {damageReminders.map((e) => (
+        <div key={e.key} className="hint" style={{ color: "var(--gold)" }}>{e.technique} ({e.source}) : {("text" in e && e.text) || e.summary}</div>
+      ))}
 
       {raises > 0 && (
         <div className="tnline" style={{ marginTop: 10, color: raises > c.voidRing ? "var(--bad)" : undefined }}>
@@ -151,7 +187,7 @@ export function Roller() {
           <span>ND final</span>
           <span className="mono">
             <b style={{ fontSize: 18 }} data-testid="final-tn">{tn}</b>{" "}
-            <span className="muted">= {base}{raises ? ` + ${TN_PER_RAISE * raises} augm.` : ""}{ws.penalty ? ` + ${ws.penalty} blessures` : ""}{bonusTN ? ` ${bonusTN > 0 ? "+" : "−"} ${Math.abs(bonusTN)} bonus` : ""}</span>
+            <span className="muted">= {base}{raises ? ` + ${TN_PER_RAISE * raises} augm.` : ""}{penalty ? ` + ${penalty} blessures` : ""}{bonusTN ? ` ${bonusTN > 0 ? "+" : "−"} ${Math.abs(bonusTN)} bonus` : ""}</span>
           </span>
         </div>
       )}
@@ -247,11 +283,44 @@ function TnField({ action: a, opts, set }: { action: ActionDef; opts: RollOption
   }
 }
 
-function ManeuverPicker() {
+/** Techniques d'école à cocher pour ce jet (annexe C.5), remises à zéro à chaque nouvelle action. */
+function TechniqueOptions({ effects }: { effects: readonly ActiveEffect[] }) {
+  const { state, dispatch } = useStore();
+  const c = useCharacter();
+  const { techToggles, techInputs } = state.ui;
+  return (
+    <div className="grid bonuses" style={{ gap: 6, marginBottom: 12 }} role="group" aria-label="Techniques à cocher">
+      <div className="label">Techniques à cocher</div>
+      {effects.map((e) => {
+        const effect = describeEffect(e, c, techInputs[e.key]);
+        return (
+          <div key={e.key}>
+            <label className="chk">
+              <input type="checkbox" checked={!!techToggles[e.key]} onChange={(ev) => dispatch({ type: "toggleTechnique", key: e.key, on: ev.target.checked })} />
+              {" "}{("label" in e && e.label) || e.technique}{" "}
+              <span className="muted">· {effect ? `${effect} · ` : ""}{"void" in e && e.void ? `${e.void} point de Vide · ` : ""}{e.source}</span>
+            </label>
+            {"input" in e && e.input && (
+              <label className="field" style={{ marginLeft: 24, maxWidth: 260 }}>
+                <span className="label">{e.input}</span>
+                <NumberField className="in mono" min={0} value={techInputs[e.key] ?? 0} onChange={(n) => dispatch({ type: "techniqueInput", key: e.key, value: n })} />
+              </label>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function ManeuverPicker({ effects }: { effects: readonly ActiveEffect[] }) {
   const { state, dispatch } = useStore();
   const c = useCharacter();
   const sel = state.ui.maneuvers;
   const list = effectiveManeuvers(c);
+  const selected = selectedKeys(state.ui.techToggles);
+  const reserved = effects.filter((e) => e.kind === "maneuver" && e.freeRaisesFor && effectOn(e, selected));
+  const free = maneuverFreeRaises(effects, selected);
   const setCount = (id: string, count: number) => dispatch({ type: "maneuver", id, count });
   return (
     <>
@@ -267,11 +336,16 @@ function ManeuverPicker() {
             </div>
           ) : (
             <button key={m.id} type="button" className={`man${n ? " on" : ""}`} aria-pressed={n > 0} title={m.effect} onClick={() => setCount(m.id, n ? 0 : 1)}>
-              {m.name} <b className="mono">{m.cost}</b>
+              {m.name} <b className="mono">{Math.max(0, maneuverCost(c, m) - (free[m.id] ?? 0))}</b>
             </button>
           );
         })}
       </div>
+      {reserved.map((e) => (
+        <div key={e.key} className="hint" style={{ marginTop: 4, color: "var(--gold)" }}>
+          {describeEffect(e, c)} · {e.source} : déduites du coût de la manœuvre.
+        </div>
+      ))}
       {list.filter((m) => sel[m.id]).map((m) => (
         <div key={m.id} className="hint" style={{ marginTop: 4 }}>• <b>{m.name}</b> : {m.effect}</div>
       ))}
@@ -300,6 +374,11 @@ function RollOutcome({ roll: r }: { roll: RollRecord }) {
           <div className={`verdict ${ok ? "ok" : "ko"}`}>
             {ok ? "Réussite" : "Échec"} <span className="mono" style={{ fontSize: 16 }}>{total} / {r.tn} ({margin >= 0 ? "+" : ""}{margin})</span>
           </div>
+          {r.baseSuccess && (
+            <div className="hint" data-testid="base-success" style={{ color: "var(--gold)" }}>
+              Réussite sans les augmentations : le ND de base {r.baseTn} est atteint (Akodo R5), les augmentations n'ont pas d'effet.
+            </div>
+          )}
           {ok && (r.raises > 0 || r.free > 0) && (
             <div className="hint">{r.raises + r.free} augmentation(s) à appliquer{r.free ? ` dont ${r.free} gratuite(s)` : ""}.</div>
           )}

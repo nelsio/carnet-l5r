@@ -1,14 +1,17 @@
 import { useState, type ReactNode } from "react";
 import {
-  attackTrait, computePool, defaultModifiers, formatDice, isRanged, rings, ROLL_TRAITS,
+  attackTrait, catalogWeapon, computePool, defaultModifiers, isRanged, parseWeaponKeywords, rings, ROLL_TRAITS, schoolOf,
+  schoolRankOf, schoolsByClan, suggestSchool, techniqueCategories, weaponKeywords,
   type Character, type PoolAction, type RollTrait, type TraitKey,
 } from "@carnet/core";
+import { WEAPON_KEYWORD_LABELS } from "../../rules/ecoles";
 import { RINGS, TRAIT_LABELS, type RingKey } from "../../rules/l5r4e";
 import { decimal } from "../format";
+import { poolLabel } from "../rolls";
 import { useCharacter, useStore, type ListKey } from "../store";
 import { FileActions } from "./FileActions";
 import { Modifiers } from "./Modifiers";
-import { ListField, NumberField } from "./fields";
+import { ListField, NumberField, TextListField } from "./fields";
 
 const CLAN_SUGGESTIONS = ["Crabe", "Grue", "Dragon", "Licorne", "Lion", "Mante", "Phénix", "Scorpion", "Araignée", "Impérial"];
 const RING_ORDER: RingKey[] = ["earth", "water", "fire", "air", "void"];
@@ -22,13 +25,10 @@ function useSheet() {
   return { c, edit: state.ui.edit, dispatch, set };
 }
 
-/** Réserve affichée sur la fiche : avec les bonus appliqués d'office. */
+/** Réserve affichée sur la fiche : bonus et techniques d'office, posture Attaque (annexe C.4). */
 const poolOf = (c: Character, action: PoolAction) => computePool(c, action, { modifiers: defaultModifiers(c, action) });
 
-const pool = (c: Character, trait: RollTrait, skill: string) => {
-  const p = poolOf(c, { kind: "skill", skill, trait });
-  return formatDice(p.rolled, p.kept) + (p.bonus ? ` ${p.bonus > 0 ? "+" : ""}${p.bonus}` : "");
-};
+const pool = (c: Character, trait: RollTrait, skill: string) => poolLabel(poolOf(c, { kind: "skill", skill, trait }));
 
 export function Sheet() {
   const { edit, dispatch } = useSheet();
@@ -129,7 +129,23 @@ function Identity() {
           <datalist id="clan-list">{CLAN_SUGGESTIONS.map((n) => <option key={n} value={n} />)}</datalist>
         </Field>
         <Field label="Famille">{text(["family"], c.family)}</Field>
-        <Field label="École">{text(["school"], c.school, { maxLength: 120 })}</Field>
+        <Field label="École (nom affiché)">{text(["school"], c.school, { maxLength: 120 })}</Field>
+        <Field label="Techniques d'école">
+          <select className="in" value={c.schoolId ?? ""} onChange={(e) => set(["schoolId"], e.target.value)}>
+            <option value="">— Aucune (techniques libres)</option>
+            {schoolsByClan().map((g) => (
+              <optgroup key={g.clan} label={g.clan}>
+                {g.schools.map((sc) => <option key={sc.id} value={sc.id}>{sc.name}</option>)}
+              </optgroup>
+            ))}
+          </select>
+        </Field>
+        <Field label="Rang d'école">
+          <OptionalNumber
+            min={1} value={c.schoolRank ?? undefined} placeholder={`= Insight (${c.insightRank})`} aria-label="Rang d'école"
+            onChange={(n) => set(["schoolRank"], n ?? null)}
+          />
+        </Field>
         <Field label="Rang (Insight)">{num(["insightRank"], c.insightRank, 1, 10)}</Field>
         <Field label="Honneur">{num(["honor"], c.honor, 0, 10, 0.1)}</Field>
         <Field label="Gloire">{num(["glory"], c.glory, 0, 10, 0.1)}</Field>
@@ -153,7 +169,7 @@ function Identity() {
         <span className="label">Armure</span>
         <b style={{ fontSize: 15 }}>{c.armor.name || "—"} <span className="muted">ND +{c.armor.bonus} · réd. {c.armor.reduction}</span></b>
       </div>
-      <div><span className="label">Initiative</span><b>{formatDice(init.rolled, init.kept)}</b></div>
+      <div><span className="label">Initiative</span><b data-testid="sheet-initiative">{poolLabel(init)}</b></div>
     </div>
   );
 }
@@ -231,7 +247,7 @@ function Weapons() {
       <>
         <div className="tbl">
           <table>
-            <thead><tr><th>Arme</th><th>Compétence</th><th>VD</th><th>Force arc</th><th /></tr></thead>
+            <thead><tr><th>Arme</th><th>Compétence</th><th>VD</th><th>Force arc</th><th>Mots-clés</th><th /></tr></thead>
             <tbody>
               {c.weapons.map((w, i) => (
                 <tr key={i}>
@@ -241,13 +257,20 @@ function Weapons() {
                   <td style={{ width: 70 }}>
                     <OptionalNumber value={w.bowStrength} aria-label={`Force de l'arc ${w.name}`} onChange={(n) => set(["weapons", i, "bowStrength"], n)} />
                   </td>
+                  <td style={{ minWidth: 140 }}>
+                    <TextListField
+                      aria-label={`Mots-clés de ${w.name}`} value={w.keywords ?? []} parse={parseWeaponKeywords}
+                      placeholder={catalogWeapon(w.name)?.keywords.join(", ") ?? "samourai, lourde…"}
+                      onChange={(v) => set(["weapons", i, "keywords"], v)}
+                    />
+                  </td>
                   <td><RemoveButton list="weapons" index={i} name={w.name} /></td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <AddButton list="weapons" label="+ Arme" item={() => ({ name: "", skill: "Kenjutsu", dr: "3g2" })} />
+        <AddButton list="weapons" label="+ Arme" item={() => ({ name: "", skill: "Kenjutsu", dr: "3g2", keywords: [] })} />
       </>
     );
   }
@@ -257,16 +280,18 @@ function Weapons() {
         <thead><tr><th>Arme</th><th>Attaque</th><th>Dégâts</th></tr></thead>
         <tbody>
           {c.weapons.length ? c.weapons.map((w, i) => {
-            const atk = poolOf(c, { kind: "skill", skill: w.skill, trait: attackTrait(w), attack: true });
+            const atk = poolOf(c, { kind: "skill", skill: w.skill, trait: attackTrait(w), attack: true, weapon: w });
+            const keywords = [...weaponKeywords(c, w)];
             const dmg = poolOf(c, { kind: "damage", weapon: w });
             return (
               <tr key={i}>
                 <td>
                   <b>{w.name}</b>
                   <div className="muted" style={{ fontSize: 12.5 }}>{w.skill} · VD {w.dr}{isRanged(w) ? ` · arc ${w.bowStrength ?? 0}` : ""}</div>
+                  {keywords.length > 0 && <div>{keywords.map((k) => <span key={k} className="tag">{WEAPON_KEYWORD_LABELS[k]}</span>)}</div>}
                 </td>
-                <td className="pool">{formatDice(atk.rolled, atk.kept)}</td>
-                <td className="pool">{formatDice(dmg.rolled, dmg.kept)}</td>
+                <td className="pool" data-testid={`attack-pool-${w.name}`}>{poolLabel(atk)}</td>
+                <td className="pool" data-testid={`damage-pool-${w.name}`}>{poolLabel(dmg)}</td>
               </tr>
             );
           }) : <tr><td colSpan={3} className="muted">Aucune arme.</td></tr>}
@@ -277,15 +302,17 @@ function Weapons() {
 }
 
 /** Nombre facultatif : vide = absent. */
-function OptionalNumber({ value, onChange, ...rest }: { value: number | undefined; onChange: (n: number | undefined) => void; "aria-label": string }) {
+function OptionalNumber({ value, onChange, min = 0, placeholder = "—", ...rest }: {
+  value: number | undefined; onChange: (n: number | undefined) => void; "aria-label": string; min?: number; placeholder?: string;
+}) {
   return (
     <input
-      {...rest} className="in" type="number" min={0} max={10} placeholder="—"
+      {...rest} className="in" type="number" min={min} max={10} placeholder={placeholder}
       value={value ?? ""}
       onChange={(e) => {
         const n = Number(e.target.value);
         if (e.target.value === "") onChange(undefined);
-        else if (Number.isInteger(n) && n >= 0 && n <= 10) onChange(n);
+        else if (Number.isInteger(n) && n >= min && n <= 10) onChange(n);
       }}
     />
   );
@@ -293,9 +320,15 @@ function OptionalNumber({ value, onChange, ...rest }: { value: number | undefine
 
 function Techniques() {
   const { c, edit, set } = useSheet();
+  const school = <SchoolTechniques />;
+  const others = schoolOf(c) && (c.techniques.length > 0 || edit)
+    ? <div className="label" style={{ marginTop: 12 }}>Autres techniques, kata, sorts</div>
+    : null;
   if (edit) {
     return (
       <>
+        {school}
+        {others}
         {c.techniques.map((t, i) => (
           <div key={i} className="field" style={{ marginBottom: 10 }}>
             <div style={{ display: "flex", gap: 6 }}>
@@ -309,9 +342,58 @@ function Techniques() {
       </>
     );
   }
-  return c.techniques.length
-    ? <>{c.techniques.map((t, i) => <div key={i} className="tech"><b>{t.name}</b><div className="prose muted">{t.text}</div></div>)}</>
-    : <p className="muted">Aucune technique notée.</p>;
+  return (
+    <>
+      {school}
+      {others}
+      {c.techniques.length
+        ? c.techniques.map((t, i) => <div key={i} className="tech"><b>{t.name}</b><div className="prose muted">{t.text}</div></div>)
+        : !schoolOf(c) && <p className="muted">Aucune technique notée.</p>}
+    </>
+  );
+}
+
+/** École du catalogue : les cinq rangs, résumés et badges ; rangs non atteints grisés (annexe C.5). */
+function SchoolTechniques() {
+  const { c, edit, set } = useSheet();
+  const { state } = useStore();
+  const school = schoolOf(c);
+  const suggestion = state.mode === "edit" ? suggestSchool(c) : undefined;
+  if (!school) {
+    return (
+      <>
+        {suggestion && (
+          <div className="suggest" role="group" aria-label="Suggestion d'école">
+            <span>Associer à <b>{suggestion.name}</b> ?</span>
+            <button type="button" className="btn sm" onClick={() => set(["schoolId"], suggestion.id)}>Associer</button>
+          </div>
+        )}
+        {edit && <p className="hint" style={{ marginTop: 0 }}>Choisis une école dans « Techniques d'école » (bloc Identité) pour ajouter ses techniques automatiquement.</p>}
+      </>
+    );
+  }
+  const rank = schoolRankOf(c);
+  return (
+    <div data-testid="school-techniques">
+      <div className="schoolhead"><b>{school.name}</b> <span className="muted">· {school.clan} · Rang d'école {rank}</span></div>
+      {school.ranks.map((r) => {
+        const on = r.rank <= rank;
+        return (
+          <div key={r.rank} className={`tech${on ? "" : " locked"}`} data-testid={`school-rank-${r.rank}`}>
+            <div className="techtop">
+              <b>R{r.rank} · {r.name}</b>
+              <span>
+                {on
+                  ? techniqueCategories(r).map((cat) => <span key={cat} className={`badge b-${cat.replace(/\W/g, "")}`}>{cat}</span>)
+                  : <span className="badge">rang {r.rank}</span>}
+              </span>
+            </div>
+            <div className="muted">{r.summary}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 function LongText({ field, label }: { field: "advantages" | "disadvantages" | "notes"; label: string }) {
