@@ -1,8 +1,12 @@
 import { useEffect } from "react";
-import { armorTN, describeModifier, formatDice, modifiersOf, movement, rings, type ActionDef } from "@carnet/core";
+import {
+  armorEffects, describeModifier, hasMountedEffects, isSimpleAttack, modifiersOf, movement, movementBonus, resolveValue,
+  rings, schoolOf, schoolReminders, stackCount, stackEffects, stackMax, voidMultiplier,
+  type ActionDef, type ActiveEffect,
+} from "@carnet/core";
 import { COMBAT_SUBS, SITUATIONS, STANCES } from "../../rules/l5r4e";
 import { toMeters } from "../format";
-import { armorBonus, DEFAULT_ROLL_OPTIONS, isActive, isRollable, poolFor } from "../rolls";
+import { contextOf, currentArmorTN, DEFAULT_ROLL_OPTIONS, isActive, isRollable, poolFor, poolLabel, toPoolAction } from "../rolls";
 import { currentActions, useCharacter, useStore, type AidSituation, type InfoPanel } from "../store";
 import { Roller } from "./Roller";
 import { Stats } from "./Stats";
@@ -56,6 +60,7 @@ export function Aid() {
           {initiative && <InitiativeCard action={initiative} />}
           {combat && ui.sub !== "duel" && <StancePanel />}
           {combat && <VoidPanel />}
+          {combat && <RemindersPanel />}
           <div className="actions">
             {actions.filter((a) => a.kind !== "initiative").map((a) => <ActionCard key={a.id} action={a} />)}
             {combat && !c.weapons.length && <p className="muted">Ajoute des armes dans la fiche pour voir les attaques.</p>}
@@ -74,7 +79,7 @@ function InitiativeCard({ action }: { action: ActionDef }) {
   const { state, dispatch } = useStore();
   const c = useCharacter();
   const p = poolFor(c, action, DEFAULT_ROLL_OPTIONS, "attack");
-  const dice = formatDice(p.rolled, p.kept);
+  const dice = poolLabel(p);
   const value = state.ui.initiative;
   return (
     <button type="button" className="act" aria-pressed={state.ui.selectedId === action.id} onClick={() => dispatch({ type: "select", id: action.id })}>
@@ -93,7 +98,7 @@ function StancePanel() {
   const { state, dispatch } = useStore();
   const c = useCharacter();
   const { ui } = state;
-  const tn = armorTN(c, { stance: ui.stance, fullDefenseBonus: ui.fullDefenseBonus, voidArmor: ui.voidArmor, bonus: armorBonus(c, ui.armorToggles, ui.stance) });
+  const tn = currentArmorTN(c, ui);
   const armorMods = modifiersOf(c).filter((m) => m.appliesTo === "armor");
   return (
     <div className="panel" style={{ padding: 12 }}>
@@ -101,7 +106,7 @@ function StancePanel() {
         <span className="panel-title"><span className="label">Posture</span><InfoButton panel="stance" label="Posture" /></span>
         <span className="muted" style={{ fontSize: 13 }}>
           ND d'armure <b className="mono" style={{ color: "var(--ink)", fontSize: 16 }}>{tn}</b>
-          {ui.voidArmor && <> <span className="tag">+10 Vide</span></>}
+          {ui.voidArmor && <> <span className="tag">+{10 * voidMultiplier(c)} Vide</span></>}
         </span>
       </div>
       <div className="stance" role="group" aria-label="Posture">
@@ -121,6 +126,86 @@ function StancePanel() {
           ))}
         </div>
       )}
+      <SchoolCombat />
+    </div>
+  );
+}
+
+/** Techniques d'école du panneau Posture : monture, Centre du round précédent, compteurs et cases de ND d'armure. */
+function SchoolCombat() {
+  const { state, dispatch } = useStore();
+  const c = useCharacter();
+  const { ui } = state;
+  if (!schoolOf(c)) return null;
+  const armor = armorEffects(c, contextOf(ui));
+  // Compteurs : ND d'armure valables dans la posture, et ND de la cible (toujours).
+  const stacked = [...armor.filter((e) => "stack" in e && e.stack), ...stackEffects(c).filter((e) => e.kind === "targetTn")];
+  const boxes = armor.filter((e) => e.kind === "armor" && !e.stack && e.mode === "optional");
+  const mounted = hasMountedEffects(c);
+  if (!mounted && !ui.centerLastRound && !stacked.length && !boxes.length) return null;
+  return (
+    <div className="techbox" role="group" aria-label="Techniques d'école">
+      <div className="label">Techniques d'école</div>
+      {mounted && (
+        <label className="chk"><input type="checkbox" checked={ui.mounted} onChange={(e) => dispatch({ type: "mounted", on: e.target.checked })} /> Monté</label>
+      )}
+      {ui.centerLastRound && <span className="tag" style={{ justifySelf: "start" }}>Bonus de Centre du round précédent actif</span>}
+      {stacked.map((e) => <StackRow key={e.key} effect={e} />)}
+      {boxes.map((e) => e.kind === "armor" && (
+        <label key={e.key} className="chk">
+          <input type="checkbox" checked={!!ui.schoolArmor[e.key]} onChange={(ev) => dispatch({ type: "toggleSchoolArmor", key: e.key, on: ev.target.checked })} />
+          {" "}<b>{e.label ?? e.technique}</b> <span className="muted">· +{resolveValue(e.value, c)} ND d'armure · {e.source}</span>
+        </label>
+      ))}
+      {stacked.some((e) => (ui.stacks[e.key] ?? 0) > 0) && (
+        <button type="button" className="btn sm" style={{ justifySelf: "start" }} onClick={() => dispatch({ type: "resetStacks" })}>Fin de l'escarmouche : compteurs à zéro</button>
+      )}
+    </div>
+  );
+}
+
+/** Compteur −/+ d'une technique cumulable, plafonné (Hiruma R2, Yoritomo R2). */
+function StackRow({ effect: e }: { effect: ActiveEffect }) {
+  const { state, dispatch } = useStore();
+  const c = useCharacter();
+  if (!("stack" in e) || !e.stack || (e.kind !== "armor" && e.kind !== "targetTn")) return null;
+  const n = stackCount(c, e, state.ui.stacks);
+  const max = stackMax(c, e);
+  const value = resolveValue(e.value, c);
+  const each = e.kind === "armor" ? `+${value} ND d'armure` : `${value} au ND de la cible`;
+  return (
+    <div className="stackrow">
+      <span><b>{e.stack.label}</b> <span className="muted">· {each} chacune, max {max} · {e.source}</span></span>
+      <span className="stepper">
+        <button type="button" aria-label={`Retirer : ${e.stack.label}`} onClick={() => dispatch({ type: "stack", key: e.key, count: n - 1 })}>−</button>
+        <b className="mono" data-testid={`stack-${e.key}`}>{n}</b>
+        <button type="button" aria-label={`Ajouter : ${e.stack.label}`} disabled={n >= max} onClick={() => dispatch({ type: "stack", key: e.key, count: Math.min(max, n + 1) })}>+</button>
+      </span>
+    </div>
+  );
+}
+
+/** Techniques de contexte (combat, et duel en Duel iaijutsu) : noms, détail par le « i ». */
+function RemindersPanel() {
+  const { state } = useStore();
+  const c = useCharacter();
+  const reminders = schoolReminders(c, state.ui.sub === "duel" ? ["combat", "duel"] : ["combat"]);
+  if (!reminders.length) return null;
+  const details = !!state.ui.info.reminders;
+  return (
+    <div className="panel" style={{ padding: 12 }}>
+      <div className="panel-head" style={{ marginBottom: 6 }}>
+        <span className="panel-title"><span className="label">Rappels d'école</span><InfoButton panel="reminders" label="Rappels d'école" /></span>
+        <span className="muted" style={{ fontSize: 12 }}>{reminders.length}</span>
+      </div>
+      <div className="rems">
+        {reminders.map((e) => (
+          <div key={e.key}>
+            <b>{e.technique}</b> <span className="muted">· {e.source}</span>
+            {details && <div className="muted">{("text" in e && e.text) || e.summary}</div>}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -142,10 +227,10 @@ function VoidPanel() {
       )}
       <div className="stance">
         <button type="button" aria-pressed={ui.opts.voidPoint} disabled={none && !ui.opts.voidPoint} onClick={() => dispatch({ type: "option", patch: { voidPoint: !ui.opts.voidPoint } })}>
-          <b>+1g1 au jet</b>{details && <span className="muted">Dépensé au prochain jet lancé.</span>}
+          <b>+{voidMultiplier(c)}g{voidMultiplier(c)} au jet</b>{details && <span className="muted">Dépensé au prochain jet lancé.</span>}
         </button>
         <button type="button" aria-pressed={ui.voidArmor} disabled={none && !ui.voidArmor} onClick={() => dispatch({ type: "voidArmor" })}>
-          <b>+10 ND d'armure</b>{details && <span className="muted">Jusqu'au prochain round.</span>}
+          <b>+{10 * voidMultiplier(c)} ND d'armure</b>{details && <span className="muted">Jusqu'au prochain round.</span>}
         </button>
         <button type="button" aria-pressed={ui.opts.voidSkill} disabled={none && !ui.opts.voidSkill} onClick={() => dispatch({ type: "option", patch: { voidSkill: !ui.opts.voidSkill } })}>
           <b>Compétence au rang 1</b>{details && <span className="muted">Jouer une compétence que tu n'as pas.</span>}
@@ -163,6 +248,7 @@ function MovePanel() {
   const details = !!state.ui.info.move;
   const c = useCharacter();
   const m = movement(c);
+  const bonus = movementBonus(c, contextOf(state.ui));
   const tiles = [
     { label: "Action libre", ft: m.free, note: "1 fois par round" },
     { label: "Action simple", ft: m.simple, note: "Eau × 10" },
@@ -186,6 +272,7 @@ function MovePanel() {
           </div>
         ))}
       </div>
+      {bonus > 0 && <p className="hint" style={{ margin: "6px 0 0", color: "var(--gold)" }}>+{bonus} pieds par tour (technique d'école), sans dépasser le maximum.</p>}
       {details && <p className="hint" style={{ marginBottom: 0 }}>Terrain difficile (eau, foule, escaliers) : distances divisées par deux. Valeurs 4e à vérifier dans ton livre.</p>}
     </div>
   );
@@ -214,7 +301,10 @@ function ActionCard({ action: a }: { action: ActionDef }) {
       <div className="act info"><span className="t">{a.label}</span><span /><span className="d">{a.description}</span></div>
     );
   }
-  const p = isRollable(a) ? poolFor(c, a, DEFAULT_ROLL_OPTIONS, ui.stance) : null;
+  const p = isRollable(a)
+    ? poolFor(c, a, DEFAULT_ROLL_OPTIONS, ui.stance, undefined, { mounted: ui.mounted, centerLastRound: ui.centerLastRound })
+    : null;
+  const simple = a.attack && isSimpleAttack(c, toPoolAction(a), contextOf(ui));
   const child = a.kind === "damage";
   const pending = child && ui.pendingDamage && ui.pendingDamage.parent === a.parent ? ui.pendingDamage.dice : 0;
   return (
@@ -225,8 +315,8 @@ function ActionCard({ action: a }: { action: ActionDef }) {
       onClick={() => dispatch({ type: "select", id: a.id })}
     >
       <span className="t">{a.label}{pending > 0 && <> <span className="pend">+{pending}g0 en attente</span></>}</span>
-      <span className="p">{p ? formatDice(p.rolled, p.kept) : ""}</span>
-      <span className="d">{a.description}</span>
+      <span className="p">{p ? poolLabel(p) : ""}</span>
+      <span className="d">{simple && <><span className="tag sa">Attaque : Action simple</span>{" "}</>}{a.description}</span>
     </button>
   );
 }

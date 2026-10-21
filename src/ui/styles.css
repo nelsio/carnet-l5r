@@ -114,6 +114,22 @@ tr:last-child td{border-bottom:0}
 .prose{white-space:pre-wrap}
 .tech{border-left:3px solid var(--gold);padding-left:10px;margin-bottom:10px}
 .tech b{font-family:var(--f-display)}
+/* Techniques d'école (annexe C.5) */
+.locked{opacity:.5}
+.schoolhead{margin-bottom:8px}
+.techtop{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
+.badge{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;padding:1px 7px;border-radius:999px;background:var(--sunk);color:var(--muted);margin-left:4px;white-space:nowrap}
+.badge.b-auto{background:var(--gold-soft);color:var(--ink)}
+.badge.b-cocher{background:color-mix(in srgb,var(--water) 18%,var(--surface));color:var(--ink)}
+.badge.b-rappel{background:color-mix(in srgb,var(--fire) 14%,var(--surface));color:var(--ink)}
+.tchips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.tchip{font-size:12px;padding:2px 8px;border-radius:999px;background:var(--gold-soft);color:var(--ink);border:1px solid color-mix(in srgb,var(--gold) 40%,transparent)}
+.techbox{display:grid;gap:6px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.stackrow{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13.5px}
+.stackrow .stepper button{width:30px;height:30px}
+.rems{display:grid;gap:6px;font-size:13.5px}
+.sa{background:var(--gold-soft);color:var(--ink)}
+.suggest{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 10px;border-radius:6px;background:var(--gold-soft);font-size:13.5px;margin-bottom:10px}
 
 /* Édition */
 .btn{border:1px solid var(--line);background:var(--surface);padding:7px 13px;border-radius:7px;font-weight:700}

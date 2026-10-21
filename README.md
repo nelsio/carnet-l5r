@@ -54,12 +54,23 @@ Pour lancer dans l'outil, appuie sur le bouton **Lanceur de dés** de l'en-tête
 
 Les tuiles **ND armure** et **Réduction** de la barre d'état ouvrent l'éditeur d'armure. Les boutons « i » de l'aide de jeu affichent ou masquent le détail des postures, des dépenses de Vide et du déplacement.
 
+## Techniques d'école
+
+Les 14 écoles de bushi du livre de base (Hida, Hiruma, Kakita, Daidoji, Mirumoto, Togashi, Akodo, Matsu, Yoritomo, Tsuruchi, Shiba, Bayushi, Moto, Utaku) sont intégrées. Sur la fiche, en modification, choisis ton école dans **Techniques d'école** (bloc Identité) ; le **Rang d'école** vaut ton Rang d'Insight, sauf si tu le changes.
+
+- Les techniques de ton rang s'appliquent d'elles-mêmes aux réserves de la fiche, de l'aide de jeu et des statistiques (posture de référence : Attaque).
+- Les techniques situationnelles se cochent dans le lanceur (**Techniques à cocher**) ou dans le panneau **Posture** (cases de ND d'armure, compteurs de touches, case **Monté**).
+- Les techniques sans effet chiffré apparaissent dans le panneau **Rappels d'école**.
+- Les armes ont des **mots-clés** (Samouraï, Lourde, Arc…) pré-remplis pour les armes connues : ils décident des techniques qui s'appliquent.
+
+Une fiche d'une version précédente propose d'associer l'école reconnue dans son nom (« Associer à École de bushi Kakita ? ») : rien ne change sans ta confirmation. Les résumés sont écrits pour l'outil : réfère-toi à ton livre pour le texte exact.
+
 ## Bonus des techniques et avantages
 
-Certaines techniques d'école, certains avantages et désavantages modifient les jets. Sur la fiche, en modification, le panneau **Bonus de jet** permet de les saisir :
+Pour une technique hors catalogue (courtisan, shugenja, kata), un avantage ou un désavantage qui modifie les jets, Sur la fiche, en modification, le panneau **Bonus de jet** permet de les saisir :
 
 - librement, ou à partir d'un **modèle** (+1g0 à une compétence, augmentation gratuite, +5 au ND d'armure…) ;
-- ou depuis le **catalogue**, qui contient pour l'instant l'école Hiruma Bushi (rangs 1 à 3), Force de la Terre et Aspect dérangeant. Ces entrées sont des résumés à vérifier dans ton livre.
+- ou depuis le **catalogue**, qui contient Force de la Terre et Aspect dérangeant. Ces entrées sont des résumés à vérifier dans ton livre.
 
 Un bonus « d'office » est compté dans toutes les réserves ; un bonus « au choix » se coche dans le lanceur quand sa condition est remplie.
 

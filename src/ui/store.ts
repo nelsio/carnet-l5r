@@ -4,7 +4,7 @@
  */
 import { createContext, useContext, type Dispatch } from "react";
 import {
-  buildActions, DAMAGE_MANEUVER_ID, emphasisMatches,
+  activeEffects, buildActions, DAMAGE_MANEUVER_ID, emphasisMatches, voidSpendOption,
   type ActionDef, type Character, type CombatSub, type RollResult, type Situation, type Stance,
 } from "@carnet/core";
 import type { LibraryEntry } from "../storage";
@@ -15,7 +15,7 @@ export type View = "sheet" | "aid";
 export type AidSituation = Situation | "stats";
 export type ListKey = "skills" | "weapons" | "techniques" | "maneuvers" | "modifiers";
 /** Panneaux de l'aide de jeu dotés d'un bouton « i » (HANDOFF §6.2). */
-export type InfoPanel = "stance" | "void" | "move";
+export type InfoPanel = "stance" | "void" | "move" | "reminders";
 type Path = readonly (string | number)[];
 
 export interface RollRecord {
@@ -30,6 +30,10 @@ export interface RollRecord {
   /** Dés de dégâts gagnés par « Augmentation des dégâts ». */
   damageDice: number;
   fullDefense: boolean;
+  /** ND sans les augmentations annoncées (Akodo R5). */
+  baseTn?: number;
+  /** Échec rattrapé : ND de base atteint, réussite sans les augmentations (Akodo R5). */
+  baseSuccess?: boolean;
 }
 
 export interface UiState {
@@ -64,6 +68,18 @@ export interface UiState {
   /** Bonus de ND d'armure cochés ou décochés pour le combat en cours. */
   armorToggles: Record<string, boolean>;
   stats: { voidPoint: boolean; emphasis: boolean; penalty: boolean };
+  /** Techniques d'école (annexe C.5) : combat monté. */
+  mounted: boolean;
+  /** Posture Centre au round précédent (mémorisée par « Nouveau round »). */
+  centerLastRound: boolean;
+  /** Techniques à cocher du lanceur, par clé d'effet (remises à zéro au choix d'une action). */
+  techToggles: Record<string, boolean>;
+  /** Valeurs saisies pour les techniques à champ. */
+  techInputs: Record<string, number>;
+  /** Cases de ND d'armure des techniques (décochées à chaque nouveau round). */
+  schoolArmor: Record<string, boolean>;
+  /** Compteurs des techniques cumulables (gardés jusqu'à la remise à zéro). */
+  stacks: Record<string, number>;
 }
 
 export type Screen = "library" | "character";
@@ -105,6 +121,12 @@ export const initialUi: UiState = {
   modifierToggles: {},
   armorToggles: {},
   stats: { voidPoint: false, emphasis: true, penalty: true },
+  mounted: false,
+  centerLastRound: false,
+  techToggles: {},
+  techInputs: {},
+  schoolArmor: {},
+  stacks: {},
 };
 
 export function initialState(): AppState {
@@ -141,7 +163,13 @@ export type AppAction =
   | { type: "statsOption"; patch: Partial<UiState["stats"]> }
   | { type: "toggleModifier"; id: string; on: boolean }
   | { type: "toggleArmorModifier"; id: string; on: boolean }
-  | { type: "rolled"; result: RollResult; tn: number | null | "opposed"; raises: number; free?: number };
+  | { type: "mounted"; on: boolean }
+  | { type: "toggleTechnique"; key: string; on: boolean }
+  | { type: "techniqueInput"; key: string; value: number }
+  | { type: "toggleSchoolArmor"; key: string; on: boolean }
+  | { type: "stack"; key: string; count: number }
+  | { type: "resetStacks" }
+  | { type: "rolled"; result: RollResult; tn: number | null | "opposed"; raises: number; free?: number; baseTn?: number; baseSuccess?: boolean };
 
 /** Copie immuable avec une valeur remplacée au chemin donné. */
 export function setIn<T>(obj: T, path: Path, value: unknown): T {
@@ -182,7 +210,10 @@ function select(c: Character, ui: UiState, a: ActionDef, open: boolean): UiState
     opts.extraRolled = pendingDamage.dice;
     pendingDamage = null;
   }
-  return { ...ui, selectedId: a.id, opts, maneuvers: {}, modifierToggles: {}, pendingDamage, sheetOpen: open || ui.sheetOpen };
+  return {
+    ...ui, selectedId: a.id, opts: { ...opts, voidSpend: false }, maneuvers: {}, modifierToggles: {}, techToggles: {}, techInputs: {},
+    pendingDamage, sheetOpen: open || ui.sheetOpen,
+  };
 }
 
 /** Après un changement de situation : première action jouable sélectionnée, lanceur fermé. */
@@ -217,9 +248,17 @@ function uiReducer(state: AppState, action: AppAction): AppState {
     case "statsOption": return withUi({ stats: { ...ui.stats, ...action.patch } });
     case "toggleModifier": return withUi({ modifierToggles: { ...ui.modifierToggles, [action.id]: action.on } });
     case "toggleArmorModifier": return withUi({ armorToggles: { ...ui.armorToggles, [action.id]: action.on } });
+    case "mounted": return withUi({ mounted: action.on });
+    case "toggleTechnique": return withUi({ techToggles: { ...ui.techToggles, [action.key]: action.on } });
+    case "techniqueInput": return withUi({ techInputs: { ...ui.techInputs, [action.key]: action.value } });
+    case "toggleSchoolArmor": return withUi({ schoolArmor: { ...ui.schoolArmor, [action.key]: action.on } });
+    case "stack": return withUi({ stacks: { ...ui.stacks, [action.key]: Math.max(0, action.count) } });
+    case "resetStacks": return withUi({ stacks: {} });
     case "newRound":
+      // Centre mémorisé pour le round suivant (Kakita R1) ; les cases d'armure se décochent, les compteurs restent.
       return withUi({
         voidArmor: false, voidSpentThisRound: false, fullDefenseBonus: 0,
+        centerLastRound: ui.stance === "center", schoolArmor: {},
         stance: ui.stance === "fullDefense" ? "defense" : ui.stance,
       });
     default: return state;
@@ -297,6 +336,13 @@ function rolled(state: AppState, c: Character, action: Extract<AppAction, { type
   if (opts.voidPoint) next = spendVoid(next);
   // La dépense « compétence au rang 1 » ne vaut que pour une compétence non maîtrisée.
   if (opts.voidSkill && isUnskilled(c, a)) next = spendVoid(next);
+  // Techniques payées en Vide : option Shiba R1, et effets cochés avec un coût en Vide.
+  const spend = opts.voidSpend ? voidSpendOption(c) : undefined;
+  if (spend && c.voidPoints >= spend.points) for (let i = 0; i < spend.points; i++) next = spendVoid(next);
+  for (const e of activeEffects(c)) {
+    if (!state.ui.techToggles[e.key] || !("void" in e) || !e.void) continue;
+    for (let i = 0; i < e.void; i++) next = spendVoid(next);
+  }
   const ui = next.ui;
   const { total } = action.result;
   const success = typeof action.tn === "number" && total >= action.tn;
@@ -312,12 +358,13 @@ function rolled(state: AppState, c: Character, action: Extract<AppAction, { type
   const record: RollRecord = {
     actionId: a.id, label: a.label, kind: a.kind, result: action.result, tn: action.tn,
     raises: action.raises, free: action.free ?? opts.free, maneuvers, damageDice, fullDefense: !!a.fullDefense,
+    baseTn: action.baseTn, baseSuccess: action.baseSuccess,
   };
   return {
     ...next,
     ui: {
       ...ui,
-      opts: { ...ui.opts, voidPoint: false, voidSkill: false },
+      opts: { ...ui.opts, voidPoint: false, voidSkill: false, voidSpend: false },
       initiative: a.kind === "initiative" ? total : ui.initiative,
       ...(a.fullDefense ? { stance: "fullDefense" as const, fullDefenseBonus: Math.floor(total / 2) } : {}),
       pendingDamage: a.attack ? (damageDice ? { parent: a.id, dice: damageDice } : null) : ui.pendingDamage,

@@ -1,4 +1,4 @@
-import { CharacterSchema, SCHEMA_VERSION, zodErrors, type Character, type FieldError } from "./schema";
+import { characterShape, CharacterSchema, SCHEMA_VERSION, zodErrors, type Character, type FieldError } from "./schema";
 import { catalogWeapon } from "./schools";
 
 type Json = Record<string, unknown>;
@@ -127,10 +127,12 @@ export function migrate(json: unknown): Character {
 
 /** Fiche complète : école et mots-clés explicites (`""`, `null`, `[]`). */
 export function withV2Defaults(c: Character): Character {
-  return {
+  const full: Character = {
     ...c,
     schoolId: c.schoolId ?? "",
     schoolRank: c.schoolRank ?? null,
     weapons: c.weapons.map((w) => ({ ...w, keywords: w.keywords ?? [] })),
   };
+  // Clés dans l'ordre du schéma : un export reste identique d'un aller-retour à l'autre.
+  return Object.fromEntries(Object.keys(characterShape).filter((k) => k in full).map((k) => [k, full[k as keyof Character]])) as Character;
 }

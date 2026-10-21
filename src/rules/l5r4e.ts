@@ -167,6 +167,8 @@ export interface ActionDef {
   emphasisHint?: string;
   tn: ActionTN;
   attack?: boolean;
+  /** Attaque ou dégâts à mains nues (techniques d'école, annexe C). */
+  unarmed?: boolean;
   fullDefense?: boolean;
   /** Valeur de dégâts, pour les actions `damage`. */
   dr?: string;
@@ -206,9 +208,9 @@ export const FIXED_ACTIONS: readonly ActionDef[] = [
   { id: "march", situation: "movement", label: "Endurer une marche forcée", kind: "trait", trait: "stamina", tn: 15, description: "Jet de Trait pur : Constitution gardée Constitution. Échec : fatigue (+5 au ND des jets suivants)." },
   // Escarmouche
   { id: "initiative", situation: "combat", sub: "skirmish", label: "Initiative", kind: "initiative", tn: null, description: "Rang + Réflexes, gardé Réflexes. Ordre du round." },
-  { id: "unarmed", situation: "combat", sub: "skirmish", label: "Attaque à mains nues", kind: "skill", skill: "Jiujutsu", trait: "agility", tn: "target", attack: true, description: "Jiujutsu (Agilité) contre le ND d'armure. Dégâts : Force + 0g1." },
-  { id: "unarmed-dmg", situation: "combat", sub: "skirmish", parent: "unarmed", label: "Dégâts · mains nues", kind: "damage", dr: "0g1", weapon: { name: "Mains nues", skill: "Jiujutsu", dr: "0g1" }, tn: null, description: "Force + 0g1." },
-  { id: "grapple", situation: "combat", sub: "skirmish", label: "Lutte (saisie)", kind: "skill", skill: "Jiujutsu", trait: "agility", tn: "target", attack: true, description: "Attaque Jiujutsu ; si elle touche, jets de Force en opposition pour établir et tenir la prise." },
+  { id: "unarmed", situation: "combat", sub: "skirmish", label: "Attaque à mains nues", kind: "skill", skill: "Jiujutsu", trait: "agility", tn: "target", attack: true, unarmed: true, description: "Jiujutsu (Agilité) contre le ND d'armure. Dégâts : Force + 0g1." },
+  { id: "unarmed-dmg", situation: "combat", sub: "skirmish", parent: "unarmed", label: "Dégâts · mains nues", kind: "damage", unarmed: true, dr: "0g1", weapon: { name: "Mains nues", skill: "Jiujutsu", dr: "0g1" }, tn: null, description: "Force + 0g1." },
+  { id: "grapple", situation: "combat", sub: "skirmish", label: "Lutte (saisie)", kind: "skill", skill: "Jiujutsu", trait: "agility", tn: "target", attack: true, unarmed: true, description: "Attaque Jiujutsu ; si elle touche, jets de Force en opposition pour établir et tenir la prise." },
   { id: "full-defense", situation: "combat", sub: "skirmish", label: "Défense totale", kind: "skill", skill: "Défense", trait: "reflexes", tn: null, fullDefense: true, description: "Posture Défense totale : la moitié du résultat s'ajoute à ton ND d'armure ce round." },
   // Duel iaijutsu
   { id: "assess", situation: "combat", sub: "duel", label: "1 · Évaluation", kind: "skill", skill: "Iaijutsu", trait: "awareness", tn: "assessment", description: "ND 10 + 5 × Rang de l'adversaire. Réussite : tu apprends des informations sur lui (Rang, Anneaux…), chaque augmentation en plus." },

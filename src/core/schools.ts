@@ -5,7 +5,7 @@ import {
   type CatalogWeapon, type Effect, type On, type ReminderContext, type School, type SchoolRank, type Value, type When,
 } from "../rules/ecoles";
 import { findSkill, isRanged, normalize, rings, traitValue, type PoolAction, type WeaponLike } from "./engine";
-import type { Character, Maneuver, TraitKey, WeaponKeyword } from "./schema";
+import { WEAPON_KEYWORDS, type Character, type Maneuver, type TraitKey, type WeaponKeyword } from "./schema";
 
 /** Situation du personnage au moment du jet. */
 export interface SchoolContext {
@@ -119,6 +119,17 @@ export function resolveValue(v: Value | undefined, c: Character, input?: number)
 export function catalogWeapon(name: string): CatalogWeapon | undefined {
   const key = normalize(name);
   return WEAPON_CATALOG.find((w) => normalize(w.name) === key);
+}
+
+/** Mots-clés saisis en texte (« Samouraï, deux mains ») → mots-clés valides, sans doublon. */
+export function parseWeaponKeywords(text: string): WeaponKeyword[] {
+  const valid = new Set<string>(WEAPON_KEYWORDS);
+  const out: WeaponKeyword[] = [];
+  for (const raw of text.split(/[,;]/)) {
+    const k = normalize(raw).replace(/\s+/g, "-");
+    if (valid.has(k) && !out.includes(k as WeaponKeyword)) out.push(k as WeaponKeyword);
+  }
+  return out;
 }
 
 /** Mots-clés de l'arme (ceux du catalogue à défaut), plus ceux ajoutés par une technique (Moto R1). */

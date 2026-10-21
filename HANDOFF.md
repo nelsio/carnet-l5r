@@ -759,3 +759,9 @@ Personnage : `reference/perso-test-ecoles.json` (Agilité, Réflexes, Intuition 
 | E18 | Lanceur, Kakita 2, attaque | Étiquette « +1g1 +1 · Kakita R1 » en Centre ; case « Cible à l'Initiative plus basse » décochée par défaut, remise à zéro à l'action suivante |
 | E19 | Fiche v1 importée | Suggestion « Associer à École de bushi Kakita ? » ; rien n'est appliqué sans confirmation |
 
+### C.8 Écarts relevés à l'implémentation (lot 10)
+- **E18** : l'étiquette attendue « +1g1 +1 · Kakita R1 » correspond au rang d'école 1. Au rang 2, la règle C.1 (+ Rang d'école au total) donne « +1g1 +2 » : c'est ce que l'outil affiche et ce que testent E18 (interface et Playwright). À confirmer.
+- **Yoritomo R4** : le catalogue de référence vise la manœuvre `knock` (identifiant du prototype) ; l'outil l'appelle `knockdown`. La copie `src/rules/ecoles-bushi.json` est corrigée, `reference/` reste inchangé.
+- **Spec v1** : deux tests de migration de `core.rules.spec.ts` attendaient `schemaVersion: 1` ; ils attendent désormais la fiche v2 (P6 : mise à jour de la spécification avec le format). Aucune valeur de règle n'a changé.
+- **Type `Character`** : `schoolId`, `schoolRank` et `keywords` sont facultatifs dans le type (les fiches v1 de la spec restent typées) ; `migrate()` et la fusion les remplissent (`""`, `null`, `[]`).
+

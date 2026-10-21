@@ -1,8 +1,9 @@
 /** Passerelle entre les actions de l'aide de jeu et le moteur de règles. */
 import {
-  applicableModifiers, armorModifierBonus, assessmentTN, computePool, DEFAULT_MANEUVERS, findSkill, maneuverRaises,
-  modifiersOf, modifierTN, targetNumber, woundState,
-  type ActionDef, type Character, type Maneuver, type Modifier, type Pool, type PoolAction, type Stance,
+  applicableModifiers, armorModifierBonus, armorTN, assessmentTN, computePool, DEFAULT_MANEUVERS, findSkill, ignoresWoundPenalty,
+  maneuverFreeRaises, maneuverRaises, modifiersOf, modifierTN, schoolContext, targetNumber, targetTnModifier, woundState,
+  type ActionDef, type ActiveEffect, type Character, type Maneuver, type Modifier, type Pool, type PoolAction, type SchoolContext,
+  type Stance,
 } from "@carnet/core";
 
 export interface RollOptions {
@@ -18,13 +19,25 @@ export interface RollOptions {
   flat: number;
   voidPoint: boolean;
   voidSkill: boolean;
+  /** Option d'école : plusieurs points de Vide d'un coup (Shiba R1). */
+  voidSpend: boolean;
   emphasis: boolean;
 }
 
 export const DEFAULT_ROLL_OPTIONS: RollOptions = {
   tn: 15, targetTN: 20, opponentRank: 2, raises: 0, free: 0, extraRolled: 0, flat: 0,
-  voidPoint: false, voidSkill: false, emphasis: false,
+  voidPoint: false, voidSkill: false, voidSpend: false, emphasis: false,
 };
+
+/** Techniques d'école : situation de combat et cases cochées (annexe C.5). */
+export interface SchoolInputs {
+  mounted?: boolean;
+  centerLastRound?: boolean;
+  /** Techniques à cocher retenues pour ce jet. */
+  selected?: ReadonlySet<string>;
+  /** Valeurs saisies (Moto R2). */
+  inputs?: Readonly<Record<string, number>>;
+}
 
 /** Une action donne-t-elle lieu à un jet ? */
 export const isRollable = (a: ActionDef) => a.kind !== "info" && a.kind !== "move";
@@ -32,13 +45,16 @@ export const isRollable = (a: ActionDef) => a.kind !== "info" && a.kind !== "mov
 export function toPoolAction(a: ActionDef): PoolAction {
   switch (a.kind) {
     case "damage":
-      return { kind: "damage", weapon: a.weapon ?? { name: a.label, skill: "", dr: a.dr ?? "0g0" } };
+      return { kind: "damage", weapon: a.weapon ?? { name: a.label, skill: "", dr: a.dr ?? "0g0" }, unarmed: a.unarmed };
     case "initiative":
       return { kind: "initiative" };
     case "trait":
       return { kind: "trait", trait: a.trait ?? "stamina" };
     default:
-      return { kind: "skill", skill: a.skill ?? "", trait: a.trait ?? "agility", attack: a.attack };
+      return {
+        kind: "skill", skill: a.skill ?? "", trait: a.trait ?? "agility", attack: a.attack,
+        weapon: a.weapon, unarmed: a.unarmed, focus: a.id === "focus",
+      };
   }
 }
 
@@ -60,20 +76,57 @@ export function armorBonus(c: Character, toggles: Readonly<Record<string, boolea
   return armorModifierBonus(modifiersOf(c).filter((m) => m.appliesTo === "armor" && isActive(m, toggles)), stance);
 }
 
+/** Cases cochées (`Record` d'interface) → ensemble de clés. */
+export const selectedKeys = (toggles: Readonly<Record<string, boolean>>): Set<string> =>
+  new Set(Object.entries(toggles).filter(([, on]) => on).map(([k]) => k));
+
+/** État de combat de l'interface, tel que le lit le moteur. */
+export interface CombatUi {
+  stance: Stance;
+  fullDefenseBonus: number;
+  voidArmor: boolean;
+  armorToggles: Record<string, boolean>;
+  mounted: boolean;
+  centerLastRound: boolean;
+  schoolArmor: Record<string, boolean>;
+  stacks: Record<string, number>;
+}
+
+export function contextOf(ui: Pick<CombatUi, "stance" | "mounted" | "centerLastRound">): SchoolContext {
+  return schoolContext({ stance: ui.stance, mounted: ui.mounted, centerLastRound: ui.centerLastRound });
+}
+
+/** ND d'armure du personnage : posture, Vide, bonus de jet et techniques d'école. */
+export function currentArmorTN(c: Character, ui: CombatUi): number {
+  return armorTN(c, {
+    stance: ui.stance, fullDefenseBonus: ui.fullDefenseBonus, voidArmor: ui.voidArmor,
+    bonus: armorBonus(c, ui.armorToggles, ui.stance),
+    mounted: ui.mounted, centerLastRound: ui.centerLastRound, selected: selectedKeys(ui.schoolArmor), stacks: ui.stacks,
+  });
+}
+
 export function poolFor(
   c: Character,
   a: ActionDef,
-  opts: Pick<RollOptions, "extraRolled" | "voidPoint" | "voidSkill">,
+  opts: Pick<RollOptions, "extraRolled" | "voidPoint" | "voidSkill"> & { voidSpend?: boolean },
   stance: Stance,
   modifiers: readonly Modifier[] = activeModifiers(c, a, {}, stance),
+  school: SchoolInputs = {},
 ): Pool {
   return computePool(c, toPoolAction(a), {
     stance,
     extraRolled: opts.extraRolled,
     voidPoint: opts.voidPoint,
     voidSkill: opts.voidSkill && isUnskilled(c, a),
+    voidSpend: opts.voidSpend,
     modifiers,
+    ...school,
   });
+}
+
+/** Réserve affichée : « 4g3 +6 ». */
+export function poolLabel(p: Pool): string {
+  return `${p.rolled}g${p.kept}${p.bonus ? ` ${p.bonus > 0 ? "+" : ""}${p.bonus}` : ""}`;
 }
 
 /** Manœuvres de la fiche, ou celles par défaut si la liste est vide. */
@@ -91,17 +144,42 @@ export function baseTN(a: ActionDef, opts: RollOptions): number | null | "oppose
   }
 }
 
-export function calledRaises(c: Character, a: ActionDef, opts: RollOptions, selection: Readonly<Record<string, number>>): number {
-  return opts.raises + (a.attack ? maneuverRaises(selection, effectiveManeuvers(c)) : 0);
+/** Augmentations annoncées : libres + manœuvres (coûts des techniques, augmentations gratuites réservées déduites). */
+export function calledRaises(
+  c: Character, a: ActionDef, opts: RollOptions, selection: Readonly<Record<string, number>>,
+  effects: readonly ActiveEffect[] = [], selected?: ReadonlySet<string>,
+): number {
+  if (!a.attack) return opts.raises;
+  return opts.raises + maneuverRaises(selection, effectiveManeuvers(c), { character: c, free: maneuverFreeRaises(effects, selected) });
+}
+
+/** Contexte du ND final : techniques cochées, compteurs et posture. */
+export interface TnContext {
+  effects?: readonly ActiveEffect[];
+  selected?: ReadonlySet<string>;
+  stacks?: Readonly<Record<string, number>>;
+  ctx?: SchoolContext;
+}
+
+/** ND de la cible : ND d'armure saisi, modifié par les techniques (Yoritomo R2) pour les attaques. */
+export function targetBaseTN(c: Character, a: ActionDef, opts: RollOptions, stacks?: Readonly<Record<string, number>>): number | null | "opposed" {
+  const b = baseTN(a, opts);
+  return typeof b === "number" && a.tn === "target" && a.attack ? b + targetTnModifier(c, stacks) : b;
+}
+
+/** Pénalité de blessure de ce jet (0 si une technique cochée l'ignore). */
+export function rollWoundPenalty(c: Character, t: TnContext = {}): number {
+  return ignoresWoundPenalty(t.effects ?? [], t.selected) ? 0 : (woundState(c, t.ctx).penalty ?? 0);
 }
 
 export function finalTN(
   c: Character, a: ActionDef, opts: RollOptions, selection: Readonly<Record<string, number>>, active: readonly Modifier[] = [],
+  t: TnContext = {},
 ): number | null | "opposed" {
   return targetNumber({
-    base: baseTN(a, opts),
-    calledRaises: calledRaises(c, a, opts, selection),
-    woundPenalty: woundState(c).penalty ?? 0,
+    base: targetBaseTN(c, a, opts, t.stacks),
+    calledRaises: calledRaises(c, a, opts, selection, t.effects, t.selected),
+    woundPenalty: rollWoundPenalty(c, t),
     modifier: modifierTN(active),
   });
 }
