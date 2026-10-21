@@ -300,22 +300,7 @@ export const MODIFIER_TEMPLATES: readonly ModifierTemplate[] = [
  * À vérifier dans le livre avant de s'y fier ; les effets non chiffrables restent dans le texte des techniques.
  */
 export const NAMED_MODIFIERS: readonly ModifierTemplate[] = [
-  // École Hiruma Bushi (Crabe), livre de base 4e.
-  {
-    ...T, id: "hiruma-bushi-1", label: "Hiruma Bushi, rang 1 : Torch's Flame Flickers", source: "technique",
-    appliesTo: "attack", rolled: 1, stance: "attack", mode: "always",
-    note: "+1g0 aux attaques en posture Attaque. Aussi : rations deux fois plus longues pour (rang de Chasse) personnes. À vérifier dans le livre.",
-  },
-  {
-    ...T, id: "hiruma-bushi-2", label: "Hiruma Bushi, rang 2 : Wolf's Little Lesson", source: "technique",
-    appliesTo: "armor", flat: 5, stance: "attack", mode: "optional",
-    note: "+5 au ND d'armure à chaque touche au corps à corps en posture Attaque, cumulable jusqu'au rang d'école, jusqu'à la fin de l'escarmouche : ajuste la valeur (5, 10, 15…). À vérifier dans le livre.",
-  },
-  {
-    ...T, id: "hiruma-bushi-3", label: "Hiruma Bushi, rang 3 : Hummingbird Wings", source: "technique",
-    appliesTo: "armor", flat: 6, mode: "optional",
-    note: "Une fois par round, quand tu es pris pour cible : + (2 × rang d'école) au ND d'armure pour cette attaque. 6 au rang 3 : ajuste au rang 4 (8) et 5 (10). À vérifier dans le livre.",
-  },
+  // Les techniques d'école vivent dans le catalogue d'écoles (ecoles-bushi.json, annexe C).
   // Avantages et désavantages, livre de base 4e.
   {
     ...T, id: "force-de-la-terre", label: "Force de la Terre (Strength of the Earth)", source: "advantage",

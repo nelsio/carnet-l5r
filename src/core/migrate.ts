@@ -1,4 +1,5 @@
 import { CharacterSchema, SCHEMA_VERSION, zodErrors, type Character, type FieldError } from "./schema";
+import { catalogWeapon } from "./schools";
 
 type Json = Record<string, unknown>;
 
@@ -84,9 +85,27 @@ function v0ToV1(src: Json): Json {
   return o;
 }
 
+/**
+ * v1 → v2 (HANDOFF annexe C.2) : mots-clés des armes connues du catalogue.
+ * `schoolId` et `schoolRank` prennent leur valeur par défaut à la validation ;
+ * une arme inconnue reste sans `keywords` (liste vide par défaut, ou valeur conservée lors d'une fusion).
+ */
+function v1ToV2(src: Json): Json {
+  const o: Json = structuredClone(src);
+  if (Array.isArray(o.weapons)) {
+    o.weapons = o.weapons.map((w) => {
+      if (!isObject(w) || "keywords" in w || typeof w.name !== "string") return w;
+      const known = catalogWeapon(w.name);
+      return known ? { ...w, keywords: [...known.keywords] } : w;
+    });
+  }
+  return o;
+}
+
 /** Migrations successives : MIGRATIONS[n] amène la version n à n + 1. */
 const MIGRATIONS: Record<number, (o: Json) => Json> = {
   0: v0ToV1,
+  1: v1ToV2,
 };
 
 /** Ramène un JSON (complet ou partiel) au format courant, sans le valider. */
@@ -103,5 +122,15 @@ export function migrate(json: unknown): Character {
   if (!isObject(json)) throw new CharacterFormatError([{ path: "", message: "doit être un objet JSON" }]);
   const result = CharacterSchema.safeParse(upgrade(json));
   if (!result.success) throw new CharacterFormatError(zodErrors(result.error));
-  return result.data;
+  return withV2Defaults(result.data);
+}
+
+/** Fiche complète : école et mots-clés explicites (`""`, `null`, `[]`). */
+export function withV2Defaults(c: Character): Character {
+  return {
+    ...c,
+    schoolId: c.schoolId ?? "",
+    schoolRank: c.schoolRank ?? null,
+    weapons: c.weapons.map((w) => ({ ...w, keywords: w.keywords ?? [] })),
+  };
 }

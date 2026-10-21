@@ -1,14 +1,16 @@
 /** Stockage (HANDOFF §10.2), sur fake-indexeddb. */
 import { IDBFactory } from "fake-indexeddb";
 import { describe, expect, it, vi } from "vitest";
-import type { Character } from "@carnet/core";
+import { migrate, type Character } from "@carnet/core";
 import { openStorage, readCharacter, requestPersistence, type LibraryEntry } from "../../src/storage";
 import { DB_NAME, DB_VERSION } from "../../src/storage/indexeddb";
 import kakita from "../../reference/exemple-personnage.json";
 
 const base = () => structuredClone(kakita) as Character;
+/** La même fiche au format courant (v2), telle que relue. */
+const v2 = () => migrate(base());
 const entry = (id = "a", patch: Partial<LibraryEntry> = {}): LibraryEntry => ({
-  id, character: base(), mode: "edit", updatedAt: "2026-10-18T10:00:00.000Z", ...patch,
+  id, character: v2(), mode: "edit", updatedAt: "2026-10-18T10:00:00.000Z", ...patch,
 });
 
 describe("Bibliothèque IndexedDB", () => {
@@ -49,7 +51,7 @@ describe("Bibliothèque IndexedDB", () => {
     const v0 = { ...v1, insight: insightRank } as unknown as Character;
     delete (v0 as Partial<Character>).schemaVersion;
     await library.put(entry("old", { character: v0 }));
-    expect((await library.get("old"))?.character).toEqual(base());
+    expect((await library.get("old"))?.character).toEqual(v2());
   });
 
   it("garde une fiche incomplète telle quelle, et ignore une fiche d'une version plus récente", async () => {
@@ -124,7 +126,7 @@ describe("Persistance du stockage", () => {
 
 describe("readCharacter", () => {
   it("valide et migre, sinon garde tel quel", () => {
-    expect(readCharacter(base())).toEqual(base());
+    expect(readCharacter(base())).toEqual(v2());
     expect(readCharacter({ ...base(), traits: { ...base().traits, agility: 0 } }).traits.agility).toBe(0);
   });
 });

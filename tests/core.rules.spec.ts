@@ -307,7 +307,7 @@ describe("Import par fusion (mergeCharacter)", () => {
   });
 });
 
-describe("Migration v0 (prototype) → v1", () => {
+describe("Migration v0 (prototype) → v2", () => {
   it("convertit le format du prototype", () => {
     const v0 = {
       name: "Test", clan: "Lion", insight: 2, honor: "4.5", glory: "", status: "1.0",
@@ -321,15 +321,19 @@ describe("Migration v0 (prototype) → v1", () => {
     };
     const c = migrate(v0);
     expect(c).toMatchObject({
-      schemaVersion: 1, insightRank: 2, honor: 4.5, glory: 0, voidRing: 3,
+      schemaVersion: 2, insightRank: 2, honor: 4.5, glory: 0, voidRing: 3, schoolId: "", schoolRank: null,
       xp: { total: 40, spent: 10 },
       skills: [{ name: "Kenjutsu", emphases: ["Katana", "Nodachi"] }],
-      weapons: [{ name: "Yumi", dr: "2g2", bowStrength: 3 }],
+      weapons: [{ name: "Yumi", dr: "2g2", bowStrength: 3, keywords: ["arc", "distance", "samourai"] }],
       maneuvers: [{ id: "dmg", name: "Augmentation des dégâts", cost: 1, effect: "+1g0", stackable: true }],
     });
   });
-  it("laisse passer une fiche v1 sans changement", () => {
-    expect(migrate(base())).toEqual(base());
+  it("amène une fiche v1 en v2 sans rien perdre (annexe C.2)", () => {
+    const keywords = [["samourai", "moyenne"], ["samourai", "petite"]];
+    expect(migrate(base())).toEqual({
+      ...base(), schemaVersion: 2, schoolId: "", schoolRank: null,
+      weapons: base().weapons.map((w, i) => ({ ...w, keywords: keywords[i] })),
+    });
   });
 });
 

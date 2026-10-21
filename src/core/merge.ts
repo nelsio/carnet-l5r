@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { DEFAULT_MANEUVERS } from "../rules/l5r4e";
 import { normalize } from "./engine";
-import { CharacterFormatError, isObject, upgrade } from "./migrate";
+import { CharacterFormatError, isObject, upgrade, withV2Defaults } from "./migrate";
 import {
   ArmorSchema, CharacterSchema, ManeuverSchema, ModifierSchema, SkillSchema, TechniqueSchema, TraitsSchema,
   WeaponSchema, XpSchema, characterShape, zodErrors,
@@ -66,7 +66,8 @@ export function mergeCharacter(base: Character, patch: unknown): MergeResult {
   }
   delete src.schemaVersion;
 
-  const out = structuredClone(base) as unknown as Json;
+  // Fiche d'une version antérieure (ex. spec v1) : ramenée au format courant avant la fusion.
+  const out = upgrade(structuredClone(base) as unknown as Json);
   const changes: Change[] = [];
   const warnings: string[] = [];
   const errors: FieldError[] = [];
@@ -165,5 +166,5 @@ export function mergeCharacter(base: Character, patch: unknown): MergeResult {
   // Contrôles croisés sur la fiche obtenue (ex. points de Vide <= Anneau de Vide).
   const final = CharacterSchema.safeParse(out);
   if (!final.success) return { ok: false, errors: zodErrors(final.error) };
-  return { ok: true, character: final.data, changes, warnings };
+  return { ok: true, character: withV2Defaults(final.data), changes, warnings };
 }

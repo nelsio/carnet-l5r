@@ -2,6 +2,7 @@
  * Fiche d'exemple téléchargeable depuis la Bibliothèque : un modèle déjà rempli à copier ou modifier.
  * Base : reference/exemple-personnage.json, plus des bonus de jet pour montrer leur format.
  */
+import { migrate } from "../core/migrate";
 import type { Character } from "../core/schema";
 import kakita from "../../reference/exemple-personnage.json";
 
@@ -9,7 +10,7 @@ export const EXAMPLE_FILE_NAME = "exemple-fiche-l5r.json";
 
 export function exampleCharacter(): Character {
   return {
-    ...(structuredClone(kakita) as Character),
+    ...migrate(kakita),
     modifiers: [
       {
         id: "exemple-technique", name: "Exemple : technique d'école (à adapter)", source: "technique",
