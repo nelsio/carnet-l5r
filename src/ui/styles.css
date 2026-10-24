@@ -25,8 +25,8 @@
 header.top{border-bottom:3px solid var(--gold)}
 .mon{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
 .mon::before{content:"";width:12px;height:12px;border-radius:50%;background:var(--gold)}
-.top-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.theme-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 12px;font-weight:700;font-size:13px;color:var(--muted)}
+.top-right{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.theme-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 10px;font-weight:700;font-size:13px;color:var(--muted)}
 .theme-btn.on{border-color:var(--gold);background:var(--gold-soft);color:var(--ink)}
 .theme-btn .ico{width:16px;height:16px;flex:none}
 
@@ -47,8 +47,8 @@ button{cursor:pointer}
 header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;padding-block:22px 14px}
 .who h1{font-size:clamp(26px,5vw,38px);font-weight:800}
 .who .sub{color:var(--muted);margin-top:2px}
-.tabs{display:flex;gap:4px;background:var(--sunk);padding:4px;border-radius:999px}
-.tabs button{border:0;background:transparent;padding:8px 16px;border-radius:999px;font-weight:700;color:var(--muted)}
+.tabs{display:flex;gap:2px;background:var(--sunk);padding:4px;border-radius:999px}
+.tabs button{border:0;background:transparent;padding:8px 12px;border-radius:999px;font-weight:700;color:var(--muted)}
 .tabs button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
 
 /* Barre d'état */
@@ -228,10 +228,10 @@ div.man button{border:0;background:var(--surface);width:24px;height:24px;border-
   body{font-size:15.5px;padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
   header.top{padding-block:14px 10px}
   .who h1{font-size:26px}
-  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;border-radius:0;display:grid;grid-template-columns:1fr 1fr;gap:6px;
+  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;border-radius:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;
     background:var(--surface);border-top:1px solid var(--line);
     padding:6px max(12px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
-  .tabs button{padding:12px;border-radius:8px;font-size:15px}
+  .tabs button{padding:12px 4px;border-radius:8px;font-size:15px}
   .tabs button[aria-pressed="true"]{background:var(--gold-soft);color:var(--ink);box-shadow:none}
   /* En-tête : boutons ronds de 40 px, icône seule ; le texte reste pour les lecteurs d'écran */
   .theme-btn{position:relative;width:40px;height:40px;padding:0;justify-content:center;border-radius:50%}
@@ -265,8 +265,9 @@ div.man button{border:0;background:var(--surface);width:24px;height:24px;border-
   .in{font-size:16px;padding:8px 9px}   /* 16 px : évite le zoom auto d'iOS */
   .btn{padding:10px 14px}
   .x{font-size:22px;padding:6px 10px}
-  .sit{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px)));padding-inline:max(16px,env(safe-area-inset-left,0px))}
-  .sit button{flex:0 0 auto;padding:10px 16px}
+  /* Situations : les 4 onglets se partagent la largeur, sans défilement (360 px compris) */
+  .sit{flex-wrap:nowrap;gap:4px}
+  .sit button{flex:1 1 auto;min-width:0;min-height:40px;padding:8px 6px;font-size:14px}
   .act{padding:12px}
   .stance{grid-template-columns:repeat(2,minmax(0,1fr))}
   .stance button{padding:10px}

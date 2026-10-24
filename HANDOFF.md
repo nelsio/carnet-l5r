@@ -300,7 +300,7 @@ interface LibraryStore {
 
   Le bouton « Modifier la fiche » bascule en mode édition.
 - **Aide de jeu** :
-  - Enquête / Déplacement / Combat / **Statistiques**, avec en Combat les sous-types Escarmouche, Duel iaijutsu et Bataille ;
+  - Enquête / Cour / Déplacement / Combat, avec en Combat les sous-types Escarmouche, Duel iaijutsu et Bataille (Statistiques est une vue à part, voir plus bas) ;
   - en Déplacement, un **encart « Se déplacer en combat »** en tête de liste : trois tuiles (action libre, action simple, maximum par round) en pieds et en mètres, calculées depuis l'Anneau d'Eau, avec un rappel « terrain difficile : distances divisées par deux » ;
   - en Escarmouche : carte **Initiative** en premier (elle affiche le score, et « Nouveau round » ne la réinitialise pas), puis la carte **Nouveau round** (bouton et description courte : « Efface le Vide en armure et la Défense totale ; garde l'initiative et les compteurs. », deux lignes au plus sur mobile ; présente dans tous les types de combat), puis Posture (sauf en Duel), puis le panneau Vide, puis les actions.
 - **Lanceur** :
@@ -321,7 +321,7 @@ interface LibraryStore {
   - dés obtenus (gardés mis en évidence, explosions marquées) ; un dé qui a explosé affiche **sous son total le détail des tirages** (« 13 » avec « 9+4 » en petit), visible sans survol, donc aussi sur mobile ;
   - verdict, marge, augmentations possibles ;
   - historique des 6 derniers jets.
-- **Statistiques** (écran pleine largeur, sans lanceur) : tableau de tous les jets du personnage. Colonnes : Jet, Réserve, Min, Moy., Max, puis chance de réussite contre ND 10, 15, 20, 25, 30 et 40.
+- **Statistiques** (troisième vue, à côté de Fiche et Aide de jeu : dans l'en-tête sur bureau, dans la barre du bas sur mobile ; écran pleine largeur, sans lanceur) : tableau de tous les jets du personnage. Colonnes : Jet, Réserve, Min, Moy., Max, puis chance de réussite contre ND 10, 15, 20, 25, 30 et 40.
   - Lignes : Initiative ; pour chaque arme, l'attaque puis les dégâts en sous-ligne (└) ; puis les compétences triées par nom.
   - Les jets sans ND (dégâts, initiative) affichent « sans ND » à la place des pourcentages.
   - Cellules teintées en vert proportionnellement à la chance de réussite.
@@ -377,7 +377,7 @@ Point de rupture : **largeur ≤ 720 px**. Au-dessus, mise en page bureau inchan
 | Élément | Comportement mobile |
 |---|---|
 | En-tête | Bibliothèque, Lanceur de dés et Thème en **boutons ronds de 40 px, icône seule** ; nom du personnage et icônes tiennent **sur une seule ligne** (le nom passe à la ligne si besoin, jamais les icônes). Lanceur affiché = fond d'accent pâle. |
-| Navigation | Onglets Fiche / Aide de jeu dans une **barre fixe en bas**, deux boutons pleine largeur. Marge basse = hauteur de la barre + `env(safe-area-inset-bottom)`. Onglet actif sur fond d'accent pâle. |
+| Navigation | Onglets Fiche / Aide de jeu / Statistiques dans une **barre fixe en bas**, trois boutons de même largeur. Marge basse = hauteur de la barre + `env(safe-area-inset-bottom)`. Onglet actif sur fond d'accent pâle. Les quatre onglets de situation de l'aide de jeu tiennent sur **une ligne, sans défilement** (360 px compris). |
 | Barre d'état | Les quatre tuiles Dépl. / ND armure / Réduction / Pénalité occupent **toute la largeur sur 4 colonnes égales**, texte centré. **Résumé sur une ligne** (niveau de blessure, pénalité, `blessures / seuil max`), cliquable, bordure rouge si le personnage est blessé. Un appui déplie la piste complète en **2 rangées de 4**. En dessous : compteur −/+ (boutons 40 px) et pastilles de Vide (26 px). |
 | Lanceur | **Panneau glissant depuis le bas**, ouvert au choix d'une action (pas à l'ouverture de l'écran). Hauteur max 88 vh, défilement interne, fond assombri derrière. Poignée et bouton × en haut ; fermeture par ×, appui sur le fond ou Échap. Bouton « Lancer » **collé en bas** du panneau. Après un lancer, le résultat est amené à l'écran et le panneau reste ouvert. Changer une option ne remet pas le défilement du panneau à zéro. Le défilement de la page est bloqué pendant l'ouverture. |
 | Situations | Rangées Enquête / Déplacement / Combat et sous-types en **défilement horizontal**, sans retour à la ligne. |
@@ -526,6 +526,7 @@ Ces cas complètent la spec fournie. L'agent les écrit dans `tests/core.modifie
 | M10 | Boutons « i » | Zone de toucher ≥ 40 × 40 px ; les panneaux Posture et Vide tiennent sur moins d'un écran détails fermés |
 | M11 | En-tête à 360 px de large | Bibliothèque, Lanceur de dés et Thème en icônes de 40 px sur la même ligne que le nom ; libellé accessible avec l'état courant |
 | M12 | Combat sur mobile, et à 360 px de large | Carte « Nouveau round » entre l'Initiative et la Posture ; sa description tient sur 2 lignes au plus |
+| M13 | Aide de jeu sur mobile, et à 360 px de large | Les 4 onglets de situation (Enquête, Cour, Déplacement, Combat) sur une ligne, sans défilement ni texte tronqué, zones de 40 px de haut ; Statistiques est dans la barre du bas |
 
 ---
 
@@ -536,7 +537,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 1. **Socle** : Vite + React + TypeScript strict, ESLint, Vitest, `vite-plugin-singlefile`, workflow `ci.yml`.
 2. **Moteur** : schéma Zod, migrations, données de règles, moteur → `core.rules.spec.ts` vert.
 3. **Interface bureau** : portage du prototype en composants, thème, clans. Revue visuelle par comparaison avec `reference/prototype.html`.
-4. **Mobile** : §7 → tests M1 à M9 (M10 à M12 ajoutés ensuite).
+4. **Mobile** : §7 → tests M1 à M9 (M10 à M13 ajoutés ensuite).
 5. **Stockage** : bibliothèque IndexedDB, écran Bibliothèque, mode consultation → S1, S2, U1.
 6. **Import / export** : fusion avec aperçu, trois destinations → U5, E3 à E5.
 7. **Fichier lié** : File System Access, reprise de permission, conflits → S3 à S5, U6.

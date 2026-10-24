@@ -11,8 +11,8 @@ import type { LibraryEntry } from "../storage";
 import { DEFAULT_ROLL_OPTIONS, effectiveManeuvers, isRollable, isUnskilled, toPoolAction, type RollOptions } from "./rolls";
 
 export type Theme = "auto" | "light" | "dark";
-export type View = "sheet" | "aid";
-export type AidSituation = Situation | "stats";
+export type View = "sheet" | "aid" | "stats";
+export type AidSituation = Situation;
 export type ListKey = "skills" | "weapons" | "techniques" | "maneuvers" | "modifiers";
 /** Panneaux de l'aide de jeu dotés d'un bouton « i » (HANDOFF §6.2). */
 export type InfoPanel = "stance" | "void" | "move" | "reminders";
@@ -183,7 +183,7 @@ export function setIn<T>(obj: T, path: Path, value: unknown): T {
 
 /** Actions de la situation courante de l'aide de jeu. */
 export function currentActions(c: Character, ui: Pick<UiState, "situation" | "sub">): ActionDef[] {
-  return ui.situation === "stats" ? [] : buildActions(c, ui.situation, ui.situation === "combat" ? ui.sub : undefined);
+  return buildActions(c, ui.situation, ui.situation === "combat" ? ui.sub : undefined);
 }
 
 export function selectedAction(c: Character, ui: UiState): ActionDef | undefined {
@@ -237,7 +237,7 @@ function uiReducer(state: AppState, action: AppAction): AppState {
     case "view":
       return action.view === "aid"
         ? { ...state, ui: selectFirst(c, { ...ui, view: "aid", edit: false }) }
-        : withUi({ view: "sheet", sheetOpen: false });
+        : withUi({ view: action.view, sheetOpen: false });
     case "situation": return { ...state, ui: selectFirst(c, { ...ui, situation: action.situation }) };
     case "sub": return { ...state, ui: selectFirst(c, { ...ui, sub: action.sub }) };
     case "stance":

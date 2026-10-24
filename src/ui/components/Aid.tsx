@@ -10,9 +10,8 @@ import { toMeters } from "../format";
 import { contextOf, currentArmorTN, DEFAULT_ROLL_OPTIONS, isActive, isRollable, poolFor, poolLabel, toPoolAction } from "../rolls";
 import { currentActions, useCharacter, useStore, type AidSituation, type InfoPanel } from "../store";
 import { Roller } from "./Roller";
-import { Stats } from "./Stats";
 
-const AID_SITUATIONS: { id: AidSituation; label: string }[] = [...SITUATIONS, { id: "stats", label: "Statistiques" }];
+const AID_SITUATIONS: readonly { id: AidSituation; label: string }[] = SITUATIONS;
 
 export function Aid() {
   const { state, dispatch } = useStore();
@@ -40,7 +39,6 @@ export function Aid() {
       ))}
     </div>
   );
-  if (ui.situation === "stats") return <>{situations}<Stats /></>;
 
   const actions = currentActions(c, ui);
   const initiative = actions.find((a) => a.kind === "initiative");

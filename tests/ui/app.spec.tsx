@@ -406,6 +406,19 @@ describe("Aide de jeu", () => {
     expect(pctAt20()).toBeGreaterThan(before);
   });
 
+  it("Statistiques : page à part dans la navigation (Fiche, Aide de jeu, Statistiques), plus une situation", async () => {
+    await renderApp();
+    const nav = within(screen.getByRole("group", { name: "Vue" }));
+    expect(nav.getAllByRole("button").map((b) => b.textContent)).toEqual(["Fiche", "Aide de jeu", "Statistiques"]);
+    fireEvent.click(nav.getByRole("button", { name: "Statistiques" }));
+    expect(nav.getByRole("button", { name: "Statistiques" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("heading", { name: "Statistiques de tes jets" })).toBeInTheDocument();
+    expect(screen.queryByRole("group", { name: "Situation" })).toBeNull();
+    goToAid();
+    const situations = within(screen.getByRole("group", { name: "Situation" })).getAllByRole("button").map((b) => b.textContent);
+    expect(situations).toEqual(["Enquête", "Cour", "Déplacement", "Combat"]);
+  });
+
   it("étiquette « 9+ » sur les dégâts d'une compétence martiale au rang 7", async () => {
     const c = base();
     c.skills.find((s) => s.name === "Kenjutsu")!.rank = 7;
