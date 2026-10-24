@@ -6,7 +6,7 @@ import {
 import { describeModifier, woundPenaltyReduction } from "./modifiers";
 import type { Character, Maneuver, Modifier, RollTrait, Skill, TraitKey, WeaponKeyword } from "./schema";
 import {
-  describeEffect, effectOn, maneuverCost, resolveValue, rollEffects, schoolArmorBonus, schoolContext, voidMultiplier, voidSpendOption,
+  describeEffect, effectOn, maneuverCost, resolveValue, rollEffects, sameEmphasis, schoolArmorBonus, schoolContext, voidMultiplier, voidPointBonus, voidSpendBonus, voidSpendOption,
   woundEffects, type ActiveEffect, type SchoolContext,
 } from "./schools";
 
@@ -28,6 +28,10 @@ export interface Pool extends TenDice {
   optional?: ActiveEffect[];
   /** Bonus fixe des techniques, compris dans `bonus` (ajouté après la règle des dix dés). */
   techFlat?: number;
+  /** Modification du ND de ce jet par les techniques (Ide R1). */
+  techTn?: number;
+  /** Une technique lève la limite d'augmentations du Vide (Shosuro). */
+  unlimitedRaises?: boolean;
 }
 
 /** Arme telle que lue par le moteur (`bowStrength` et `keywords` facultatifs). */
@@ -57,6 +61,8 @@ export interface PoolMods {
   inputs?: Readonly<Record<string, number>>;
   /** Option de l'école : plusieurs points de Vide dépensés d'un coup (Shiba R1). */
   voidSpend?: boolean;
+  /** Spécialisation choisie au lanceur (conditions des techniques, annexe D-c). */
+  emphasis?: string;
 }
 
 export interface CombatState {
@@ -205,10 +211,14 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
     notes.push(`${m.name} : ${describeModifier(m)}`);
   }
   // Techniques d'école : effets d'office et effets cochés.
-  const ctx = schoolContext({ stance: mods.stance, mounted: mods.mounted, centerLastRound: mods.centerLastRound });
+  const ctx = schoolContext({
+    stance: mods.stance, mounted: mods.mounted, centerLastRound: mods.centerLastRound, emphasis: mods.emphasis,
+  });
   const applied: ActiveEffect[] = [];
   const optional: ActiveEffect[] = [];
   let techFlat = 0;
+  let techTn = 0;
+  let unlimitedRaises = false;
   for (const e of rollEffects(c, action, ctx)) {
     ("mode" in e && e.mode === "auto" ? applied : optional).push(e);
     if (e.kind !== "roll" || !effectOn(e, mods.selected)) continue;
@@ -217,19 +227,24 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
     kept = Math.max(0, kept + resolveValue(e.kept, c, input));
     techFlat += resolveValue(e.flat, c, input);
     freeRaises += resolveValue(e.freeRaises, c, input);
+    techTn += resolveValue(e.tn, c, input);
+    unlimitedRaises ||= !!e.unlimitedRaises;
     notes.push(`${e.source} : ${describeEffect(e, c, input)}`);
   }
   const vm = voidMultiplier(c);
   if (mods.voidPoint) {
-    rolled += POOL_BONUS.voidPoint.rolled * vm;
-    kept += POOL_BONUS.voidPoint.kept * vm;
-    notes.push(`Point de Vide : +${vm}g${vm}`);
+    // Un point vaut 1g1, ou plus avec une technique (Asako R1, Shosuro Acteur R1).
+    const per = voidPointBonus(c, action, ctx);
+    rolled += per.rolled * POOL_BONUS.voidPoint.rolled * vm;
+    kept += per.kept * POOL_BONUS.voidPoint.kept * vm;
+    notes.push(`Point de Vide : +${per.rolled * vm}g${per.kept * vm}`);
   }
-  const spend = mods.voidSpend ? voidSpendOption(c) : undefined;
+  const spend = mods.voidSpend ? voidSpendOption(c, action) : undefined;
   if (spend) {
-    rolled += spend.rolled * vm;
-    kept += spend.kept * vm;
-    notes.push(`${spend.points} points de Vide (${spend.source}) : +${spend.rolled * vm}g${spend.kept * vm}`);
+    const b = voidSpendBonus(c, spend, action, ctx);
+    rolled += b.rolled * vm;
+    kept += b.kept * vm;
+    notes.push(`${spend.points} points de Vide (${spend.source}) : +${b.rolled * vm}g${b.kept * vm}`);
   }
   const ten = applyTenDiceRule(rolled, kept);
   if (ten.bonus) notes.push(`Règle des dix dés : +${ten.bonus}`);
@@ -237,6 +252,8 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
     ...ten, bonus: ten.bonus + flat + techFlat, explodes, explodeOn, canRaise, notes, applied, optional, techFlat,
   };
   if (freeRaises) pool.freeRaises = freeRaises;
+  if (techTn) pool.techTn = techTn;
+  if (unlimitedRaises) pool.unlimitedRaises = true;
   return pool;
 }
 
@@ -370,13 +387,17 @@ export function movement(c: Character): { free: number; simple: number; max: num
   return { free: water * MOVEMENT.free, simple: water * MOVEMENT.simple, max: water * MOVEMENT.max };
 }
 
+/** Spécialisation de la compétence qui correspond à l'indice de l'action (choisie d'office au lanceur). */
+export function matchingEmphasis(c: Character, skillName: string, hint: string | undefined): string | undefined {
+  if (!hint) return undefined;
+  const h = normalize(hint);
+  return findSkill(c, skillName)?.emphases.find((e) => {
+    const n = normalize(e);
+    return n !== "" && (h.includes(n) || n.includes(h) || sameEmphasis(e, hint));
+  });
+}
+
 /** Une spécialisation de la compétence correspond-elle à l'indice de l'action ? */
 export function emphasisMatches(c: Character, skillName: string, hint: string | undefined): boolean {
-  if (!hint) return false;
-  const h = normalize(hint);
-  const skill = findSkill(c, skillName);
-  return !!skill && skill.emphases.some((e) => {
-    const n = normalize(e);
-    return n !== "" && (h.includes(n) || n.includes(h));
-  });
+  return matchingEmphasis(c, skillName, hint) !== undefined;
 }

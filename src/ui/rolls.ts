@@ -21,12 +21,15 @@ export interface RollOptions {
   voidSkill: boolean;
   /** Option d'école : plusieurs points de Vide d'un coup (Shiba R1). */
   voidSpend: boolean;
+  /** Relance des 1 de la spécialisation. */
   emphasis: boolean;
+  /** Spécialisation choisie dans la liste du lanceur ("" : aucune ou non nommée), annexe D-c. */
+  emphasisName: string;
 }
 
 export const DEFAULT_ROLL_OPTIONS: RollOptions = {
   tn: 15, targetTN: 20, opponentRank: 2, raises: 0, free: 0, extraRolled: 0, flat: 0,
-  voidPoint: false, voidSkill: false, voidSpend: false, emphasis: false,
+  voidPoint: false, voidSkill: false, voidSpend: false, emphasis: false, emphasisName: "",
 };
 
 /** Techniques d'école : situation de combat et cases cochées (annexe C.5). */
@@ -108,7 +111,7 @@ export function currentArmorTN(c: Character, ui: CombatUi): number {
 export function poolFor(
   c: Character,
   a: ActionDef,
-  opts: Pick<RollOptions, "extraRolled" | "voidPoint" | "voidSkill"> & { voidSpend?: boolean },
+  opts: Pick<RollOptions, "extraRolled" | "voidPoint" | "voidSkill"> & { voidSpend?: boolean; emphasisName?: string },
   stance: Stance,
   modifiers: readonly Modifier[] = activeModifiers(c, a, {}, stance),
   school: SchoolInputs = {},
@@ -119,6 +122,7 @@ export function poolFor(
     voidPoint: opts.voidPoint,
     voidSkill: opts.voidSkill && isUnskilled(c, a),
     voidSpend: opts.voidSpend,
+    emphasis: opts.emphasisName || undefined,
     modifiers,
     ...school,
   });
@@ -159,6 +163,8 @@ export interface TnContext {
   selected?: ReadonlySet<string>;
   stacks?: Readonly<Record<string, number>>;
   ctx?: SchoolContext;
+  /** Modification du ND par les techniques appliquées (`Pool.techTn`, Ide R1). */
+  techTn?: number;
 }
 
 /** ND de la cible : ND d'armure saisi, modifié par les techniques (Yoritomo R2) pour les attaques. */
@@ -180,6 +186,6 @@ export function finalTN(
     base: targetBaseTN(c, a, opts, t.stacks),
     calledRaises: calledRaises(c, a, opts, selection, t.effects, t.selected),
     woundPenalty: rollWoundPenalty(c, t),
-    modifier: modifierTN(active),
+    modifier: modifierTN(active) + (t.techTn ?? 0),
   });
 }

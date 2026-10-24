@@ -6,7 +6,7 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document.
 
-**Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro, brouillon).
+**Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro).
 
 ---
 
@@ -542,7 +542,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 8. **Distribution** : `pages.yml`, `release.yml`, README joueur, premier tag `v1.0.0`.
 9. **v1.1 — règles et ergonomie** : règle des dix dés du livre (§4.7), maîtrise 7+ (§4.8), détails repliables « i » (§6.2), ligne « lancer à la main » et options alignées du lanceur, retrait de l'encadré Manœuvres de la fiche, éditeur d'armure depuis la barre d'état, option « Lanceur de dés » (masqué par défaut), boutons d'en-tête en icônes sur mobile, cas B1 à B11 → spec moteur verte (80 tests), E11 à E15, M10, M11 ; tag `v1.1.0`. Aucun changement de format de fiche (`schemaVersion` reste 1).
 10. **v2.0 — techniques d'école (bushi)** : annexe C. Format de fiche v2 et migration, moteur d'effets, catalogue `reference/ecoles-bushi.json` (14 écoles), choix d'école sur la fiche, effets automatiques et à cocher, mots-clés d'arme, rappels, badge « Action simple » → cas T1 à T24, E16 à E19 ; tag `v2.0.0`.
-11. **v2.1 — techniques des courtisans et de Shosuro** : même moteur, nouvelles entrées de catalogue (compétences sociales, Connaissance, conditions d'Honneur, spécialisations). Spec : **annexe D, brouillon à valider** avant implémentation → T25 à T42, E20 à E23 ; tag `v2.1.0`.
+11. **v2.1 — techniques des courtisans et de Shosuro** : même moteur, nouvelles entrées de catalogue (compétences sociales, Connaissance, conditions d'Honneur, spécialisations). Annexe D (validée le 24/10/2026) : catalogue `src/rules/ecoles-courtisans.json` (12 écoles), situation Cour, spécialisation choisie au lanceur → cas T25 à T42, E20 à E23 ; tag `v2.1.0`. Aucun changement de format de fiche (`schemaVersion` reste 2).
 
 ---
 
@@ -768,17 +768,17 @@ Personnage : `reference/perso-test-ecoles.json` (Agilité, Réflexes, Intuition 
 
 ---
 
-## Annexe D — Techniques des courtisans et de Shosuro (lot 11, v2.1) — **brouillon à valider**
+## Annexe D — Techniques des courtisans et de Shosuro (lot 11, v2.1)
 
-Statut : **proposition du 24/10/2026, non validée.** Rien n'est implémenté avant validation des points D.1 par Nelson. Les effets ci-dessous sont résumés depuis magicalsamurai.wikidot.com (pages `schools-<clan>`), **à vérifier dans le livre** ; les valeurs attendues de D.6 sont **calculées par l'agent**, pas encore vérifiées dans un prototype.
+Statut : **validée par Nelson le 24/10/2026, défauts retenus** (D.1). Les effets sont résumés depuis magicalsamurai.wikidot.com (pages `schools-<clan>`), **à vérifier dans le livre** ; les valeurs attendues de D.6 sont calculées par l'agent et vérifiées par le moteur, pas dans un prototype.
 
-### D.1 Décisions à trancher
-| # | Sujet | Proposition (défaut si non tranché) |
+### D.1 Décisions (validées le 24/10/2026 : défauts retenus)
+| # | Sujet | Décision |
 |---|---|---|
 | D-a | Périmètre | 10 écoles de courtisans : Yasuki (Crabe), Doji (Grue), Kitsuki enquêteur (Dragon), Ikoma barde (Lion), Yoritomo courtisan (Mante), Asako maître du savoir (Phénix), Bayushi courtisan (Scorpion), Ide émissaire (Licorne), Otomo et Miya héraut (Impérial). Plus **deux** écoles Shosuro (ninja) : Infiltré et Acteur. Voies alternatives (Doji Innocents, Kitsuki Debater, Hand of Peace…) et écoles avancées exclues. |
-| D-b | Lequel des Shosuro | Les deux (Infiltré : livre de base ; Acteur : Secrets of the Scorpion). À réduire à un seul si tu préfères. |
+| D-b | Lequel des Shosuro | Les deux (Infiltré : livre de base ; Acteur : Secrets of the Scorpion). |
 | D-c | Spécialisations | Le lanceur remplace la case « Spécialisation » par une **liste** des spécialisations de la compétence (« Aucune » + chacune). La relance des 1 s'applique dès qu'une spécialisation est choisie (comportement actuel inchangé). Les effets conditionnés à une spécialisation (Ide R1, Yoritomo R2, Shosuro Acteur R1) ne s'appliquent qu'au lanceur, quand elle est choisie ; hors lanceur, jamais. |
-| D-d | Noms des spécialisations | Comparaison normalisée avec alias FR/EN : Honnêteté/Honesty, Duperie/Deceit, Contrôle/Control, Manipulation, Ragots/Gossip, Politesse/Courtesy. « Courtesy » d'Étiquette est traduit **Politesse** pour ne pas se confondre avec la compétence Courtoisie (Courtier). À corriger selon l'édition française. |
+| D-d | Noms des spécialisations | Comparaison normalisée avec alias FR/EN : Honnêteté/Honesty, Duperie/Deceit, Contrôle/Control, Manipulation, Ragots/Gossip, Politesse/Courtesy/Courtoisie, Rhétorique/Rhetoric. « Courtesy » d'Étiquette est traduit **Politesse** pour ne pas se confondre avec la compétence Courtoisie (Courtier). À corriger selon l'édition française. |
 | D-e | Seuil d'Honneur (Doji R1) | Comparaison sur l'Honneur **non arrondi** : 6,0 et plus. (P9, arrondi inférieur, ne vaut que pour l'Honneur utilisé comme valeur.) |
 | D-f | Effets sur autrui | Les techniques qui modifient le ND ou les jets **des autres** (Yasuki R4, Ikoma R2, Kitsuki R2, Bayushi R4…) restent des **rappels**, avec la valeur calculée dans le texte (« +10 au ND de qui tente de te tromper »). |
 | D-g | Utilisations par séance | « N fois par séance » (relances Yasuki R2, Yoritomo R3, Ikoma R4…) : rappel seulement, pas de compteur. |
@@ -859,7 +859,7 @@ Les personas (Acteur R1, R3, R5) restent dans le résumé.
 - **Fiche, bloc Techniques d'école** : rappels chiffrés calculés (« +10 au ND… » au rang 2).
 - **Combat** : Kitsuki R1 dans le ND d'armure (barre d'état, éditeur d'armure).
 
-### D.6 Tests du moteur (`tests/core.schools.spec.ts`, suite)
+### D.6 Tests du moteur (`tests/core.courtiers.spec.ts`)
 Personnage proposé : `reference/perso-test-courtisans.json` — Intuition, Volonté, Perception, Intelligence 3 ; autres traits 2 ; Vide 2 ; Honneur 6,5 ; Courtoisie 3 (Manipulation), Étiquette 3 (Politesse), Sincérité 2 (Honnêteté, Duperie), Intimidation 2 (Contrôle), Connaissance : Histoire 2, Investigation 2, Commerce 1, Comédie 2, Couteaux 2, Furtivité 2, Représentation : Conteur 3 ; Tanto (petite, samouraï), Katana. `insightRank` = rang d'école du cas. **Valeurs calculées, à vérifier.**
 
 | # | École, rang | Cas | Attendu |
@@ -892,3 +892,13 @@ Personnage proposé : `reference/perso-test-courtisans.json` — Intuition, Volo
 | E23 | Lanceur, Shosuro Acteur 3, Comédie | Option « 2 points de Vide (+6g2) » ; absente en Kenjutsu |
 
 Livraison : tag `v2.1.0` (mineure : catalogue et moteur, format inchangé).
+
+### D.8 Écarts relevés à l'implémentation (lot 11)
+- **Situation « Cour »** (ajout) : le lanceur n'avait aucune action pour Sincérité, Intimidation, Tentation, Comédie ni Commerce, ce qui rendait la plupart des techniques inutilisables. Nouvel onglet **Cour** entre Enquête et Déplacement, avec ces jets (en opposition, sauf Commerce ND 15) et une action « Se produire » par compétence « Représentation : … » de la fiche. En **Enquête**, l'action générique « Se souvenir (Connaissance) » est remplacée par une action par compétence « Connaissance : … » de la fiche, quand il y en a. Les panneaux « Rappels d'école » de la Cour et du lanceur affichent les rappels `social`.
+- **Spécialisation (D-c)** : la liste ne remplace la case que si la compétence a des spécialisations nommées ; sans spécialisation, la case « relancer les 1 » reste. La présélection par l'indice de l'action tient compte des alias.
+- **Alias (D-d)** : la fiche d'exemple note « Courtoisie » comme spécialisation d'Étiquette. « Courtoisie » est donc un alias de Politesse/Courtesy (seulement parmi les spécialisations, la compétence Courtoisie n'est pas concernée). « Rhétorique/Rhetoric » est ajouté (Miya R4).
+- **Suggestion (D-h)** : sans mot de classe ni école bushi, la suggestion retient l'école quand elle est **seule** de sa famille (« Doji » → courtisans Doji). « Shosuro » seul reste sans suggestion.
+- **Ide R1 (ND +5 en Duperie)** : les jets de la Cour sont en opposition, donc l'effet s'affiche en étiquette (« ND +5 · Ide R1 ») et ne modifie un ND chiffré que sur un jet à ND.
+- **Liste « Techniques d'école »** : la classe n'est pas ajoutée après le nom (D.5), les noms du catalogue la contiennent déjà (« École de courtisans Bayushi », « École d'acteurs Shosuro »).
+- **Shosuro Infiltré** : pas de liste de compétences d'école (aucun effet ne s'en sert, et la source ne la donnait pas).
+- **Tests** : T25 à T42 sont dans un fichier à part, `tests/core.courtiers.spec.ts`. Les valeurs calculées de D.6 sont toutes confirmées par le moteur. Le test d'interface « spécialisation cochée automatiquement » vérifie maintenant la liste.

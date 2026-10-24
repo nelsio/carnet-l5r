@@ -302,12 +302,21 @@ describe("Aide de jeu", () => {
     expect(chance()).toBeLessThan(before);
   });
 
-  it("spécialisation cochée automatiquement quand elle correspond à l'action", async () => {
+  it("spécialisation choisie automatiquement quand elle correspond à l'action", async () => {
     await renderApp();
     goToAid();
     click(/^Remarquer un détail/);
-    expect(roller().getByRole("checkbox", { name: /Spécialisation/ })).toBeChecked();
+    expect(roller().getByRole("combobox", { name: /Spécialisation/ })).toHaveValue("Remarquer");
+    expect(screen.getByTestId("manual")).toHaveTextContent("relance une fois chaque 1");
     click(/^Fouiller un lieu/);
+    expect(roller().getByRole("combobox", { name: /Spécialisation/ })).toHaveValue("");
+    expect(screen.getByTestId("manual")).not.toHaveTextContent("relance une fois chaque 1");
+  });
+
+  it("compétence sans spécialisation : la case « Spécialisation » reste proposée", async () => {
+    await renderApp();
+    goToAid();
+    click(/^Obtenir des informations en cour/);
     expect(roller().getByRole("checkbox", { name: /Spécialisation/ })).not.toBeChecked();
   });
 

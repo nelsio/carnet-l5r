@@ -4,6 +4,7 @@ import {
 } from "../rules/l5r4e";
 import { attackTrait, isRanged, type WeaponLike } from "./engine";
 import type { Character } from "./schema";
+import { skillIs } from "./schools";
 
 const fixed = (situation: Situation, sub?: CombatSub) =>
   FIXED_ACTIONS.filter((a) => a.situation === situation && a.sub === sub);
@@ -30,8 +31,33 @@ export function weaponActions(w: WeaponLike, sub: CombatSub): ActionDef[] {
   ];
 }
 
+const skillsStarting = (c: Character, prefix: string) => c.skills.filter((s) => s.name.includes(":") && skillIs(s.name, prefix));
+const detail = (name: string) => name.slice(name.indexOf(":") + 1).trim();
+
+/** Une action « Se souvenir » par Connaissance de la fiche (« Connaissance : Histoire ») ; l'action générique sinon. */
+function loreActions(c: Character): ActionDef[] {
+  const generic = FIXED_ACTIONS.find((a) => a.id === "lore");
+  const lores = skillsStarting(c, "Connaissance");
+  if (!generic || !lores.length) return generic ? [generic] : [];
+  return lores.map((s): ActionDef => ({
+    ...generic, id: `lore-${s.name}`, skill: s.name, label: `Se souvenir · ${detail(s.name)}`,
+    description: `${s.name} (Intelligence). Les augmentations donnent des détails de plus.`,
+  }));
+}
+
+/** Une action par Représentation de la fiche (« Représentation : Conteur »). */
+function performActions(c: Character): ActionDef[] {
+  return skillsStarting(c, "Représentation").map((s): ActionDef => ({
+    id: `perform-${s.name}`, situation: "court", kind: "skill", skill: s.name, trait: "awareness", tn: 15,
+    label: `Se produire · ${detail(s.name)}`,
+    description: `${s.name} (Intuition). ND selon le public ; chaque augmentation marque davantage les esprits.`,
+  }));
+}
+
 /** Actions d'une situation, dans l'ordre d'affichage (HANDOFF §6.2). */
 export function buildActions(c: Character, situation: Situation, sub?: CombatSub): ActionDef[] {
+  if (situation === "investigation") return fixed(situation).flatMap((a) => (a.id === "lore" ? loreActions(c) : [a]));
+  if (situation === "court") return [...fixed(situation), ...performActions(c)];
   if (situation !== "combat") return fixed(situation);
   switch (sub ?? "skirmish") {
     case "skirmish": {

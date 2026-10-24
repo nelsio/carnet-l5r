@@ -149,7 +149,7 @@ export const CLAN_ALIASES: Readonly<Record<string, string>> = {
 
 /* ---------- Catalogue d'actions ---------- */
 
-export type Situation = "investigation" | "movement" | "combat";
+export type Situation = "investigation" | "court" | "movement" | "combat";
 export type CombatSub = "skirmish" | "duel" | "battle";
 export type ActionTN = number | "target" | "opposed" | "assessment" | null;
 export type ActionKind = "skill" | "trait" | "damage" | "initiative" | "move" | "info";
@@ -179,6 +179,7 @@ export interface ActionDef {
 
 export const SITUATIONS: readonly { id: Situation; label: string }[] = [
   { id: "investigation", label: "Enquête" },
+  { id: "court", label: "Cour" },
   { id: "movement", label: "Déplacement" },
   { id: "combat", label: "Combat" },
 ];
@@ -199,6 +200,14 @@ export const FIXED_ACTIONS: readonly ActionDef[] = [
   { id: "court", situation: "investigation", label: "Obtenir des informations en cour", kind: "skill", skill: "Courtoisie", trait: "awareness", tn: 15, description: "Conversation polie, rumeurs, faveurs. Chaque augmentation donne un détail de plus." },
   { id: "etiquette", situation: "investigation", label: "Garder contenance", kind: "skill", skill: "Étiquette", trait: "awareness", tn: 15, description: "Ne rien laisser paraître, éviter un faux pas qui coûte de l'Honneur." },
   { id: "lore", situation: "investigation", label: "Se souvenir (Connaissance)", kind: "skill", skill: "Connaissance", trait: "intelligence", tn: 15, description: "Nomme ta Connaissance précise dans la fiche (ex. « Connaissance : Héraldique »). Sinon, jet sans compétence." },
+  // Cour (lot 11) : jets sociaux, le plus souvent en opposition. Les Représentations viennent de la fiche (core/actions).
+  { id: "persuade", situation: "court", label: "Convaincre, manipuler", kind: "skill", skill: "Courtoisie", trait: "awareness", emphasisHint: "Manipulation", tn: "opposed", description: "Courtoisie (Intuition) contre Étiquette (Intuition ou Volonté) de l'interlocuteur." },
+  { id: "resist", situation: "court", label: "Résister à une influence", kind: "skill", skill: "Étiquette", trait: "awareness", emphasisHint: "Politesse", tn: "opposed", description: "Étiquette (Intuition ou Volonté) contre la Courtoisie, l'Intimidation ou la Tentation adverse." },
+  { id: "sincerity", situation: "court", label: "Être cru", kind: "skill", skill: "Sincérité", trait: "awareness", tn: "opposed", description: "Sincérité (Intuition) contre Investigation (Intuition). Choisis la spécialisation : Honnêteté pour la vérité, Duperie pour un mensonge." },
+  { id: "intimidate", situation: "court", label: "Intimider", kind: "skill", skill: "Intimidation", trait: "willpower", emphasisHint: "Contrôle", tn: "opposed", description: "Intimidation (Volonté) contre Étiquette (Volonté). Peut coûter de l'Honneur." },
+  { id: "tempt", situation: "court", label: "Tenter, séduire", kind: "skill", skill: "Tentation", trait: "awareness", tn: "opposed", description: "Tentation (Intuition) contre Étiquette (Volonté). Compétence basse : peut coûter de l'Honneur." },
+  { id: "act", situation: "court", label: "Jouer un rôle", kind: "skill", skill: "Comédie", trait: "awareness", tn: "opposed", description: "Comédie (Intuition) contre Investigation (Perception) de qui t'observe." },
+  { id: "trade", situation: "court", label: "Marchander, estimer", kind: "skill", skill: "Commerce", trait: "intelligence", emphasisHint: "Estimation", tn: 15, description: "Estimer la valeur d'un objet ou négocier un prix. Compétence marchande : peut coûter de l'Honneur en public." },
   // Déplacement
   { id: "move", situation: "movement", label: "Se déplacer en combat", kind: "move", tn: null, description: "Terrain difficile : distances divisées par deux." },
   { id: "athletics", situation: "movement", label: "Courir, grimper, sauter", kind: "skill", skill: "Athlétisme", trait: "strength", tn: 15, description: "Escalade d'un mur 15, falaise 25. Course prolongée : Constitution au lieu de Force." },

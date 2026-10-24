@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
 import {
-  attackTrait, catalogWeapon, computePool, defaultModifiers, isRanged, parseWeaponKeywords, rings, ROLL_TRAITS, schoolOf,
+  activeEffects, attackTrait, catalogWeapon, reminderText, computePool, defaultModifiers, isRanged, parseWeaponKeywords, rings, ROLL_TRAITS, schoolOf,
   schoolRankOf, schoolsByClan, suggestSchool, techniqueCategories, weaponKeywords,
   type Character, type PoolAction, type RollTrait, type TraitKey,
 } from "@carnet/core";
@@ -373,6 +373,8 @@ function SchoolTechniques() {
     );
   }
   const rank = schoolRankOf(c);
+  // Rappels chiffrés des rangs atteints (« +10 au ND de qui te ment »), annexe D.5.
+  const valued = activeEffects(c).filter((e) => e.kind === "reminder" && e.value !== undefined);
   return (
     <div data-testid="school-techniques">
       <div className="schoolhead"><b>{school.name}</b> <span className="muted">· {school.clan} · Rang d'école {rank}</span></div>
@@ -389,6 +391,9 @@ function SchoolTechniques() {
               </span>
             </div>
             <div className="muted">{r.summary}</div>
+            {valued.filter((e) => e.rank === r.rank).map((e) => (
+              <div key={e.key} className="hint" style={{ color: "var(--gold)" }}>→ {reminderText(e, c)}</div>
+            ))}
           </div>
         );
       })}

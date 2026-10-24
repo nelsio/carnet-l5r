@@ -1,6 +1,6 @@
 # Carnet de Rokugan
 
-Compagnon de campagne pour les joueurs de **La Légende des Cinq Anneaux, 4e édition** : la fiche de personnage, et une aide aux jets Roll & Keep selon la situation (enquête, déplacement, escarmouche, duel, bataille).
+Compagnon de campagne pour les joueurs de **La Légende des Cinq Anneaux, 4e édition** : la fiche de personnage, et une aide aux jets Roll & Keep selon la situation (enquête, cour, déplacement, escarmouche, duel, bataille).
 
 L'outil tient dans **un seul fichier HTML**. Il n'a ni serveur, ni compte, et n'envoie rien sur internet : tes fiches restent dans ton navigateur.
 
@@ -63,11 +63,17 @@ Les 14 écoles de bushi du livre de base (Hida, Hiruma, Kakita, Daidoji, Mirumot
 - Les techniques sans effet chiffré apparaissent dans le panneau **Rappels d'école**.
 - Les armes ont des **mots-clés** (Samouraï, Lourde, Arc…) pré-remplis pour les armes connues : ils décident des techniques qui s'appliquent.
 
+Depuis la v2.1, le catalogue compte aussi 10 écoles de **courtisans** (Yasuki, Doji, Kitsuki, Ikoma, Yoritomo, Asako, Bayushi, Ide, Otomo, Miya) et deux écoles **Shosuro** (Infiltré, Acteur). Pour elles :
+
+- la situation **Cour** de l'aide de jeu propose les jets sociaux (Courtoisie, Étiquette, Sincérité, Intimidation, Tentation, Comédie, Commerce) et une action par **Représentation** de ta fiche. **Enquête** propose une action par **Connaissance** de ta fiche ;
+- dans le lanceur, la **Spécialisation** se choisit dans une liste. Certaines techniques en dépendent : Duperie ou Honnêteté pour Ide, Contrôle pour Yoritomo ;
+- les techniques qui agissent sur les autres (« +10 au ND de qui te ment ») sont rappelées avec leur valeur, sur la fiche et sous la réserve des jets sociaux.
+
 Une fiche d'une version précédente propose d'associer l'école reconnue dans son nom (« Associer à École de bushi Kakita ? ») : rien ne change sans ta confirmation. Les résumés sont écrits pour l'outil : réfère-toi à ton livre pour le texte exact.
 
 ## Bonus des techniques et avantages
 
-Pour une technique hors catalogue (courtisan, shugenja, kata), un avantage ou un désavantage qui modifie les jets, Sur la fiche, en modification, le panneau **Bonus de jet** permet de les saisir :
+Pour une technique hors catalogue (shugenja, kata), un avantage ou un désavantage qui modifie les jets, Sur la fiche, en modification, le panneau **Bonus de jet** permet de les saisir :
 
 - librement, ou à partir d'un **modèle** (+1g0 à une compétence, augmentation gratuite, +5 au ND d'armure…) ;
 - ou depuis le **catalogue**, qui contient Force de la Terre et Aspect dérangeant. Ces entrées sont des résumés à vérifier dans ton livre.

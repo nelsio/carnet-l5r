@@ -77,3 +77,74 @@ test("E19 : fiche v1 importée : suggestion « Associer à École de bushi Kakit
   await expect(page.getByTestId("school-techniques")).toContainText("École de bushi Kakita");
   await expect(page.getByTestId("sheet-initiative")).toHaveText("4g3 +6");
 });
+
+/* ---------- Lot 11 : courtisans et Shosuro (annexe D.7) ---------- */
+
+const courtierPath = resolve("reference/perso-test-courtisans.json");
+
+/** Importe le personnage de test des courtisans en « Nouvelle fiche ». */
+async function importCourtier(page: Page) {
+  await page.goto(pageUrl);
+  await page.getByLabel("Fichier JSON à importer").setInputFiles(courtierPath);
+  await page.getByRole("dialog").getByRole("radio", { name: /Nouvelle fiche/ }).check();
+  await page.getByRole("dialog").getByRole("button", { name: "Importer" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Personnage de test des courtisans" })).toBeVisible();
+}
+
+async function court(page: Page) {
+  await page.getByRole("button", { name: "Aide de jeu" }).click();
+  await page.getByRole("button", { name: "Cour", exact: true }).click();
+}
+
+test("E20 : Doji, Honneur 6,5 puis 5,0 : « 1 augm. gratuite · Doji R1 » en Courtoisie, puis plus rien", async ({ page }) => {
+  await importCourtier(page);
+  await chooseSchool(page, "École de courtisans Doji", "1");
+  await court(page);
+  await page.getByRole("button", { name: /^Convaincre, manipuler/ }).click();
+  const roller = page.getByRole("dialog", { name: "Lanceur de dés" });
+  await expect(roller.getByTestId("tech-chips")).toContainText("1 augm. gratuite · Doji R1");
+  await page.getByRole("button", { name: "Fiche", exact: true }).click();
+  await page.getByRole("button", { name: "Modifier la fiche" }).click();
+  await page.getByRole("spinbutton", { name: "Honneur" }).fill("5");
+  await page.getByRole("button", { name: "Terminer" }).click();
+  await court(page);
+  await page.getByRole("button", { name: /^Convaincre, manipuler/ }).click();
+  await expect(roller.getByTestId("tech-chips")).toHaveCount(0);
+});
+
+test("E21 : Ide 1, Sincérité : Duperie puis Honnêteté, étiquettes Ide R1 et relance des 1", async ({ page }) => {
+  await importCourtier(page);
+  await chooseSchool(page, "École d'émissaires Ide", "1");
+  await court(page);
+  await page.getByRole("button", { name: /^Être cru/ }).click();
+  const roller = page.getByRole("dialog", { name: "Lanceur de dés" });
+  const emphasis = roller.getByRole("combobox", { name: /Spécialisation/ });
+  await emphasis.selectOption("Duperie");
+  await expect(roller.getByTestId("tech-chips")).toContainText("ND +5 · Ide R1");
+  await expect(roller.getByTestId("manual")).toContainText("relance une fois chaque 1");
+  await emphasis.selectOption("Honnêteté");
+  await expect(roller.getByTestId("tech-chips")).toContainText("1 augm. gratuite · Ide R1");
+  await expect(roller.getByTestId("manual")).toContainText("relance une fois chaque 1");
+});
+
+test("E22 : Yasuki 4, Étiquette : rappel « +20 au ND de qui tente de te tromper » sous la réserve", async ({ page }) => {
+  await importCourtier(page);
+  await chooseSchool(page, "École de courtisans Yasuki", "4");
+  await court(page);
+  await page.getByRole("button", { name: /^Résister à une influence/ }).click();
+  await expect(page.getByRole("dialog", { name: "Lanceur de dés" }).getByTestId("school-reminders"))
+    .toContainText("+20 au ND de qui tente de te tromper.");
+});
+
+test("E23 : Shosuro Acteur 3, Comédie : option « 2 points de Vide (+6g2) », absente en Kenjutsu", async ({ page }) => {
+  await importCourtier(page);
+  await chooseSchool(page, "École d'acteurs Shosuro", "3");
+  await court(page);
+  await page.getByRole("button", { name: /^Jouer un rôle/ }).click();
+  const roller = page.getByRole("dialog", { name: "Lanceur de dés" });
+  await roller.getByRole("checkbox", { name: /Dépenser 2 points de Vide \(\+6g2\)/ }).check();
+  await expect(roller.getByTestId("pool")).toHaveText("10g5");
+  await page.getByRole("button", { name: "Combat", exact: true }).click();
+  await page.getByRole("button", { name: /^Attaque · Katana/ }).click();
+  await expect(roller.getByRole("checkbox", { name: /Dépenser 2 points de Vide/ })).toHaveCount(0);
+});
