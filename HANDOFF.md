@@ -6,6 +6,8 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document.
 
+**État au 24/10/2026 :** version publiée **v2.1.2**, lots 1 à 11 livrés (§11), format de fiche `schemaVersion: 2`. Lot 12 à définir.
+
 **Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro).
 
 ---
@@ -44,14 +46,17 @@ carnet-l5r/
 ├─ src/
 │  ├─ core/       # schéma Zod, types, moteur de règles, fusion, migrations (aucune dépendance au DOM)
 │  ├─ rules/      # l5r4e.ts : manœuvres, postures, ND, blessures, clans, catalogue d'actions
+│  │              # ecoles.ts + ecoles-bushi.json (annexe C) + ecoles-courtisans.json (annexe D) : techniques d'école
 │  ├─ storage/    # LibraryStore : IndexedDB, fichiers, fichier lié
 │  ├─ ui/         # composants React, thème CSS, hooks
 │  └─ main.tsx
 ├─ tests/
 │  ├─ core.rules.spec.ts      # fourni : spécification exécutable du moteur
+│  ├─ core.*.spec.ts          # bonus de jet (B1 à B11), écoles bushi (T1 à T24), courtisans (T25 à T42), import, moteur
+│  ├─ storage/                # Vitest + fake-indexeddb
 │  ├─ ui/                     # Vitest + Testing Library
 │  └─ e2e/                    # Playwright
-├─ reference/     # prototype.html, exemple-personnage.json (ne pas modifier)
+├─ reference/     # prototype.html, exemple-personnage.json, ecoles-bushi.json, perso-test-*.json (ne pas modifier)
 ├─ public/fonts/  # polices embarquées dans le build
 ├─ .github/workflows/  # ci.yml, pages.yml, release.yml
 ├─ README.md      # guide joueur (§9.3)
@@ -77,6 +82,8 @@ Dans les tests fournis, `@carnet/core` est un alias de `src/core` (à déclarer 
 
 ### 3.1 Fiche (`Character`, `schemaVersion: 1`)
 Clés de code en anglais, libellés d'interface en français.
+
+**Format courant : `schemaVersion: 2`** (depuis la v2.0). Il ajoute à la v1 ci-dessous `schoolId`, `schoolRank` et les `keywords` des armes (annexe C.2) ; `migrate()` convertit toute fiche v0 ou v1. La v2.1 n'a pas changé le format (annexe D-i).
 
 ```ts
 type TraitKey = "stamina"|"willpower"|"strength"|"perception"|"agility"|"intelligence"|"reflexes"|"awareness";
@@ -127,6 +134,8 @@ Restent en mémoire de l'onglet :
 - les effets du round (Vide en armure, défense totale) ;
 - le score d'initiative ;
 - les manœuvres sélectionnées ;
+- la spécialisation choisie au lanceur ;
+- les techniques d'école cochées, les compteurs, la case Monté et le Centre du round précédent (annexe C.5) ;
 - l'ouverture du panneau mobile.
 
 ---
@@ -265,7 +274,8 @@ interface LibraryStore {
 |---|---|
 | **Bibliothèque** (écran d'accueil s'il n'y a aucune fiche, sinon accessible par l'en-tête) | Liste des fiches locales : nom, clan (pastille de couleur), école, date, badge « Consultation » pour les fiches en lecture seule. Actions : Ouvrir, Nouvelle fiche, Importer un JSON, Supprimer (avec confirmation intégrée à la page). |
 | **Fiche** | Comme le prototype (§6.2). |
-| **Aide de jeu** | Comme le prototype (§6.2). |
+| **Aide de jeu** | Comme le prototype (§6.2), avec la situation **Cour** en plus (annexe D.8). |
+| **Statistiques** | Tableau des chances de réussite de tous les jets (§6.2). Troisième vue, à côté de Fiche et Aide de jeu (v2.1.2). |
 
 **Fiches en consultation** :
 - aucun champ éditable, pas de bouton « Modifier » ;
@@ -281,9 +291,9 @@ interface LibraryStore {
   - **boutons d'en-tête** Bibliothèque, Lanceur de dés et Thème : chacun = **icône + texte** sur bureau (livres, dé, demi-cercle), **icône seule** sur mobile (§7) ; le texte reste présent pour les lecteurs d'écran et en info-bulle, avec l'état courant (« Thème : sombre », « Lanceur de dés : masqué ») ;
   - bouton **« Lanceur de dés : masqué / affiché »**, à côté du thème et de la Bibliothèque (même style ; fond d'accent pâle quand affiché). **Masqué par défaut**, choix mémorisé dans les préférences :
     - **masqué** : le panneau d'action reste un panneau d'aide (réserve, ligne « lancer à la main », Min · Moy. · Max, chance de réussite, ND final, options, manœuvres) mais **sans** bouton « Lancer », sans dés obtenus, sans verdict et sans historique. Les enchaînements qui dépendent d'un lancer (score d'initiative affiché, bonus de Défense totale, dés de dégâts pré-remplis) ne se déclenchent pas ; les dépenses de Vide se font par les pastilles et le panneau Vide ;
-    - **affiché** : le bouton « Lancer » et les résultats apparaissent dans tous les lanceurs (Enquête, Déplacement, Combat) ;
+    - **affiché** : le bouton « Lancer » et les résultats apparaissent dans tous les lanceurs (Enquête, Cour, Déplacement, Combat) ;
     - le changement s'applique immédiatement, sans recharger ;
-  - onglets Fiche et Aide de jeu.
+  - onglets Fiche, Aide de jeu et Statistiques (dans la barre du bas sur mobile, §7).
 - **Barre d'état collante** :
   - piste des 8 niveaux de blessure, avec le niveau courant ;
   - compteur −/+ ;
@@ -307,7 +317,7 @@ interface LibraryStore {
   - réserve en grand, et juste dessous la ligne **Min · Moy. · Max** (« Max 30+ » si la réserve explose) et la **chance de réussite** contre le ND final quand il y en a un. Elle se recalcule à chaque option (augmentations, Vide, spécialisation, bonus fixe) ;
   - juste sous la réserve, une ligne **« lancer à la main »** (avant Min · Moy. · Max) qui donne les règles de relance pour jouer avec de vrais dés (pas de phrase « Lance N dés, garde K » : le XgY suffit) :
     - la règle d'explosion applicable : « Les **10** explosent : relance le dé et additionne, tant qu'il retombe sur 10. », ou « Les **9 et 10** explosent… » en cas de maîtrise, ou « Aucun dé n'explose (compétence non maîtrisée). » ;
-    - « Spécialisation : relance une fois chaque **1**. » si la spécialisation est cochée ;
+    - « Spécialisation : relance une fois chaque **1**. » si une spécialisation est choisie (liste des spécialisations de la compétence, ou case si elle n'en a pas, annexe D-c) ;
     - « Ajoute **+N** au total » si bonus fixe ou règle des dix dés (« dont règle des dix dés ») ;
     - elle se met à jour avec chaque option (Vide, dés ±, posture, maîtrise) ;
   - ND de base selon l'action ;
@@ -449,6 +459,8 @@ Depuis un fichier (bouton ou glisser-déposer). Trois destinations :
 
 « Terminé » = tests verts, `tsc --noEmit` sans erreur, lint propre, CI verte.
 
+État en v2.1.2 : **339 tests Vitest** (moteur, stockage, interface) et **52 tests Playwright** (chromium, iPhone 13, Pixel 7), lignes de `src/core` couvertes à 100 %.
+
 ### 10.1 Moteur (`tests/core.rules.spec.ts`) — fourni, 80 tests
 - C'est la **spécification exécutable** du moteur. Elle a été validée contre une implémentation de référence : 80 tests sur 80 passent (v1.1 : règle des dix dés du livre, maîtrise 7+).
 - **Changement d'attendus en v1.1** : la règle des dix dés précédente était fausse. Les cas `12k5`, `14k9` et la réserve 14k7 du test « règle des dix dés en dernier » ont des valeurs corrigées, conformes au livre.
@@ -545,6 +557,9 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 9. **v1.1 — règles et ergonomie** : règle des dix dés du livre (§4.7), maîtrise 7+ (§4.8), détails repliables « i » (§6.2), ligne « lancer à la main » et options alignées du lanceur, retrait de l'encadré Manœuvres de la fiche, éditeur d'armure depuis la barre d'état, option « Lanceur de dés » (masqué par défaut), boutons d'en-tête en icônes sur mobile, cas B1 à B11 → spec moteur verte (80 tests), E11 à E15, M10, M11 ; tag `v1.1.0`. Aucun changement de format de fiche (`schemaVersion` reste 1).
 10. **v2.0 — techniques d'école (bushi)** : annexe C. Format de fiche v2 et migration, moteur d'effets, catalogue `reference/ecoles-bushi.json` (14 écoles), choix d'école sur la fiche, effets automatiques et à cocher, mots-clés d'arme, rappels, badge « Action simple » → cas T1 à T24, E16 à E19 ; tag `v2.0.0`.
 11. **v2.1 — techniques des courtisans et de Shosuro** : même moteur, nouvelles entrées de catalogue (compétences sociales, Connaissance, conditions d'Honneur, spécialisations). Annexe D (validée le 24/10/2026) : catalogue `src/rules/ecoles-courtisans.json` (12 écoles), situation Cour, spécialisation choisie au lanceur → cas T25 à T42, E20 à E23 ; tag `v2.1.0`. Aucun changement de format de fiche (`schemaVersion` reste 2).
+   - **v2.1.1** (patch) : carte « Nouveau round » entre l'Initiative et la Posture, avec une description de deux lignes au plus sur mobile (§6.2, M12) ; test du fichier lié rendu robuste (lecture du fichier avant sa première écriture).
+   - **v2.1.2** (patch) : Statistiques devient une vue à part (en-tête sur bureau, barre du bas sur mobile) ; les 4 onglets de situation tiennent sur une ligne à 360 px (§7, M13).
+12. **À définir** : pistes possibles, voies alternatives et écoles avancées (exclues en D-a), shugenja et sorts (hors périmètre, §1), compteurs « N fois par séance » (D-g), points ouverts P3 et P10.
 
 ---
 
