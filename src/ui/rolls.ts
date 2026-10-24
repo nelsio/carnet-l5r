@@ -5,6 +5,7 @@ import {
   type ActionDef, type ActiveEffect, type Character, type Maneuver, type Modifier, type Pool, type PoolAction, type SchoolContext,
   type Stance,
 } from "@carnet/core";
+import { CALLED_ZONES, KNOCKDOWN_QUADRUPED_COST, type CalledZone } from "../rules/l5r4e";
 
 export interface RollOptions {
   /** ND de base choisi dans l'échelle. */
@@ -25,12 +26,26 @@ export interface RollOptions {
   emphasis: boolean;
   /** Spécialisation choisie dans la liste du lanceur ("" : aucune ou non nommée), annexe D-c. */
   emphasisName: string;
+  /** Zone du Coup ciblé (annexe E.2 C5). */
+  calledZone: CalledZone;
+  /** Renversement d'un quadrupède : 4 augmentations (C7). */
+  quadruped: boolean;
+  /** Dégâts qui suivent un Désarmement réussi : 2g1 sans la Force (C6). */
+  disarm: boolean;
 }
 
 export const DEFAULT_ROLL_OPTIONS: RollOptions = {
   tn: 15, targetTN: 20, opponentRank: 2, raises: 0, free: 0, extraRolled: 0, flat: 0,
   voidPoint: false, voidSkill: false, voidSpend: false, emphasis: false, emphasisName: "",
+  calledZone: "limb", quadruped: false, disarm: false,
 };
+
+/** Coût des manœuvres selon la variante choisie : zone du Coup ciblé, quadrupède renversé. */
+export function maneuverCosts(opts: Pick<RollOptions, "calledZone" | "quadruped">): Record<string, number> {
+  const costs: Record<string, number> = { called: CALLED_ZONES.find((z) => z.id === opts.calledZone)?.cost ?? 1 };
+  if (opts.quadruped) costs.knockdown = KNOCKDOWN_QUADRUPED_COST;
+  return costs;
+}
 
 /** Techniques d'école : situation de combat et cases cochées (annexe C.5). */
 export interface SchoolInputs {
@@ -111,7 +126,7 @@ export function currentArmorTN(c: Character, ui: CombatUi): number {
 export function poolFor(
   c: Character,
   a: ActionDef,
-  opts: Pick<RollOptions, "extraRolled" | "voidPoint" | "voidSkill"> & { voidSpend?: boolean; emphasisName?: string },
+  opts: Pick<RollOptions, "extraRolled" | "voidPoint" | "voidSkill"> & { voidSpend?: boolean; emphasisName?: string; disarm?: boolean },
   stance: Stance,
   modifiers: readonly Modifier[] = activeModifiers(c, a, {}, stance),
   school: SchoolInputs = {},
@@ -123,6 +138,7 @@ export function poolFor(
     voidSkill: opts.voidSkill && isUnskilled(c, a),
     voidSpend: opts.voidSpend,
     emphasis: opts.emphasisName || undefined,
+    disarm: a.kind === "damage" && !!opts.disarm,
     modifiers,
     ...school,
   });
@@ -154,7 +170,9 @@ export function calledRaises(
   effects: readonly ActiveEffect[] = [], selected?: ReadonlySet<string>,
 ): number {
   if (!a.attack) return opts.raises;
-  return opts.raises + maneuverRaises(selection, effectiveManeuvers(c), { character: c, free: maneuverFreeRaises(effects, selected) });
+  return opts.raises + maneuverRaises(selection, effectiveManeuvers(c), {
+    character: c, free: maneuverFreeRaises(effects, selected), costs: maneuverCosts(opts),
+  });
 }
 
 /** Contexte du ND final : techniques cochées, compteurs et posture. */
@@ -165,6 +183,8 @@ export interface TnContext {
   ctx?: SchoolContext;
   /** Modification du ND par les techniques appliquées (`Pool.techTn`, Ide R1). */
   techTn?: number;
+  /** Modification du ND par l'arme (`Pool.weaponTn` : yumi monté, dai-kyu à pied). */
+  weaponTn?: number;
 }
 
 /** ND de la cible : ND d'armure saisi, modifié par les techniques (Yoritomo R2) pour les attaques. */
@@ -186,6 +206,6 @@ export function finalTN(
     base: targetBaseTN(c, a, opts, t.stacks),
     calledRaises: calledRaises(c, a, opts, selection, t.effects, t.selected),
     woundPenalty: rollWoundPenalty(c, t),
-    modifier: modifierTN(active) + (t.techTn ?? 0),
+    modifier: modifierTN(active) + (t.techTn ?? 0) + (t.weaponTn ?? 0),
   });
 }

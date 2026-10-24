@@ -8,7 +8,7 @@ import {
   DEFAULT_MANEUVERS, emphasisMatches, formatDice, formatPath, mergeCharacter, migrate, poolStats, rollDice,
   woundState, type Character,
 } from "@carnet/core";
-import kakita from "../reference/exemple-personnage.json";
+import kakita from "./fixtures/kakita-v1.json";
 
 const base = () => structuredClone(kakita) as Character;
 const sword = { name: "Katana", skill: "Kenjutsu", dr: "3k2" };
@@ -139,7 +139,7 @@ describe("Migration : cas limites", () => {
     const c = migrate(v0);
     expect(c.honor).toBe(0);
     expect(c.xp).toEqual({ total: 40, spent: 34 });
-    expect(c.weapons[0]).toEqual({ name: "Yumi", skill: "Kyujutsu", dr: "2g2", keywords: ["arc", "distance", "samourai"] });
+    expect(c.weapons[0]).toEqual({ name: "Yumi", skill: "Kyujutsu", dr: "2g2", keywords: ["arc", "distance", "grande"] });
     expect(c.maneuvers[0]?.stackable).toBe(false);
     expect(() => migrate({ ...v0, skills: [1], weapons: [2], maneuvers: [3] })).toThrow(CharacterFormatError);
   });

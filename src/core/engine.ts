@@ -1,13 +1,13 @@
 import {
-  ARMOR_TN, DEAD_LABEL, MASTERY, MOVEMENT, POOL_BONUS, RANGED_PATTERN, RINGS, TN_PER_RAISE,
-  WOUND_FIRST_MULTIPLIER, WOUND_LEVELS, WOUND_NEXT_MULTIPLIER,
-  type RingKey, type Stance,
+  ARMOR_TN, DEAD_LABEL, DISARM_DAMAGE, FULL_DEFENSE_DIVISOR, MASTERY, MOVEMENT, POOL_BONUS, RANGED_PATTERN, RINGS, SKILL_ALIASES,
+  TERRAINS, TN_PER_RAISE, WOUND_FIRST_MULTIPLIER, WOUND_LEVELS, WOUND_NEXT_MULTIPLIER,
+  type RingKey, type Stance, type Terrain,
 } from "../rules/l5r4e";
 import { describeModifier, woundPenaltyReduction } from "./modifiers";
 import type { Character, Maneuver, Modifier, RollTrait, Skill, TraitKey, WeaponKeyword } from "./schema";
 import {
-  describeEffect, effectOn, maneuverCost, resolveValue, rollEffects, sameEmphasis, schoolArmorBonus, schoolContext, voidMultiplier, voidPointBonus, voidSpendBonus, voidSpendOption,
-  woundEffects, type ActiveEffect, type SchoolContext,
+  catalogWeapon, describeEffect, effectOn, maneuverCost, resolveValue, rollEffects, sameEmphasis, schoolArmorBonus, schoolContext, skillIs,
+  voidMultiplier, voidPointBonus, voidSpendBonus, voidSpendOption, woundEffects, type ActiveEffect, type SchoolContext,
 } from "./schools";
 
 export type Rng = () => number;
@@ -32,6 +32,14 @@ export interface Pool extends TenDice {
   techTn?: number;
   /** Une technique lève la limite d'augmentations du Vide (Shosuro). */
   unlimitedRaises?: boolean;
+  /** Modification du ND par l'arme : yumi monté, dai-kyu à pied (annexe E.2 C12). */
+  weaponTn?: number;
+  /** Le point de Vide (+1g1) n'est pas permis sur ce jet : dégâts d'une autre arme que le katana (C2). */
+  voidBlocked?: boolean;
+  /** Point de Vide permis aux dégâts grâce au katana (C2). */
+  katanaVoid?: boolean;
+  /** Avertissements de l'arme (Force insuffisante pour le dai-kyu). */
+  warnings?: string[];
 }
 
 /** Arme telle que lue par le moteur (`bowStrength` et `keywords` facultatifs). */
@@ -63,6 +71,8 @@ export interface PoolMods {
   voidSpend?: boolean;
   /** Spécialisation choisie au lanceur (conditions des techniques, annexe D-c). */
   emphasis?: string;
+  /** Dégâts après un Désarmement réussi : 2g1 sans la Force ni dés en plus (annexe E.2 C6). */
+  disarm?: boolean;
 }
 
 export interface CombatState {
@@ -100,9 +110,21 @@ export function rings(c: Character): Record<RingKey, number> {
   };
 }
 
+const skillKey = (name: string): string => {
+  const n = normalize(name);
+  const group = SKILL_ALIASES.find((g) => g.some((x) => normalize(x) === n));
+  return group ? normalize(group[0]) : n;
+};
+
+/** Deux noms de compétence équivalents (« Courtoisie » et « Courtisan », « Furtivité » et « Discrétion »). */
+export function sameSkill(a: string, b: string): boolean {
+  return skillKey(a) === skillKey(b);
+}
+
+/** Compétence de la fiche : nom exact, sinon un de ses alias. */
 export function findSkill(c: Character, name: string): Skill | undefined {
   const key = normalize(name);
-  return c.skills.find((s) => normalize(s.name) === key);
+  return c.skills.find((s) => normalize(s.name) === key) ?? c.skills.find((s) => sameSkill(s.name, name));
 }
 
 export function parseDR(s: string): DiceCode {
@@ -178,13 +200,19 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
       rolled = kept = traitValue(c, action.trait);
       break;
     case "damage": {
+      canRaise = false;
+      if (mods.disarm) {
+        // Désarmement réussi : 2g1, quelle que soit l'arme (C6).
+        ({ rolled, kept } = parseDR(DISARM_DAMAGE));
+        notes.push("Désarmement : 2g1 sans la Force ni augmentation de dégâts");
+        break;
+      }
       const dr = parseDR(action.weapon.dr);
-      const strength = isRanged(action.weapon) ? (action.weapon.bowStrength ?? 0) : c.traits.strength;
+      const strength = isRanged(action.weapon) ? bowStrength(c, action.weapon, notes) : c.traits.strength;
       rolled = strength + dr.rolled;
       kept = dr.kept;
-      canRaise = false;
-      const mastery = findSkill(c, action.weapon.skill);
-      if (mastery && mastery.rank >= MASTERY.damageExplodeOn9AtRank) {
+      const mastery = damageMastery(c, action.weapon);
+      if (mastery) {
         explodeOn = 9;
         notes.push(`Maîtrise ${mastery.name} ${mastery.rank} : les dés explosent sur 9 et 10`);
       }
@@ -197,7 +225,8 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
       break;
   }
 
-  if (mods.extraRolled) {
+  const disarmed = action.kind === "damage" && !!mods.disarm;
+  if (mods.extraRolled && !disarmed) {
     rolled = Math.max(0, rolled + mods.extraRolled);
     notes.push(`${mods.extraRolled > 0 ? "+" : ""}${mods.extraRolled} dé(s) lancé(s)`);
   }
@@ -232,14 +261,17 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
     notes.push(`${e.source} : ${describeEffect(e, c, input)}`);
   }
   const vm = voidMultiplier(c);
-  if (mods.voidPoint) {
+  // Dégâts : pas de point de Vide, sauf au katana, et un seul (C2).
+  const katana = action.kind === "damage" && !disarmed && isKatanaVoid(action.weapon);
+  const voidBlocked = action.kind === "damage" && !katana;
+  if (mods.voidPoint && !voidBlocked) {
     // Un point vaut 1g1, ou plus avec une technique (Asako R1, Shosuro Acteur R1).
     const per = voidPointBonus(c, action, ctx);
     rolled += per.rolled * POOL_BONUS.voidPoint.rolled * vm;
     kept += per.kept * POOL_BONUS.voidPoint.kept * vm;
-    notes.push(`Point de Vide : +${per.rolled * vm}g${per.kept * vm}`);
+    notes.push(`${katana ? "Vide (katana)" : "Point de Vide"} : +${per.rolled * vm}g${per.kept * vm}`);
   }
-  const spend = mods.voidSpend ? voidSpendOption(c, action) : undefined;
+  const spend = mods.voidSpend && action.kind !== "damage" ? voidSpendOption(c, action) : undefined;
   if (spend) {
     const b = voidSpendBonus(c, spend, action, ctx);
     rolled += b.rolled * vm;
@@ -254,7 +286,70 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
   if (freeRaises) pool.freeRaises = freeRaises;
   if (techTn) pool.techTn = techTn;
   if (unlimitedRaises) pool.unlimitedRaises = true;
+  if (voidBlocked) pool.voidBlocked = true;
+  if (katana) pool.katanaVoid = true;
+  const w = action.kind === "skill" || action.kind === "damage" ? action.weapon : undefined;
+  if (w) applyWeaponRules(c, w, action.kind === "skill" && !!action.attack, !!mods.mounted, pool);
   return pool;
+}
+
+/** Arme du catalogue portant ce nom (règles propres à l'arme). */
+const bookWeapon = (w: WeaponLike) => catalogWeapon(w.name);
+
+/** Katana : un point de Vide permis aux dégâts (p. 206). */
+export function isKatanaVoid(w: WeaponLike): boolean {
+  return bookWeapon(w)?.special === "katanaVoid";
+}
+
+/** Maîtrise qui fait exploser les dégâts de cette arme sur 9 (Kenjutsu ou Armes lourdes au rang 7, C1). */
+export function damageMastery(c: Character, w: WeaponLike): Skill | undefined {
+  const { skills, rank } = MASTERY.explodeOn9;
+  if (!skills.some((s) => skillIs(w.skill, s))) return undefined;
+  const skill = findSkill(c, w.skill);
+  return skill && skill.rank >= rank ? skill : undefined;
+}
+
+/**
+ * Force effective d'un arc (C11) : force de l'arc, +1 avec Kyujutsu 7, plafonnée par la Force du personnage
+ * (le +1 s'ajoute avant le plafond, HANDOFF P16).
+ */
+export function bowStrength(c: Character, w: WeaponLike, notes: string[] = []): number {
+  let s = w.bowStrength ?? 0;
+  const m = MASTERY.bowStrength;
+  const skill = skillIs(w.skill, m.skill) ? findSkill(c, w.skill) : undefined;
+  if (skill && skill.rank >= m.rank) {
+    s += m.bonus;
+    notes.push(`Maîtrise ${skill.name} ${skill.rank} : force de l'arc +${m.bonus}`);
+  }
+  if (s > c.traits.strength) {
+    notes.push(`Force ${c.traits.strength} : l'arc de force ${s} tire à ${c.traits.strength}`);
+    s = c.traits.strength;
+  }
+  return s;
+}
+
+/** La fiche porte-t-elle une arme dont le ND dépend de la monture (yumi, dai-kyu) ? */
+export function hasMountRules(c: Character): boolean {
+  return c.weapons.some((w) => {
+    const book = bookWeapon(w);
+    return !!(book?.tnMounted || book?.tnOnFoot);
+  });
+}
+
+/** Règles d'arme du livre : ND des arcs selon la monture, Force minimale (C12). */
+function applyWeaponRules(c: Character, w: WeaponLike, attack: boolean, mounted: boolean, pool: Pool): void {
+  const book = bookWeapon(w);
+  if (!book) return;
+  if (attack) {
+    const tn = mounted ? (book.tnMounted ?? 0) : (book.tnOnFoot ?? 0);
+    if (tn) {
+      pool.weaponTn = tn;
+      pool.notes.push(`${book.name} : +${tn} au ND des tirs ${mounted ? "montés" : "à pied"}`);
+    }
+  }
+  if (book.minStrength && c.traits.strength < book.minStrength) {
+    (pool.warnings ??= []).push(`${book.name} : Force ${book.minStrength} minimum (tu as ${c.traits.strength}).`);
+  }
 }
 
 export interface Die {
@@ -330,11 +425,26 @@ export function woundState(c: Character, ctx: Partial<SchoolContext> = {}): Woun
   if (passed > last) {
     return { level: last, label: DEAD_LABEL, penalty: null, thresholds, status: "dead" };
   }
-  const { label, penalty } = WOUND_LEVELS[passed];
+  const { label } = WOUND_LEVELS[passed];
+  const penalty = woundPenaltyAt(c, passed, ctx);
   if (penalty === null) return { level: passed, label, penalty, thresholds, status: "out" };
-  // Force de la Terre et effets semblables : pénalité réduite, jamais négative.
+  return { level: passed, label, penalty, thresholds, status: "ok" };
+}
+
+/**
+ * Pénalité effective d'un niveau de blessure (annexe E.9 S5) : réduite par les effets (Force de la Terre, Matsu R4,
+ * bonus `wounds`), augmentée par les malus (Seuil de douleur bas), plancher 0. Indemne reste à 0 ; `null` : hors de combat.
+ */
+export function woundPenaltyAt(c: Character, level: number, ctx: Partial<SchoolContext> = {}): number | null {
+  const base = WOUND_LEVELS[level]?.penalty ?? null;
+  if (base === null || base === 0) return base;
   const ignored = woundPenaltyReduction(c) + woundEffects(c, schoolContext(ctx)).ignore;
-  return { level: passed, label, penalty: Math.max(0, penalty - ignored), thresholds, status: "ok" };
+  return Math.max(0, base - ignored);
+}
+
+/** Bonus de Défense totale au ND d'armure : moitié du jet, arrondie au supérieur (C3). */
+export function fullDefenseBonus(total: number): number {
+  return Math.ceil(total / FULL_DEFENSE_DIVISOR);
 }
 
 export function armorTN(c: Character, state: CombatState): number {
@@ -357,18 +467,19 @@ export function armorTN(c: Character, state: CombatState): number {
 
 /**
  * Somme des coûts : une manœuvre cumulable compte coût × nombre, une autre compte une fois.
- * Avec une fiche, le coût suit les techniques (Bayushi R2) ; `free` déduit les augmentations gratuites
+ * Avec une fiche, le coût suit les techniques (Bayushi R2) ; `costs` impose le coût d'une variante choisie au lanceur
+ * (zone du Coup ciblé, Renversement d'un quadrupède) ; `free` déduit les augmentations gratuites
  * réservées à une manœuvre (Tsuruchi R2), sans descendre sous 0.
  */
 export function maneuverRaises(
   selection: Readonly<Record<string, number>>,
   maneuvers: readonly Maneuver[],
-  opts: { character?: Character; free?: Readonly<Record<string, number>> } = {},
+  opts: { character?: Character; free?: Readonly<Record<string, number>>; costs?: Readonly<Record<string, number>> } = {},
 ): number {
   return maneuvers.reduce((sum, m) => {
     const n = selection[m.id] ?? 0;
     if (n <= 0) return sum;
-    const cost = maneuverCost(opts.character, m);
+    const cost = opts.costs?.[m.id] ?? maneuverCost(opts.character, m);
     return sum + Math.max(0, (m.stackable ? cost * n : cost) - (opts.free?.[m.id] ?? 0));
   }, 0);
 }
@@ -382,8 +493,14 @@ export function raiseCapExceeded(c: Character, called: number): boolean {
   return called > c.voidRing;
 }
 
-export function movement(c: Character): { free: number; simple: number; max: number } {
-  const water = rings(c).water;
+/** Anneau d'Eau compté pour les distances : 1 ou 2 rangs de moins en terrain modéré ou difficile, 1 au minimum (C4). */
+export function movementWater(c: Character, terrain: Terrain = "normal"): number {
+  const malus = TERRAINS.find((t) => t.id === terrain)?.waterMalus ?? 0;
+  return Math.max(1, rings(c).water - malus);
+}
+
+export function movement(c: Character, terrain: Terrain = "normal"): { free: number; simple: number; max: number } {
+  const water = movementWater(c, terrain);
   return { free: water * MOVEMENT.free, simple: water * MOVEMENT.simple, max: water * MOVEMENT.max };
 }
 

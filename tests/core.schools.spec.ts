@@ -10,7 +10,7 @@ import {
   type Character, type PoolAction, type PoolMods, type Stance, type WeaponLike,
 } from "@carnet/core";
 import perso from "../reference/perso-test-ecoles.json";
-import kakitaV1 from "../reference/exemple-personnage.json";
+import kakitaV1 from "./fixtures/kakita-v1.json";
 
 const char = (schoolId: string, rank: number, patch: Partial<Character> = {}): Character =>
   ({ ...(structuredClone(perso) as Character), schoolId, insightRank: rank, ...patch });
@@ -122,11 +122,11 @@ describe("Techniques d'école : cas T1 à T24 (annexe C.6)", () => {
     expect(movementBonus(c, REFERENCE_CONTEXT)).toBe(0);
   });
 
-  it("T14 : Tsuruchi 2, Initiative 5g3 +3 ; tir yumi 6g3 ; dégâts yumi 7g2 ; attaque katana 5g3", () => {
+  it("T14 : Tsuruchi 2, Initiative 5g3 +3 ; tir yumi 6g3 ; dégâts yumi 6g2 (arc plafonné à Force 2) ; attaque katana 5g3", () => {
     const c = char("tsuruchi-archer", 2);
     expect(show(c, initiative)).toBe("5g3 +3");
     expect(show(c, attack(c, "Yumi"))).toBe("6g3");
-    expect(show(c, damage(c, "Yumi"))).toBe("7g2");
+    expect(show(c, damage(c, "Yumi"))).toBe("6g2");
     expect(show(c, attack(c, "Katana"))).toBe("5g3");
   });
 
@@ -193,7 +193,7 @@ describe("Techniques d'école : cas T1 à T24 (annexe C.6)", () => {
     expect(show(c, attack(c, "Katana"))).toBe("5g3");
     expect(show(c, attack(c, "Katana"), { stance: "fullAttack" })).toBe("7g4");
     expect(show(c, damage(c, "Katana"))).toBe("5g2");
-    expect(show(c, damage(c, "Yumi"))).toBe("5g2");
+    expect(show(c, damage(c, "Yumi"))).toBe("4g2");
     expect(armorTN(c, { stance: "attack", voidArmor: true })).toBe(30);
     expect(woundState(c).thresholds).toEqual([10, 14, 18, 22, 26, 30, 34, 38]);
     expect(activeEffects(c)).toEqual([]);
@@ -206,7 +206,7 @@ describe("Techniques d'école : cas T1 à T24 (annexe C.6)", () => {
     expect(c).toMatchObject({ schemaVersion: 2, schoolId: "", schoolRank: null });
     expect(c.weapons.map((w) => [w.name, w.keywords])).toEqual([
       ["Katana", ["samourai", "moyenne"]],
-      ["Wakizashi", ["samourai", "petite"]],
+      ["Wakizashi", ["samourai", "moyenne"]],
     ]);
     expect(suggestSchool(c)?.name).toBe("École de bushi Kakita");
   });

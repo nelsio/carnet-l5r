@@ -6,7 +6,7 @@ import {
   type Character, type Modifier, type PoolAction, type Stance,
 } from "@carnet/core";
 import { MODIFIER_TEMPLATES, NAMED_MODIFIERS } from "../src/rules/l5r4e";
-import kakita from "../reference/exemple-personnage.json";
+import kakita from "./fixtures/kakita-v1.json";
 
 const base = () => structuredClone(kakita) as Character;
 const mod = (patch: Partial<Modifier>): Modifier => ({
@@ -161,14 +161,14 @@ describe("Compétences sociales, pénalité de blessure, ND, posture", () => {
 describe("Catalogue nommé (livre de base 4e, résumés à vérifier)", () => {
   const entry = (id: string) => NAMED_MODIFIERS.find((t) => t.id === id)!;
   it("les techniques Hiruma sont passées au catalogue d'écoles (annexe C.2)", () => {
-    expect(NAMED_MODIFIERS.map((t) => t.id)).toEqual(["force-de-la-terre", "aspect-derangeant"]);
+    expect(NAMED_MODIFIERS.map((t) => t.id)).toEqual(["force-de-la-terre", "aspect-derangeant", "seuil-de-douleur-bas"]);
   });
   it("Force de la Terre : pénalité de blessure −3 ; Aspect dérangeant : +5 au ND des compétences sociales", () => {
     expect(entry("force-de-la-terre")).toMatchObject({ source: "advantage", appliesTo: "wounds", flat: 3, mode: "always" });
     expect(entry("aspect-derangeant")).toMatchObject({ source: "disadvantage", appliesTo: "social", tn: 5, mode: "always" });
   });
   it("chaque entrée signale qu'elle est à vérifier dans le livre", () => {
-    for (const t of NAMED_MODIFIERS) expect(t.note).toMatch(/À vérifier dans le livre/);
+    for (const t of NAMED_MODIFIERS) expect(t.note).toMatch(/À vérifier dans le livre|livre p\. \d+/);
   });
 });
 

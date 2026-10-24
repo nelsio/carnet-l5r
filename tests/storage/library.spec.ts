@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { migrate, type Character } from "@carnet/core";
 import { openStorage, readCharacter, requestPersistence, type LibraryEntry } from "../../src/storage";
 import { DB_NAME, DB_VERSION } from "../../src/storage/indexeddb";
-import kakita from "../../reference/exemple-personnage.json";
+import kakita from "../fixtures/kakita-v1.json";
 
 const base = () => structuredClone(kakita) as Character;
 /** La même fiche au format courant (v2), telle que relue. */

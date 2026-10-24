@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { importCharacter, migrate, serializeCharacter, type Character } from "@carnet/core";
 import { memoryStorage, type LibraryEntry } from "../../src/storage";
 import { App } from "../../src/ui/App";
-import kakita from "../../reference/exemple-personnage.json";
+import kakita from "../fixtures/kakita-v1.json";
 
 const base = () => structuredClone(kakita) as Character;
 const entry = (patch: Partial<LibraryEntry> = {}): LibraryEntry => ({
@@ -104,7 +104,7 @@ describe("Nouvelle fiche et consultation", () => {
     expect(dialog).toHaveTextContent("Kakita Haruto · Grue · École de duellistes Kakita · Rang 1");
     fireEvent.click(within(dialog).getByRole("button", { name: "Importer" }));
     expect(await screen.findByRole("heading", { level: 1, name: "Kakita Haruto" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Modifier la fiche" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Edit : Compétences" })).toBeInTheDocument();
     expect((await storage.library.list()).map((e) => [e.mode, e.character])).toEqual([["edit", migrate(base())]]);
   });
 
@@ -115,7 +115,7 @@ describe("Nouvelle fiche et consultation", () => {
     expect(dialog).toHaveTextContent(/en consultation : lecture seule/);
     fireEvent.click(within(dialog).getByRole("button", { name: "Importer" }));
     expect(await screen.findByRole("heading", { level: 1, name: /Bayushi Kaede/ })).toHaveTextContent("Consultation");
-    expect(screen.queryByRole("button", { name: "Modifier la fiche" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Edit : Compétences" })).toBeNull();
     expect((await storage.library.list()).find((e) => e.character.name === "Bayushi Kaede")?.mode).toBe("readonly");
   });
 
@@ -180,13 +180,13 @@ describe("Exemple de fiche", () => {
     const text = await blobs[0]!.text();
     const json = JSON.parse(text) as Character;
     expect(json).toMatchObject({ schemaVersion: 2, name: "Kakita Haruto" });
-    expect(json.modifiers).toHaveLength(2);
+    expect(json.modifiers?.map((m) => m.name)).toEqual(["Voix"]);
     expect(importCharacter(json)).toEqual({ ok: true, character: json });
 
     const dialog = await chooseFile(new File([text], "exemple-fiche-l5r.json", { type: "application/json" }));
     fireEvent.click(within(dialog).getByRole("button", { name: "Importer" }));
     expect(await screen.findByRole("heading", { level: 1, name: "Kakita Haruto" })).toBeInTheDocument();
-    expect(screen.getByText("Exemple : technique d'école (à adapter)")).toBeInTheDocument();
+    expect(screen.getByTestId("modifier-voix")).toHaveTextContent("+1g1 · d'office");
     expect(await storage.library.list()).toHaveLength(1);
   });
 

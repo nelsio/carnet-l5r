@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
 import {
-  activeEffects, attackTrait, catalogWeapon, reminderText, computePool, defaultModifiers, isRanged, parseWeaponKeywords, rings, ROLL_TRAITS, schoolOf,
+  activeEffects, attackTrait, catalogGap, catalogWeapon, reminderText, computePool, defaultModifiers, isRanged, parseDR, parseWeaponKeywords, rings, ROLL_TRAITS, schoolOf,
   schoolRankOf, schoolsByClan, suggestSchool, techniqueCategories, weaponKeywords,
   type Character, type PoolAction, type RollTrait, type TraitKey,
 } from "@carnet/core";
@@ -8,7 +8,7 @@ import { WEAPON_KEYWORD_LABELS } from "../../rules/ecoles";
 import { RINGS, TRAIT_LABELS, type RingKey } from "../../rules/l5r4e";
 import { decimal } from "../format";
 import { poolLabel } from "../rolls";
-import { useCharacter, useStore, type ListKey } from "../store";
+import { useCharacter, useStore, type BlockId, type ListKey } from "../store";
 import { FileActions } from "./FileActions";
 import { Modifiers } from "./Modifiers";
 import { ListField, NumberField, TextListField } from "./fields";
@@ -18,11 +18,11 @@ const RING_ORDER: RingKey[] = ["earth", "water", "fire", "air", "void"];
 
 type Setter = (path: (string | number)[], value: unknown) => void;
 
-function useSheet() {
+function useSheet(block?: BlockId) {
   const { state, dispatch } = useStore();
   const c = useCharacter();
   const set: Setter = (path, value) => dispatch({ type: "set", path, value });
-  return { c, edit: state.ui.edit, dispatch, set };
+  return { c, edit: !!block && state.mode === "edit" && state.ui.editing.has(block), dispatch, set };
 }
 
 /** Réserve affichée sur la fiche : bonus et techniques d'office, posture Attaque (annexe C.4). */
@@ -31,54 +31,67 @@ const poolOf = (c: Character, action: PoolAction) => computePool(c, action, { mo
 const pool = (c: Character, trait: RollTrait, skill: string) => poolLabel(poolOf(c, { kind: "skill", skill, trait }));
 
 export function Sheet() {
-  const { edit, dispatch } = useSheet();
   const { state, library } = useStore();
   const readonly = state.mode === "readonly";
   return (
     <div className="grid">
       {readonly && (
-        <p className="hint" style={{ margin: 0 }}>
-          Fiche en consultation : lecture seule. Le lanceur reste utilisable mais ne dépense rien.
-        </p>
+        <div className="readonly-head">
+          <p className="hint" style={{ margin: 0 }}>
+            Fiche en consultation : lecture seule. Le lanceur reste utilisable mais ne dépense rien.
+          </p>
+          <button type="button" className="btn" onClick={() => void library.makeEditableCopy()}>Rendre modifiable</button>
+        </div>
       )}
-      <div className="panel">
-        <div className="panel-head">
-          <h2>Anneaux &amp; Traits</h2>
-          {readonly ? (
-            <button type="button" className="btn" onClick={() => void library.makeEditableCopy()}>Rendre modifiable</button>
-          ) : (
-            <button type="button" className={`btn${edit ? " gold" : ""}`} onClick={() => dispatch({ type: "toggleEdit" })}>
-              {edit ? "Terminer" : "Modifier la fiche"}
-            </button>
-          )}
-        </div>
-        <Rings />
-      </div>
-      <div className="panel"><h2>Identité &amp; réputation</h2><Identity /></div>
+      <Block id="rings" title={<>Anneaux &amp; Traits</>} label="Anneaux & Traits"><Rings /></Block>
+      <Block id="identity" title={<>Identité &amp; réputation</>} label="Identité & réputation"><Identity /></Block>
       <div className="grid cols-2">
-        <div className="panel"><h2>Compétences</h2><Skills /></div>
+        <Block id="skills" title="Compétences"><Skills /></Block>
         <div className="grid">
-          <div className="panel"><h2>Armes</h2><Weapons /></div>
-          <div className="panel"><h2>Techniques d'école</h2><Techniques /></div>
-          <div className="panel"><h2>Bonus de jet</h2><Modifiers /></div>
+          <Block id="weapons" title="Armes"><Weapons /></Block>
+          <Block id="techniques" title="Techniques d'école"><Techniques /></Block>
+          <Block id="modifiers" title="Bonus de jet"><Modifiers /></Block>
         </div>
       </div>
-      <div className="panel">
-        <h2>Avantages, désavantages, notes</h2>
+      <Block id="notes" title="Avantages, désavantages, notes">
         <div className="grid cols-2">
           <LongText field="advantages" label="Avantages" />
           <LongText field="disadvantages" label="Désavantages" />
         </div>
         <div style={{ marginTop: 14 }}><LongText field="notes" label="Notes de campagne" /></div>
-      </div>
+      </Block>
       <FileActions />
-      {edit && <DeleteCharacter />}
     </div>
   );
 }
 
+/**
+ * Bloc de la fiche avec son bouton « Edit » (« Terminer » pendant l'édition), annexe E.9 S2.
+ * Plusieurs blocs peuvent être ouverts ensemble ; aucun bouton en consultation.
+ */
+function Block({ id, title, label, children }: { id: BlockId; title: ReactNode; label?: string; children: ReactNode }) {
+  const { state, dispatch } = useStore();
+  const edit = state.ui.editing.has(id);
+  const name = label ?? (typeof title === "string" ? title : id);
+  return (
+    <section className={`panel${edit ? " editing" : ""}`} aria-label={name} data-testid={`block-${id}`}>
+      <div className="panel-head">
+        <h2>{title}</h2>
+        {state.mode === "edit" && (
+          <button
+            type="button" className={`btn sm${edit ? " gold" : ""}`} aria-pressed={edit}
+            aria-label={`${edit ? "Terminer" : "Edit"} : ${name}`}
+            onClick={() => dispatch({ type: "toggleBlockEdit", block: id })}
+          >{edit ? "Terminer" : "Edit"}</button>
+        )}
+      </div>
+      {children}
+    </section>
+  );
+}
+
 function Rings() {
-  const { c, edit, set } = useSheet();
+  const { c, edit, set } = useSheet("rings");
   const r = rings(c);
   const value = (path: (string | number)[], v: number, label: string) =>
     edit
@@ -112,7 +125,7 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 }
 
 function Identity() {
-  const { c, edit, set } = useSheet();
+  const { c, edit, set } = useSheet("identity");
   const text = (path: string[], value: string, extra?: { list?: string; maxLength?: number }) => (
     <input className="in" type="text" value={value} maxLength={extra?.maxLength ?? 80} list={extra?.list} onChange={(e) => set(path, e.target.value)} />
   );
@@ -155,6 +168,7 @@ function Identity() {
         <Field label="Armure">{text(["armor", "name"], c.armor.name)}</Field>
         <Field label="Bonus d'armure (ND)">{num(["armor", "bonus"], c.armor.bonus, 0)}</Field>
         <Field label="Réduction de dégâts">{num(["armor", "reduction"], c.armor.reduction, 0)}</Field>
+        <div style={{ gridColumn: "1/-1" }}><DeleteCharacter /></div>
       </div>
     );
   }
@@ -187,7 +201,7 @@ function RemoveButton({ list, index, name }: { list: ListKey; index: number; nam
 }
 
 function Skills() {
-  const { c, edit, set } = useSheet();
+  const { c, edit, set } = useSheet("skills");
   if (edit) {
     return (
       <>
@@ -232,7 +246,7 @@ function Skills() {
               <td className="pool" data-testid={`skill-pool-${s.name}`}>{pool(c, s.trait, s.name)}</td>
             </tr>
           )) : (
-            <tr><td colSpan={4} className="muted">Aucune compétence. Passe en mode modification pour en ajouter.</td></tr>
+            <tr><td colSpan={4} className="muted">Aucune compétence. « Edit » pour en ajouter.</td></tr>
           )}
         </tbody>
       </table>
@@ -240,8 +254,32 @@ function Skills() {
   );
 }
 
+/** Arme saisie différente du livre (VD, mots-clés) : mise à jour proposée, jamais faite d'office (annexe E.2 C8). */
+function CatalogGap({ index }: { index: number }) {
+  const { c, set } = useSheet();
+  const w = c.weapons[index];
+  const gap = w && catalogGap(w);
+  if (!w || !gap) return null;
+  const [own, book] = [parseDR(w.dr), parseDR(gap.dr)];
+  const sameKeywords = [...(w.keywords ?? [])].sort().join() === [...gap.keywords].sort().join();
+  const parts = [
+    own.rolled !== book.rolled || own.kept !== book.kept ? gap.dr : "",
+    sameKeywords ? "" : gap.keywords.map((k) => WEAPON_KEYWORD_LABELS[k]).join(", "),
+  ].filter(Boolean);
+  return (
+    <div className="suggest" role="group" aria-label={`Écart avec le livre : ${w.name}`}>
+      <span>Le livre indique {parts.join(" · ")} : mettre à jour ?</span>
+      <button
+        type="button" className="btn sm"
+        onClick={() => set(["weapons", index], { ...w, dr: gap.dr, keywords: gap.keywords })}
+      >Mettre à jour</button>
+    </div>
+  );
+}
+
 function Weapons() {
-  const { c, edit, set } = useSheet();
+  const { c, edit, set } = useSheet("weapons");
+  const { state } = useStore();
   if (edit) {
     return (
       <>
@@ -289,6 +327,7 @@ function Weapons() {
                   <b>{w.name}</b>
                   <div className="muted" style={{ fontSize: 12.5 }}>{w.skill} · VD {w.dr}{isRanged(w) ? ` · arc ${w.bowStrength ?? 0}` : ""}</div>
                   {keywords.length > 0 && <div>{keywords.map((k) => <span key={k} className="tag">{WEAPON_KEYWORD_LABELS[k]}</span>)}</div>}
+                  {state.mode === "edit" && <CatalogGap index={i} />}
                 </td>
                 <td className="pool" data-testid={`attack-pool-${w.name}`}>{poolLabel(atk)}</td>
                 <td className="pool" data-testid={`damage-pool-${w.name}`}>{poolLabel(dmg)}</td>
@@ -319,7 +358,7 @@ function OptionalNumber({ value, onChange, min = 0, placeholder = "—", ...rest
 }
 
 function Techniques() {
-  const { c, edit, set } = useSheet();
+  const { c, edit, set } = useSheet("techniques");
   const school = <SchoolTechniques />;
   const others = schoolOf(c) && (c.techniques.length > 0 || edit)
     ? <div className="label" style={{ marginTop: 12 }}>Autres techniques, kata, sorts</div>
@@ -355,7 +394,7 @@ function Techniques() {
 
 /** École du catalogue : les cinq rangs, résumés et badges ; rangs non atteints grisés (annexe C.5). */
 function SchoolTechniques() {
-  const { c, edit, set } = useSheet();
+  const { c, edit, set } = useSheet("techniques");
   const { state } = useStore();
   const school = schoolOf(c);
   const suggestion = state.mode === "edit" ? suggestSchool(c) : undefined;
@@ -368,7 +407,7 @@ function SchoolTechniques() {
             <button type="button" className="btn sm" onClick={() => set(["schoolId"], suggestion.id)}>Associer</button>
           </div>
         )}
-        {edit && <p className="hint" style={{ marginTop: 0 }}>Choisis une école dans « Techniques d'école » (bloc Identité) pour ajouter ses techniques automatiquement.</p>}
+        {edit && <p className="hint" style={{ marginTop: 0 }}>Choisis une école dans « Techniques d'école » (bloc Identité, bouton « Edit ») pour ajouter ses techniques automatiquement.</p>}
       </>
     );
   }
@@ -402,7 +441,7 @@ function SchoolTechniques() {
 }
 
 function LongText({ field, label }: { field: "advantages" | "disadvantages" | "notes"; label: string }) {
-  const { c, edit, set } = useSheet();
+  const { c, edit, set } = useSheet("notes");
   return edit ? (
     <label className="field"><span className="label">{label}</span><textarea className="in" value={c[field]} onChange={(e) => set([field], e.target.value)} /></label>
   ) : (

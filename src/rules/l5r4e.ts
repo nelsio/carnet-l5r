@@ -79,7 +79,7 @@ export const STANCES: readonly { id: Stance; label: string; description: string 
   { id: "attack", label: "Attaque", description: "Posture normale." },
   { id: "fullAttack", label: "Assaut", description: "+2g1 à l'attaque, −10 au ND d'armure." },
   { id: "defense", label: "Défense", description: "Ajoute Air + Défense au ND d'armure." },
-  { id: "fullDefense", label: "Défense totale", description: "Jet Défense (Réflexes), + moitié au ND d'armure." },
+  { id: "fullDefense", label: "Défense totale", description: "Jet Défense (Réflexes), + moitié (arrondie au supérieur) au ND d'armure." },
   { id: "center", label: "Centre", description: "Aucune action ; bonus au round suivant (voir livre)." },
 ];
 
@@ -89,24 +89,58 @@ export const POOL_BONUS = {
   voidPoint: { rolled: 1, kept: 1 },
 } as const;
 
-/** Maîtrise des compétences martiales (HANDOFF §4.8). */
-export const MASTERY = { damageExplodeOn9AtRank: 7 } as const;
+/**
+ * Maîtrise des compétences martiales (livre p. 143-144, annexe E.2 C1) :
+ * Kenjutsu et Armes lourdes au rang 7, les dés de dégâts explosent sur 9 ; Kyujutsu au rang 7, force de l'arc +1.
+ */
+export const MASTERY = {
+  explodeOn9: { skills: ["Kenjutsu", "Armes lourdes"], rank: 7 },
+  bowStrength: { skill: "Kyujutsu", rank: 7, bonus: 1 },
+} as const;
+
+/** Bonus de Défense totale : moitié du jet, arrondie au supérieur (p. 86). */
+export const FULL_DEFENSE_DIVISOR = 2;
 
 /** Déplacement en pieds, en multiples de l'Anneau d'Eau. */
 export const MOVEMENT = { free: 5, simple: 10, max: 20 } as const;
 export const FEET_TO_METERS = 0.3048;
 
+/** Terrain (p. 87) : l'Anneau d'Eau compte un ou deux rangs de moins pour les distances, 1 au minimum. */
+export type Terrain = "normal" | "moderate" | "difficult";
+export const TERRAINS: readonly { id: Terrain; label: string; waterMalus: number }[] = [
+  { id: "normal", label: "Normal", waterMalus: 0 },
+  { id: "moderate", label: "Modéré", waterMalus: 1 },
+  { id: "difficult", label: "Difficile", waterMalus: 2 },
+];
+
+/** Coup ciblé (p. 88) : coût selon la zone visée. */
+export type CalledZone = "limb" | "extremity" | "head" | "precise";
+export const CALLED_ZONES: readonly { id: CalledZone; label: string; cost: number }[] = [
+  { id: "limb", label: "Membre", cost: 1 },
+  { id: "extremity", label: "Main ou pied", cost: 2 },
+  { id: "head", label: "Tête", cost: 3 },
+  { id: "precise", label: "Œil ou doigt", cost: 4 },
+];
+/** Renversement d'un quadrupède (p. 89). */
+export const KNOCKDOWN_QUADRUPED_COST = 4;
+/** Dégâts après un Désarmement réussi (p. 88) : sans la Force ni augmentation de dégâts. */
+export const DISARM_DAMAGE = "2k1";
+/** Malus au ND des arcs selon la monture (p. 202). */
+export const BOW_TN_PENALTY = 10;
+
 /** Manœuvres par défaut (coût en augmentations). */
 export const DEFAULT_MANEUVERS: readonly Maneuver[] = [
   { id: "dmg", name: "Augmentation des dégâts", cost: 1, stackable: true, effect: "+1g0 aux dégâts par augmentation (cumulable)." },
-  { id: "called", name: "Coup ciblé", cost: 1, stackable: false, effect: "Viser une zone précise (main, jambe, tête…). Coût selon la zone, à fixer avec le MJ." },
-  { id: "feint", name: "Feinte", cost: 2, stackable: false, effect: "Effet détaillé dans les manœuvres de base de ton livre." },
-  { id: "knockdown", name: "Renversement", cost: 2, stackable: false, effect: "Jet de Force en opposition : la cible tombe à terre si tu l'emportes." },
-  { id: "disarm", name: "Désarmement", cost: 3, stackable: false, effect: "Pas de dégâts. Jet de Force en opposition : la cible lâche son arme si tu l'emportes." },
+  { id: "called", name: "Coup ciblé", cost: 1, stackable: false, effect: "Viser une zone : membre 1, main ou pied 2, tête 3, œil ou doigt 4 augmentations (zone à choisir)." },
+  { id: "feint", name: "Feinte", cost: 2, stackable: false, effect: "Dégâts + moitié de l'excédent sur le ND, plafonnés à 5 × Rang d'Insight." },
+  { id: "knockdown", name: "Renversement", cost: 2, stackable: false, effect: "Jet de Force en opposition : la cible tombe à terre si tu l'emportes. Quadrupède : 4 augmentations." },
+  { id: "disarm", name: "Désarmement", cost: 3, stackable: false, effect: "Dégâts 2g1 sans la Force. Jet de Force en opposition : la cible lâche son arme si tu l'emportes." },
   { id: "extra", name: "Attaque supplémentaire", cost: 5, stackable: false, effect: "Une attaque de plus ce round." },
 ];
 /** Manœuvre dont chaque prise ajoute +1g0 au jet de dégâts suivant. */
 export const DAMAGE_MANEUVER_ID = "dmg";
+/** Désarmement : les dégâts liés passent à 2g1 sans la Force (annexe E.2 C6). */
+export const DISARM_MANEUVER_ID = "disarm";
 
 /** Fiche vierge (bouton « Nouvelle fiche »). */
 export const NEW_CHARACTER_NAME = "Nouveau samouraï";
@@ -209,7 +243,7 @@ export const FIXED_ACTIONS: readonly ActionDef[] = [
   { id: "act", situation: "court", label: "Jouer un rôle", kind: "skill", skill: "Comédie", trait: "awareness", tn: "opposed", description: "Comédie (Intuition) contre Investigation (Perception) de qui t'observe." },
   { id: "trade", situation: "court", label: "Marchander, estimer", kind: "skill", skill: "Commerce", trait: "intelligence", emphasisHint: "Estimation", tn: 15, description: "Estimer la valeur d'un objet ou négocier un prix. Compétence marchande : peut coûter de l'Honneur en public." },
   // Déplacement
-  { id: "move", situation: "movement", label: "Se déplacer en combat", kind: "move", tn: null, description: "Terrain difficile : distances divisées par deux." },
+  { id: "move", situation: "movement", label: "Se déplacer en combat", kind: "move", tn: null, description: "Terrain modéré ou difficile : l'Anneau d'Eau compte 1 ou 2 rangs de moins." },
   { id: "athletics", situation: "movement", label: "Courir, grimper, sauter", kind: "skill", skill: "Athlétisme", trait: "strength", tn: 15, description: "Escalade d'un mur 15, falaise 25. Course prolongée : Constitution au lieu de Force." },
   { id: "ride", situation: "movement", label: "Chevaucher en terrain difficile", kind: "skill", skill: "Équitation", trait: "agility", tn: 15, description: "Poursuite, saut d'obstacle, combat monté. Garder le contrôle d'une monture effrayée : ND 20." },
   { id: "stealth", situation: "movement", label: "Se déplacer discrètement", kind: "skill", skill: "Furtivité", trait: "agility", tn: "opposed", description: "En opposition contre Investigation (Perception) des gardes." },
@@ -226,9 +260,19 @@ export const FIXED_ACTIONS: readonly ActionDef[] = [
   { id: "focus", situation: "combat", sub: "duel", label: "2 · Concentration", kind: "skill", skill: "Iaijutsu", trait: "void", tn: "opposed", description: "Jets en opposition à chaque échange. Le vainqueur frappe en premier ; l'écart se convertit en augmentations gratuites pour la Frappe." },
   { id: "strike", situation: "combat", sub: "duel", label: "3 · Frappe", kind: "skill", skill: "Iaijutsu", trait: "reflexes", tn: "target", attack: true, description: "Iaijutsu (Réflexes) contre le ND d'armure. Ajoute tes augmentations gratuites de la Concentration." },
   // Bataille
-  { id: "tactics", situation: "combat", sub: "battle", label: "Commander / lire le champ", kind: "skill", skill: "Bataille", trait: "perception", tn: "opposed", description: "Commandants : jets en opposition chaque tour. Le vainqueur infléchit le cours de la bataille." },
-  { id: "battle", situation: "combat", sub: "battle", label: "Jet de bataille personnel", kind: "skill", skill: "Bataille", trait: "perception", tn: 15, description: "Selon ton niveau d'engagement, le résultat détermine ta ligne sur la table de bataille de masse (gloire, blessures, opportunités)." },
+  { id: "tactics", situation: "combat", sub: "battle", label: "Commander / lire le champ", kind: "skill", skill: "Bataille", trait: "perception", tn: "opposed", description: "Commandants : jets en opposition chaque tour. 5 d'écart pour l'emporter ; sinon, égalité." },
   { id: "engagement", situation: "combat", sub: "battle", label: "Niveau d'engagement", kind: "info", tn: null, description: "Réserve → Désengagé → Engagé → Fortement engagé. Plus tu t'engages, plus tu gagnes de Gloire et d'opportunités, plus tu risques de blessures." },
+];
+
+/**
+ * Noms de compétence équivalents (édition française, ancien libellé, anglais), le premier faisant foi
+ * pour le catalogue actuel. La fiche d'exemple (annexe E.9 S4) emploie déjà le vocabulaire de l'annexe E.7.
+ */
+export const SKILL_ALIASES: readonly (readonly string[])[] = [
+  ["Courtoisie", "Courtisan", "Courtier"],
+  ["Furtivité", "Discrétion", "Stealth"],
+  ["Représentation : Conteur", "Représentation : Conte", "Perform: Storytelling"],
+  ["Représentation : Éloquence", "Représentation : Art oratoire", "Perform: Oratory"],
 ];
 
 /* ---------- Bonus de jet (HANDOFF annexe B) ---------- */
@@ -239,7 +283,7 @@ export const FIXED_ACTIONS: readonly ActionDef[] = [
  */
 export const SOCIAL_SKILLS: readonly string[] = [
   "Comédie", "Acting",
-  "Courtoisie", "Courtier",
+  "Courtoisie", "Courtisan", "Courtier",
   "Étiquette",
   "Sincérité", "Sincerity",
   "Intimidation",
@@ -322,5 +366,10 @@ export const NAMED_MODIFIERS: readonly ModifierTemplate[] = [
     ...T, id: "aspect-derangeant", label: "Aspect dérangeant (Disturbing Countenance)", source: "disadvantage",
     appliesTo: "social", tn: 5, mode: "always",
     note: "Désavantage physique, 3 points : +5 au ND de tous les jets de compétences sociales. À vérifier dans le livre.",
+  },
+  {
+    ...T, id: "seuil-de-douleur-bas", label: "Seuil de douleur bas (Low Pain Threshold)", source: "disadvantage",
+    appliesTo: "wounds", flat: -5, mode: "always",
+    note: "Désavantage physique : +5 à la pénalité de chaque niveau de blessure (livre p. 162).",
   },
 ];

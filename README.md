@@ -39,9 +39,10 @@ Les fiches enregistrées hors ligne restent **propres à ce fichier, sur cet app
 ## 3. Créer et remplir ta fiche
 
 - **Bibliothèque** → **Créer mon personnage** (ou **Nouvelle fiche**). La Bibliothèque liste toutes tes fiches ; on y revient par le bouton **Bibliothèque** de l'en-tête.
-- **Modifier la fiche** passe en saisie ; **Terminer** revient en lecture. Les réserves (`5g3`, `6g2`…) se recalculent à chaque changement.
+- Chaque bloc de la fiche a son bouton **Edit** : il passe ce bloc en saisie, **Terminer** le repasse en lecture. Plusieurs blocs peuvent être ouverts ensemble. Les réserves (`5g3`, `6g2`…) se recalculent à chaque changement.
+- Une arme du livre saisie avec d'autres valeurs (VD, mots-clés) est signalée : **Mettre à jour** reprend celles du livre.
 - La **barre d'état**, en haut, reste visible partout :
-  - **blessures** avec les boutons `−` / `+`, et la piste des 8 niveaux (un appui sur le résumé la déplie sur mobile) ;
+  - **blessures** avec les boutons `−` / `+`, et la piste des 8 niveaux avec leur pénalité effective (sur mobile, un appui sur le résumé ouvre le détail : une ligne par niveau, avec l'intervalle de blessures) ;
   - **points de Vide** : une pastille par point, un appui en dépense ou en rend ;
   - quatre tuiles : **Dépl.** (`10/20 pi` = action libre / action simple), **ND armure**, **Réduction** et **Pénalité** (en rouge dès qu'elle dépasse `0`).
 - Les tuiles **ND armure** et **Réduction** ouvrent l'**éditeur d'armure** : nom de l'armure, bonus au ND, réduction. Le ND d'armure lui-même est calculé (`5 × Réflexes + 5 + bonus`, puis posture et Vide).

@@ -1,5 +1,5 @@
 import {
-  armorEffects, movement, resolveValue, schoolArmorBonus, schoolReduction, woundState,
+  armorEffects, movement, resolveValue, schoolArmorBonus, schoolReduction, woundPenaltyAt, woundState,
   type Character,
 } from "@carnet/core";
 import { ARMOR_TN, WOUND_LEVELS } from "../../rules/l5r4e";
@@ -21,6 +21,17 @@ export function StatusBar() {
   // Fiche en consultation : blessures et Vide affichés, mais ni modifiables ni cliquables (HANDOFF §6.1).
   const readonly = state.mode === "readonly";
   const maxWounds = ws.thresholds[ws.thresholds.length - 1];
+  // Pénalités effectives de chaque niveau, même calcul que la tuile Pénalité (annexe E.9 S5).
+  const levels = WOUND_LEVELS.map((w, i) => {
+    const penalty = woundPenaltyAt(c, i, contextOf(ui));
+    const current = i === ws.level && hurt;
+    return {
+      label: w.label, short: w.short ?? w.label, current,
+      min: i === 0 ? 0 : ws.thresholds[i - 1] + 1, max: ws.thresholds[i],
+      penaltyText: penalty === null ? "✕" : `+${penalty}`,
+      cls: (base: string) => [base, i < ws.level ? "past" : "", current ? "cur" : ""].filter(Boolean).join(" "),
+    };
+  });
 
   return (
     <div className={`status${ui.woundsExpanded ? " exp" : ""}`}>
@@ -34,16 +45,25 @@ export function StatusBar() {
           <span className="muted mono">{c.wounds} / {maxWounds} {ui.woundsExpanded ? "▴" : "▾"}</span>
         </button>
         <div className="wtrack" aria-label="Niveaux de blessure">
-          {WOUND_LEVELS.map((w, i) => {
-            const cls = ["wl", i < ws.level ? "past" : "", i === ws.level && hurt ? "cur" : ""].filter(Boolean).join(" ");
-            return (
-              <div key={w.label} className={cls} title={`${w.label} jusqu'à ${ws.thresholds[i]} blessures`} aria-current={i === ws.level && hurt ? "step" : undefined}>
-                <b>{w.penalty === null ? "✕" : `+${w.penalty}`}</b>
-                <span>{w.short ?? w.label}</span>
-              </div>
-            );
-          })}
+          {levels.map((l) => (
+            <div key={l.label} className={l.cls("wl")} title={`${l.label} jusqu'à ${l.max} blessures`} aria-current={l.current ? "step" : undefined}>
+              <b>{l.penaltyText}</b>
+              <span>{l.short}</span>
+            </div>
+          ))}
         </div>
+        {/* Mobile : une ligne par niveau sous la barre, à l'appui sur le résumé (annexe E.9 S3). */}
+        {ui.woundsExpanded && (
+          <ol className="wdetail" aria-label="Détail des blessures" data-testid="wound-detail">
+            {levels.map((l) => (
+              <li key={l.label} className={l.cls("wdl")} aria-current={l.current ? "step" : undefined}>
+                <span className="wn">{l.label}</span>
+                <span className="wr">{l.min}–{l.max}</span>
+                <span className="wp">{l.penaltyText}</span>
+              </li>
+            ))}
+          </ol>
+        )}
         <div>
           <div className="label">Blessures</div>
           <div className="stepper">

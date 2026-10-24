@@ -1,9 +1,11 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "name": "Kakita Haruto",
   "clan": "Grue",
   "family": "Kakita",
-  "school": "École de duellistes Kakita",
+  "school": "École de bushi Kakita",
+  "schoolId": "kakita-bushi",
+  "schoolRank": null,
   "insightRank": 1,
   "honor": 6.5,
   "glory": 1.0,
@@ -18,28 +20,35 @@
   "voidRing": 2,
   "voidPoints": 2,
   "wounds": 0,
-  "armor": { "name": "Aucune (tenue de cour)", "bonus": 0, "reduction": 0 },
+  "armor": { "name": "Armure légère", "bonus": 5, "reduction": 3 },
   "skills": [
     { "name": "Iaijutsu", "rank": 3, "trait": "reflexes", "emphases": ["Concentration"] },
     { "name": "Kenjutsu", "rank": 2, "trait": "agility", "emphases": ["Katana"] },
+    { "name": "Kyujutsu", "rank": 1, "trait": "reflexes", "emphases": [] },
     { "name": "Défense", "rank": 1, "trait": "reflexes", "emphases": [] },
     { "name": "Étiquette", "rank": 2, "trait": "awareness", "emphases": ["Courtoisie"] },
-    { "name": "Courtoisie", "rank": 1, "trait": "awareness", "emphases": [] },
-    { "name": "Investigation", "rank": 1, "trait": "perception", "emphases": ["Remarquer"] },
     { "name": "Sincérité", "rank": 1, "trait": "awareness", "emphases": ["Honnêteté"] },
-    { "name": "Athlétisme", "rank": 1, "trait": "strength", "emphases": [] },
-    { "name": "Équitation", "rank": 1, "trait": "agility", "emphases": [] },
-    { "name": "Bataille", "rank": 1, "trait": "perception", "emphases": [] }
+    { "name": "Cérémonie du thé", "rank": 1, "trait": "void", "emphases": [] },
+    { "name": "Courtisan", "rank": 1, "trait": "awareness", "emphases": [] },
+    { "name": "Investigation", "rank": 1, "trait": "perception", "emphases": ["Remarquer"] },
+    { "name": "Représentation : Art oratoire", "rank": 1, "trait": "awareness", "emphases": [] },
+    { "name": "Équitation", "rank": 1, "trait": "agility", "emphases": [] }
   ],
   "weapons": [
-    { "name": "Katana", "skill": "Kenjutsu", "dr": "3k2" },
-    { "name": "Wakizashi", "skill": "Kenjutsu", "dr": "2k2" }
+    { "name": "Katana", "skill": "Kenjutsu", "dr": "3k2", "keywords": ["samourai", "moyenne"] },
+    { "name": "Wakizashi", "skill": "Kenjutsu", "dr": "2k2", "keywords": ["samourai", "moyenne"] },
+    { "name": "Yumi", "skill": "Kyujutsu", "dr": "2k2", "bowStrength": 3, "keywords": ["arc", "distance", "grande"] }
   ],
-  "techniques": [
-    { "name": "Voie de la Grue (Rang 1)", "text": "Texte de la technique d'école, à recopier depuis le livre." }
-  ],
+  "techniques": [],
   "maneuvers": [],
-  "advantages": "Bien-né, Voix",
+  "modifiers": [
+    {
+      "id": "voix", "name": "Voix", "source": "advantage", "appliesTo": "skill", "skill": "Représentation : Art oratoire",
+      "rolled": 1, "kept": 1, "flat": 0, "tn": 0, "freeRaises": 0, "mode": "always",
+      "note": "+1g1 aux jets de Représentation qui passent par la voix (chant, art oratoire)."
+    }
+  ],
+  "advantages": "Voix",
   "disadvantages": "Orgueil",
-  "notes": ""
+  "notes": "Personnage d'exemple (Grue, bushi Kakita de rang 1). Remplace tout par ton samouraï."
 }

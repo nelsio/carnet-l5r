@@ -5,7 +5,7 @@ import {
   BUGEI_SKILLS, EMPHASIS_ALIASES, SCHOOLS, WEAPON_CATALOG,
   type CatalogWeapon, type Effect, type On, type ReminderContext, type School, type SchoolRank, type Value, type When,
 } from "../rules/ecoles";
-import { findSkill, isRanged, normalize, rings, traitValue, type PoolAction, type WeaponLike } from "./engine";
+import { findSkill, isRanged, normalize, rings, sameSkill, traitValue, type PoolAction, type WeaponLike } from "./engine";
 import { WEAPON_KEYWORDS, type Character, type Maneuver, type TraitKey, type WeaponKeyword } from "./schema";
 
 /** Situation du personnage au moment du jet. */
@@ -122,7 +122,7 @@ export function resolveValue(v: Value | undefined, c: Character, input?: number)
   else if (ref.startsWith("trait:")) n = traitValue(c, ref.slice(6) as TraitKey);
   else n = findSkill(c, ref.slice(6))?.rank ?? 0;
   n *= v.mult ?? 1;
-  if (v.div) n = Math.floor(n / v.div);
+  if (v.div) n = v.round === "nearest" ? Math.round(n / v.div) : Math.floor(n / v.div);
   n += v.add ?? 0;
   if (v.min !== undefined) n = Math.max(v.min, n);
   if (v.max !== undefined) n = Math.min(v.max, n);
@@ -132,6 +132,19 @@ export function resolveValue(v: Value | undefined, c: Character, input?: number)
 export function catalogWeapon(name: string): CatalogWeapon | undefined {
   const key = normalize(name);
   return WEAPON_CATALOG.find((w) => normalize(w.name) === key);
+}
+
+/**
+ * Écart entre une arme de la fiche et l'arme du livre de même nom (annexe E.2 C8) : VD ou mots-clés différents.
+ * Les armes déjà saisies ne sont jamais modifiées d'office ; la fiche propose la mise à jour.
+ */
+export function catalogGap(w: WeaponLike): { dr: string; keywords: WeaponKeyword[] } | undefined {
+  const book = catalogWeapon(w.name);
+  if (!book) return undefined;
+  const dr = (s: string) => s.replace(/\s+/g, "").toLowerCase().replace("g", "k");
+  const own = [...(w.keywords ?? [])].sort().join(",");
+  const same = dr(w.dr) === dr(book.dr) && own === [...book.keywords].sort().join(",");
+  return same ? undefined : { dr: book.dr, keywords: [...book.keywords] };
 }
 
 /** Mots-clés saisis en texte (« Samouraï, deux mains ») → mots-clés valides, sans doublon. */
@@ -199,10 +212,9 @@ export function sameEmphasis(a: string, b: string): boolean {
   return a.trim() !== "" && emphasisKey(a) === emphasisKey(b);
 }
 
-/** Compétence `name` égale à `target`, ou variante « target : … » (« Connaissance : Histoire »). */
+/** Compétence `name` égale à `target` (ou à un de ses alias), ou variante « target : … » (« Connaissance : Histoire »). */
 export function skillIs(name: string, target: string): boolean {
-  const t = normalize(target);
-  return normalize(name) === t || normalize(name.split(":")[0]) === t;
+  return sameSkill(name, target) || sameSkill(name.split(":")[0], target);
 }
 
 /** Compétence de Connaissance (« Connaissance : Histoire », « Lore: History »). */

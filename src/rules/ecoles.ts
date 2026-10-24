@@ -10,10 +10,13 @@ import bushi from "./ecoles-bushi.json";
 import courtiers from "./ecoles-courtisans.json";
 import type { RingKey, Stance } from "./l5r4e";
 
-/** Valeur fixe, ou calculée depuis la fiche : `ref` × `mult` ÷ `div` (arrondi inférieur) + `add`, plancher `min`, plafond `max`. */
+/**
+ * Valeur fixe, ou calculée depuis la fiche : `ref` × `mult` ÷ `div` + `add`, plancher `min`, plafond `max`.
+ * La division arrondit à l'inférieur, ou au plus proche avec `round: "nearest"` (Bayushi courtisan R1, annexe E-h).
+ */
 export type Value = number | {
   ref: "schoolRank" | "honor" | "input" | `ring:${RingKey}` | `trait:${TraitKey}` | `skill:${string}`;
-  mult?: number; div?: number; add?: number; min?: number; max?: number;
+  mult?: number; div?: number; round?: "nearest"; add?: number; min?: number; max?: number;
 };
 
 /** Conditions d'un effet : toutes celles présentes doivent être vraies. */
@@ -78,11 +81,18 @@ export interface School {
   /** Mots qui désignent l'école dans le champ libre « École », en plus du nom de famille (suggestion, annexe D-h). */
   classWords?: string[];
 }
-export interface CatalogWeapon { name: string; keywords: WeaponKeyword[]; skill: string; dr: string; bowStrength?: number }
+/**
+ * Arme du livre (p. 201-206, annexe E.2 C8). `special: "katanaVoid"` : un point de Vide possible aux dégâts ;
+ * `tnMounted` / `tnOnFoot` : ND des tirs augmenté monté ou à pied ; `minStrength` : Force conseillée.
+ */
+export interface CatalogWeapon {
+  name: string; keywords: WeaponKeyword[]; skill: string; dr: string; bowStrength?: number;
+  special?: "katanaVoid"; tnMounted?: number; tnOnFoot?: number; minStrength?: number;
+}
 
 /** Écoles bushi (lot 10), puis courtisans et Shosuro (lot 11). */
 export const SCHOOLS = [...bushi.schools, ...courtiers.schools] as unknown as readonly School[];
-/** Catalogue d'armes : mots-clés pré-remplis (valeurs de dégâts à vérifier, HANDOFF P10). */
+/** Catalogue d'armes : mots-clés, compétence et VD du livre (vérifiés, HANDOFF P10 et annexe E.2 C8). */
 export const WEAPON_CATALOG = bushi.weaponCatalog as unknown as readonly CatalogWeapon[];
 /** Compétences Bugei (Akodo R5, Utaku R5). */
 export const BUGEI_SKILLS: readonly string[] = bushi.skillGroups.bugei;

@@ -5,7 +5,7 @@ import { resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 
 const pageUrl = pathToFileURL(resolve("dist/carnet-l5r.html")).href;
-const kakitaPath = resolve("reference/exemple-personnage.json");
+const kakitaPath = resolve("tests/fixtures/kakita-v1.json");
 
 const fileInput = (page: Page) => page.getByLabel("Fichier JSON à importer");
 const dialog = (page: Page) => page.getByRole("dialog");
@@ -33,7 +33,8 @@ test("E3 : export, puis import en « Nouvelle fiche » : fiche identique", async
   expect(readFileSync(await second.path()).toString()).toBe(exported.toString());
   // Fiche v1 de référence, exportée au format v2 (annexe C.2).
   const v1 = JSON.parse(readFileSync(kakitaPath, "utf8"));
-  const keywords = [["samourai", "moyenne"], ["samourai", "petite"]];
+  // Mots-clés du livre (annexe E.2 C8) : le wakizashi est une arme moyenne.
+  const keywords = [["samourai", "moyenne"], ["samourai", "moyenne"]];
   expect(JSON.parse(exported.toString())).toEqual({
     ...v1, schemaVersion: 2, schoolId: "", schoolRank: null,
     weapons: v1.weapons.map((w: object, i: number) => ({ ...w, keywords: keywords[i] })),
@@ -49,7 +50,7 @@ test("E4 : import en « Consultation » : badge, lecture seule, jet possible san
   await dialog(page).getByRole("button", { name: "Importer" }).click();
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Consultation");
   await expect(page.locator("main input, main textarea, main select, .status input")).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Modifier la fiche" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /^Edit : / })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Point de Vide 1" })).toBeDisabled();
 
   await page.getByRole("button", { name: "Aide de jeu" }).click();
@@ -85,11 +86,12 @@ test("E5 : fusion ajoutant Kyujutsu et un arc : aperçu, puis tir sur Réflexes 
 
   await page.getByRole("button", { name: "Aide de jeu" }).click();
   await page.getByRole("button", { name: "Combat", exact: true }).click();
-  // Kyujutsu 1 + Réflexes 3 = 4g3 ; force de l'arc 3 + 2g2 = 5g2.
+  // Kyujutsu 1 + Réflexes 3 = 4g3 ; force de l'arc 3 plafonnée par la Force 2 (C11) + 2g2 = 4g2.
   await expect(page.locator("button.act").filter({ hasText: "Tir · Yumi" }).locator(".p")).toHaveText("4g3");
-  await expect(page.locator("button.act").filter({ hasText: "Dégâts · Yumi" }).locator(".p")).toHaveText("5g2");
+  await expect(page.locator("button.act").filter({ hasText: "Dégâts · Yumi" }).locator(".p")).toHaveText("4g2");
   await page.locator("button.act").filter({ hasText: "Tir · Yumi" }).click();
   await expect(page.getByText("Kyujutsu 1 + Réflexes 3")).toBeVisible();
   await page.locator("button.act").filter({ hasText: "Dégâts · Yumi" }).click();
-  await expect(page.getByText("Arc 3 + VD 2k2")).toBeVisible();
+  await expect(page.getByText("Arc 2 + VD 2k2")).toBeVisible();
+  await expect(page.getByText("Force 2 : l'arc de force 3 tire à 2.")).toBeVisible();
 });

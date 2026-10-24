@@ -26,8 +26,10 @@ for (const t of targets) {
       await page.getByRole("button", { name: "Créer mon personnage" }).click();
       await page.getByRole("textbox", { name: "Nom", exact: true }).fill("Doji Ayame");
       await page.getByRole("combobox", { name: "Clan" }).fill("Grue");
+      await page.getByRole("button", { name: "Edit : Anneaux & Traits" }).click();
       await page.getByRole("spinbutton", { name: "Agilité" }).fill("4");
-      await page.getByRole("button", { name: "Terminer" }).click();
+      await page.getByRole("button", { name: "Terminer : Anneaux & Traits" }).click();
+      await page.getByRole("button", { name: "Terminer : Identité & réputation" }).click();
       await page.getByRole("button", { name: "Ajouter 1 blessure" }).click();
       await expect(page.getByText(/Enregistré dans ce navigateur/)).toBeVisible();
       await expect(page.getByRole("alert")).toHaveCount(0);

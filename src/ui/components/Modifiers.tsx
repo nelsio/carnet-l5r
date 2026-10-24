@@ -34,28 +34,23 @@ export function Modifiers() {
   const set = (i: number, patch: Partial<Modifier>) =>
     dispatch({ type: "set", path: ["modifiers", i], value: { ...list[i], ...patch } });
 
-  if (!state.ui.edit) {
+  if (!(state.mode === "edit" && state.ui.editing.has("modifiers"))) {
+    // Bureau : nom et cible à gauche, effet à droite ; mobile : trois lignes, nom, effet, cible (annexe E.9 S1).
     return list.length ? (
-      <div className="tbl">
-        <table>
-          <tbody>
-            {list.map((m) => (
-              <tr key={m.id}>
-                <td>
-                  <b>{m.name}</b>{" "}<span className="tag">{MODIFIER_SOURCE_LABELS[m.source]}</span>
-                  <div className="muted" style={{ fontSize: 12.5 }}>{targetLabel(m)}{m.note ? ` · ${m.note}` : ""}</div>
-                </td>
-                <td className="pool" style={{ whiteSpace: "nowrap" }}>
-                  {describeModifier(m)}
-                  <div className="muted" style={{ fontSize: 12, fontWeight: 500 }}>{m.mode === "always" ? "d'office" : "au choix"}</div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <ul className="modlist">
+        {list.map((m) => (
+          <li key={m.id} className="modrow" data-testid={`modifier-${m.id}`}>
+            <div className="mod-name"><b>{m.name}</b>{" "}<span className="tag">{MODIFIER_SOURCE_LABELS[m.source]}</span></div>
+            <div className="mod-effect">
+              <span className="mono">{describeModifier(m)}</span>
+              <span className="muted"> · {m.mode === "always" ? "d'office" : "au choix"}</span>
+            </div>
+            <div className="mod-target muted">{targetLabel(m)}{m.note ? ` · ${m.note}` : ""}</div>
+          </li>
+        ))}
+      </ul>
     ) : (
-      <p className="muted">Aucun bonus. En modification, ajoute ceux de tes techniques, avantages et désavantages : ils s'appliquent aux jets concernés.</p>
+      <p className="muted">Aucun bonus. Avec « Edit », ajoute ceux de tes techniques, avantages et désavantages : ils s'appliquent aux jets concernés.</p>
     );
   }
 

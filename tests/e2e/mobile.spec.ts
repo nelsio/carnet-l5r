@@ -1,4 +1,4 @@
-/** Version mobile (HANDOFF §7), tests M1 à M13 (§10.5). */
+/** Version mobile (HANDOFF §7), tests M1 à M14 (§10.5). */
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { expect, test, type Locator, type Page } from "@playwright/test";
@@ -9,13 +9,23 @@ const pageUrl = pathToFileURL(resolve("dist/carnet-l5r.html")).href;
 async function start(page: Page) {
   await page.goto(pageUrl);
   await page.getByRole("button", { name: "Créer mon personnage" }).click();
+  await page.getByRole("button", { name: "Terminer : Identité & réputation" }).click();
+  await page.getByRole("button", { name: "Edit : Compétences" }).click();
   await page.getByRole("button", { name: "+ Compétence" }).click();
   await page.getByRole("textbox", { name: "Nom de la compétence" }).fill("Kenjutsu");
+  await page.getByRole("button", { name: "Terminer : Compétences" }).click();
+  await page.getByRole("button", { name: "Edit : Armes" }).click();
   await page.getByRole("button", { name: "+ Arme" }).click();
   await page.getByRole("textbox", { name: "Nom de l'arme" }).fill("Katana");
-  await page.getByRole("button", { name: "Terminer" }).click();
+  await page.getByRole("button", { name: "Terminer : Armes" }).click();
   // Le bouton « Lancer » n'apparaît qu'avec le lanceur de dés affiché (masqué par défaut).
   await page.getByRole("button", { name: "Lanceur de dés : masqué" }).click();
+}
+
+/** Ouvre tous les blocs de la fiche en modification (bouton « Edit » de chacun, annexe E.9 S2). */
+async function editAllBlocks(page: Page) {
+  const edit = page.getByRole("button", { name: /^Edit : / });
+  while (await edit.count()) await edit.first().click();
 }
 
 const tab = (page: Page, name: "Fiche" | "Aide de jeu" | "Statistiques") => page.getByRole("group", { name: "Vue" }).getByRole("button", { name });
@@ -57,7 +67,7 @@ test.beforeEach(async ({ page }) => start(page));
 
 test("M1 : aucune vue ne défile horizontalement", async ({ page }) => {
   await noHorizontalScroll(page, "Fiche");
-  await page.getByRole("button", { name: "Modifier la fiche" }).click();
+  await editAllBlocks(page);
   await noHorizontalScroll(page, "Fiche en modification");
   await tab(page, "Aide de jeu").click();
   for (const s of ["Enquête", "Cour", "Déplacement", "Combat"]) {
@@ -81,6 +91,8 @@ test("M1 : aucune vue ne défile horizontalement", async ({ page }) => {
   await noHorizontalScroll(page, "Bibliothèque, confirmation de suppression");
   await page.getByRole("button", { name: "Annuler" }).click();
   await page.getByRole("button", { name: /^Ouvrir / }).click();
+  // La fiche doit être rouverte avant l'import : sinon le fichier part dans le champ de la Bibliothèque, qui disparaît.
+  await expect(page.getByRole("button", { name: "Exporter la fiche" })).toBeVisible();
   const patch = { schemaVersion: 1, traits: { agility: 4 }, skills: [{ name: "Kyujutsu", rank: 1, trait: "reflexes", emphases: [] }], notes: "x".repeat(400), foo: 1 };
   await page.getByLabel("Fichier JSON à importer").setInputFiles({ name: "fusion-avec-un-nom-de-fichier-tres-long.json", mimeType: "application/json", buffer: Buffer.from(JSON.stringify(patch)) });
   await expect(page.getByRole("dialog")).toBeVisible();
@@ -102,19 +114,29 @@ test("M2 : la barre de navigation est fixe en bas, sur Fiche, Aide de jeu et Sta
   }
 });
 
-test("M3 : un appui sur le résumé déplie la piste en 2 × 4, un second la replie", async ({ page }) => {
+test("M3 (E26) : un appui sur le résumé ouvre le détail, une ligne par niveau sous la barre ; un second le replie", async ({ page }) => {
+  await page.getByRole("button", { name: "Ajouter 1 blessure" }).click();
   const summary = page.locator("button.wsum");
   const track = page.getByLabel("Niveaux de blessure");
+  const detail = page.getByTestId("wound-detail");
   await expect(summary).toBeVisible();
   await expect(track).toBeHidden();
+  await expect(detail).toHaveCount(0);
   await summary.click();
-  await expect(track).toBeVisible();
-  const tops = await track.locator(".wl").evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)));
-  expect(tops).toHaveLength(8);
-  expect(new Set(tops).size).toBe(2);
-  expect(tops.slice(0, 4).every((t) => t === tops[0])).toBe(true);
-  await summary.click();
+  await expect(detail).toBeVisible();
   await expect(track).toBeHidden();
+  const rows = detail.getByRole("listitem");
+  await expect(rows).toHaveCount(8);
+  const boxes = await rows.evaluateAll((els) => els.map((e) => e.getBoundingClientRect()).map((r) => ({ top: Math.round(r.top), width: Math.round(r.width) })));
+  // Une ligne par niveau, de haut en bas, toutes de la même largeur.
+  expect(boxes.every((b, i) => i === 0 || b.top > boxes[i - 1]!.top)).toBe(true);
+  expect(new Set(boxes.map((b) => b.width)).size).toBe(1);
+  await expect(rows.first()).toHaveAttribute("aria-current", "step");
+  await expect(rows.first()).toContainText("Indemne");
+  const summaryBox = (await summary.boundingBox())!;
+  expect((await detail.boundingBox())!.y).toBeGreaterThanOrEqual(summaryBox.y + summaryBox.height);
+  await summary.click();
+  await expect(detail).toHaveCount(0);
 });
 
 test("M4 : choisir une action ouvre le panneau ; « Lancer » est visible sans défiler", async ({ page }) => {
@@ -165,7 +187,7 @@ test("M6 bis : la page ne défile pas derrière le panneau ouvert", async ({ pag
 });
 
 test("M7 : en modification, les champs ont une police d'au moins 16 px", async ({ page }) => {
-  await page.getByRole("button", { name: "Modifier la fiche" }).click();
+  await editAllBlocks(page);
   // Le champ fichier caché (bouton « Importer ») n'est jamais saisi au clavier.
   const sizes = await page.locator("input:not([type=checkbox]):not([type=file]), select, textarea").evaluateAll((els) =>
     els.map((e) => ({ name: e.getAttribute("aria-label") ?? e.className, size: parseFloat(getComputedStyle(e).fontSize) })));
@@ -325,4 +347,36 @@ test.describe("M11 : en-tête à 360 px de large", () => {
     await expect(buttons[1]!).toHaveAttribute("title", "Lanceur de dés : affiché");
     await noHorizontalScroll(page, "en-tête 360 px");
   });
+});
+
+/** Bonus de jet en lecture : trois lignes (nom, effet, cible), sans texte tronqué (annexe E.9 S1, E24). */
+async function modifiersOnThreeLines(page: Page) {
+  await page.getByRole("button", { name: "Edit : Bonus de jet" }).click();
+  for (const id of ["skill-1g1", "force-de-la-terre"]) {
+    await page.getByRole("combobox", { name: "Modèle de bonus" }).selectOption(id);
+    await page.getByRole("button", { name: "+ Bonus" }).click();
+  }
+  await page.getByRole("button", { name: "Terminer : Bonus de jet" }).click();
+  const rows = page.locator(".modrow");
+  await expect(rows).toHaveCount(2);
+  for (const row of await rows.all()) {
+    const parts = await row.evaluate((r) => [".mod-name", ".mod-effect", ".mod-target"].map((s) => {
+      const e = r.querySelector(s)!;
+      const b = e.getBoundingClientRect();
+      return { top: b.top, bottom: b.bottom, truncated: e.scrollWidth > e.clientWidth + 0.5 };
+    }));
+    // Chaque partie commence sous la précédente.
+    expect(parts[1]!.top).toBeGreaterThanOrEqual(parts[0]!.bottom - 0.5);
+    expect(parts[2]!.top).toBeGreaterThanOrEqual(parts[1]!.bottom - 0.5);
+    expect(parts.filter((p) => p.truncated)).toEqual([]);
+  }
+  await expect(rows.first().locator(".mod-effect")).toHaveText("+1g1 · d'office");
+  await noHorizontalScroll(page, "bonus de jet");
+}
+
+test("M14 (E24) : bonus de jet sur 3 lignes, aucun texte tronqué", async ({ page }) => modifiersOnThreeLines(page));
+
+test.describe("M14 à 360 px de large", () => {
+  test.use({ viewport: { width: 360, height: 740 } });
+  test("bonus de jet sur 3 lignes, aucun texte tronqué", async ({ page }) => modifiersOnThreeLines(page));
 });

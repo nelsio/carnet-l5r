@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { serializeCharacter, type Character } from "@carnet/core";
 import { memoryStorage, type LibraryEntry, type Storage } from "../../src/storage";
 import { App } from "../../src/ui/App";
-import kakita from "../../reference/exemple-personnage.json";
+import kakita from "../fixtures/kakita-v1.json";
 import { FakeHandle } from "../helpers/fakeHandle";
 
 const base = () => structuredClone(kakita) as Character;

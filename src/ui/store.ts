@@ -4,9 +4,10 @@
  */
 import { createContext, useContext, type Dispatch } from "react";
 import {
-  activeEffects, buildActions, DAMAGE_MANEUVER_ID, emphasisMatches, matchingEmphasis, voidSpendOption,
-  type ActionDef, type Character, type CombatSub, type RollResult, type Situation, type Stance,
+  activeEffects, buildActions, DAMAGE_MANEUVER_ID, DISARM_MANEUVER_ID, emphasisMatches, matchingEmphasis, voidSpendOption,
+  fullDefenseBonus, type ActionDef, type Character, type CombatSub, type RollResult, type Situation, type Stance,
 } from "@carnet/core";
+import type { Terrain } from "../rules/l5r4e";
 import type { LibraryEntry } from "../storage";
 import { DEFAULT_ROLL_OPTIONS, effectiveManeuvers, isRollable, isUnskilled, toPoolAction, type RollOptions } from "./rolls";
 
@@ -14,6 +15,10 @@ export type Theme = "auto" | "light" | "dark";
 export type View = "sheet" | "aid" | "stats";
 export type AidSituation = Situation;
 export type ListKey = "skills" | "weapons" | "techniques" | "maneuvers" | "modifiers";
+/** Blocs modifiables de la fiche (annexe E.9 S2). */
+export type BlockId = "rings" | "identity" | "skills" | "weapons" | "techniques" | "modifiers" | "notes";
+/** Bloc ouvert à la création d'une fiche : le nom en premier. */
+export const NEW_CHARACTER_BLOCK: BlockId = "identity";
 /** Panneaux de l'aide de jeu dotés d'un bouton « i » (HANDOFF §6.2). */
 export type InfoPanel = "stance" | "void" | "move" | "reminders";
 type Path = readonly (string | number)[];
@@ -27,6 +32,8 @@ export interface RollRecord {
   raises: number;
   free: number;
   maneuvers: string[];
+  /** Désarmement réussi : les dégâts liés passent à 2g1 sans la Force. */
+  disarm?: boolean;
   /** Dés de dégâts gagnés par « Augmentation des dégâts ». */
   damageDice: number;
   fullDefense: boolean;
@@ -45,7 +52,10 @@ export interface UiState {
   /** Éditeur d'armure ouvert sous les tuiles de la barre d'état. */
   armorEdit: boolean;
   view: View;
-  edit: boolean;
+  /** Blocs de la fiche ouverts en modification, chacun par son bouton « Edit » (annexe E.9 S2). */
+  editing: ReadonlySet<BlockId>;
+  /** Terrain de l'encart « Se déplacer en combat » (annexe E.2 C4). */
+  terrain: Terrain;
   situation: AidSituation;
   sub: CombatSub;
   stance: Stance;
@@ -58,7 +68,8 @@ export interface UiState {
   selectedId: string | null;
   opts: RollOptions;
   maneuvers: Record<string, number>;
-  pendingDamage: { parent: string; dice: number } | null;
+  /** Dégâts liés à l'attaque réussie : dés d'augmentation, ou Désarmement (2g1 sans la Force). */
+  pendingDamage: { parent: string; dice: number; disarm?: boolean } | null;
   lastRoll: RollRecord | null;
   history: { label: string; total: number; tn: number | null | "opposed" }[];
   sheetOpen: boolean;
@@ -102,7 +113,8 @@ export const initialUi: UiState = {
   info: {},
   armorEdit: false,
   view: "sheet",
-  edit: false,
+  editing: new Set(),
+  terrain: "normal",
   situation: "investigation",
   sub: "skirmish",
   stance: "attack",
@@ -148,7 +160,8 @@ export type AppAction =
   | { type: "toggleInfo"; panel: InfoPanel }
   | { type: "toggleArmorEdit" }
   | { type: "view"; view: View }
-  | { type: "toggleEdit" }
+  | { type: "toggleBlockEdit"; block: BlockId }
+  | { type: "terrain"; terrain: Terrain }
   | { type: "situation"; situation: AidSituation }
   | { type: "sub"; sub: CombatSub }
   | { type: "stance"; stance: Stance }
@@ -201,14 +214,16 @@ function spendVoid(state: AppState): AppState {
 function select(c: Character, ui: UiState, a: ActionDef, open: boolean): UiState {
   const opts: RollOptions = {
     ...ui.opts,
-    raises: 0, free: 0, flat: 0, extraRolled: 0,
+    raises: 0, free: 0, flat: 0, extraRolled: 0, calledZone: "limb", quadruped: false, disarm: false,
     tn: typeof a.tn === "number" ? a.tn : ui.opts.tn,
     emphasis: a.kind === "skill" && emphasisMatches(c, a.skill ?? "", a.emphasisHint),
     emphasisName: (a.kind === "skill" && matchingEmphasis(c, a.skill ?? "", a.emphasisHint)) || "",
   };
   let pendingDamage = ui.pendingDamage;
   if (a.kind === "damage" && pendingDamage && pendingDamage.parent === a.parent) {
-    opts.extraRolled = pendingDamage.dice;
+    // Désarmement : 2g1 sans la Force ni augmentation de dégâts (C6).
+    if (pendingDamage.disarm) opts.disarm = true;
+    else opts.extraRolled = pendingDamage.dice;
     pendingDamage = null;
   }
   return {
@@ -236,7 +251,7 @@ function uiReducer(state: AppState, action: AppAction): AppState {
     case "toggleArmorEdit": return withUi({ armorEdit: state.mode === "edit" && !ui.armorEdit });
     case "view":
       return action.view === "aid"
-        ? { ...state, ui: selectFirst(c, { ...ui, view: "aid", edit: false }) }
+        ? { ...state, ui: selectFirst(c, { ...ui, view: "aid", editing: new Set() }) }
         : withUi({ view: action.view, sheetOpen: false });
     case "situation": return { ...state, ui: selectFirst(c, { ...ui, situation: action.situation }) };
     case "sub": return { ...state, ui: selectFirst(c, { ...ui, sub: action.sub }) };
@@ -250,6 +265,7 @@ function uiReducer(state: AppState, action: AppAction): AppState {
     case "toggleModifier": return withUi({ modifierToggles: { ...ui.modifierToggles, [action.id]: action.on } });
     case "toggleArmorModifier": return withUi({ armorToggles: { ...ui.armorToggles, [action.id]: action.on } });
     case "mounted": return withUi({ mounted: action.on });
+    case "terrain": return withUi({ terrain: action.terrain });
     case "toggleTechnique": return withUi({ techToggles: { ...ui.techToggles, [action.key]: action.on } });
     case "techniqueInput": return withUi({ techInputs: { ...ui.techInputs, [action.key]: action.value } });
     case "toggleSchoolArmor": return withUi({ schoolArmor: { ...ui.schoolArmor, [action.key]: action.on } });
@@ -271,7 +287,7 @@ const kept = (ui: UiState): Pick<UiState, "theme" | "showDiceRoller" | "info"> =
   ({ theme: ui.theme, showDiceRoller: ui.showDiceRoller, info: ui.info });
 
 /** Actions qui modifient la fiche : refusées en consultation. */
-const EDITING = new Set<AppAction["type"]>(["set", "add", "remove", "wounds", "pip", "toggleEdit", "replaceCharacter"]);
+const EDITING = new Set<AppAction["type"]>(["set", "add", "remove", "wounds", "pip", "toggleBlockEdit", "replaceCharacter"]);
 
 export function reducer(state: AppState, action: AppAction): AppState {
   const { character: c, ui } = state;
@@ -279,7 +295,7 @@ export function reducer(state: AppState, action: AppAction): AppState {
   if (action.type === "open") {
     return {
       screen: "character", entryId: action.id, mode: action.mode, character: action.character,
-      ui: { ...initialUi, ...kept(ui), edit: !!action.edit && action.mode === "edit" },
+      ui: { ...initialUi, ...kept(ui), editing: new Set(action.edit && action.mode === "edit" ? [NEW_CHARACTER_BLOCK] : []) },
     };
   }
   if (action.type === "library") {
@@ -301,8 +317,11 @@ export function reducer(state: AppState, action: AppAction): AppState {
       return { ...state, character: { ...c, wounds: Math.max(0, Math.floor(action.value) || 0) } };
     case "pip":
       return { ...state, character: { ...c, voidPoints: c.voidPoints === action.index + 1 ? action.index : action.index + 1 } };
-    case "toggleEdit":
-      return { ...state, ui: { ...ui, edit: !ui.edit } };
+    case "toggleBlockEdit": {
+      const editing = new Set(ui.editing);
+      if (!editing.delete(action.block)) editing.add(action.block);
+      return { ...state, ui: { ...ui, editing } };
+    }
     case "select": {
       const a = currentActions(c, ui).find((x) => x.id === action.id);
       return a && isRollable(a) ? { ...state, ui: select(c, ui, a, true) } : state;
@@ -348,6 +367,7 @@ function rolled(state: AppState, c: Character, action: Extract<AppAction, { type
   const { total } = action.result;
   const success = typeof action.tn === "number" && total >= action.tn;
   const damageDice = a.attack && success ? (ui.maneuvers[DAMAGE_MANEUVER_ID] ?? 0) : 0;
+  const disarm = a.attack && success && (ui.maneuvers[DISARM_MANEUVER_ID] ?? 0) > 0;
   const maneuvers = a.attack
     ? Object.entries(ui.maneuvers).filter(([, n]) => n > 0).map(([id, n]) => {
         const m = effectiveManeuvers(c).find((x) => x.id === id);
@@ -358,7 +378,7 @@ function rolled(state: AppState, c: Character, action: Extract<AppAction, { type
 
   const record: RollRecord = {
     actionId: a.id, label: a.label, kind: a.kind, result: action.result, tn: action.tn,
-    raises: action.raises, free: action.free ?? opts.free, maneuvers, damageDice, fullDefense: !!a.fullDefense,
+    raises: action.raises, free: action.free ?? opts.free, maneuvers, damageDice, fullDefense: !!a.fullDefense, disarm,
     baseTn: action.baseTn, baseSuccess: action.baseSuccess,
   };
   return {
@@ -367,8 +387,10 @@ function rolled(state: AppState, c: Character, action: Extract<AppAction, { type
       ...ui,
       opts: { ...ui.opts, voidPoint: false, voidSkill: false, voidSpend: false },
       initiative: a.kind === "initiative" ? total : ui.initiative,
-      ...(a.fullDefense ? { stance: "fullDefense" as const, fullDefenseBonus: Math.floor(total / 2) } : {}),
-      pendingDamage: a.attack ? (damageDice ? { parent: a.id, dice: damageDice } : null) : ui.pendingDamage,
+      ...(a.fullDefense ? { stance: "fullDefense" as const, fullDefenseBonus: fullDefenseBonus(total) } : {}),
+      pendingDamage: a.attack
+        ? (disarm ? { parent: a.id, dice: 0, disarm } : damageDice ? { parent: a.id, dice: damageDice } : null)
+        : ui.pendingDamage,
       lastRoll: record,
       history: [{ label: a.label, total, tn: action.tn }, ...ui.history].slice(0, HISTORY_SIZE),
     },
