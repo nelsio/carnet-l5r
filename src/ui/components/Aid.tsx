@@ -1,10 +1,11 @@
 import { useEffect } from "react";
 import {
   armorEffects, describeModifier, hasMountedEffects, isSimpleAttack, modifiersOf, movement, movementBonus, resolveValue,
-  rings, schoolOf, schoolReminders, stackCount, stackEffects, stackMax, voidMultiplier,
+  reminderText, rings, schoolOf, schoolReminders, stackCount, stackEffects, stackMax, voidMultiplier,
   type ActionDef, type ActiveEffect,
 } from "@carnet/core";
 import { COMBAT_SUBS, SITUATIONS, STANCES } from "../../rules/l5r4e";
+import type { ReminderContext } from "../../rules/ecoles";
 import { toMeters } from "../format";
 import { contextOf, currentArmorTN, DEFAULT_ROLL_OPTIONS, isActive, isRollable, poolFor, poolLabel, toPoolAction } from "../rolls";
 import { currentActions, useCharacter, useStore, type AidSituation, type InfoPanel } from "../store";
@@ -60,7 +61,7 @@ export function Aid() {
           {initiative && <InitiativeCard action={initiative} />}
           {combat && ui.sub !== "duel" && <StancePanel />}
           {combat && <VoidPanel />}
-          {combat && <RemindersPanel />}
+          {(combat || ui.situation === "court") && <RemindersPanel />}
           <div className="actions">
             {actions.filter((a) => a.kind !== "initiative").map((a) => <ActionCard key={a.id} action={a} />)}
             {combat && !c.weapons.length && <p className="muted">Ajoute des armes dans la fiche pour voir les attaques.</p>}
@@ -185,11 +186,13 @@ function StackRow({ effect: e }: { effect: ActiveEffect }) {
   );
 }
 
-/** Techniques de contexte (combat, et duel en Duel iaijutsu) : noms, détail par le « i ». */
+/** Techniques de contexte (combat, duel en Duel iaijutsu, social à la Cour) : noms, détail par le « i ». */
 function RemindersPanel() {
   const { state } = useStore();
   const c = useCharacter();
-  const reminders = schoolReminders(c, state.ui.sub === "duel" ? ["combat", "duel"] : ["combat"]);
+  const { situation, sub } = state.ui;
+  const contexts: ReminderContext[] = situation === "court" ? ["social"] : sub === "duel" ? ["combat", "duel"] : ["combat"];
+  const reminders = schoolReminders(c, contexts);
   if (!reminders.length) return null;
   const details = !!state.ui.info.reminders;
   return (
@@ -202,7 +205,7 @@ function RemindersPanel() {
         {reminders.map((e) => (
           <div key={e.key}>
             <b>{e.technique}</b> <span className="muted">· {e.source}</span>
-            {details && <div className="muted">{("text" in e && e.text) || e.summary}</div>}
+            {details && <div className="muted">{reminderText(e, c)}</div>}
           </div>
         ))}
       </div>

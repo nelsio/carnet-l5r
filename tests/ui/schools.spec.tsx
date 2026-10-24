@@ -149,3 +149,93 @@ describe("Techniques d'école : détails de l'interface", () => {
     expect(row).toHaveTextContent("Deux mains");
   });
 });
+
+/** Fiche d'exemple avec des compétences sociales en plus (lot 11). */
+const courtSkills = (): Partial<Character> => ({
+  skills: [
+    ...base().skills.filter((s) => s.name !== "Sincérité"),
+    { name: "Sincérité", rank: 2, trait: "awareness", emphases: ["Honnêteté", "Duperie"] },
+    { name: "Comédie", rank: 2, trait: "awareness", emphases: [] },
+  ],
+});
+
+function court() {
+  click("Aide de jeu");
+  click("Cour");
+}
+
+describe("Techniques des courtisans et de Shosuro : parcours E20 à E23", () => {
+  it("E20 : Doji, Honneur 6,5 puis 5,0 → « 1 augm. gratuite · Doji R1 » en Courtoisie, puis plus rien", async () => {
+    await mount({ schoolId: "doji-courtisan", insightRank: 1 });
+    court();
+    click(/^Convaincre, manipuler/);
+    expect(roller().getByTestId("tech-chips")).toHaveTextContent("1 augm. gratuite · Doji R1");
+    expect(roller().getByText(/Augm\. gratuites \(\+1 bonus\)/)).toBeInTheDocument();
+
+    click("Fiche");
+    click("Modifier la fiche");
+    fireEvent.change(screen.getByRole("spinbutton", { name: "Honneur" }), { target: { value: "5" } });
+    click("Terminer");
+    court();
+    click(/^Convaincre, manipuler/);
+    expect(roller().queryByTestId("tech-chips")).toBeNull();
+  });
+
+  it("E21 : Ide 1, Sincérité : Duperie → « ND +5 · Ide R1 », Honnêteté → « 1 augm. gratuite · Ide R1 » ; relance des 1", async () => {
+    await mount({ schoolId: "ide-emissaire", insightRank: 1, ...courtSkills() });
+    court();
+    click(/^Être cru/);
+    const emphasis = roller().getByRole("combobox", { name: /Spécialisation/ });
+    expect(emphasis).toHaveValue("");
+    expect(roller().queryByTestId("tech-chips")).toBeNull();
+
+    fireEvent.change(emphasis, { target: { value: "Duperie" } });
+    expect(roller().getByTestId("tech-chips")).toHaveTextContent("ND +5 · Ide R1");
+    expect(roller().getByTestId("manual")).toHaveTextContent("relance une fois chaque 1");
+
+    fireEvent.change(emphasis, { target: { value: "Honnêteté" } });
+    expect(roller().getByTestId("tech-chips")).toHaveTextContent("1 augm. gratuite · Ide R1");
+    expect(roller().getByTestId("manual")).toHaveTextContent("relance une fois chaque 1");
+  });
+
+  it("E22 : Yasuki 4, Étiquette → rappel « +20 au ND de qui tente de te tromper » sous la réserve", async () => {
+    await mount({ schoolId: "yasuki-courtisan", insightRank: 4 });
+    court();
+    click(/^Résister à une influence/);
+    expect(roller().getByTestId("school-reminders")).toHaveTextContent("+20 au ND de qui tente de te tromper.");
+    // Panneau « Rappels d'école » de la situation Cour, détail chiffré par le « i ».
+    click("Afficher le détail : Rappels d'école");
+    expect(screen.getByText("+20 au ND de qui tente de te tromper.")).toBeInTheDocument();
+  });
+
+  it("E23 : Shosuro Acteur 3, Comédie → option « 2 points de Vide (+6g2) » ; absente en Kenjutsu", async () => {
+    await mount({ schoolId: "shosuro-acteur", insightRank: 3, ...courtSkills() });
+    court();
+    click(/^Jouer un rôle/);
+    expect(roller().getByRole("checkbox", { name: /Dépenser 1 point de Vide \(\+3g1\)/ })).toBeInTheDocument();
+    const spend = roller().getByRole("checkbox", { name: /Dépenser 2 points de Vide \(\+6g2\)/ });
+    fireEvent.click(spend);
+    // Comédie 2 + Intuition 3 = 5g3, +6g2 = 11g5 → 10g5 (règle des dix dés, P8).
+    expect(roller().getByTestId("pool")).toHaveTextContent("10g5");
+    click("Combat");
+    click(/^Attaque · Katana/);
+    expect(roller().queryByRole("checkbox", { name: /Dépenser 2 points de Vide/ })).toBeNull();
+  });
+
+  it("fiche : rappels chiffrés sous les rangs atteints", async () => {
+    await mount({ schoolId: "kitsuki-enqueteur", insightRank: 2 });
+    expect(screen.getByTestId("school-rank-2")).toHaveTextContent("→ +10 au ND de qui te ment.");
+    expect(screen.getByTestId("school-rank-1")).toHaveTextContent("auto");
+  });
+
+  it("Shosuro Infiltré 2 : case « Cible qui ne te voit pas », augmentations non limitées", async () => {
+    await mount({ schoolId: "shosuro-infiltre", insightRank: 2 });
+    click("Aide de jeu");
+    click("Combat");
+    click(/^Attaque · Katana/);
+    fireEvent.click(roller().getByRole("checkbox", { name: /Cible qui ne te voit pas/ }));
+    expect(roller().getByText("Augmentations non limitées par ton Vide.")).toBeInTheDocument();
+    fireEvent.change(roller().getByRole("spinbutton", { name: "Augm. libres" }), { target: { value: "4" } });
+    expect(roller().queryByText(/dépasse ton Vide/)).toBeNull();
+  });
+});

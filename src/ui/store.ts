@@ -4,11 +4,11 @@
  */
 import { createContext, useContext, type Dispatch } from "react";
 import {
-  activeEffects, buildActions, DAMAGE_MANEUVER_ID, emphasisMatches, voidSpendOption,
+  activeEffects, buildActions, DAMAGE_MANEUVER_ID, emphasisMatches, matchingEmphasis, voidSpendOption,
   type ActionDef, type Character, type CombatSub, type RollResult, type Situation, type Stance,
 } from "@carnet/core";
 import type { LibraryEntry } from "../storage";
-import { DEFAULT_ROLL_OPTIONS, effectiveManeuvers, isRollable, isUnskilled, type RollOptions } from "./rolls";
+import { DEFAULT_ROLL_OPTIONS, effectiveManeuvers, isRollable, isUnskilled, toPoolAction, type RollOptions } from "./rolls";
 
 export type Theme = "auto" | "light" | "dark";
 export type View = "sheet" | "aid";
@@ -204,6 +204,7 @@ function select(c: Character, ui: UiState, a: ActionDef, open: boolean): UiState
     raises: 0, free: 0, flat: 0, extraRolled: 0,
     tn: typeof a.tn === "number" ? a.tn : ui.opts.tn,
     emphasis: a.kind === "skill" && emphasisMatches(c, a.skill ?? "", a.emphasisHint),
+    emphasisName: (a.kind === "skill" && matchingEmphasis(c, a.skill ?? "", a.emphasisHint)) || "",
   };
   let pendingDamage = ui.pendingDamage;
   if (a.kind === "damage" && pendingDamage && pendingDamage.parent === a.parent) {
@@ -337,7 +338,7 @@ function rolled(state: AppState, c: Character, action: Extract<AppAction, { type
   // La dépense « compétence au rang 1 » ne vaut que pour une compétence non maîtrisée.
   if (opts.voidSkill && isUnskilled(c, a)) next = spendVoid(next);
   // Techniques payées en Vide : option Shiba R1, et effets cochés avec un coût en Vide.
-  const spend = opts.voidSpend ? voidSpendOption(c) : undefined;
+  const spend = opts.voidSpend ? voidSpendOption(c, toPoolAction(a)) : undefined;
   if (spend && c.voidPoints >= spend.points) for (let i = 0; i < spend.points; i++) next = spendVoid(next);
   for (const e of activeEffects(c)) {
     if (!state.ui.techToggles[e.key] || !("void" in e) || !e.void) continue;

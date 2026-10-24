@@ -1,7 +1,8 @@
 /** Techniques d'école : moteur d'effets du catalogue bushi (HANDOFF annexe C.4). */
 import { DEFAULT_MANEUVERS, type RingKey, type Stance } from "../rules/l5r4e";
+import { isSocialSkill } from "./modifiers";
 import {
-  BUGEI_SKILLS, SCHOOLS, WEAPON_CATALOG,
+  BUGEI_SKILLS, EMPHASIS_ALIASES, SCHOOLS, WEAPON_CATALOG,
   type CatalogWeapon, type Effect, type On, type ReminderContext, type School, type SchoolRank, type Value, type When,
 } from "../rules/ecoles";
 import { findSkill, isRanged, normalize, rings, traitValue, type PoolAction, type WeaponLike } from "./engine";
@@ -13,6 +14,8 @@ export interface SchoolContext {
   mounted: boolean;
   /** Posture Centre au round précédent (Kakita R1). */
   centerLastRound: boolean;
+  /** Spécialisation choisie au lanceur (annexe D-c) ; absente hors lanceur. */
+  emphasis?: string;
 }
 
 /** Contexte de référence hors lanceur (fiche, statistiques) : posture Attaque, non monté. */
@@ -32,11 +35,13 @@ export type Verdict = "success" | "failure" | "baseSuccess";
 
 /** Contexte partiel : les champs absents prennent la valeur de référence. */
 export function schoolContext(ctx: Partial<SchoolContext> = {}): SchoolContext {
-  return {
+  const out: SchoolContext = {
     stance: ctx.stance ?? REFERENCE_CONTEXT.stance,
     mounted: ctx.mounted ?? false,
     centerLastRound: ctx.centerLastRound ?? false,
   };
+  if (ctx.emphasis) out.emphasis = ctx.emphasis;
+  return out;
 }
 
 /** « Nouveau round » : retient si la posture était Centre. */
@@ -73,11 +78,18 @@ export function schoolsByClan(): { clan: string; schools: School[] }[] {
   return groups;
 }
 
-/** École du catalogue dont le nom de famille apparaît dans le champ libre « École » (fiche sans école associée). */
+/**
+ * École du catalogue suggérée d'après le champ libre « École » (fiche sans école associée, annexe D-h) :
+ * nom de famille présent, puis mot de classe (« courtisan », « barde »…) ; sans mot de classe, l'école bushi,
+ * ou la seule école de cette famille ; aucune si le doute reste (« Shosuro »).
+ */
 export function suggestSchool(c: Character): School | undefined {
   if (c.schoolId || !c.school) return undefined;
   const words = new Set(normalize(c.school).split(/[^a-z0-9-]+/));
-  return SCHOOLS.find((s) => words.has(normalize(shortSchoolName(s))));
+  const candidates = SCHOOLS.filter((s) => words.has(normalize(shortSchoolName(s))));
+  return candidates.find((s) => s.classWords?.some((w) => words.has(normalize(w))))
+    ?? candidates.find((s) => !s.classWords)
+    ?? (candidates.length === 1 ? candidates[0] : undefined);
 }
 
 export function activeEffects(c: Character): ActiveEffect[] {
@@ -113,6 +125,7 @@ export function resolveValue(v: Value | undefined, c: Character, input?: number)
   if (v.div) n = Math.floor(n / v.div);
   n += v.add ?? 0;
   if (v.min !== undefined) n = Math.max(v.min, n);
+  if (v.max !== undefined) n = Math.min(v.max, n);
   return n;
 }
 
@@ -169,11 +182,40 @@ export function whenOk(w: When | undefined, c: Character, a: PoolAction | undefi
     if (W.melee && (!(weapon || unarmed) || (weapon && isRanged(weapon)))) return false;
     if (W.ranged && !(weapon && isRanged(weapon))) return false;
   }
+  if (w.honorMin !== undefined && c.honor < w.honorMin) return false;
+  if (w.emphasis && !(ctx.emphasis && w.emphasis.some((e) => sameEmphasis(e, ctx.emphasis ?? "")))) return false;
   if (w.anyOf && !w.anyOf.some((x) => whenOk(x, c, a, ctx))) return false;
   return true;
 }
 
-export function onMatches(on: readonly On[] | undefined, a: PoolAction): boolean {
+const emphasisKey = (name: string): string => {
+  const n = normalize(name);
+  const group = EMPHASIS_ALIASES.find((g) => g.some((x) => normalize(x) === n));
+  return group ? normalize(group[0]) : n;
+};
+
+/** Deux noms de spécialisation équivalents (« Duperie » et « Deceit »). */
+export function sameEmphasis(a: string, b: string): boolean {
+  return a.trim() !== "" && emphasisKey(a) === emphasisKey(b);
+}
+
+/** Compétence `name` égale à `target`, ou variante « target : … » (« Connaissance : Histoire »). */
+export function skillIs(name: string, target: string): boolean {
+  const t = normalize(target);
+  return normalize(name) === t || normalize(name.split(":")[0]) === t;
+}
+
+/** Compétence de Connaissance (« Connaissance : Histoire », « Lore: History »). */
+export function isLoreSkill(name: string): boolean {
+  return skillIs(name, "Connaissance") || skillIs(name, "Lore");
+}
+
+/** Compétence de l'école du personnage (On `school`). */
+export function isSchoolSkill(c: Character, name: string): boolean {
+  return !!schoolOf(c)?.skills?.some((s) => skillIs(name, s));
+}
+
+export function onMatches(on: readonly On[] | undefined, a: PoolAction, c?: Character): boolean {
   if (!on) return true;
   return on.some((o) => {
     switch (o) {
@@ -184,7 +226,10 @@ export function onMatches(on: readonly On[] | undefined, a: PoolAction): boolean
       case "skill": return a.kind === "skill" && !a.attack;
       case "trait": return a.kind === "trait";
       case "bugei": return a.kind === "skill" && isBugeiSkill(a.skill);
-      default: return a.kind === "skill" && normalize(a.skill) === normalize(o.slice(6));
+      case "social": return a.kind === "skill" && !a.attack && isSocialSkill(a.skill);
+      case "lore": return a.kind === "skill" && isLoreSkill(a.skill);
+      case "school": return a.kind === "skill" && !!c && isSchoolSkill(c, a.skill);
+      default: return a.kind === "skill" && skillIs(a.skill, o.slice(6));
     }
   });
 }
@@ -195,8 +240,8 @@ export function onMatches(on: readonly On[] | undefined, a: PoolAction): boolean
  */
 export function rollEffects(c: Character, a: PoolAction, ctx: SchoolContext): ActiveEffect[] {
   return activeEffects(c).filter((e) => {
-    if (e.kind === "roll") return onMatches(e.on, a) && whenOk(e.when, c, a, ctx);
-    if (e.kind === "wounds" && e.mode === "optional") return onMatches(e.on, a) && whenOk(e.when, c, a, ctx);
+    if (e.kind === "roll") return onMatches(e.on, a, c) && whenOk(e.when, c, a, ctx);
+    if (e.kind === "wounds" && e.mode === "optional") return onMatches(e.on, a, c) && whenOk(e.when, c, a, ctx);
     if (e.kind === "maneuver" && e.freeRaisesFor) return a.kind === "skill" && !!a.attack && whenOk(e.when, c, a, ctx);
     return false;
   });
@@ -269,9 +314,30 @@ export function voidMultiplier(c: Character): number {
   return has(c, "voidDouble") ? 2 : 1;
 }
 
-/** Option de dépense de plusieurs points de Vide (Shiba R1). */
-export function voidSpendOption(c: Character): (ActiveEffect & { kind: "void" }) | undefined {
-  return activeEffects(c).find((e): e is ActiveEffect & { kind: "void" } => e.kind === "void");
+/** Bonus d'un point de Vide sur ce jet : 1g1, ou celui d'un effet `voidBoost` (Asako R1, Shosuro Acteur R1). */
+export function voidPointBonus(c: Character, a: PoolAction | undefined, ctx: SchoolContext = REFERENCE_CONTEXT): DiceBonus {
+  const boost = a && activeEffects(c).find((e) => e.kind === "voidBoost" && onMatches(e.on, a, c) && whenOk(e.when, c, a, ctx));
+  return boost && boost.kind === "voidBoost" ? { rolled: boost.rolled, kept: boost.kept } : { rolled: 1, kept: 1 };
+}
+
+export interface DiceBonus { rolled: number; kept: number }
+
+/**
+ * Option de dépense de plusieurs points de Vide (Shiba R1), pour ce jet s'il est donné :
+ * une option limitée à certains jets (`on`, Shosuro Acteur R3) n'est proposée que sur eux.
+ */
+export function voidSpendOption(c: Character, a?: PoolAction): (ActiveEffect & { kind: "void" }) | undefined {
+  return activeEffects(c).find((e): e is ActiveEffect & { kind: "void" } =>
+    e.kind === "void" && (!e.on || (!!a && onMatches(e.on, a, c))));
+}
+
+/** Dés apportés par l'option de dépense de plusieurs points (avant le doublement de Shiba R5). */
+export function voidSpendBonus(
+  c: Character, spend: ActiveEffect & { kind: "void" }, a: PoolAction | undefined, ctx: SchoolContext = REFERENCE_CONTEXT,
+): DiceBonus {
+  if (!spend.perPoint) return { rolled: spend.rolled, kept: spend.kept };
+  const per = voidPointBonus(c, a, ctx);
+  return { rolled: per.rolled * spend.points, kept: per.kept * spend.points };
 }
 
 /** Badge « Attaque : Action simple ». */
@@ -313,9 +379,15 @@ export function verdict(
   return akodo && total >= baseTn ? "baseSuccess" : "failure";
 }
 
-/** Techniques à rappeler dans ce contexte (panneau « Rappels d'école », jets de dégâts). */
+/** Techniques à rappeler dans ce contexte (panneau « Rappels d'école », jets de dégâts, jets sociaux). */
 export function schoolReminders(c: Character, contexts: readonly ReminderContext[]): ActiveEffect[] {
   return activeEffects(c).filter((e) => e.kind === "reminder" && contexts.includes(e.context));
+}
+
+/** Texte d'un rappel, `{n}` remplacé par sa valeur calculée (« +10 au ND de qui te ment »). Sans texte : le résumé. */
+export function reminderText(e: ActiveEffect, c: Character): string {
+  if (e.kind !== "reminder" || !e.text) return e.summary;
+  return e.text.replace("{n}", String(resolveValue(e.value, c)));
 }
 
 /** L'école a-t-elle des effets qui dépendent d'une monture ? */
@@ -349,11 +421,17 @@ export function describeEffect(e: ActiveEffect, c: Character, input?: number): s
       const k = resolveValue(e.kept, c, input);
       const f = resolveValue(e.flat, c, input);
       const fr = resolveValue(e.freeRaises, c, input);
+      const tn = resolveValue(e.tn, c, input);
       if (r || k) parts.push(`${r >= 0 && k >= 0 ? "+" : ""}${r}g${k}`);
       if (f || (e.flat !== undefined && e.input)) parts.push(signed(f));
-      if (fr) parts.push(`${fr} augm. gratuite${fr > 1 ? "s" : ""}`);
+      if (fr || (e.freeRaises !== undefined && e.input)) parts.push(`${fr} augm. gratuite${fr > 1 ? "s" : ""}`);
+      if (tn) parts.push(`ND ${signed(tn)}`);
+      if (e.unlimitedRaises) parts.push("augmentations non limitées");
       break;
     }
+    case "voidBoost":
+      parts.push(`Vide : +${e.rolled}g${e.kept} par point`);
+      break;
     case "armor":
       parts.push(`${signed(resolveValue(e.value, c))} au ND d'armure${e.stack ? " par cran" : ""}`);
       break;

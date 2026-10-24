@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "name": "Personnage de test des courtisans",
+  "clan": "", "family": "", "school": "",
+  "schoolId": "", "schoolRank": null,
+  "insightRank": 1,
+  "honor": 6.5, "glory": 1.0, "status": 1.0,
+  "xp": { "total": 0, "spent": 0 },
+  "traits": { "stamina": 2, "willpower": 3, "strength": 2, "perception": 3, "agility": 2, "intelligence": 3, "reflexes": 2, "awareness": 3 },
+  "voidRing": 2, "voidPoints": 2, "wounds": 0,
+  "armor": { "name": "Aucune", "bonus": 0, "reduction": 0 },
+  "skills": [
+    { "name": "Courtoisie", "rank": 3, "trait": "awareness", "emphases": ["Manipulation"] },
+    { "name": "Étiquette", "rank": 3, "trait": "awareness", "emphases": ["Politesse"] },
+    { "name": "Sincérité", "rank": 2, "trait": "awareness", "emphases": ["Honnêteté", "Duperie"] },
+    { "name": "Intimidation", "rank": 2, "trait": "willpower", "emphases": ["Contrôle"] },
+    { "name": "Connaissance : Histoire", "rank": 2, "trait": "intelligence", "emphases": [] },
+    { "name": "Investigation", "rank": 2, "trait": "perception", "emphases": [] },
+    { "name": "Commerce", "rank": 1, "trait": "intelligence", "emphases": [] },
+    { "name": "Comédie", "rank": 2, "trait": "awareness", "emphases": [] },
+    { "name": "Couteaux", "rank": 2, "trait": "agility", "emphases": [] },
+    { "name": "Furtivité", "rank": 2, "trait": "agility", "emphases": [] },
+    { "name": "Représentation : Conteur", "rank": 3, "trait": "awareness", "emphases": [] }
+  ],
+  "weapons": [
+    { "name": "Tanto", "skill": "Couteaux", "dr": "1k1", "keywords": ["samourai", "petite"] },
+    { "name": "Katana", "skill": "Kenjutsu", "dr": "3k2", "keywords": ["samourai", "moyenne"] }
+  ],
+  "techniques": [], "maneuvers": [], "advantages": "", "disadvantages": "", "notes": ""
+}

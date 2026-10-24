@@ -1,7 +1,8 @@
 import { useEffect, useRef } from "react";
 import {
   applicableModifiers, describeEffect, describeModifier, effectOn, findSkill, maneuverCost, maneuverFreeRaises, modifierTN,
-  formatDice, isRanged, poolStats, rollDice, schoolReminders, verdict, voidMultiplier, voidSpendOption, woundState,
+  formatDice, isRanged, isSocialSkill, poolStats, reminderText, rollDice, schoolContext, schoolReminders, verdict, voidMultiplier,
+  voidPointBonus, voidSpendBonus, voidSpendOption, woundState,
   type ActionDef, type ActiveEffect, type Character, type Pool,
 } from "@carnet/core";
 import { COMBAT_SUBS, SITUATIONS, TN_PER_RAISE, TN_SCALE, TRAIT_LABELS } from "../../rules/l5r4e";
@@ -34,16 +35,17 @@ export function Roller() {
   if (!a) return <p className="muted">Choisis une action.</p>;
 
   const { opts } = ui;
-  const ctx = contextOf(ui);
+  const ctx = schoolContext({ ...contextOf(ui), emphasis: opts.emphasisName });
+  const pa = toPoolAction(a);
   const selected = selectedKeys(ui.techToggles);
   const active = activeModifiers(c, a, ui.modifierToggles, ui.stance);
   const pool = poolFor(c, a, opts, ui.stance, active, {
     mounted: ui.mounted, centerLastRound: ui.centerLastRound, selected, inputs: ui.techInputs,
   });
   const effects = [...(pool.applied ?? []), ...(pool.optional ?? [])];
-  const tnContext = { effects, selected, stacks: ui.stacks, ctx };
+  const tnContext = { effects, selected, stacks: ui.stacks, ctx, techTn: pool.techTn };
   const bonuses = applicableModifiers(c, toPoolAction(a), ui.stance);
-  const bonusTN = modifierTN(active);
+  const bonusTN = modifierTN(active) + (pool.techTn ?? 0);
   const bonusFree = pool.canRaise ? (pool.freeRaises ?? 0) : 0;
   const set = (patch: Partial<RollOptions>) => dispatch({ type: "option", patch });
   const ws = woundState(c, ctx);
@@ -52,11 +54,16 @@ export function Roller() {
   const tn = finalTN(c, a, opts, ui.maneuvers, active, tnContext);
   const raises = pool.canRaise ? calledRaises(c, a, opts, ui.maneuvers, effects, selected) : 0;
   const vm = voidMultiplier(c);
-  const spend = voidSpendOption(c);
+  const perVoid = voidPointBonus(c, pa, ctx);
+  const spend = voidSpendOption(c, pa);
+  const spendDice = spend && voidSpendBonus(c, spend, pa, ctx);
   const chips = (pool.applied ?? []).filter((e) => e.kind === "roll" || e.kind === "maneuver");
-  const damageReminders = a.kind === "damage" ? schoolReminders(c, ["damage"]) : [];
+  const social = pa.kind === "skill" && !pa.attack && (ui.situation === "court" || isSocialSkill(pa.skill));
+  const reminders = a.kind === "damage" ? schoolReminders(c, ["damage"]) : social ? schoolReminders(c, ["social"]) : [];
   const unskilled = isUnskilled(c, a);
   const emphasisOffered = a.kind === "skill" && pool.canRaise;
+  const emphases = (findSkill(c, a.skill ?? "")?.emphases ?? []).filter((e) => e.trim() !== "");
+  const unlimited = !!pool.unlimitedRaises;
   const mastery = pool.explodeOn === 9 ? pool.notes.find((n) => n.startsWith("Maîtrise")) : undefined;
   const stats = pool.rolled > 0 ? poolStats(pool, { emphasis: opts.emphasis && emphasisOffered, flatBonus: opts.flat }) : null;
   const context = ui.situation === "combat"
@@ -128,15 +135,15 @@ export function Roller() {
       <div className="grid" style={{ gap: 6, marginBottom: 12 }}>
         <label className="chk">
           <input type="checkbox" checked={opts.voidPoint} disabled={c.voidPoints < 1 && !opts.voidPoint} onChange={(e) => set({ voidPoint: e.target.checked })} />
-          {" "}Dépenser 1 point de Vide (+{vm}g{vm}) <span className="muted">· reste {c.voidPoints}</span>
+          {" "}Dépenser 1 point de Vide (+{perVoid.rolled * vm}g{perVoid.kept * vm}) <span className="muted">· reste {c.voidPoints}</span>
         </label>
-        {spend && (
+        {spend && spendDice && (
           <label className="chk">
             <input
               type="checkbox" checked={opts.voidSpend} disabled={c.voidPoints < spend.points && !opts.voidSpend}
               onChange={(e) => set({ voidSpend: e.target.checked })}
             />
-            {" "}Dépenser {spend.points} points de Vide (+{spend.rolled * vm}g{spend.kept * vm}) <span className="muted">· {spend.source}</span>
+            {" "}Dépenser {spend.points} points de Vide (+{spendDice.rolled * vm}g{spendDice.kept * vm}) <span className="muted">· {spend.source}</span>
           </label>
         )}
         {unskilled && (
@@ -145,7 +152,19 @@ export function Roller() {
             {" "}Dépenser 1 point de Vide : jouer {a.skill} au rang 1
           </label>
         )}
-        {emphasisOffered && (
+        {emphasisOffered && emphases.length > 0 && (
+          <label className="field">
+            <span className="label">Spécialisation · relance les 1</span>
+            <select
+              className="in" value={opts.emphasisName}
+              onChange={(e) => set({ emphasisName: e.target.value, emphasis: e.target.value !== "" })}
+            >
+              <option value="">Aucune</option>
+              {emphases.map((e) => <option key={e} value={e}>{e}</option>)}
+            </select>
+          </label>
+        )}
+        {emphasisOffered && !emphases.length && (
           <label className="chk">
             <input type="checkbox" checked={opts.emphasis} onChange={(e) => set({ emphasis: e.target.checked })} />
             {" "}Spécialisation : relancer les 1 {a.emphasisHint && <span className="muted">({a.emphasisHint})</span>}
@@ -172,14 +191,19 @@ export function Roller() {
 
       {a.attack && pool.canRaise && <ManeuverPicker effects={effects} />}
 
-      {damageReminders.map((e) => (
-        <div key={e.key} className="hint" style={{ color: "var(--gold)" }}>{e.technique} ({e.source}) : {("text" in e && e.text) || e.summary}</div>
-      ))}
+      {reminders.length > 0 && (
+        <div data-testid="school-reminders">
+          {reminders.map((e) => (
+            <div key={e.key} className="hint" style={{ color: "var(--gold)" }}>{e.technique} ({e.source}) : {reminderText(e, c)}</div>
+          ))}
+        </div>
+      )}
 
+      {unlimited && <div className="hint" style={{ color: "var(--gold)" }}>Augmentations non limitées par ton Vide.</div>}
       {raises > 0 && (
-        <div className="tnline" style={{ marginTop: 10, color: raises > c.voidRing ? "var(--bad)" : undefined }}>
+        <div className="tnline" style={{ marginTop: 10, color: !unlimited && raises > c.voidRing ? "var(--bad)" : undefined }}>
           <span>Augmentations annoncées</span>
-          <span className="mono"><b>{raises}</b> / max {c.voidRing}{raises > c.voidRing ? " · dépasse ton Vide" : ""}</span>
+          <span className="mono"><b>{raises}</b>{unlimited ? "" : ` / max ${c.voidRing}`}{!unlimited && raises > c.voidRing ? " · dépasse ton Vide" : ""}</span>
         </div>
       )}
       {typeof tn === "number" && typeof base === "number" && (
