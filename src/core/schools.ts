@@ -1,5 +1,5 @@
 /** Techniques d'école : moteur d'effets du catalogue bushi (HANDOFF annexe C.4). */
-import { DEFAULT_MANEUVERS, type RingKey, type Stance } from "../rules/l5r4e";
+import { DEFAULT_MANEUVERS, DUEL_FOCUS, GUARD, type RingKey, type Stance } from "../rules/l5r4e";
 import { isSocialSkill } from "./modifiers";
 import {
   BUGEI_SKILLS, EMPHASIS_ALIASES, SCHOOLS, WEAPON_CATALOG,
@@ -350,6 +350,24 @@ export function voidSpendBonus(
   if (!spend.perPoint) return { rolled: spend.rolled, kept: spend.kept };
   const per = voidPointBonus(c, a, ctx);
   return { rolled: per.rolled * spend.points, kept: per.kept * spend.points };
+}
+
+export interface GuardRule { selfPenalty: number; allyBonus: number; extraRound: boolean; free: boolean; source?: string }
+
+/**
+ * Garde (annexe E.3 F5) : règle du livre, ou celle d'une technique (Daidoji R2 : pas de malus, allié +15, un round de plus ;
+ * Shiba R1 : action gratuite, allié +5). La technique de rang le plus haut l'emporte.
+ */
+export function guardRule(c: Character): GuardRule {
+  const e = activeEffects(c).filter((x) => x.kind === "guard").pop();
+  if (!e || e.kind !== "guard") return { ...GUARD, extraRound: false, free: false };
+  return { selfPenalty: e.selfPenalty, allyBonus: e.allyBonus, extraRound: !!e.extraRound, free: !!e.free, source: e.source };
+}
+
+/** Concentration en duel (F10) : écart pour frapper en premier et tranche par augmentation gratuite (Kakita R3). */
+export function duelFocusRule(c: Character): { threshold: number; per: number; source?: string } {
+  const e = activeEffects(c).find((x) => x.kind === "duelFocus");
+  return e && e.kind === "duelFocus" ? { threshold: e.threshold, per: e.per, source: e.source } : { ...DUEL_FOCUS };
 }
 
 /** Badge « Attaque : Action simple ». */

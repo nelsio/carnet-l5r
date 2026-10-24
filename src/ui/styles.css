@@ -386,3 +386,16 @@ header.top + main{margin-top:18px}
 .terrain{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:8px}
 .terrain button{border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:6px 8px;font-size:13px;min-height:36px}
 .terrain button[aria-pressed="true"]{border-color:var(--gold);background:var(--gold-soft);font-weight:700}
+
+/* ---------- Combat complet (annexe E.3, v2.3.0) ---------- */
+/* Encaisser des dégâts : bouton à côté du compteur, ligne pleine largeur sous la barre (F6) */
+.dmgbtn{width:auto!important;padding:0 8px;font-size:12.5px;font-weight:600}
+.dmgbtn.on{border-color:var(--gold)!important;background:var(--gold-soft)!important}
+.dmgedit{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:flex-end;background:var(--surface);border:1px solid var(--gold);border-radius:8px;padding:10px;margin-top:6px}
+.dmgedit .field{max-width:140px}
+@media (max-width:720px){.dmgbtn{height:40px}.dmgedit .btn{min-height:40px}}
+/* Carte d'action empêchée par la posture : grisée, raison et « Lancer quand même » (F2) */
+.act.blocked{opacity:.6;cursor:default}
+.act.blocked .reason{color:var(--bad);font-weight:600}
+.linkbtn{background:none;border:0;padding:0;color:var(--gold);text-decoration:underline;font:inherit;cursor:pointer}
+@media (max-width:720px){.linkbtn{min-height:40px}}

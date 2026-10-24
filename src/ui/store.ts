@@ -5,9 +5,9 @@
 import { createContext, useContext, type Dispatch } from "react";
 import {
   activeEffects, buildActions, DAMAGE_MANEUVER_ID, DISARM_MANEUVER_ID, emphasisMatches, matchingEmphasis, voidSpendOption,
-  fullDefenseBonus, type ActionDef, type Character, type CombatSub, type RollResult, type Situation, type Stance,
+  feintBonus, focusOutcome, fullAttackAllowed, fullDefenseBonus, woundsFromDamage, type ActionDef, type Character, type CombatSub, type RollResult, type Situation, type Stance,
 } from "@carnet/core";
-import type { Terrain } from "../rules/l5r4e";
+import { FEINT_MANEUVER_ID, type Terrain } from "../rules/l5r4e";
 import type { LibraryEntry } from "../storage";
 import { DEFAULT_ROLL_OPTIONS, effectiveManeuvers, isRollable, isUnskilled, toPoolAction, type RollOptions } from "./rolls";
 
@@ -41,6 +41,10 @@ export interface RollRecord {
   baseTn?: number;
   /** Échec rattrapé : ND de base atteint, réussite sans les augmentations (Akodo R5). */
   baseSuccess?: boolean;
+  /** Bonus de Feinte pré-rempli sur les dégâts liés (E.3 F4). */
+  feint?: number;
+  /** Total adverse saisi (jet en opposition, F7). */
+  opponent?: number;
 }
 
 export interface UiState {
@@ -56,6 +60,16 @@ export interface UiState {
   editing: ReadonlySet<BlockId>;
   /** Terrain de l'encart « Se déplacer en combat » (annexe E.2 C4). */
   terrain: Terrain;
+  /** Bonus de Centre déjà pris ce round (un seul jet, E.3 F1). */
+  centerBonusUsed: boolean;
+  /** « Je garde un allié » (F5) : gardé jusqu'à ton tour suivant, « Nouveau round » ne le décoche pas. */
+  guard: boolean;
+  /** Points de Vide dépensés pour +10 à l'Initiative de l'escarmouche (F3). */
+  voidInitiative: number;
+  /** Duel : Évaluation gagnée de 10 ou plus (F10). */
+  assessmentWon: boolean;
+  /** Duel : écart de Concentration saisi (F10). */
+  focusGap: number | null;
   situation: AidSituation;
   sub: CombatSub;
   stance: Stance;
@@ -69,7 +83,7 @@ export interface UiState {
   opts: RollOptions;
   maneuvers: Record<string, number>;
   /** Dégâts liés à l'attaque réussie : dés d'augmentation, ou Désarmement (2g1 sans la Force). */
-  pendingDamage: { parent: string; dice: number; disarm?: boolean } | null;
+  pendingDamage: { parent: string; dice: number; disarm?: boolean; flat?: number } | null;
   lastRoll: RollRecord | null;
   history: { label: string; total: number; tn: number | null | "opposed" }[];
   sheetOpen: boolean;
@@ -115,6 +129,11 @@ export const initialUi: UiState = {
   view: "sheet",
   editing: new Set(),
   terrain: "normal",
+  centerBonusUsed: false,
+  guard: false,
+  voidInitiative: 0,
+  assessmentWon: false,
+  focusGap: null,
   situation: "investigation",
   sub: "skirmish",
   stance: "attack",
@@ -162,6 +181,11 @@ export type AppAction =
   | { type: "view"; view: View }
   | { type: "toggleBlockEdit"; block: BlockId }
   | { type: "terrain"; terrain: Terrain }
+  | { type: "guard"; on: boolean }
+  | { type: "voidInitiative" }
+  | { type: "takeDamage"; damage: number; voidSpent: boolean }
+  | { type: "assessmentWon"; on: boolean }
+  | { type: "focusGap"; gap: number | null }
   | { type: "situation"; situation: AidSituation }
   | { type: "sub"; sub: CombatSub }
   | { type: "stance"; stance: Stance }
@@ -215,6 +239,7 @@ function select(c: Character, ui: UiState, a: ActionDef, open: boolean): UiState
   const opts: RollOptions = {
     ...ui.opts,
     raises: 0, free: 0, flat: 0, extraRolled: 0, calledZone: "limb", quadruped: false, disarm: false,
+    centerBonus: false, meleeTarget: false, freeToTn: false, opponentTotal: null,
     tn: typeof a.tn === "number" ? a.tn : ui.opts.tn,
     emphasis: a.kind === "skill" && emphasisMatches(c, a.skill ?? "", a.emphasisHint),
     emphasisName: (a.kind === "skill" && matchingEmphasis(c, a.skill ?? "", a.emphasisHint)) || "",
@@ -224,8 +249,12 @@ function select(c: Character, ui: UiState, a: ActionDef, open: boolean): UiState
     // Désarmement : 2g1 sans la Force ni augmentation de dégâts (C6).
     if (pendingDamage.disarm) opts.disarm = true;
     else opts.extraRolled = pendingDamage.dice;
+    // Feinte : bonus fixe pré-rempli (F4).
+    if (pendingDamage.flat) opts.flat = pendingDamage.flat;
     pendingDamage = null;
   }
+  // Duel : les augmentations gratuites de la Concentration passent sur la Frappe (F10).
+  if (a.id === "strike" && ui.focusGap !== null) opts.free = focusOutcome(c, ui.focusGap).freeRaises;
   return {
     ...ui, selectedId: a.id, opts: { ...opts, voidSpend: false }, maneuvers: {}, modifierToggles: {}, techToggles: {}, techInputs: {},
     pendingDamage, sheetOpen: open || ui.sheetOpen,
@@ -256,7 +285,11 @@ function uiReducer(state: AppState, action: AppAction): AppState {
     case "situation": return { ...state, ui: selectFirst(c, { ...ui, situation: action.situation }) };
     case "sub": return { ...state, ui: selectFirst(c, { ...ui, sub: action.sub }) };
     case "stance":
-      return withUi({ stance: action.stance, fullDefenseBonus: action.stance === "fullDefense" ? ui.fullDefenseBonus : 0 });
+      // La Garde est impossible en Assaut (F5).
+      return withUi({
+        stance: action.stance, fullDefenseBonus: action.stance === "fullDefense" ? ui.fullDefenseBonus : 0,
+        guard: action.stance === "fullAttack" ? false : ui.guard,
+      });
     case "closeSheet": return withUi({ sheetOpen: false });
     case "toggleWounds": return withUi({ woundsExpanded: !ui.woundsExpanded });
     case "option": return withUi({ opts: { ...ui.opts, ...action.patch } });
@@ -264,7 +297,15 @@ function uiReducer(state: AppState, action: AppAction): AppState {
     case "statsOption": return withUi({ stats: { ...ui.stats, ...action.patch } });
     case "toggleModifier": return withUi({ modifierToggles: { ...ui.modifierToggles, [action.id]: action.on } });
     case "toggleArmorModifier": return withUi({ armorToggles: { ...ui.armorToggles, [action.id]: action.on } });
-    case "mounted": return withUi({ mounted: action.on });
+    case "mounted":
+      // Assaut monté sans Équitation 3 : retour en Attaque (F2).
+      return withUi({
+        mounted: action.on,
+        stance: ui.stance === "fullAttack" && c && !fullAttackAllowed(c, action.on) ? "attack" : ui.stance,
+      });
+    case "guard": return withUi({ guard: action.on && ui.stance !== "fullAttack" });
+    case "assessmentWon": return withUi({ assessmentWon: action.on });
+    case "focusGap": return withUi({ focusGap: action.gap });
     case "terrain": return withUi({ terrain: action.terrain });
     case "toggleTechnique": return withUi({ techToggles: { ...ui.techToggles, [action.key]: action.on } });
     case "techniqueInput": return withUi({ techInputs: { ...ui.techInputs, [action.key]: action.value } });
@@ -275,7 +316,7 @@ function uiReducer(state: AppState, action: AppAction): AppState {
       // Centre mémorisé pour le round suivant (Kakita R1) ; les cases d'armure se décochent, les compteurs restent.
       return withUi({
         voidArmor: false, voidSpentThisRound: false, fullDefenseBonus: 0,
-        centerLastRound: ui.stance === "center", schoolArmor: {},
+        centerLastRound: ui.stance === "center", centerBonusUsed: false, schoolArmor: {},
         stance: ui.stance === "fullDefense" ? "defense" : ui.stance,
       });
     default: return state;
@@ -340,6 +381,20 @@ export function reducer(state: AppState, action: AppAction): AppState {
       }
     case "voidTechnique":
       return spendVoid(state);
+    case "voidInitiative": {
+      // +10 à l'Initiative jusqu'à la fin de l'escarmouche (F3) ; en consultation, sans rien dépenser.
+      if (state.mode !== "readonly" && c.voidPoints < 1) return state;
+      const spent = spendVoid(state);
+      return { ...spent, ui: { ...spent.ui, voidInitiative: spent.ui.voidInitiative + 1 } };
+    }
+    case "takeDamage": {
+      // Encaisser (F6) : blessures = dégâts − Réduction (− 10 avec le Vide), le point est dépensé.
+      if (state.mode === "readonly") return state;
+      const voidSpent = action.voidSpent && c.voidPoints >= 1;
+      const added = woundsFromDamage(c, action.damage, voidSpent);
+      const hurt = { ...state, character: { ...c, wounds: c.wounds + added } };
+      return voidSpent ? spendVoid(hurt) : hurt;
+    }
     case "rolled":
       return rolled(state, c, action);
     default:
@@ -368,6 +423,8 @@ function rolled(state: AppState, c: Character, action: Extract<AppAction, { type
   const success = typeof action.tn === "number" && total >= action.tn;
   const damageDice = a.attack && success ? (ui.maneuvers[DAMAGE_MANEUVER_ID] ?? 0) : 0;
   const disarm = a.attack && success && (ui.maneuvers[DISARM_MANEUVER_ID] ?? 0) > 0;
+  const feint = a.attack && success && typeof action.tn === "number" && (ui.maneuvers[FEINT_MANEUVER_ID] ?? 0) > 0
+    ? feintBonus(c, total, action.tn) : 0;
   const maneuvers = a.attack
     ? Object.entries(ui.maneuvers).filter(([, n]) => n > 0).map(([id, n]) => {
         const m = effectiveManeuvers(c).find((x) => x.id === id);
@@ -380,16 +437,22 @@ function rolled(state: AppState, c: Character, action: Extract<AppAction, { type
     actionId: a.id, label: a.label, kind: a.kind, result: action.result, tn: action.tn,
     raises: action.raises, free: action.free ?? opts.free, maneuvers, damageDice, fullDefense: !!a.fullDefense, disarm,
     baseTn: action.baseTn, baseSuccess: action.baseSuccess,
+    ...(feint ? { feint } : {}),
+    ...(opts.opponentTotal !== null && action.tn === "opposed" ? { opponent: opts.opponentTotal } : {}),
   };
   return {
     ...next,
     ui: {
       ...ui,
-      opts: { ...ui.opts, voidPoint: false, voidSkill: false, voidSpend: false },
+      opts: { ...ui.opts, voidPoint: false, voidSkill: false, voidSpend: false, centerBonus: false },
       initiative: a.kind === "initiative" ? total : ui.initiative,
+      // Une nouvelle Initiative ouvre une nouvelle escarmouche : le Vide d'Initiative retombe.
+      voidInitiative: a.kind === "initiative" ? 0 : ui.voidInitiative,
+      centerBonusUsed: ui.centerBonusUsed || opts.centerBonus,
       ...(a.fullDefense ? { stance: "fullDefense" as const, fullDefenseBonus: fullDefenseBonus(total) } : {}),
       pendingDamage: a.attack
-        ? (disarm ? { parent: a.id, dice: 0, disarm } : damageDice ? { parent: a.id, dice: damageDice } : null)
+        ? (disarm ? { parent: a.id, dice: 0, disarm }
+          : damageDice || feint ? { parent: a.id, dice: damageDice, ...(feint ? { flat: feint } : {}) } : null)
         : ui.pendingDamage,
       lastRoll: record,
       history: [{ label: a.label, total, tn: action.tn }, ...ui.history].slice(0, HISTORY_SIZE),

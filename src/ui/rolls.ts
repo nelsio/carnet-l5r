@@ -3,9 +3,9 @@ import {
   applicableModifiers, armorModifierBonus, armorTN, assessmentTN, computePool, DEFAULT_MANEUVERS, findSkill, ignoresWoundPenalty,
   maneuverFreeRaises, maneuverRaises, modifiersOf, modifierTN, schoolContext, targetNumber, targetTnModifier, woundState,
   type ActionDef, type ActiveEffect, type Character, type Maneuver, type Modifier, type Pool, type PoolAction, type SchoolContext,
-  type Stance,
+  rollStance, type CombatSub, type Situation, type Stance,
 } from "@carnet/core";
-import { CALLED_ZONES, KNOCKDOWN_QUADRUPED_COST, type CalledZone } from "../rules/l5r4e";
+import { CALLED_ZONES, KNOCKDOWN_QUADRUPED_COST, TN_PER_RAISE, type CalledZone } from "../rules/l5r4e";
 
 export interface RollOptions {
   /** ND de base choisi dans l'échelle. */
@@ -32,12 +32,21 @@ export interface RollOptions {
   quadruped: boolean;
   /** Dégâts qui suivent un Désarmement réussi : 2g1 sans la Force (C6). */
   disarm: boolean;
+  /** Bonus de Centre du round précédent sur ce jet (E.3 F1). */
+  centerBonus: boolean;
+  /** Tir sur une cible au corps à corps : −10 (F9). */
+  meleeTarget: boolean;
+  /** Augmentations gratuites utilisées pour baisser le ND, −5 chacune (F8). */
+  freeToTn: boolean;
+  /** Total adverse d'un jet en opposition, s'il est saisi (F7). */
+  opponentTotal: number | null;
 }
 
 export const DEFAULT_ROLL_OPTIONS: RollOptions = {
   tn: 15, targetTN: 20, opponentRank: 2, raises: 0, free: 0, extraRolled: 0, flat: 0,
   voidPoint: false, voidSkill: false, voidSpend: false, emphasis: false, emphasisName: "",
   calledZone: "limb", quadruped: false, disarm: false,
+  centerBonus: false, meleeTarget: false, freeToTn: false, opponentTotal: null,
 };
 
 /** Coût des manœuvres selon la variante choisie : zone du Coup ciblé, quadrupède renversé. */
@@ -55,6 +64,8 @@ export interface SchoolInputs {
   selected?: ReadonlySet<string>;
   /** Valeurs saisies (Moto R2). */
   inputs?: Readonly<Record<string, number>>;
+  /** Duel : Évaluation gagnée de 10 ou plus (F10). */
+  assessmentWon?: boolean;
 }
 
 /** Une action donne-t-elle lieu à un jet ? */
@@ -108,10 +119,17 @@ export interface CombatUi {
   centerLastRound: boolean;
   schoolArmor: Record<string, boolean>;
   stacks: Record<string, number>;
+  /** « Je garde un allié » (F5), facultatif hors aide de jeu. */
+  guard?: boolean;
 }
 
-export function contextOf(ui: Pick<CombatUi, "stance" | "mounted" | "centerLastRound">): SchoolContext {
-  return schoolContext({ stance: ui.stance, mounted: ui.mounted, centerLastRound: ui.centerLastRound });
+/** Posture des jets : celle choisie, ou le Centre implicite du duel iaijutsu (F10). */
+export function uiRollStance(ui: { stance: Stance; situation?: Situation; sub?: CombatSub }): Stance {
+  return rollStance({ stance: ui.stance, sub: ui.situation === "combat" ? ui.sub : undefined });
+}
+
+export function contextOf(ui: Pick<CombatUi, "stance" | "mounted" | "centerLastRound"> & { situation?: Situation; sub?: CombatSub }): SchoolContext {
+  return schoolContext({ stance: uiRollStance(ui), mounted: ui.mounted, centerLastRound: ui.centerLastRound });
 }
 
 /** ND d'armure du personnage : posture, Vide, bonus de jet et techniques d'école. */
@@ -119,14 +137,15 @@ export function currentArmorTN(c: Character, ui: CombatUi): number {
   return armorTN(c, {
     stance: ui.stance, fullDefenseBonus: ui.fullDefenseBonus, voidArmor: ui.voidArmor,
     bonus: armorBonus(c, ui.armorToggles, ui.stance),
-    mounted: ui.mounted, centerLastRound: ui.centerLastRound, selected: selectedKeys(ui.schoolArmor), stacks: ui.stacks,
+    mounted: ui.mounted, centerLastRound: ui.centerLastRound, selected: selectedKeys(ui.schoolArmor), stacks: ui.stacks, guard: ui.guard,
   });
 }
 
 export function poolFor(
   c: Character,
   a: ActionDef,
-  opts: Pick<RollOptions, "extraRolled" | "voidPoint" | "voidSkill"> & { voidSpend?: boolean; emphasisName?: string; disarm?: boolean },
+  opts: Pick<RollOptions, "extraRolled" | "voidPoint" | "voidSkill">
+    & { voidSpend?: boolean; emphasisName?: string; disarm?: boolean; centerBonus?: boolean; meleeTarget?: boolean },
   stance: Stance,
   modifiers: readonly Modifier[] = activeModifiers(c, a, {}, stance),
   school: SchoolInputs = {},
@@ -139,6 +158,8 @@ export function poolFor(
     voidSpend: opts.voidSpend,
     emphasis: opts.emphasisName || undefined,
     disarm: a.kind === "damage" && !!opts.disarm,
+    centerBonus: !!opts.centerBonus,
+    meleeTarget: !!opts.meleeTarget,
     modifiers,
     ...school,
   });
@@ -185,6 +206,8 @@ export interface TnContext {
   techTn?: number;
   /** Modification du ND par l'arme (`Pool.weaponTn` : yumi monté, dai-kyu à pied). */
   weaponTn?: number;
+  /** Augmentations gratuites converties en baisse du ND (F8). */
+  freeToTn?: number;
 }
 
 /** ND de la cible : ND d'armure saisi, modifié par les techniques (Yoritomo R2) pour les attaques. */
@@ -206,6 +229,6 @@ export function finalTN(
     base: targetBaseTN(c, a, opts, t.stacks),
     calledRaises: calledRaises(c, a, opts, selection, t.effects, t.selected),
     woundPenalty: rollWoundPenalty(c, t),
-    modifier: modifierTN(active) + (t.techTn ?? 0) + (t.weaponTn ?? 0),
+    modifier: modifierTN(active) + (t.techTn ?? 0) + (t.weaponTn ?? 0) - TN_PER_RAISE * (t.freeToTn ?? 0),
   });
 }

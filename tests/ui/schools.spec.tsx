@@ -73,7 +73,8 @@ describe("Techniques d'école : parcours E16 à E19", () => {
     await mount({ schoolId: "kakita-bushi", insightRank: 2 });
     skirmish();
     click("Centre");
-    click(/^Attaque · Katana/);
+    // En Centre, la carte est grisée (annexe E.3 F2) : « Lancer quand même ».
+    click("Lancer quand même : Attaque · Katana");
     // « + Rang d'école au total » : +2 au rang 2 (annexe C.1).
     expect(roller().getByTestId("tech-chips")).toHaveTextContent("+1g1 +2 · Kakita R1");
     expect(roller().getByTestId("pool")).toHaveTextContent("6g4");
@@ -81,8 +82,8 @@ describe("Techniques d'école : parcours E16 à E19", () => {
     expect(box).not.toBeChecked();
     fireEvent.click(box);
     expect(roller().getByTestId("pool")).toHaveTextContent("8g4");
-    click(/^Dégâts · Katana/);
-    click(/^Attaque · Katana/);
+    click("Lancer quand même : Dégâts · Katana");
+    click("Lancer quand même : Attaque · Katana");
     expect(roller().getByRole("checkbox", { name: /Cible à l'Initiative plus basse/ })).not.toBeChecked();
   });
 

@@ -128,6 +128,31 @@ export const DISARM_DAMAGE = "2k1";
 /** Malus au ND des arcs selon la monture (p. 202). */
 export const BOW_TN_PENALTY = 10;
 
+/* ---------- Combat complet (annexe E.3, v2.3.0) ---------- */
+
+/** Round après le Centre (p. 86) : +1g1 et + Anneau de Vide au total d'un jet, +10 à l'Initiative du round. */
+export const CENTER_BONUS = { rolled: 1, kept: 1, initiative: 10 } as const;
+/** Assaut monté : interdit sauf Équitation à ce rang (p. 142). */
+export const MOUNTED_ASSAULT_RIDING = { skill: "Équitation", rank: 3 } as const;
+/** Vide en combat (p. 80) : +10 à l'Initiative de l'escarmouche, −10 blessures à l'encaissement. */
+export const VOID_COMBAT = { initiative: 10, wounds: 10 } as const;
+/** Feinte réussie (p. 88) : dégâts + moitié (arrondie à l'inférieur) de l'excédent, plafonnés à 5 × Rang d'Insight. */
+export const FEINT = { divisor: 2, capPerInsight: 5 } as const;
+export const FEINT_MANEUVER_ID = "feint";
+/** Garde (p. 88-89) : ton ND d'armure −5, celui de l'allié gardé +10. */
+export const GUARD = { selfPenalty: 5, allyBonus: 10 } as const;
+/** Concentration en duel (p. 89) : 5 d'écart pour frapper en premier, puis 1 augmentation gratuite par tranche de 5. */
+export const DUEL_FOCUS = { threshold: 5, per: 5 } as const;
+/** Évaluation gagnée de 10 ou plus : +1g1 à la Concentration (+2g2 avec Iaijutsu 7, E.4). */
+export const DUEL_ASSESSMENT_WIN = { margin: 10, rolled: 1, kept: 1, masterySkill: "Iaijutsu", masteryRank: 7, masteryRolled: 2, masteryKept: 2 } as const;
+/** Tir sur une cible engagée au corps à corps (p. 84) : −10 au total. */
+export const MELEE_TARGET_PENALTY = 10;
+/** Niveaux de blessure à rappel (p. 84) : Estropié, À terre. */
+export const WOUND_EFFECT_NOTES: Readonly<Record<string, string>> = {
+  "Estropié": "Estropié : chaque déplacement coûte un cran de plus (action libre → simple, simple → complexe).",
+  "À terre": "À terre : actions gratuites seulement, en dépensant 1 point de Vide pour chacune.",
+};
+
 /** Manœuvres par défaut (coût en augmentations). */
 export const DEFAULT_MANEUVERS: readonly Maneuver[] = [
   { id: "dmg", name: "Augmentation des dégâts", cost: 1, stackable: true, effect: "+1g0 aux dégâts par augmentation (cumulable)." },
