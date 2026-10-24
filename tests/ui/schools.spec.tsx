@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { migrate, type Character } from "@carnet/core";
 import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
-import kakita from "../../reference/exemple-personnage.json";
+import kakita from "../fixtures/kakita-v1.json";
 
 const base = () => structuredClone(kakita) as Character;
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
@@ -28,13 +28,13 @@ function skirmish() {
 describe("Techniques d'école : parcours E16 à E19", () => {
   it("E16 : École de bushi Hiruma, Rang d'Insight 2 → R1 et R2 actifs, R3 à R5 grisés ; attaque katana 6g3", async () => {
     const { storage } = await mount();
-    click("Modifier la fiche");
+    click("Edit : Identité & réputation");
     const select = screen.getByRole("combobox", { name: "Techniques d'école" });
     expect(within(select).getByRole("group", { name: "Crabe" })).toBeInTheDocument();
     fireEvent.change(select, { target: { value: "hiruma-bushi" } });
     fireEvent.change(screen.getByRole("spinbutton", { name: "Rang (Insight)" }), { target: { value: "2" } });
     expect(screen.getByRole("spinbutton", { name: "Rang d'école" })).toHaveAttribute("placeholder", "= Insight (2)");
-    click("Terminer");
+    click("Terminer : Identité & réputation");
 
     const block = screen.getByTestId("school-techniques");
     expect(block).toHaveTextContent("École de bushi Hiruma · Crabe · Rang d'école 2");
@@ -136,14 +136,14 @@ describe("Techniques d'école : détails de l'interface", () => {
 
   it("Mots-clés d'arme : saisie libre, étiquettes en lecture", async () => {
     await mount();
-    click("Modifier la fiche");
+    click("Edit : Armes");
     const field = screen.getByRole("textbox", { name: "Mots-clés de Katana" });
     expect(field).toHaveValue("samourai, moyenne");
     fireEvent.change(field, { target: { value: "Samouraï, deux mains, inconnu" } });
     expect(field).toHaveValue("Samouraï, deux mains, inconnu");
     fireEvent.blur(field);
     expect(field).toHaveValue("samourai, deux-mains");
-    click("Terminer");
+    click("Terminer : Armes");
     const row = screen.getAllByRole("row").find((r) => r.textContent?.startsWith("Katana"))!;
     expect(row).toHaveTextContent("Samouraï");
     expect(row).toHaveTextContent("Deux mains");
@@ -173,9 +173,9 @@ describe("Techniques des courtisans et de Shosuro : parcours E20 à E23", () => 
     expect(roller().getByText(/Augm\. gratuites \(\+1 bonus\)/)).toBeInTheDocument();
 
     click("Fiche");
-    click("Modifier la fiche");
+    click("Edit : Identité & réputation");
     fireEvent.change(screen.getByRole("spinbutton", { name: "Honneur" }), { target: { value: "5" } });
-    click("Terminer");
+    click("Terminer : Identité & réputation");
     court();
     click(/^Convaincre, manipuler/);
     expect(roller().queryByTestId("tech-chips")).toBeNull();

@@ -350,3 +350,39 @@ header.top + main{margin-top:18px}
 
 /* ---------- Bonus de jet ---------- */
 .modifier{border:1px solid var(--line);border-radius:8px;padding:10px;margin:0 0 10px;display:grid;gap:8px;min-width:0}
+
+/* Lecture : nom et cible à gauche, effet à droite ; mobile : trois lignes (annexe E.9 S1) */
+.modlist{list-style:none;margin:0;padding:0}
+.modrow{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"name effect" "target effect";gap:2px 12px;padding:7px 0;border-bottom:1px solid var(--line);min-width:0}
+.modrow:last-child{border-bottom:0}
+.mod-name{grid-area:name;min-width:0;overflow-wrap:anywhere}
+.mod-effect{grid-area:effect;text-align:right;white-space:nowrap}
+.mod-effect .mono{font-weight:700;color:var(--gold)}
+.mod-target{grid-area:target;font-size:12.5px;min-width:0;overflow-wrap:anywhere}
+@media (max-width:720px){
+  .modrow{grid-template-columns:minmax(0,1fr);grid-template-areas:"name" "effect" "target"}
+  .mod-effect{text-align:left;white-space:normal}
+}
+
+/* ---------- Blocs de la fiche : « Edit » par bloc (annexe E.9 S2) ---------- */
+.panel.editing{border-color:var(--gold)}
+.readonly-head{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between}
+
+/* ---------- Détail des blessures sur mobile : une ligne par niveau (annexe E.9 S3) ---------- */
+.wdetail{display:none}
+@media (max-width:720px){
+  .status .wtrack,.status.exp .wtrack{display:none}
+  .status.exp .wdetail{display:grid;grid-column:1/-1;gap:2px;margin:0;padding:0;list-style:none}
+  .wdl{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:baseline;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--surface);font-size:14px}
+  .wdl .wn{min-width:0;overflow-wrap:anywhere}
+  .wdl .wr{color:var(--muted);font-family:var(--f-mono);font-size:13px}
+  .wdl .wp{font-family:var(--f-mono);font-weight:700;min-width:3ch;text-align:right}
+  .wdl.past{background:var(--sunk);opacity:.55}
+  .wdl.cur{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,var(--surface))}
+  .wdl.cur .wn{font-weight:700}
+}
+
+/* Terrain de l'encart « Se déplacer en combat » (annexe E.2 C4) */
+.terrain{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:8px}
+.terrain button{border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:6px 8px;font-size:13px;min-height:36px}
+.terrain button[aria-pressed="true"]{border-color:var(--gold);background:var(--gold-soft);font-weight:700}

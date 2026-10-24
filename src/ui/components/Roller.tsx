@@ -1,14 +1,14 @@
 import { useEffect, useRef } from "react";
 import {
-  applicableModifiers, describeEffect, describeModifier, effectOn, findSkill, maneuverCost, maneuverFreeRaises, modifierTN,
+  applicableModifiers, bowStrength, describeEffect, describeModifier, effectOn, findSkill, fullDefenseBonus, maneuverCost, maneuverFreeRaises, modifierTN,
   formatDice, isRanged, isSocialSkill, poolStats, reminderText, rollDice, schoolContext, schoolReminders, verdict, voidMultiplier,
   voidPointBonus, voidSpendBonus, voidSpendOption, woundState,
   type ActionDef, type ActiveEffect, type Character, type Pool,
 } from "@carnet/core";
-import { COMBAT_SUBS, SITUATIONS, TN_PER_RAISE, TN_SCALE, TRAIT_LABELS } from "../../rules/l5r4e";
+import { CALLED_ZONES, COMBAT_SUBS, SITUATIONS, TN_PER_RAISE, TN_SCALE, TRAIT_LABELS, type CalledZone } from "../../rules/l5r4e";
 import { pct } from "../format";
 import {
-  activeModifiers, calledRaises, contextOf, effectiveManeuvers, finalTN, isActive, isUnskilled, poolFor, rollWoundPenalty,
+  activeModifiers, calledRaises, contextOf, effectiveManeuvers, finalTN, isActive, isUnskilled, maneuverCosts, poolFor, rollWoundPenalty,
   selectedKeys, targetBaseTN, toPoolAction, type RollOptions,
 } from "../rolls";
 import { selectedAction, useCharacter, useStore, type RollRecord } from "../store";
@@ -43,7 +43,7 @@ export function Roller() {
     mounted: ui.mounted, centerLastRound: ui.centerLastRound, selected, inputs: ui.techInputs,
   });
   const effects = [...(pool.applied ?? []), ...(pool.optional ?? [])];
-  const tnContext = { effects, selected, stacks: ui.stacks, ctx, techTn: pool.techTn };
+  const tnContext = { effects, selected, stacks: ui.stacks, ctx, techTn: pool.techTn, weaponTn: pool.weaponTn };
   const bonuses = applicableModifiers(c, toPoolAction(a), ui.stance);
   const bonusTN = modifierTN(active) + (pool.techTn ?? 0);
   const bonusFree = pool.canRaise ? (pool.freeRaises ?? 0) : 0;
@@ -55,7 +55,9 @@ export function Roller() {
   const raises = pool.canRaise ? calledRaises(c, a, opts, ui.maneuvers, effects, selected) : 0;
   const vm = voidMultiplier(c);
   const perVoid = voidPointBonus(c, pa, ctx);
-  const spend = voidSpendOption(c, pa);
+  // Dégâts : un seul point de Vide, au katana seulement (C2).
+  const spend = pa.kind === "damage" ? undefined : voidSpendOption(c, pa);
+  const weaponTn = pool.weaponTn ?? 0;
   const spendDice = spend && voidSpendBonus(c, spend, pa, ctx);
   const chips = (pool.applied ?? []).filter((e) => e.kind === "roll" || e.kind === "maneuver");
   const social = pa.kind === "skill" && !pa.attack && (ui.situation === "court" || isSocialSkill(pa.skill));
@@ -105,6 +107,10 @@ export function Roller() {
         </div>
       )}
       {mastery && <div className="hint" data-testid="mastery" style={{ color: "var(--gold)" }}>{mastery}.</div>}
+      {pool.notes.filter((n) => n.startsWith("Force ") || n.includes("force de l'arc") || n.startsWith("Désarmement")).map((n) => (
+        <div key={n} className="hint" data-testid="weapon-note" style={{ color: "var(--gold)" }}>{n}.</div>
+      ))}
+      {pool.warnings?.map((w) => <div key={w} className="hint" data-testid="weapon-warning" style={{ color: "var(--bad)" }}>{w}</div>)}
       {!pool.canRaise && a.kind === "skill" && <div className="hint" style={{ color: "var(--bad)" }}>Sans compétence : pas d'explosion, pas d'augmentation.</div>}
 
       <div className="opts">
@@ -133,10 +139,15 @@ export function Roller() {
       </div>
 
       <div className="grid" style={{ gap: 6, marginBottom: 12 }}>
-        <label className="chk">
-          <input type="checkbox" checked={opts.voidPoint} disabled={c.voidPoints < 1 && !opts.voidPoint} onChange={(e) => set({ voidPoint: e.target.checked })} />
-          {" "}Dépenser 1 point de Vide (+{perVoid.rolled * vm}g{perVoid.kept * vm}) <span className="muted">· reste {c.voidPoints}</span>
-        </label>
+        {!pool.voidBlocked && (
+          <label className="chk">
+            <input type="checkbox" checked={opts.voidPoint} disabled={c.voidPoints < 1 && !opts.voidPoint} onChange={(e) => set({ voidPoint: e.target.checked })} />
+            {" "}{pool.katanaVoid
+              ? <>Vide : +{perVoid.rolled * vm}g{perVoid.kept * vm} aux dégâts (katana)</>
+              : <>Dépenser 1 point de Vide (+{perVoid.rolled * vm}g{perVoid.kept * vm})</>}
+            {" "}<span className="muted">· reste {c.voidPoints}</span>
+          </label>
+        )}
         {spend && spendDice && (
           <label className="chk">
             <input
@@ -211,7 +222,7 @@ export function Roller() {
           <span>ND final</span>
           <span className="mono">
             <b style={{ fontSize: 18 }} data-testid="final-tn">{tn}</b>{" "}
-            <span className="muted">= {base}{raises ? ` + ${TN_PER_RAISE * raises} augm.` : ""}{penalty ? ` + ${penalty} blessures` : ""}{bonusTN ? ` ${bonusTN > 0 ? "+" : "−"} ${Math.abs(bonusTN)} bonus` : ""}</span>
+            <span className="muted">= {base}{raises ? ` + ${TN_PER_RAISE * raises} augm.` : ""}{penalty ? ` + ${penalty} blessures` : ""}{bonusTN ? ` ${bonusTN > 0 ? "+" : "−"} ${Math.abs(bonusTN)} bonus` : ""}{weaponTn ? ` + ${weaponTn} arc` : ""}</span>
           </span>
         </div>
       )}
@@ -270,7 +281,8 @@ function poolOrigin(c: Character, a: ActionDef, opts: RollOptions): string {
     }
     case "trait": return `${TRAIT_LABELS[a.trait ?? "stamina"]} pur${extra}`;
     case "damage": {
-      const bow = a.weapon && isRanged(a.weapon) ? `Arc ${a.weapon.bowStrength ?? 0}` : null;
+      // Force effective de l'arc : plafonnée par la Force, +1 avec Kyujutsu 7 (annexe E.2 C11).
+      const bow = a.weapon && isRanged(a.weapon) ? `Arc ${bowStrength(c, a.weapon)}` : null;
       return `${bow ?? `Force ${c.traits.strength}`} + VD ${a.dr ?? ""}${extra}`;
     }
     default: return `Rang ${c.insightRank} + Réflexes ${c.traits.reflexes}${extra}`;
@@ -345,7 +357,9 @@ function ManeuverPicker({ effects }: { effects: readonly ActiveEffect[] }) {
   const selected = selectedKeys(state.ui.techToggles);
   const reserved = effects.filter((e) => e.kind === "maneuver" && e.freeRaisesFor && effectOn(e, selected));
   const free = maneuverFreeRaises(effects, selected);
+  const costs = maneuverCosts(state.ui.opts);
   const setCount = (id: string, count: number) => dispatch({ type: "maneuver", id, count });
+  const setOpt = (patch: { calledZone?: CalledZone; quadruped?: boolean }) => dispatch({ type: "option", patch });
   return (
     <>
       <div className="label">Manœuvres <span style={{ textTransform: "none", letterSpacing: 0, fontWeight: 500 }}>· coût en augmentations</span></div>
@@ -360,11 +374,25 @@ function ManeuverPicker({ effects }: { effects: readonly ActiveEffect[] }) {
             </div>
           ) : (
             <button key={m.id} type="button" className={`man${n ? " on" : ""}`} aria-pressed={n > 0} title={m.effect} onClick={() => setCount(m.id, n ? 0 : 1)}>
-              {m.name} <b className="mono">{Math.max(0, maneuverCost(c, m) - (free[m.id] ?? 0))}</b>
+              {m.name} <b className="mono">{Math.max(0, (costs[m.id] ?? maneuverCost(c, m)) - (free[m.id] ?? 0))}</b>
             </button>
           );
         })}
       </div>
+      {(sel.called ?? 0) > 0 && list.some((m) => m.id === "called") && (
+        <label className="field" style={{ marginTop: 6, maxWidth: 260 }}>
+          <span className="label">Coup ciblé · zone</span>
+          <select className="in" value={state.ui.opts.calledZone} onChange={(e) => setOpt({ calledZone: e.target.value as CalledZone })}>
+            {CALLED_ZONES.map((z) => <option key={z.id} value={z.id}>{z.label} · {z.cost} augm.</option>)}
+          </select>
+        </label>
+      )}
+      {(sel.knockdown ?? 0) > 0 && list.some((m) => m.id === "knockdown") && (
+        <label className="chk" style={{ marginTop: 6 }}>
+          <input type="checkbox" checked={state.ui.opts.quadruped} onChange={(e) => setOpt({ quadruped: e.target.checked })} />
+          {" "}Renverser un quadrupède <span className="muted">· 4 augmentations</span>
+        </label>
+      )}
       {reserved.map((e) => (
         <div key={e.key} className="hint" style={{ marginTop: 4, color: "var(--gold)" }}>
           {describeEffect(e, c)} · {e.source} : déduites du coût de la manœuvre.
@@ -407,7 +435,8 @@ function RollOutcome({ roll: r }: { roll: RollRecord }) {
             <div className="hint">{r.raises + r.free} augmentation(s) à appliquer{r.free ? ` dont ${r.free} gratuite(s)` : ""}.</div>
           )}
           {r.maneuvers.length > 0 && <div className="hint">{ok ? "Manœuvres réussies" : "Manœuvres perdues"} : {r.maneuvers.join(", ")}.</div>}
-          {r.damageDice > 0 && <div className="hint">+{r.damageDice}g0 pré-rempli sur le prochain jet de dégâts.</div>}
+          {r.damageDice > 0 && !r.disarm && <div className="hint">+{r.damageDice}g0 pré-rempli sur le prochain jet de dégâts.</div>}
+          {r.disarm && <div className="hint" data-testid="disarm-note">Désarmement réussi : le prochain jet de dégâts est 2g1 sans la Force, sans augmentation de dégâts.</div>}
           {ok && !r.raises && margin >= TN_PER_RAISE && r.kind !== "damage" && (
             <div className="hint">Marge de {margin} : tu aurais pu annoncer {Math.floor(margin / TN_PER_RAISE)} augmentation(s).</div>
           )}
@@ -420,7 +449,7 @@ function RollOutcome({ roll: r }: { roll: RollRecord }) {
           </span>
         </div>
       )}
-      {r.fullDefense && <div className="hint">+{Math.floor(total / 2)} au ND d'armure ce round (posture Défense totale activée).</div>}
+      {r.fullDefense && <div className="hint">+{fullDefenseBonus(total)} au ND d'armure ce round (posture Défense totale activée).</div>}
     </>
   );
 }

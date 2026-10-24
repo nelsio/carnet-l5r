@@ -308,19 +308,22 @@
     }
   ],
   "weaponCatalog": [
-    { "name": "Katana", "keywords": ["samourai", "moyenne"], "skill": "Kenjutsu", "dr": "3k2" },
-    { "name": "Wakizashi", "keywords": ["samourai", "petite"], "skill": "Kenjutsu", "dr": "2k2" },
-    { "name": "No-dachi", "keywords": ["samourai", "grande", "deux-mains"], "skill": "Kenjutsu", "dr": "3k3" },
+    { "name": "Katana", "keywords": ["samourai", "moyenne"], "skill": "Kenjutsu", "dr": "3k2", "special": "katanaVoid" },
+    { "name": "Wakizashi", "keywords": ["samourai", "moyenne"], "skill": "Kenjutsu", "dr": "2k2" },
+    { "name": "No-dachi", "keywords": ["grande", "deux-mains"], "skill": "Kenjutsu", "dr": "3k3" },
     { "name": "Tanto", "keywords": ["petite"], "skill": "Couteaux", "dr": "1k1" },
-    { "name": "Cimeterre", "keywords": ["cimeterre", "moyenne"], "skill": "Kenjutsu", "dr": "3k2" },
+    { "name": "Cimeterre", "keywords": ["cimeterre", "moyenne"], "skill": "Kenjutsu", "dr": "2k3" },
     { "name": "Tetsubo", "keywords": ["lourde", "grande", "deux-mains"], "skill": "Armes lourdes", "dr": "3k3" },
     { "name": "Ono", "keywords": ["lourde", "grande", "deux-mains"], "skill": "Armes lourdes", "dr": "0k4" },
+    { "name": "Dai tsuchi", "keywords": ["lourde", "grande", "deux-mains"], "skill": "Armes lourdes", "dr": "5k2" },
+    { "name": "Masakari", "keywords": ["lourde", "moyenne"], "skill": "Armes lourdes", "dr": "2k3" },
     { "name": "Yari", "keywords": ["lance", "grande"], "skill": "Lances", "dr": "2k2" },
-    { "name": "Naginata", "keywords": ["hast", "samourai", "grande", "deux-mains"], "skill": "Armes d'hast", "dr": "3k3" },
-    { "name": "Bo", "keywords": ["paysan", "grande", "deux-mains"], "skill": "Bâtons", "dr": "2k1" },
-    { "name": "Kama", "keywords": ["paysan", "petite"], "skill": "Armes paysannes", "dr": "2k1" },
-    { "name": "Yumi", "keywords": ["arc", "distance", "samourai"], "skill": "Kyujutsu", "dr": "2k2", "bowStrength": 3 },
-    { "name": "Dai-kyu", "keywords": ["arc", "distance", "samourai"], "skill": "Kyujutsu", "dr": "2k2", "bowStrength": 4 }
+    { "name": "Naginata", "keywords": ["hast", "samourai", "grande", "deux-mains"], "skill": "Armes d'hast", "dr": "3k2" },
+    { "name": "Bo", "keywords": ["grande", "deux-mains"], "skill": "Bâtons", "dr": "1k2" },
+    { "name": "Kama", "keywords": ["paysan", "petite"], "skill": "Couteaux", "dr": "0k2" },
+    { "name": "Ninja-to", "keywords": ["ninja", "moyenne"], "skill": "Ninjutsu", "dr": "2k2" },
+    { "name": "Yumi", "keywords": ["arc", "distance", "grande"], "skill": "Kyujutsu", "dr": "2k2", "bowStrength": 3, "tnMounted": 10 },
+    { "name": "Dai-kyu", "keywords": ["arc", "distance", "grande"], "skill": "Kyujutsu", "dr": "2k2", "bowStrength": 4, "tnOnFoot": 10, "minStrength": 3 }
   ],
   "skillGroups": {
     "bugei": ["Athlétisme", "Bataille", "Défense", "Équitation", "Chasse", "Iaijutsu", "Jiujutsu", "Kenjutsu", "Kyujutsu", "Armes à chaîne", "Armes lourdes", "Couteaux", "Ninjutsu", "Armes d'hast", "Lances", "Bâtons", "Éventail de guerre", "Armes paysannes"]

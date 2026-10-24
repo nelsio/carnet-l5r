@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Character } from "@carnet/core";
 import { memoryStorage, type LibraryEntry } from "../../src/storage";
 import { App } from "../../src/ui/App";
-import kakita from "../../reference/exemple-personnage.json";
+import kakita from "../fixtures/kakita-v1.json";
 
 const base = () => structuredClone(kakita) as Character;
 const always = (v: number) => () => v;
@@ -41,7 +41,7 @@ describe("Socle", () => {
     await renderApp(null);
     click("Créer mon personnage");
     expect(await screen.findByRole("heading", { level: 1, name: "Nouveau samouraï" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Terminer" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Terminer : Identité & réputation" })).toBeInTheDocument();
   });
   it("le thème passe d'auto à clair, sombre, puis auto", async () => {
     await renderApp();
@@ -65,9 +65,9 @@ describe("Fiche", () => {
   it("U2 : modifier un trait met à jour les réserves des compétences liées", async () => {
     await renderApp();
     expect(screen.getByTestId("skill-pool-Kenjutsu")).toHaveTextContent("5g3");
-    click("Modifier la fiche");
+    click("Edit : Anneaux & Traits");
     fireEvent.change(screen.getByRole("spinbutton", { name: "Agilité" }), { target: { value: "4" } });
-    click("Terminer");
+    click("Terminer : Anneaux & Traits");
     expect(screen.getByTestId("skill-pool-Kenjutsu")).toHaveTextContent("6g4");
     expect(screen.getByTestId("skill-pool-Équitation")).toHaveTextContent("5g4");
     expect(screen.getByTestId("skill-pool-Iaijutsu")).toHaveTextContent("6g3");
@@ -75,7 +75,7 @@ describe("Fiche", () => {
 
   it("U3 : clan « Scorpion » puis « crane » : accent rouge, puis bleu ciel", async () => {
     await renderApp();
-    click("Modifier la fiche");
+    click("Edit : Identité & réputation");
     const clan = screen.getByRole("combobox", { name: "Clan" });
     fireEvent.change(clan, { target: { value: "Scorpion" } });
     expect(root.style.getPropertyValue("--acc-l")).toBe("#a82828");
@@ -90,10 +90,12 @@ describe("Fiche", () => {
   it("U4 : un texte saisi n'est jamais interprété comme du HTML", async () => {
     const evil = "<img src=x onerror=alert(1)>";
     const { container } = await renderApp();
-    click("Modifier la fiche");
+    click("Edit : Identité & réputation");
+    click("Edit : Avantages, désavantages, notes");
     fireEvent.change(screen.getByRole("textbox", { name: "Notes de campagne" }), { target: { value: evil } });
     fireEvent.change(screen.getByRole("textbox", { name: "Nom" }), { target: { value: evil } });
-    click("Terminer");
+    click("Terminer : Identité & réputation");
+    click("Terminer : Avantages, désavantages, notes");
     expect(screen.getByText(evil, { selector: ".prose" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(evil);
     expect(container.querySelector("img")).toBeNull();
@@ -101,19 +103,19 @@ describe("Fiche", () => {
 
   it("ajoute et retire une compétence ; plus d'encadré Manœuvres sur la fiche", async () => {
     await renderApp();
-    click("Modifier la fiche");
+    click("Edit : Compétences");
     click("+ Compétence");
     const names = screen.getAllByRole("textbox", { name: "Nom de la compétence" });
     fireEvent.change(names.at(-1)!, { target: { value: "Kyujutsu" } });
     fireEvent.change(screen.getByRole("textbox", { name: "Spécialisations de Kyujutsu" }), { target: { value: "Yumi, Daikyu" } });
     expect(screen.queryByRole("heading", { name: "Manœuvres" })).toBeNull();
     expect(screen.queryByRole("spinbutton", { name: "Coût de Feinte" })).toBeNull();
-    click("Terminer");
+    click("Terminer : Compétences");
     expect(screen.getByTestId("skill-pool-Kyujutsu")).toHaveTextContent("4g3");
     expect(screen.getByText("Daikyu")).toBeInTheDocument();
-    click("Modifier la fiche");
+    click("Edit : Compétences");
     click("Supprimer Kyujutsu");
-    click("Terminer");
+    click("Terminer : Compétences");
     expect(screen.queryByTestId("skill-pool-Kyujutsu")).toBeNull();
   });
 
@@ -357,8 +359,8 @@ describe("Aide de jeu", () => {
     click(/^Défense totale.*moitié du résultat/);
     showDice();
     click("Lancer 4g3");
-    // 3 dés gardés à 5 = 15 → +7 au ND d'armure (20 + 7)
-    expect(screen.getByTestId("armor-tn")).toHaveTextContent("27");
+    // 3 dés gardés à 5 = 15 → +8 au ND d'armure, moitié arrondie au supérieur (20 + 8)
+    expect(screen.getByTestId("armor-tn")).toHaveTextContent("28");
     expect(screen.getByRole("button", { name: "Défense totale" })).toHaveAttribute("aria-pressed", "true");
   });
 

@@ -136,9 +136,9 @@
       "classWords": ["courtisan", "courtisane", "courtier"],
       "skills": ["Calligraphie", "Courtoisie", "Étiquette", "Investigation", "Sincérité", "Tentation"],
       "ranks": [
-        { "rank": 1, "name": "Ta faiblesse est ma force", "summary": "1 augmentation gratuite par 3 points de désavantages mentaux et sociaux de la cible (5 au plus) aux jets sociaux opposés ; 1 augmentation gratuite en Courtoisie pour répandre une rumeur.",
+        { "rank": 1, "name": "Ta faiblesse est ma force", "summary": "1 augmentation gratuite par 3 points de désavantages mentaux et sociaux de la cible (arrondi au plus proche, 5 au plus) aux jets sociaux opposés ; 1 augmentation gratuite en Courtoisie pour répandre une rumeur.",
           "effects": [
-            { "kind": "roll", "on": ["social"], "freeRaises": { "ref": "input", "div": 3, "max": 5 }, "mode": "optional", "label": "Faiblesses de la cible", "input": "Points de désavantages mentaux et sociaux de la cible" },
+            { "kind": "roll", "on": ["social"], "freeRaises": { "ref": "input", "div": 3, "round": "nearest", "max": 5 }, "mode": "optional", "label": "Faiblesses de la cible", "input": "Points de désavantages mentaux et sociaux de la cible" },
             { "kind": "roll", "on": ["skill:Courtoisie"], "freeRaises": 1, "mode": "optional", "label": "Répandre une rumeur" }
           ] },
         { "rank": 2, "name": "Eaux peu profondes", "summary": "Investigation/Intuition contre Étiquette/Intuition : les compétences mentale et sociale les plus faibles de la cible ; un point de Vide pour les suivantes.",

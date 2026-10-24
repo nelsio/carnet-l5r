@@ -9,7 +9,7 @@ import {
   woundState, armorTN, targetNumber, maneuverRaises, raiseCapExceeded,
   mergeCharacter, migrate, movement, poolStats, DEFAULT_MANEUVERS, type Character,
 } from "@carnet/core";
-import kakita from "../reference/exemple-personnage.json";
+import kakita from "./fixtures/kakita-v1.json";
 
 const base = () => structuredClone(kakita) as Character;
 
@@ -105,8 +105,12 @@ describe("Réserves de dés (computePool)", () => {
   it("dégâts avec augmentations d'attaque pré-remplies (+2 dés lancés)", () => {
     expect(computePool(base(), { kind: "damage", weapon: sword }, { extraRolled: 2 })).toMatchObject({ rolled: 7, kept: 2 });
   });
-  it("arc : dégâts sur la force de l'arc, pas sur la Force", () => {
-    expect(computePool(base(), { kind: "damage", weapon: bow }, {})).toMatchObject({ rolled: 5, kept: 2 });
+  it("arc : dégâts sur la force de l'arc, plafonnée par la Force (C11)", () => {
+    // Force 2, arc de force 3 : l'arc tire à 2 (L24 : 5g2 → 4g2).
+    expect(computePool(base(), { kind: "damage", weapon: bow }, {})).toMatchObject({ rolled: 4, kept: 2 });
+    const strong = base();
+    strong.traits.strength = 4;
+    expect(computePool(strong, { kind: "damage", weapon: bow }, {})).toMatchObject({ rolled: 5, kept: 2 });
   });
   it("maîtrise : compétence martiale au rang 7+, les dégâts explosent aussi sur 9", () => {
     const c = base();
@@ -115,12 +119,12 @@ describe("Réserves de dés (computePool)", () => {
     expect(computePool(c, { kind: "damage", weapon: sword }, {})).toMatchObject({ explodes: true, explodeOn: 9 });
     expect(computePool(c, atk, {})).toMatchObject({ explodeOn: 10 });        // l'attaque n'est pas concernée
   });
-  it("maîtrise : s'applique à l'arc (Kyujutsu 7) et aux mains nues (Jiujutsu 7)", () => {
+  it("maîtrise : ni l'arc (Kyujutsu 7) ni les mains nues (Jiujutsu 7) n'explosent sur 9 (C1, E-b)", () => {
     const c = base();
     c.skills.push({ name: "Kyujutsu", rank: 7, trait: "reflexes", emphases: [] });
     c.skills.push({ name: "Jiujutsu", rank: 7, trait: "agility", emphases: [] });
-    expect(computePool(c, { kind: "damage", weapon: bow }, {})).toMatchObject({ explodeOn: 9 });
-    expect(computePool(c, { kind: "damage", weapon: { name: "Mains nues", skill: "Jiujutsu", dr: "0k1" } }, {})).toMatchObject({ explodeOn: 9 });
+    expect(computePool(c, { kind: "damage", weapon: bow }, {})).toMatchObject({ explodeOn: 10 });
+    expect(computePool(c, { kind: "damage", weapon: { name: "Mains nues", skill: "Jiujutsu", dr: "0k1" } }, {})).toMatchObject({ explodeOn: 10 });
   });
   it("initiative : Rang 1 + Réflexes 3 = 4g3", () => {
     expect(computePool(base(), { kind: "initiative" }, {})).toMatchObject({ rolled: 4, kept: 3, canRaise: false });
@@ -324,12 +328,12 @@ describe("Migration v0 (prototype) → v2", () => {
       schemaVersion: 2, insightRank: 2, honor: 4.5, glory: 0, voidRing: 3, schoolId: "", schoolRank: null,
       xp: { total: 40, spent: 10 },
       skills: [{ name: "Kenjutsu", emphases: ["Katana", "Nodachi"] }],
-      weapons: [{ name: "Yumi", dr: "2g2", bowStrength: 3, keywords: ["arc", "distance", "samourai"] }],
+      weapons: [{ name: "Yumi", dr: "2g2", bowStrength: 3, keywords: ["arc", "distance", "grande"] }],
       maneuvers: [{ id: "dmg", name: "Augmentation des dégâts", cost: 1, effect: "+1g0", stackable: true }],
     });
   });
   it("amène une fiche v1 en v2 sans rien perdre (annexe C.2)", () => {
-    const keywords = [["samourai", "moyenne"], ["samourai", "petite"]];
+    const keywords = [["samourai", "moyenne"], ["samourai", "moyenne"]];
     expect(migrate(base())).toEqual({
       ...base(), schemaVersion: 2, schoolId: "", schoolRank: null,
       weapons: base().weapons.map((w, i) => ({ ...w, keywords: keywords[i] })),

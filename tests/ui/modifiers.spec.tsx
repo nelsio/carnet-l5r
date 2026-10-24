@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import type { Character, Modifier } from "@carnet/core";
 import { memoryStorage, type LibraryEntry } from "../../src/storage";
 import { App } from "../../src/ui/App";
-import kakita from "../../reference/exemple-personnage.json";
+import kakita from "../fixtures/kakita-v1.json";
 
 const base = () => structuredClone(kakita) as Character;
 const mod = (patch: Partial<Modifier>): Modifier => ({
@@ -28,26 +28,26 @@ describe("Saisie sur la fiche", () => {
   it("ajout depuis un modèle : +1g0 à Kenjutsu met à jour les réserves de la fiche", async () => {
     const { storage } = await mount();
     expect(screen.getByText(/Aucun bonus/)).toBeInTheDocument();
-    click("Modifier la fiche");
+    click("Edit : Bonus de jet");
     fireEvent.change(screen.getByRole("combobox", { name: "Modèle de bonus" }), { target: { value: "skill-1g0" } });
     click("+ Bonus");
     const editor = screen.getByRole("group", { name: "Bonus +1g0 à une compétence" });
     fireEvent.change(within(editor).getByRole("textbox", { name: "Nom du bonus" }), { target: { value: "Voie de la Grue" } });
     fireEvent.change(within(editor).getByRole("combobox", { name: "Compétence" }), { target: { value: "Kenjutsu" } });
     expect(within(editor).getByText("Effet : +1g0")).toBeInTheDocument();
-    click("Terminer");
+    click("Terminer : Bonus de jet");
     expect(screen.getByTestId("skill-pool-Kenjutsu")).toHaveTextContent("6g3");
     expect(screen.getByTestId("skill-pool-Iaijutsu")).toHaveTextContent("6g3");
     const katana = screen.getAllByRole("row").find((r) => r.textContent?.startsWith("KatanaKenjutsu"))!;
     expect(katana).toHaveTextContent("6g3");
     expect(screen.getByText("Compétence : Kenjutsu")).toBeInTheDocument();
-    expect(screen.getByText("d'office")).toBeInTheDocument();
+    expect(screen.getByText("· d'office")).toBeInTheDocument();
     await waitFor(async () => expect((await storage.library.get("a"))?.character.modifiers?.[0]).toMatchObject({ name: "Voie de la Grue", skill: "Kenjutsu", rolled: 1 }), { timeout: 1500 });
   });
 
   it("bonus libre : champs selon la cible, suppression", async () => {
     await mount();
-    click("Modifier la fiche");
+    click("Edit : Bonus de jet");
     click("+ Bonus");
     const editor = screen.getByRole("group", { name: "Bonus 1" });
     fireEvent.change(within(editor).getByRole("combobox", { name: "S'applique à" }), { target: { value: "armor" } });
@@ -139,22 +139,23 @@ describe("Lanceur", () => {
 
 describe("Catalogue : Force de la Terre, Aspect dérangeant", () => {
   async function addFromCatalogue(...ids: string[]) {
-    click("Modifier la fiche");
+    click("Edit : Bonus de jet");
     for (const id of ids) {
       fireEvent.change(screen.getByRole("combobox", { name: "Modèle de bonus" }), { target: { value: id } });
       click("+ Bonus");
     }
-    click("Terminer");
+    click("Terminer : Bonus de jet");
   }
 
   it("les entrées du catalogue sont proposées en tête de liste", async () => {
     await mount();
-    click("Modifier la fiche");
+    click("Edit : Bonus de jet");
     const select = screen.getByRole("combobox", { name: "Modèle de bonus" });
     const group = within(select).getByRole("group", { name: "Catalogue (livre de base 4e, à vérifier)" });
     expect(within(group).getAllByRole("option").map((o) => o.textContent)).toEqual([
       "Force de la Terre (Strength of the Earth)",
       "Aspect dérangeant (Disturbing Countenance)",
+      "Seuil de douleur bas (Low Pain Threshold)",
     ]);
   });
 

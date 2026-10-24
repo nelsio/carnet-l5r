@@ -5,7 +5,7 @@ import {
   hasWritePermission, LinkedLibrary, MemoryLibrary, pickLinkedFile, readLinkedFile, supportsLinkedFiles, writeLinkedFile,
   type LibraryEntry, type LinkHandle, type LinkedFile,
 } from "../../src/storage";
-import kakita from "../../reference/exemple-personnage.json";
+import kakita from "../fixtures/kakita-v1.json";
 import { FakeHandle } from "../helpers/fakeHandle";
 
 const base = () => structuredClone(kakita) as Character;

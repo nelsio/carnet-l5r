@@ -1,0 +1,18 @@
+{
+  "note": "Table de bataille de masse (livre de base 4e, page 240 du livre, 242 du PDF), transcrite en données. Colonne = indice d'engagement + décalage de l'état de l'armée. Chaque case : [dés de blessures, Gloire, événement].",
+  "engagement": ["reserves", "disengaged", "engaged", "heavilyEngaged"],
+  "statusOffset": { "winning": 0, "stalemate": 1, "losing": 2 },
+  "events": { "duel": "Duel", "heroic": "Occasion héroïque" },
+  "rows": [
+    { "min": 1,  "max": 3,  "cells": [[1,0,null],[2,0,null],[3,1,null],[4,1,null],[5,1,"duel"],[6,3,"heroic"]] },
+    { "min": 4,  "max": 6,  "cells": [[1,0,null],[1,0,null],[3,1,null],[4,1,null],[5,1,"duel"],[5,2,"heroic"]] },
+    { "min": 7,  "max": 9,  "cells": [[1,0,null],[0,0,null],[2,1,null],[3,1,"duel"],[4,1,"heroic"],[5,1,"duel"]] },
+    { "min": 10, "max": 12, "cells": [[0,0,null],[0,0,null],[2,0,"duel"],[3,0,"heroic"],[4,1,"heroic"],[4,1,"duel"]] },
+    { "min": 13, "max": 15, "cells": [[0,1,null],[0,1,null],[1,1,null],[2,1,"duel"],[3,1,null],[4,1,"heroic"]] },
+    { "min": 16, "max": 18, "cells": [[0,1,null],[0,1,"duel"],[1,1,null],[2,1,"duel"],[3,2,null],[3,2,"heroic"]] },
+    { "min": 19, "max": 21, "cells": [[0,2,null],[0,2,null],[1,2,"heroic"],[2,2,null],[3,2,"heroic"],[3,2,"duel"]] },
+    { "min": 22, "max": 24, "cells": [[0,2,null],[0,2,"heroic"],[0,2,null],[1,2,"heroic"],[2,3,null],[3,3,"duel"]] },
+    { "min": 25, "max": 27, "cells": [[0,2,null],[0,2,null],[0,3,"duel"],[1,3,null],[2,4,"heroic"],[3,4,"heroic"]] },
+    { "min": 28, "max": 30, "cells": [[0,3,null],[0,3,null],[0,4,"heroic"],[1,4,"duel"],[2,5,"duel"],[3,5,"heroic"]] }
+  ]
+}

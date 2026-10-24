@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import {
-  armorEffects, describeModifier, hasMountedEffects, isSimpleAttack, modifiersOf, movement, movementBonus, resolveValue,
+  armorEffects, describeModifier, hasMountedEffects, hasMountRules, isSimpleAttack, modifiersOf, movement, movementBonus, movementWater, resolveValue,
   reminderText, rings, schoolOf, schoolReminders, stackCount, stackEffects, stackMax, voidMultiplier,
   type ActionDef, type ActiveEffect,
 } from "@carnet/core";
-import { COMBAT_SUBS, SITUATIONS, STANCES } from "../../rules/l5r4e";
+import { COMBAT_SUBS, SITUATIONS, STANCES, TERRAINS } from "../../rules/l5r4e";
 import type { ReminderContext } from "../../rules/ecoles";
 import { toMeters } from "../format";
 import { contextOf, currentArmorTN, DEFAULT_ROLL_OPTIONS, isActive, isRollable, poolFor, poolLabel, toPoolAction } from "../rolls";
@@ -136,16 +136,19 @@ function SchoolCombat() {
   const { state, dispatch } = useStore();
   const c = useCharacter();
   const { ui } = state;
-  if (!schoolOf(c)) return null;
+  const school = !!schoolOf(c);
+  // Case « Monté » : techniques montées, ou arc dont le ND dépend de la monture (annexe E.2 C12).
+  const mounted = hasMountedEffects(c) || hasMountRules(c);
+  if (!school && !mounted) return null;
   const armor = armorEffects(c, contextOf(ui));
   // Compteurs : ND d'armure valables dans la posture, et ND de la cible (toujours).
   const stacked = [...armor.filter((e) => "stack" in e && e.stack), ...stackEffects(c).filter((e) => e.kind === "targetTn")];
   const boxes = armor.filter((e) => e.kind === "armor" && !e.stack && e.mode === "optional");
-  const mounted = hasMountedEffects(c);
   if (!mounted && !ui.centerLastRound && !stacked.length && !boxes.length) return null;
+  const title = school ? "Techniques d'école" : "Monture";
   return (
-    <div className="techbox" role="group" aria-label="Techniques d'école">
-      <div className="label">Techniques d'école</div>
+    <div className="techbox" role="group" aria-label={title}>
+      <div className="label">{title}</div>
       {mounted && (
         <label className="chk"><input type="checkbox" checked={ui.mounted} onChange={(e) => dispatch({ type: "mounted", on: e.target.checked })} /> Monté</label>
       )}
@@ -256,10 +259,12 @@ function VoidPanel() {
 }
 
 function MovePanel() {
-  const { state } = useStore();
+  const { state, dispatch } = useStore();
   const details = !!state.ui.info.move;
   const c = useCharacter();
-  const m = movement(c);
+  const { terrain } = state.ui;
+  const m = movement(c, terrain);
+  const water = movementWater(c, terrain);
   const bonus = movementBonus(c, contextOf(state.ui));
   const tiles = [
     { label: "Action libre", ft: m.free, note: "1 fois par round" },
@@ -271,9 +276,19 @@ function MovePanel() {
       <div className="panel-head" style={{ marginBottom: 8 }}>
         <h2 style={{ fontSize: 17 }}>Se déplacer en combat</h2>
         <span className="panel-title">
-          <span className="muted" style={{ fontSize: 13 }}>Anneau d'Eau {rings(c).water}</span>
+          <span className="muted" style={{ fontSize: 13 }} data-testid="move-water">
+            Anneau d'Eau {rings(c).water}{water !== rings(c).water ? ` → ${water}` : ""}
+          </span>
           <InfoButton panel="move" label="Se déplacer en combat" />
         </span>
+      </div>
+      <div className="terrain" role="group" aria-label="Terrain">
+        {TERRAINS.map((t) => (
+          <button
+            key={t.id} type="button" aria-pressed={terrain === t.id}
+            onClick={() => dispatch({ type: "terrain", terrain: t.id })}
+          >{t.label}</button>
+        ))}
       </div>
       <div className="moves">
         {tiles.map((t) => (
@@ -285,7 +300,11 @@ function MovePanel() {
         ))}
       </div>
       {bonus > 0 && <p className="hint" style={{ margin: "6px 0 0", color: "var(--gold)" }}>+{bonus} pieds par tour (technique d'école), sans dépasser le maximum.</p>}
-      {details && <p className="hint" style={{ marginBottom: 0 }}>Terrain difficile (eau, foule, escaliers) : distances divisées par deux. Valeurs 4e à vérifier dans ton livre.</p>}
+      {details && (
+        <p className="hint" style={{ marginBottom: 0 }}>
+          Terrain modéré (broussailles, foule) : Anneau d'Eau −1 ; difficile (eau, escaliers, marais) : −2, avec 1 au minimum (livre p. 87).
+        </p>
+      )}
     </div>
   );
 }

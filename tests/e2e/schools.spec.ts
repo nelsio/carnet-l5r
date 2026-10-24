@@ -4,7 +4,7 @@ import { resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 
 const pageUrl = pathToFileURL(resolve("dist/carnet-l5r.html")).href;
-const kakitaPath = resolve("reference/exemple-personnage.json");
+const kakitaPath = resolve("tests/fixtures/kakita-v1.json");
 
 /** Importe la fiche v1 d'exemple en « Nouvelle fiche ». */
 async function importKakita(page: Page) {
@@ -16,10 +16,10 @@ async function importKakita(page: Page) {
 }
 
 async function chooseSchool(page: Page, school: string, insight: string) {
-  await page.getByRole("button", { name: "Modifier la fiche" }).click();
+  await page.getByRole("button", { name: "Edit : Identité & réputation" }).click();
   await page.getByRole("combobox", { name: "Techniques d'école" }).selectOption({ label: school });
   await page.getByRole("spinbutton", { name: "Rang (Insight)" }).fill(insight);
-  await page.getByRole("button", { name: "Terminer" }).click();
+  await page.getByRole("button", { name: "Terminer : Identité & réputation" }).click();
 }
 
 async function skirmish(page: Page) {
@@ -104,9 +104,9 @@ test("E20 : Doji, Honneur 6,5 puis 5,0 : « 1 augm. gratuite · Doji R1 » en Co
   const roller = page.getByRole("dialog", { name: "Lanceur de dés" });
   await expect(roller.getByTestId("tech-chips")).toContainText("1 augm. gratuite · Doji R1");
   await page.getByRole("button", { name: "Fiche", exact: true }).click();
-  await page.getByRole("button", { name: "Modifier la fiche" }).click();
+  await page.getByRole("button", { name: "Edit : Identité & réputation" }).click();
   await page.getByRole("spinbutton", { name: "Honneur" }).fill("5");
-  await page.getByRole("button", { name: "Terminer" }).click();
+  await page.getByRole("button", { name: "Terminer : Identité & réputation" }).click();
   await court(page);
   await page.getByRole("button", { name: /^Convaincre, manipuler/ }).click();
   await expect(roller.getByTestId("tech-chips")).toHaveCount(0);

@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import type { Character } from "@carnet/core";
 import { memoryStorage, type LibraryEntry, type Storage } from "../../src/storage";
 import { App } from "../../src/ui/App";
-import kakita from "../../reference/exemple-personnage.json";
+import kakita from "../fixtures/kakita-v1.json";
 
 const base = () => structuredClone(kakita) as Character;
 const entry = (id: string, patch: Partial<LibraryEntry> = {}): LibraryEntry => ({
@@ -61,7 +61,7 @@ describe("Sauvegarde automatique", () => {
     const s = memoryStorage();
     await s.library.put(entry("a"));
     const { unmount } = await mount(s);
-    click("Modifier la fiche");
+    click("Edit : Identité & réputation");
     fireEvent.change(screen.getByRole("textbox", { name: "Nom" }), { target: { value: "Kakita Haruto II" } });
     expect((await s.library.get("a"))?.character.name).toBe("Kakita Haruto");
     expect(await screen.findByText(/Enregistré dans ce navigateur/, {}, { timeout: 1500 })).toBeInTheDocument();
@@ -151,7 +151,7 @@ describe("Écran Bibliothèque", () => {
     const s = await withTwo();
     click("Nouvelle fiche");
     expect(await screen.findByRole("heading", { level: 1, name: "Nouveau samouraï" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Terminer" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Terminer : Identité & réputation" })).toBeInTheDocument();
     expect(await s.library.list()).toHaveLength(3);
   });
 
@@ -159,7 +159,7 @@ describe("Écran Bibliothèque", () => {
     const s = memoryStorage();
     await s.library.put(entry("a"));
     await mount(s);
-    click("Modifier la fiche");
+    click("Edit : Identité & réputation");
     click("Supprimer ce personnage…");
     click("Confirmer la suppression");
     expect(await screen.findByRole("heading", { name: "Aucun personnage dans ce carnet" })).toBeInTheDocument();
@@ -179,7 +179,7 @@ describe("Fiche en consultation", () => {
     const { container } = await readonly();
     expect(screen.getByText("Consultation")).toBeInTheDocument();
     expect(container.querySelectorAll("input, textarea, select")).toHaveLength(0);
-    expect(screen.queryByRole("button", { name: "Modifier la fiche" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /^Edit/ })).toBeNull();
     expect(screen.queryByRole("button", { name: /blessure/ })).toBeNull();
     for (const pip of screen.getAllByRole("button", { name: /Point de Vide/ })) expect(pip).toBeDisabled();
   });
@@ -205,7 +205,7 @@ describe("Fiche en consultation", () => {
     const { s } = await readonly();
     click("Rendre modifiable");
     await waitFor(() => expect(screen.queryByText("Consultation")).toBeNull());
-    expect(screen.getByRole("button", { name: "Modifier la fiche" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Edit : Compétences" })).toBeInTheDocument();
     const list = await s.library.list();
     expect(list.map((e) => e.mode).sort()).toEqual(["edit", "readonly"]);
     expect(list.find((e) => e.mode === "edit")?.character).toEqual(base());
