@@ -16,10 +16,15 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
+/**
+ * Contenu du fichier lié ; `null` tant qu'il n'est pas écrit : le sélecteur crée le fichier vide avant la
+ * première écriture de l'application, et un `expect.poll` qui lirait à cet instant échouerait au lieu de réessayer.
+ */
 const readFile = (page: Page, name: string) =>
   page.evaluate(async (n) => {
     const file = await (await (await navigator.storage.getDirectory()).getFileHandle(n)).getFile();
-    return JSON.parse(await file.text()) as { name: string; wounds: number; honor: number };
+    const text = await file.text();
+    return text.trim() ? JSON.parse(text) as { name: string; wounds: number; honor: number } : null;
   }, name);
 
 const writeElsewhere = (page: Page, name: string, patch: Record<string, unknown>) =>
@@ -52,16 +57,16 @@ test("lier, écrire à chaque modification, survivre au rechargement, conflit, d
 
   await page.getByRole("button", { name: "Lier à un fichier…" }).click();
   await expect(page.getByText(`Lié à ${file}`)).toBeVisible();
-  await expect.poll(async () => (await readFile(page, file)).name).toBe("Shiba Tetsu");
+  await expect.poll(async () => (await readFile(page, file))?.name).toBe("Shiba Tetsu");
 
   await page.getByRole("button", { name: "Ajouter 1 blessure" }).click();
-  await expect.poll(async () => (await readFile(page, file)).wounds).toBe(1);
+  await expect.poll(async () => (await readFile(page, file))?.wounds).toBe(1);
 
   // La poignée survit au rechargement (rangée dans IndexedDB).
   await page.reload();
   await expect(page.getByText(`Lié à ${file}`)).toBeVisible();
   await page.getByRole("button", { name: "Ajouter 1 blessure" }).click();
-  await expect.poll(async () => (await readFile(page, file)).wounds).toBe(2);
+  await expect.poll(async () => (await readFile(page, file))?.wounds).toBe(2);
 
   // Modification par un autre programme : conflit, rien n'est écrit.
   await writeElsewhere(page, file, { honor: 9 });
@@ -72,8 +77,8 @@ test("lier, écrire à chaque modification, survivre au rechargement, conflit, d
 
   await banner.getByRole("button", { name: "Écraser avec ma version" }).click();
   await expect(banner).toBeHidden();
-  await expect.poll(async () => (await readFile(page, file)).wounds).toBe(3);
-  expect((await readFile(page, file)).honor).toBe(0);
+  await expect.poll(async () => (await readFile(page, file))?.wounds).toBe(3);
+  expect((await readFile(page, file))?.honor).toBe(0);
 
   // Délier : le fichier n'est plus touché.
   await page.getByRole("button", { name: "Délier" }).click();
@@ -81,7 +86,7 @@ test("lier, écrire à chaque modification, survivre au rechargement, conflit, d
   await page.getByRole("button", { name: "Ajouter 1 blessure" }).click();
   await expect(page.getByText(/Enregistré dans ce navigateur/)).toBeVisible();
   await page.waitForTimeout(700);
-  expect((await readFile(page, file)).wounds).toBe(3);
+  expect((await readFile(page, file))?.wounds).toBe(3);
 });
 
 test("conflit résolu en chargeant la version du fichier", async ({ page }) => {
@@ -91,7 +96,7 @@ test("conflit résolu en chargeant la version du fichier", async ({ page }) => {
   await page.getByRole("button", { name: "Terminer" }).click();
   await page.getByRole("button", { name: "Lier à un fichier…" }).click();
   await expect(page.getByText(`Lié à ${file}`)).toBeVisible();
-  await expect.poll(async () => (await readFile(page, file)).wounds).toBe(0);
+  await expect.poll(async () => (await readFile(page, file))?.wounds).toBe(0);
 
   await writeElsewhere(page, file, { name: "Version du Drive", honor: 5 });
   await page.getByRole("button", { name: "Ajouter 1 blessure" }).click();

@@ -302,7 +302,7 @@ interface LibraryStore {
 - **Aide de jeu** :
   - Enquête / Déplacement / Combat / **Statistiques**, avec en Combat les sous-types Escarmouche, Duel iaijutsu et Bataille ;
   - en Déplacement, un **encart « Se déplacer en combat »** en tête de liste : trois tuiles (action libre, action simple, maximum par round) en pieds et en mètres, calculées depuis l'Anneau d'Eau, avec un rappel « terrain difficile : distances divisées par deux » ;
-  - en Escarmouche : carte **Initiative** en premier (elle affiche le score, et « Nouveau round » ne la réinitialise pas), puis Posture (sauf en Duel), puis le panneau Vide, puis les actions.
+  - en Escarmouche : carte **Initiative** en premier (elle affiche le score, et « Nouveau round » ne la réinitialise pas), puis la carte **Nouveau round** (bouton et description courte : « Efface le Vide en armure et la Défense totale ; garde l'initiative et les compteurs. », deux lignes au plus sur mobile ; présente dans tous les types de combat), puis Posture (sauf en Duel), puis le panneau Vide, puis les actions.
 - **Lanceur** :
   - réserve en grand, et juste dessous la ligne **Min · Moy. · Max** (« Max 30+ » si la réserve explose) et la **chance de réussite** contre le ND final quand il y en a un. Elle se recalcule à chaque option (augmentations, Vide, spécialisation, bonus fixe) ;
   - juste sous la réserve, une ligne **« lancer à la main »** (avant Min · Moy. · Max) qui donne les règles de relance pour jouer avec de vrais dés (pas de phrase « Lance N dés, garde K » : le XgY suffit) :
@@ -525,6 +525,7 @@ Ces cas complètent la spec fournie. L'agent les écrit dans `tests/core.modifie
 | M9 | Tuiles de la barre d'état à 360 px de large | Les 4 libellés et valeurs sont entièrement visibles, sans troncature ni retour à la ligne |
 | M10 | Boutons « i » | Zone de toucher ≥ 40 × 40 px ; les panneaux Posture et Vide tiennent sur moins d'un écran détails fermés |
 | M11 | En-tête à 360 px de large | Bibliothèque, Lanceur de dés et Thème en icônes de 40 px sur la même ligne que le nom ; libellé accessible avec l'état courant |
+| M12 | Combat sur mobile, et à 360 px de large | Carte « Nouveau round » entre l'Initiative et la Posture ; sa description tient sur 2 lignes au plus |
 
 ---
 
@@ -535,7 +536,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 1. **Socle** : Vite + React + TypeScript strict, ESLint, Vitest, `vite-plugin-singlefile`, workflow `ci.yml`.
 2. **Moteur** : schéma Zod, migrations, données de règles, moteur → `core.rules.spec.ts` vert.
 3. **Interface bureau** : portage du prototype en composants, thème, clans. Revue visuelle par comparaison avec `reference/prototype.html`.
-4. **Mobile** : §7 → tests M1 à M9.
+4. **Mobile** : §7 → tests M1 à M9 (M10 à M12 ajoutés ensuite).
 5. **Stockage** : bibliothèque IndexedDB, écran Bibliothèque, mode consultation → S1, S2, U1.
 6. **Import / export** : fusion avec aperçu, trois destinations → U5, E3 à E5.
 7. **Fichier lié** : File System Access, reprise de permission, conflits → S3 à S5, U6.
