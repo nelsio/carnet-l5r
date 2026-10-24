@@ -161,6 +161,24 @@ describe("Aide de jeu", () => {
     expect(screen.getByTestId("initiative")).toHaveTextContent("15");
   });
 
+  it("« Nouveau round » entre l'initiative et la posture, avec sa description ; aussi en Duel", async () => {
+    await renderApp();
+    goToAid();
+    click("Combat");
+    const round = screen.getByRole("button", { name: "Nouveau round" });
+    const initiative = screen.getByTestId("initiative");
+    const stance = screen.getByRole("group", { name: "Posture" });
+    const follows = (a: Node, b: Node) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(follows(initiative, round)).toBe(true);
+    expect(follows(round, stance)).toBe(true);
+    expect(screen.getByTestId("round-desc")).toHaveTextContent("garde l'initiative et les compteurs");
+    // Plus dans le panneau Vide.
+    const voidPanel = screen.getByRole("button", { name: "Afficher le détail : Dépenser du Vide" }).closest(".panel")!;
+    expect(within(voidPanel as HTMLElement).queryByRole("button", { name: "Nouveau round" })).toBeNull();
+    click("Duel iaijutsu");
+    expect(screen.getByRole("button", { name: "Nouveau round" })).toBeInTheDocument();
+  });
+
   it("E7 : attaque réussie avec 2 « Augmentation des dégâts » → dégâts pré-remplis à +2 dés", async () => {
     await renderApp(base(), always(9));
     goToAid();

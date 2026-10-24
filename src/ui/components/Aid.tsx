@@ -59,6 +59,7 @@ export function Aid() {
       <div className="aid">
         <div className="grid" style={{ gap: 12 }}>
           {initiative && <InitiativeCard action={initiative} />}
+          {combat && <RoundPanel />}
           {combat && ui.sub !== "duel" && <StancePanel />}
           {combat && <VoidPanel />}
           {(combat || ui.situation === "court") && <RemindersPanel />}
@@ -213,6 +214,17 @@ function RemindersPanel() {
   );
 }
 
+/** « Nouveau round », entre l'initiative et la posture ; description de deux lignes au plus sur mobile. */
+function RoundPanel() {
+  const { dispatch } = useStore();
+  return (
+    <div className="panel round" style={{ padding: 12 }}>
+      <button type="button" className="btn sm" onClick={() => dispatch({ type: "newRound" })}>Nouveau round</button>
+      <span className="muted" data-testid="round-desc">Efface le Vide en armure et la Défense totale ; garde l'initiative et les compteurs.</span>
+    </div>
+  );
+}
+
 function VoidPanel() {
   const { state, dispatch } = useStore();
   const c = useCharacter();
@@ -223,7 +235,6 @@ function VoidPanel() {
     <div className="panel" style={{ padding: 12 }}>
       <div className="panel-head" style={{ marginBottom: 8 }}>
         <span className="panel-title"><span className="label">Dépenser du Vide</span><InfoButton panel="void" label="Dépenser du Vide" /></span>
-        <button type="button" className="btn sm" onClick={() => dispatch({ type: "newRound" })}>Nouveau round</button>
       </div>
       {ui.voidSpentThisRound && (
         <p className="hint" style={{ color: "var(--bad)", margin: "0 0 8px" }}>Déjà un point de Vide dépensé ce round (limite normale : 1 par round).</p>

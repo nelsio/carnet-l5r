@@ -1,4 +1,4 @@
-/** Version mobile (HANDOFF §7), tests M1 à M11 (§10.5). */
+/** Version mobile (HANDOFF §7), tests M1 à M12 (§10.5). */
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { expect, test, type Locator, type Page } from "@playwright/test";
@@ -240,6 +240,33 @@ test("M10 : boutons « i » touchables sur 40 × 40 px ; Posture et Vide tiennen
     const ib = (await info.boundingBox())!;
     expect(Math.abs(title.y + title.height / 2 - (ib.y + ib.height / 2)), name).toBeLessThan(6);
   }
+});
+
+/** « Nouveau round » : entre l'initiative et la posture ; sa description tient sur 2 lignes au plus. */
+async function roundOnTwoLines(page: Page) {
+  await tab(page, "Aide de jeu").click();
+  await page.getByRole("group", { name: "Situation" }).getByRole("button", { name: "Combat", exact: true }).click();
+  const desc = page.getByTestId("round-desc");
+  const { height, lineHeight } = await desc.evaluate((el) => ({
+    height: el.getBoundingClientRect().height,
+    lineHeight: parseFloat(getComputedStyle(el).lineHeight),
+  }));
+  expect(height / lineHeight).toBeLessThanOrEqual(2.1);
+  const initiative = (await page.getByTestId("initiative").boundingBox())!;
+  const round = (await page.getByRole("button", { name: "Nouveau round" }).boundingBox())!;
+  const stance = (await page.getByRole("group", { name: "Posture" }).boundingBox())!;
+  expect(round.y).toBeGreaterThan(initiative.y);
+  expect(stance.y).toBeGreaterThan(round.y);
+  await noHorizontalScroll(page, "Combat");
+}
+
+test("M12 : « Nouveau round » entre l'initiative et la posture, description sur 2 lignes au plus", async ({ page }) => {
+  await roundOnTwoLines(page);
+});
+
+test.describe("M12 à 360 px de large", () => {
+  test.use({ viewport: { width: 360, height: 740 } });
+  test("description de « Nouveau round » sur 2 lignes au plus", async ({ page }) => roundOnTwoLines(page));
 });
 
 test.describe("M11 : en-tête à 360 px de large", () => {
