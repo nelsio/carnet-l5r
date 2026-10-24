@@ -1,4 +1,4 @@
-/** Version mobile (HANDOFF §7), tests M1 à M12 (§10.5). */
+/** Version mobile (HANDOFF §7), tests M1 à M13 (§10.5). */
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { expect, test, type Locator, type Page } from "@playwright/test";
@@ -18,7 +18,7 @@ async function start(page: Page) {
   await page.getByRole("button", { name: "Lanceur de dés : masqué" }).click();
 }
 
-const tab = (page: Page, name: "Fiche" | "Aide de jeu") => page.getByRole("group", { name: "Vue" }).getByRole("button", { name });
+const tab = (page: Page, name: "Fiche" | "Aide de jeu" | "Statistiques") => page.getByRole("group", { name: "Vue" }).getByRole("button", { name });
 /** Le panneau fermé est masqué : on le cible par sa classe pour vérifier son état. */
 const panel = (page: Page) => page.locator(".roller");
 const rollButton = (page: Page) => panel(page).getByRole("button", { name: /^Lancer/ });
@@ -60,7 +60,7 @@ test("M1 : aucune vue ne défile horizontalement", async ({ page }) => {
   await page.getByRole("button", { name: "Modifier la fiche" }).click();
   await noHorizontalScroll(page, "Fiche en modification");
   await tab(page, "Aide de jeu").click();
-  for (const s of ["Enquête", "Déplacement", "Combat", "Statistiques"]) {
+  for (const s of ["Enquête", "Cour", "Déplacement", "Combat"]) {
     await page.getByRole("group", { name: "Situation" }).getByRole("button", { name: s, exact: true }).click();
     await noHorizontalScroll(page, s);
   }
@@ -72,6 +72,8 @@ test("M1 : aucune vue ne défile horizontalement", async ({ page }) => {
   await openAction(page, "Combat", /Attaque · Katana/, "Escarmouche");
   await noHorizontalScroll(page, "lanceur ouvert");
   await page.keyboard.press("Escape");
+  await tab(page, "Statistiques").click();
+  await noHorizontalScroll(page, "Statistiques");
   await page.getByRole("button", { name: "Bibliothèque" }).click();
   await expect(page.getByRole("heading", { name: "Bibliothèque" })).toBeVisible();
   await noHorizontalScroll(page, "Bibliothèque");
@@ -86,9 +88,9 @@ test("M1 : aucune vue ne défile horizontalement", async ({ page }) => {
   await inViewport(page, page.getByRole("dialog").getByRole("button", { name: "Appliquer" }));
 });
 
-test("M2 : la barre de navigation est fixe en bas, sur Fiche comme sur Aide de jeu", async ({ page }) => {
+test("M2 : la barre de navigation est fixe en bas, sur Fiche, Aide de jeu et Statistiques", async ({ page }) => {
   const vp = page.viewportSize()!;
-  for (const view of ["Fiche", "Aide de jeu"] as const) {
+  for (const view of ["Fiche", "Aide de jeu", "Statistiques"] as const) {
     await tab(page, view).click();
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     const nav = page.getByRole("group", { name: "Vue" });
@@ -179,6 +181,7 @@ test("M8 : cibles tactiles d'au moins 40 × 40 px (−/+, pastilles, onglets)", 
     page.getByRole("button", { name: "Point de Vide 2" }),
     tab(page, "Fiche"),
     tab(page, "Aide de jeu"),
+    tab(page, "Statistiques"),
   ];
   for (const t of targets) {
     const box = (await t.boundingBox())!;
@@ -267,6 +270,37 @@ test("M12 : « Nouveau round » entre l'initiative et la posture, description su
 test.describe("M12 à 360 px de large", () => {
   test.use({ viewport: { width: 360, height: 740 } });
   test("description de « Nouveau round » sur 2 lignes au plus", async ({ page }) => roundOnTwoLines(page));
+});
+
+/** Les onglets de situation tiennent sur une ligne, sans défilement ni texte tronqué, en zones de 40 px. */
+async function situationsFit(page: Page) {
+  await tab(page, "Aide de jeu").click();
+  const group = page.getByRole("group", { name: "Situation" });
+  await expect(group.getByRole("button")).toHaveText(["Enquête", "Cour", "Déplacement", "Combat"]);
+  const report = await group.evaluate((g) => {
+    const vw = document.documentElement.clientWidth;
+    const buttons = [...g.querySelectorAll("button")].map((b) => {
+      const r = b.getBoundingClientRect();
+      return { text: b.textContent, truncated: b.scrollWidth > b.clientWidth + 0.5, top: Math.round(r.top), right: r.right, height: r.height };
+    });
+    return { scrolls: g.scrollWidth > g.clientWidth + 0.5, vw, buttons };
+  });
+  expect(report.scrolls).toBe(false);
+  expect(new Set(report.buttons.map((b) => b.top)).size, "une seule ligne").toBe(1);
+  for (const b of report.buttons) {
+    expect(b.truncated, b.text ?? "").toBe(false);
+    expect(b.right, b.text ?? "").toBeLessThanOrEqual(report.vw);
+    expect(b.height, b.text ?? "").toBeGreaterThanOrEqual(40);
+  }
+}
+
+test("M13 : les 4 onglets de situation tiennent sur une ligne, sans défilement", async ({ page }) => {
+  await situationsFit(page);
+});
+
+test.describe("M13 à 360 px de large", () => {
+  test.use({ viewport: { width: 360, height: 740 } });
+  test("onglets de situation sur une ligne, sans défilement ni troncature", async ({ page }) => situationsFit(page));
 });
 
 test.describe("M11 : en-tête à 360 px de large", () => {

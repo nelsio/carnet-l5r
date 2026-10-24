@@ -5,6 +5,7 @@ import { Header } from "./components/Header";
 import { ImportDialog } from "./components/ImportDialog";
 import { Library } from "./components/Library";
 import { Sheet } from "./components/Sheet";
+import { Stats } from "./components/Stats";
 import { StatusBar } from "./components/StatusBar";
 import { initialState, reducer, StoreContext, type PendingImport, type Store } from "./store";
 import { useThemeAndClan } from "./theme";
@@ -51,7 +52,7 @@ export function App({ storage, rng = d10, ...libraryOptions }: AppProps) {
         <main>
           {!ready ? <div className="empty"><p className="muted">Ouverture du carnet…</p></div>
             : !c ? <Library />
-              : ui.view === "sheet" ? <Sheet /> : <Aid />}
+              : ui.view === "sheet" ? <Sheet /> : ui.view === "stats" ? <Stats /> : <Aid />}
         </main>
         <p className="note">
           Règles de référence : L5R 4e édition (Roll &amp; Keep). Les jets explosent sur 10 (dégâts : sur 9 et 10 avec une compétence martiale au rang 7), les augmentations ajoutent +5 au ND

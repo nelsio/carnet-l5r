@@ -52,6 +52,8 @@ Par défaut, l'aide de jeu ne lance pas les dés : elle donne la réserve (par e
 
 Pour lancer dans l'outil, appuie sur le bouton **Lanceur de dés** de l'en-tête (l'icône de dé sur mobile) : le bouton « Lancer », les résultats et l'historique apparaissent dans toutes les situations. Le choix est mémorisé.
 
+La page **Statistiques**, à côté de **Fiche** et **Aide de jeu** (dans la barre du bas sur mobile), donne la réserve, le minimum, la moyenne, le maximum et les chances de réussite de tous tes jets.
+
 Les tuiles **ND armure** et **Réduction** de la barre d'état ouvrent l'éditeur d'armure. Les boutons « i » de l'aide de jeu affichent ou masquent le détail des postures, des dépenses de Vide et du déplacement.
 
 ## Techniques d'école

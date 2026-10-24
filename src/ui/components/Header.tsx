@@ -37,6 +37,7 @@ export function Header() {
           <div className="tabs" role="group" aria-label="Vue">
             <button type="button" aria-pressed={ui.view === "sheet"} onClick={() => dispatch({ type: "view", view: "sheet" })}>Fiche</button>
             <button type="button" aria-pressed={ui.view === "aid"} onClick={() => dispatch({ type: "view", view: "aid" })}>Aide de jeu</button>
+            <button type="button" aria-pressed={ui.view === "stats"} onClick={() => dispatch({ type: "view", view: "stats" })}>Statistiques</button>
           </div>
         )}
       </div>
