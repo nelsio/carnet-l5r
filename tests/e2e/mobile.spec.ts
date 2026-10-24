@@ -91,6 +91,8 @@ test("M1 : aucune vue ne défile horizontalement", async ({ page }) => {
   await noHorizontalScroll(page, "Bibliothèque, confirmation de suppression");
   await page.getByRole("button", { name: "Annuler" }).click();
   await page.getByRole("button", { name: /^Ouvrir / }).click();
+  // La fiche doit être rouverte avant l'import : sinon le fichier part dans le champ de la Bibliothèque, qui disparaît.
+  await expect(page.getByRole("button", { name: "Exporter la fiche" })).toBeVisible();
   const patch = { schemaVersion: 1, traits: { agility: 4 }, skills: [{ name: "Kyujutsu", rank: 1, trait: "reflexes", emphases: [] }], notes: "x".repeat(400), foo: 1 };
   await page.getByLabel("Fichier JSON à importer").setInputFiles({ name: "fusion-avec-un-nom-de-fichier-tres-long.json", mimeType: "application/json", buffer: Buffer.from(JSON.stringify(patch)) });
   await expect(page.getByRole("dialog")).toBeVisible();
