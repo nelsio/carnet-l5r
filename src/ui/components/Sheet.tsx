@@ -9,6 +9,7 @@ import { RINGS, TRAIT_LABELS, type RingKey } from "../../rules/l5r4e";
 import { decimal } from "../format";
 import { poolLabel } from "../rolls";
 import { useCharacter, useStore, type BlockId, type ListKey } from "../store";
+import { ArmorCatalogSelect, ArmorEffect } from "./ArmorCatalog";
 import { FileActions } from "./FileActions";
 import { Modifiers } from "./Modifiers";
 import { ListField, NumberField, TextListField } from "./fields";
@@ -165,6 +166,7 @@ function Identity() {
         <Field label="Statut">{num(["status"], c.status, 0, 10, 0.1)}</Field>
         <Field label="XP total">{num(["xp", "total"], c.xp.total, 0)}</Field>
         <Field label="XP dépensée">{num(["xp", "spent"], c.xp.spent, 0)}</Field>
+        <ArmorCatalogSelect />
         <Field label="Armure">{text(["armor", "name"], c.armor.name)}</Field>
         <Field label="Bonus d'armure (ND)">{num(["armor", "bonus"], c.armor.bonus, 0)}</Field>
         <Field label="Réduction de dégâts">{num(["armor", "reduction"], c.armor.reduction, 0)}</Field>
@@ -182,6 +184,7 @@ function Identity() {
       <div>
         <span className="label">Armure</span>
         <b style={{ fontSize: 15 }}>{c.armor.name || "—"} <span className="muted">ND +{c.armor.bonus} · réd. {c.armor.reduction}</span></b>
+        <span className="muted" style={{ fontSize: 12 }}><ArmorEffect /></span>
       </div>
       <div><span className="label">Initiative</span><b data-testid="sheet-initiative">{poolLabel(init)}</b></div>
     </div>

@@ -1,12 +1,12 @@
 /** Techniques d'école : moteur d'effets du catalogue bushi (HANDOFF annexe C.4). */
-import { DEFAULT_MANEUVERS, DUEL_FOCUS, GUARD, type RingKey, type Stance } from "../rules/l5r4e";
+import { DEFAULT_MANEUVERS, DUEL_FOCUS, GUARD, MEDITATION_VOID_POINTS, type RingKey, type Stance, type Terrain } from "../rules/l5r4e";
 import { isSocialSkill } from "./modifiers";
 import {
-  BUGEI_SKILLS, EMPHASIS_ALIASES, SCHOOLS, WEAPON_CATALOG,
-  type CatalogWeapon, type Effect, type On, type ReminderContext, type School, type SchoolRank, type Value, type When,
+  BUGEI_SKILLS, EMPHASIS_ALIASES, MASTERIES, SCHOOLS, WEAPON_CATALOG,
+  type CatalogWeapon, type Effect, type Mastery, type On, type ReminderContext, type School, type SchoolRank, type Value, type When,
 } from "../rules/ecoles";
 import { findSkill, isRanged, normalize, rings, sameSkill, traitValue, type PoolAction, type WeaponLike } from "./engine";
-import { WEAPON_KEYWORDS, type Character, type Maneuver, type TraitKey, type WeaponKeyword } from "./schema";
+import { WEAPON_KEYWORDS, type Character, type Maneuver, type Skill, type TraitKey, type WeaponKeyword } from "./schema";
 
 /** Situation du personnage au moment du jet. */
 export interface SchoolContext {
@@ -29,6 +29,8 @@ export type ActiveEffect = Effect & {
   rank: number;
   technique: string;
   summary: string;
+  /** Maîtrise de compétence : nom de la compétence de la fiche (badge « Maîtrise » du lanceur). */
+  mastery?: string;
 };
 
 export type Verdict = "success" | "failure" | "baseSuccess";
@@ -92,7 +94,13 @@ export function suggestSchool(c: Character): School | undefined {
     ?? (candidates.length === 1 ? candidates[0] : undefined);
 }
 
+/** Effets des techniques d'école puis des maîtrises de compétence (annexe E.4). */
 export function activeEffects(c: Character): ActiveEffect[] {
+  return [...schoolEffects(c), ...masteryEffects(c)];
+}
+
+/** Effets des rangs d'école atteints. */
+export function schoolEffects(c: Character): ActiveEffect[] {
   const s = schoolOf(c);
   if (!s) return [];
   const rank = schoolRankOf(c);
@@ -101,6 +109,27 @@ export function activeEffects(c: Character): ActiveEffect[] {
       ...e, key: `${s.id}-${r.rank}-${i}`, source: `${shortSchoolName(s)} R${r.rank}`, rank: r.rank, technique: r.name, summary: r.summary,
     })),
   );
+}
+
+/** Maîtrises atteintes par une compétence de la fiche, dans l'ordre du catalogue. */
+export function skillMasteries(skill: Skill): Mastery[] {
+  return MASTERIES.filter((m) => skill.rank >= m.rank && (m.skill === "*" || skillIs(skill.name, m.skill)));
+}
+
+/**
+ * Effets des maîtrises de chaque compétence de la fiche, selon son rang (et non selon l'école) :
+ * source « Kenjutsu 3 », `mastery` = nom de la compétence ; « own » vise les jets de cette compétence.
+ */
+export function masteryEffects(c: Character): ActiveEffect[] {
+  return c.skills.flatMap((s) => skillMasteries(s).flatMap((m) =>
+    m.effects.map((e, i) => {
+      const effect = (e.kind === "roll" ? { ...e, on: e.on.map((o) => (o === "own" ? `skill:${s.name}` : o)) } : e) as Effect;
+      return {
+        ...effect, key: `maitrise-${normalize(s.name)}-${m.rank}-${i}`, source: `${s.name} ${m.rank}`, rank: m.rank,
+        technique: `Maîtrise ${s.name} ${m.rank}`, summary: m.summary, mastery: s.name,
+      };
+    }),
+  ));
 }
 
 const has = (c: Character, kind: Effect["kind"]) => activeEffects(c).some((e) => e.kind === kind);
@@ -194,6 +223,11 @@ export function whenOk(w: When | undefined, c: Character, a: PoolAction | undefi
     if (W.keywordsAny && !(weapon && !unarmed && W.keywordsAny.some((k) => weaponKeywords(c, weapon).has(k)))) return false;
     if (W.melee && (!(weapon || unarmed) || (weapon && isRanged(weapon)))) return false;
     if (W.ranged && !(weapon && isRanged(weapon))) return false;
+    if (W.skill && !(weapon && !unarmed && skillIs(weapon.skill, W.skill))) return false;
+    if (W.names) {
+      const words = weapon ? normalize(weapon.name).split(/[^a-z0-9]+/) : [];
+      if (!W.names.some((n) => words.includes(normalize(n)))) return false;
+    }
   }
   if (w.honorMin !== undefined && c.honor < w.honorMin) return false;
   if (w.emphasis && !(ctx.emphasis && w.emphasis.some((e) => sameEmphasis(e, ctx.emphasis ?? "")))) return false;
@@ -370,6 +404,33 @@ export function duelFocusRule(c: Character): { threshold: number; per: number; s
   return e && e.kind === "duelFocus" ? { threshold: e.threshold, per: e.per, source: e.source } : { ...DUEL_FOCUS };
 }
 
+/** Force de l'arc en plus pour cette arme (maîtrise Kyujutsu 7), avec sa source. */
+export function bowStrengthBonus(c: Character, w: WeaponLike): { value: number; source?: string } {
+  let value = 0;
+  let source: string | undefined;
+  for (const e of activeEffects(c)) {
+    if (e.kind !== "bowStrength" || (e.mastery && !skillIs(w.skill, e.mastery))) continue;
+    value += e.value;
+    source ??= e.source;
+  }
+  return { value, source };
+}
+
+/** Effet qui annule la pénalité de ce terrain (maîtrise Athlétisme 3 ou 5). */
+export function terrainWaiver(c: Character, terrain: Terrain): ActiveEffect | undefined {
+  return activeEffects(c).find((e) => e.kind === "terrain" && e.ignore.includes(terrain));
+}
+
+/** Points de Vide rendus par une méditation réussie : 1, ou plus avec la maîtrise de Méditation (annexe E.6). */
+export function meditationVoidPoints(c: Character): number {
+  return activeEffects(c).reduce((n, e) => (e.kind === "voidRecovery" ? Math.max(n, e.points) : n), MEDITATION_VOID_POINTS);
+}
+
+/** Effet qui lève le malus d'armure lourde pour cette compétence (Hida R1, sauf Discrétion). */
+export function heavyArmorWaiver(c: Character, skill: string | undefined): ActiveEffect | undefined {
+  return activeEffects(c).find((e) => e.kind === "heavyArmor" && !(skill && e.except.some((x) => skillIs(skill, x))));
+}
+
 /** Badge « Attaque : Action simple ». */
 export function isSimpleAttack(c: Character, a: PoolAction, ctx: SchoolContext): boolean {
   return a.kind === "skill" && !!a.attack && activeEffects(c).some((e) => e.kind === "simpleAttack" && whenOk(e.when, c, a, ctx));
@@ -451,6 +512,7 @@ export function describeEffect(e: ActiveEffect, c: Character, input?: number): s
       if (fr || (e.freeRaises !== undefined && e.input)) parts.push(`${fr} augm. gratuite${fr > 1 ? "s" : ""}`);
       if (tn) parts.push(`ND ${signed(tn)}`);
       if (e.unlimitedRaises) parts.push("augmentations non limitées");
+      if (e.explodeOn) parts.push(`explose sur ${e.explodeOn}`);
       break;
     }
     case "voidBoost":

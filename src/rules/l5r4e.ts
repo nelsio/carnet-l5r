@@ -89,14 +89,40 @@ export const POOL_BONUS = {
   voidPoint: { rolled: 1, kept: 1 },
 } as const;
 
-/**
- * Maîtrise des compétences martiales (livre p. 143-144, annexe E.2 C1) :
- * Kenjutsu et Armes lourdes au rang 7, les dés de dégâts explosent sur 9 ; Kyujutsu au rang 7, force de l'arc +1.
+/*
+ * Les maîtrises de compétence (explosion sur 9, force de l'arc, dés de dégâts…) vivent dans le catalogue
+ * `maitrises.json` (annexe E.4).
  */
-export const MASTERY = {
-  explodeOn9: { skills: ["Kenjutsu", "Armes lourdes"], rank: 7 },
-  bowStrength: { skill: "Kyujutsu", rank: 7, bonus: 1 },
-} as const;
+
+/**
+ * Catalogue d'armures (annexe E.5). `bonusMounted` : bonus au ND à cheval ; `heavy` : malus d'armure lourde
+ * (+5 au ND des jets d'Agilité et de Réflexes), toujours ou seulement à pied ; `tnSkills` : +5 au ND de ces compétences.
+ */
+export interface CatalogArmor {
+  id: string; name: string; bonus: number; reduction: number;
+  bonusMounted?: number; heavy?: "always" | "onFoot"; tnSkills?: string[];
+  /** Effet en une ligne, affiché sous l'éditeur d'armure. */
+  summary?: string;
+}
+export const ARMOR_CATALOG: readonly CatalogArmor[] = [
+  { id: "none", name: "Aucune", bonus: 0, reduction: 0 },
+  { id: "ashigaru", name: "Armure d'ashigaru", bonus: 3, reduction: 1 },
+  {
+    id: "light", name: "Armure légère", bonus: 5, reduction: 3, tnSkills: ["Athlétisme", "Furtivité"],
+    summary: "+5 au ND des jets d'Athlétisme et de Discrétion.",
+  },
+  {
+    id: "heavy", name: "Armure lourde", bonus: 10, reduction: 5, heavy: "always",
+    summary: "+5 au ND des jets d'Agilité et de Réflexes.",
+  },
+  {
+    id: "riding", name: "Armure de cavalerie", bonus: 4, bonusMounted: 12, reduction: 4, heavy: "onFoot",
+    summary: "+12 au ND d'armure à cheval ; compte comme lourde : à pied, +5 au ND des jets d'Agilité et de Réflexes.",
+  },
+];
+/** Malus des armures au ND des jets concernés, et traits touchés par l'armure lourde. */
+export const ARMOR_ROLL_TN = 5;
+export const HEAVY_ARMOR_TRAITS: readonly RollTrait[] = ["agility", "reflexes"];
 
 /** Bonus de Défense totale : moitié du jet, arrondie au supérieur (p. 86). */
 export const FULL_DEFENSE_DIVISOR = 2;
@@ -145,6 +171,8 @@ export const GUARD = { selfPenalty: 5, allyBonus: 10 } as const;
 export const DUEL_FOCUS = { threshold: 5, per: 5 } as const;
 /** Évaluation gagnée de 10 ou plus : +1g1 à la Concentration (+2g2 avec Iaijutsu 7, E.4). */
 export const DUEL_ASSESSMENT_WIN = { margin: 10, rolled: 1, kept: 1, masterySkill: "Iaijutsu", masteryRank: 7, masteryRolled: 2, masteryKept: 2 } as const;
+/** Méditation réussie (p. 139) : points de Vide rendus sans maîtrise (2 et 3 avec Méditation 3 et 7, E.4). */
+export const MEDITATION_VOID_POINTS = 1;
 /** Tir sur une cible engagée au corps à corps (p. 84) : −10 au total. */
 export const MELEE_TARGET_PENALTY = 10;
 /** Niveaux de blessure à rappel (p. 84) : Estropié, À terre. */

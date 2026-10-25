@@ -49,6 +49,8 @@ export const ArmorSchema = z.object({
   name: text(80),
   bonus: positiveInt(),
   reduction: positiveInt().default(0),
+  /** Armure du catalogue (annexe E.5) : ses effets s'appliquent ; facultatif, format v2 inchangé. */
+  catalogId: text(40).optional(),
 }, "doit être un objet");
 
 export const SkillSchema = z.object({

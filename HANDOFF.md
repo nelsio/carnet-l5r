@@ -6,7 +6,7 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document.
 
-**État au 24/10/2026 :** version publiée **v2.3.0**, lots 1 à 11 livrés (§11), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) : v2.2.0 (correctifs de règles et retouches d'interface) et v2.3.0 (combat complet) livrées ; v2.4 à v2.7 à implémenter.
+**État au 25/10/2026 :** version publiée **v2.4.0**, lots 1 à 11 livrés (§11), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet) et v2.4.0 (maîtrises et armures) livrées ; v2.5 à v2.7 à implémenter.
 
 **Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie).
 
@@ -46,7 +46,7 @@ carnet-l5r/
 ├─ src/
 │  ├─ core/       # schéma Zod, types, moteur de règles, fusion, migrations (aucune dépendance au DOM)
 │  ├─ rules/      # l5r4e.ts : manœuvres, postures, ND, blessures, clans, catalogue d'actions
-│  │              # ecoles.ts + ecoles-bushi.json (annexe C) + ecoles-courtisans.json (annexe D) : techniques d'école
+│  │              # ecoles.ts + ecoles-bushi.json (annexe C) + ecoles-courtisans.json (annexe D) : techniques d'école ; maitrises.json (annexe E.4) : maîtrises de compétence
 │  ├─ storage/    # LibraryStore : IndexedDB, fichiers, fichier lié
 │  ├─ ui/         # composants React, thème CSS, hooks
 │  └─ main.tsx
@@ -220,7 +220,7 @@ Exemples du livre (tous dans la spec) : 12k4 → 10k5 ; 13k9 → 10k10 +2 ; 10k1
 
 ### 4.8 Maîtrise des compétences martiales
 - Une compétence martiale au **rang 7 ou plus** fait **exploser les dés de dégâts sur 9 et 10** (au lieu de 10 seulement). Les jets d'attaque ne sont pas concernés.
-- S'applique à toutes les compétences martiales (décision P7). La compétence considérée est celle de l'arme (`weapon.skill`) ; Jiujutsu pour les mains nues. Seuil en donnée : `MASTERY.damageExplodeOn9AtRank = 7` dans `src/rules/l5r4e.ts`.
+- S'applique à toutes les compétences martiales (décision P7). La compétence considérée est celle de l'arme (`weapon.skill`) ; Jiujutsu pour les mains nues. **Corrigé en v2.2 (E-b)** : seuls Kenjutsu et Armes lourdes ; depuis la v2.4, la règle est une entrée du catalogue `src/rules/maitrises.json` (`explodeOn: 9`, annexe E.4).
 - `explodeOn` est porté par la réserve et utilisé par `rollDice` et `poolStats` (simulation et cache).
 - Affichage : dans le lanceur, une note en couleur d'accent « Maîtrise Kenjutsu 7 : les dés explosent sur 9 et 10 » ; dans les statistiques, une étiquette « 9+ » à côté du max.
 
@@ -459,7 +459,7 @@ Depuis un fichier (bouton ou glisser-déposer). Trois destinations :
 
 « Terminé » = tests verts, `tsc --noEmit` sans erreur, lint propre, CI verte.
 
-État en v2.3.0 : **393 tests Vitest** (moteur, stockage, interface) et **56 tests Playwright** (chromium, iPhone 13, Pixel 7), lignes de `src/core` couvertes à 100 %.
+État en v2.4.0 : **425 tests Vitest** (moteur, stockage, interface) et **56 tests Playwright** (chromium, iPhone 13, Pixel 7), lignes de `src/core` couvertes à 100 %.
 
 ### 10.1 Moteur (`tests/core.rules.spec.ts`) — fourni, 80 tests
 - C'est la **spécification exécutable** du moteur. Elle a été validée contre une implémentation de référence : 80 tests sur 80 passent (v1.1 : règle des dix dés du livre, maîtrise 7+).
@@ -560,7 +560,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 11. **v2.1 — techniques des courtisans et de Shosuro** : même moteur, nouvelles entrées de catalogue (compétences sociales, Connaissance, conditions d'Honneur, spécialisations). Annexe D (validée le 24/10/2026) : catalogue `src/rules/ecoles-courtisans.json` (12 écoles), situation Cour, spécialisation choisie au lanceur → cas T25 à T42, E20 à E23 ; tag `v2.1.0`. Aucun changement de format de fiche (`schemaVersion` reste 2).
    - **v2.1.1** (patch) : carte « Nouveau round » entre l'Initiative et la Posture, avec une description de deux lignes au plus sur mobile (§6.2, M12) ; test du fichier lié rendu robuste (lecture du fichier avant sa première écriture).
    - **v2.1.2** (patch) : Statistiques devient une vue à part (en-tête sur bureau, barre du bas sur mobile) ; les 4 onglets de situation tiennent sur une ligne à 360 px (§7, M13).
-12. **v2.2 à v2.7 — règles du livre, combat complet, ergonomie** : annexe E (validée le 24/10/2026). Six versions : correctifs de règles et retouches d'interface (v2.2.0, **livrée**, tag `v2.2.0`, écarts en E.12), combat complet (v2.3.0, **livrée**, tag `v2.3.0`, écarts en E.13), maîtrises et armures (v2.4.0), récupération (v2.5.0), vocabulaire français (v2.6.0), bataille de masse (v2.7.0) → cas L1 à L27, E24 à E28.
+12. **v2.2 à v2.7 — règles du livre, combat complet, ergonomie** : annexe E (validée le 24/10/2026). Six versions : correctifs de règles et retouches d'interface (v2.2.0, **livrée**, tag `v2.2.0`, écarts en E.12), combat complet (v2.3.0, **livrée**, tag `v2.3.0`, écarts en E.13), maîtrises et armures (v2.4.0, **livrée**, tag `v2.4.0`, écarts en E.14), récupération (v2.5.0), vocabulaire français (v2.6.0), bataille de masse (v2.7.0) → cas L1 à L27, E24 à E28.
 13. **À définir** : voies alternatives et écoles avancées (exclues en D-a), shugenja et sorts (hors périmètre, §1), compteurs « N fois par séance » (D-g).
 
 ---
@@ -1143,3 +1143,14 @@ Interface et mobile :
 - **Opposition** (F7) : sans augmentation, un total égal donne « Égalité » ; avec N augmentations, il faut au moins 5 × N d'écart.
 - **Augmentations gratuites → ND** (F8) : toutes les augmentations gratuites du jet (saisies et techniques) sont converties ; elles ne comptent plus au résultat.
 - **Garde de Daidoji R2** : le « round de plus » est affiché ; la case reste cochée tant que tu ne la décoches pas (« Nouveau round » ne la touche pas).
+
+### E.14 Écarts de mise en œuvre (v2.4.0)
+- **Maîtrises = effets d'école** : `activeEffects(c)` renvoie les effets de l'école puis ceux des maîtrises (`masteryEffects`), avec `source` « Kenjutsu 3 » et `mastery` (nom de la compétence de la fiche). Tout le moteur existant (réserves, ND d'armure, manœuvres, rappels, cases à cocher) les lit sans cas particulier. Dans `on`, « own » désigne les jets de la compétence maîtrisée (maîtrise 10 de toute compétence).
+- **Extensions du format d'effet** : `roll.explodeOn` (Kenjutsu et Armes lourdes 7, remplace `MASTERY.explodeOn9`) ; `bowStrength` (Kyujutsu 7, remplace `MASTERY.bowStrength`) ; `terrain` (Athlétisme 3 et 5) ; `voidRecovery` (Méditation 3 et 7, lu par `meditationVoidPoints`, prêt pour la v2.5) ; `heavyArmor` (Hida R1, ajouté à `src/rules/ecoles-bushi.json`, `reference/` inchangé) ; `When.weapon.skill` (compétence de l'arme) et `When.weapon.names` (sai, jitte).
+- **Iaijutsu 7 et Équitation 3** : entrées du catalogue sans effet, pour mémoire ; leurs règles restent portées par `DUEL_ASSESSMENT_WIN` et `MOUNTED_ASSAULT_RIDING` (v2.3).
+- **Armes ninja** (Ninjutsu 3 et 7) : reconnues à la compétence de l'arme (Ninjutsu), comme les épées (Kenjutsu).
+- **Désarmement** : les dégâts d'un Désarmement réussi (2g1) ne reçoivent plus aucun effet de jet, ni de maîtrise ni de technique (E.12 : « ni dés en plus »).
+- **Armures** : `ARMOR_CATALOG` dans `src/rules/l5r4e.ts` (pas de fichier JSON, cinq lignes). Les effets ne suivent que `armor.catalogId` : une armure saisie à la main, même nommée « Armure lourde », n'en a pas. Le malus d'armure lourde vaut pour tous les jets de compétence et de trait sur Agilité ou Réflexes, **attaques comprises**, pas pour l'Initiative ni les dégâts ; il s'affiche au ND final (« + 5 armure ») et en note du lanceur (jets en opposition compris). Cavalerie : l'écart à cheval (+8) s'ajoute au bonus saisi. « Personnalisée » retire `catalogId` et garde les valeurs.
+- **Panneau des rappels** : « Rappels d'école », « Rappels de maîtrise » ou « Rappels » selon ce qu'il contient.
+- **L22** (fiche d'exemple) : inchangé, aucune compétence de la fiche n'atteint un rang de maîtrise.
+- **Tests** : `tests/core.masteries.spec.ts` (maîtrises, L1 à L4, L8, L9, armures) et `tests/ui/masteries.spec.tsx` (badge, rappels, terrain, armure du livre). L1 et E11 passent à 6g2 avec Kenjutsu 3 ou 7.
