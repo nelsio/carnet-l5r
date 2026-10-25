@@ -1,15 +1,15 @@
 import { useState, type ReactNode } from "react";
 import {
-  activeEffects, attackTrait, catalogGap, catalogWeapon, dailyHealing, reminderText, computePool, defaultModifiers, isRanged, parseDR, parseWeaponKeywords, rings, ROLL_TRAITS, schoolOf,
-  schoolRankOf, schoolsByClan, suggestSchool, techniqueCategories, vocabularyChanges, weaponKeywords,
-  type Character, type PoolAction, type RollTrait, type TraitKey, type VocabularyChange,
+  activeEffects, armorSheet, attackTrait, catalogGap, catalogWeapon, dailyHealing, reminderText, computePool, defaultModifiers, isRanged, parseDR, parseWeaponKeywords, rings, ROLL_TRAITS, schoolOf,
+  findSchool, schoolRankOf, schoolsByClan, suggestSchool, techniqueCategories, vocabularyChanges, weaponKeywords,
+  type ArmorPart, type Character, type PoolAction, type RollTrait, type TraitKey, type VocabularyChange,
 } from "@carnet/core";
 import { WEAPON_KEYWORD_LABELS } from "../../rules/ecoles";
 import { RINGS, TRAIT_LABELS, type RingKey } from "../../rules/l5r4e";
 import { decimal } from "../format";
 import { poolLabel } from "../rolls";
 import { useCharacter, useStore, type BlockId, type ListKey } from "../store";
-import { ArmorCatalogSelect, ArmorEffect } from "./ArmorCatalog";
+import { ArmorFields } from "./ArmorCatalog";
 import { FileActions } from "./FileActions";
 import { Modifiers } from "./Modifiers";
 import { ListField, NumberField, TextListField } from "./fields";
@@ -52,6 +52,7 @@ export function Sheet() {
         <Block id="skills" title="Compétences"><Skills /></Block>
         <div className="grid">
           <Block id="weapons" title="Armes"><Weapons /></Block>
+          <Block id="armor" title="Armure"><Armor /></Block>
           <Block id="techniques" title="Techniques d'école"><Techniques /></Block>
           <Block id="modifiers" title="Bonus de jet"><Modifiers /></Block>
         </div>
@@ -147,7 +148,7 @@ function Identity() {
         <Field label="Famille">{text(["family"], c.family)}</Field>
         <Field label="École (nom affiché)">{text(["school"], c.school, { maxLength: 120 })}</Field>
         <Field label="Techniques d'école">
-          <select className="in" value={c.schoolId ?? ""} onChange={(e) => set(["schoolId"], e.target.value)}>
+          <select className="in" value={c.schoolId ?? ""} onChange={(e) => chooseSchool(set, e.target.value)}>
             <option value="">— Aucune (techniques libres)</option>
             {schoolsByClan().map((g) => (
               <optgroup key={g.clan} label={g.clan}>
@@ -168,10 +169,6 @@ function Identity() {
         <Field label="Statut">{num(["status"], c.status, 0, 10, 0.1)}</Field>
         <Field label="XP total">{num(["xp", "total"], c.xp.total, 0)}</Field>
         <Field label="XP dépensée">{num(["xp", "spent"], c.xp.spent, 0)}</Field>
-        <ArmorCatalogSelect />
-        <Field label="Armure">{text(["armor", "name"], c.armor.name)}</Field>
-        <Field label="Bonus d'armure (ND)">{num(["armor", "bonus"], c.armor.bonus, 0)}</Field>
-        <Field label="Réduction de dégâts">{num(["armor", "reduction"], c.armor.reduction, 0)}</Field>
         <div style={{ gridColumn: "1/-1" }}><DeleteCharacter /></div>
       </div>
     );
@@ -183,12 +180,68 @@ function Identity() {
       <div><span className="label">Gloire</span><b>{decimal(c.glory)}</b></div>
       <div><span className="label">Statut</span><b>{decimal(c.status)}</b></div>
       <div><span className="label">XP libre</span><b>{c.xp.total - c.xp.spent}</b></div>
-      <div>
-        <span className="label">Armure</span>
-        <b style={{ fontSize: 15 }}>{c.armor.name || "—"} <span className="muted">ND +{c.armor.bonus} · réd. {c.armor.reduction}</span></b>
-        <span className="muted" style={{ fontSize: 12 }}><ArmorEffect /></span>
-      </div>
       <div><span className="label">Initiative</span><b data-testid="sheet-initiative">{poolLabel(init)}</b></div>
+    </div>
+  );
+}
+
+/**
+ * Choix des techniques d'école : remplit aussi « École (nom affiché) » avec le nom du catalogue, modifiable ensuite ;
+ * « — Aucune » garde le nom saisi (annexe E.19 S9).
+ */
+function chooseSchool(set: Setter, id: string) {
+  set(["schoolId"], id);
+  const school = findSchool(id);
+  if (school) set(["school"], school.name);
+}
+
+/** Bloc « Armure » (annexe E.18) : ND détaillé en posture Attaque, Réduction, règle spéciale ; liste du livre en édition. */
+function Armor() {
+  const { c, edit } = useSheet("armor");
+  if (edit) {
+    return (
+      <div className="armform">
+        <ArmorFields />
+        <p className="hint" style={{ gridColumn: "1/-1", margin: 0 }}>
+          Choisir une armure du livre remplit nom, bonus et Réduction. Modifier ensuite le bonus ou la Réduction en fait une armure personnalisée.
+        </p>
+      </div>
+    );
+  }
+  const a = armorSheet(c);
+  const plus = (parts: ArmorPart[]) => parts.map((p) => ` + ${p.value} ${p.source}`).join("");
+  const rule = a.catalog?.summary;
+  return (
+    <div className="armblock" data-testid="armor-block">
+      <div className="armname">
+        <b>{c.armor.name || "Sans armure"}</b>{" "}
+        <span className="tag">{a.catalog ? "armure du livre" : "armure personnalisée"}</span>
+      </div>
+      <div className="armstats">
+        <div>
+          <span className="label">ND d'armure</span>
+          <b data-testid="armor-block-tn">{a.tn.total}</b>
+          <span className="muted">
+            5 × Réflexes {a.tn.reflexes} + 5 + armure {a.tn.armor}{plus(a.tn.auto)} = {a.tn.total}
+            {a.tn.mounted !== undefined && <> ; à cheval {a.tn.mounted}</>}
+          </span>
+        </div>
+        <div>
+          <span className="label">Réduction</span>
+          <b data-testid="armor-block-reduction">{a.reduction.total}</b>
+          <span className="muted">
+            armure {a.reduction.armor}{plus(a.reduction.parts)}{a.reduction.parts.length ? ` = ${a.reduction.total}` : ""}
+          </span>
+        </div>
+      </div>
+      {rule && (
+        <p className="armrule" data-testid="armor-rule">
+          <b>Règle spéciale :</b> {rule}
+          {a.waiver && <> {a.waiver.source} : ignorée{a.waiver.except.length ? ` sauf ${a.waiver.except.join(", ")}` : ""}.</>}
+        </p>
+      )}
+      {a.optional.length > 0 && <p className="hint">À cocher en combat (panneau Posture) : {a.optional.join(" ; ")}.</p>}
+      <p className="hint" style={{ margin: 0 }}>Posture de référence : Attaque.</p>
     </div>
   );
 }
@@ -409,7 +462,7 @@ function SchoolTechniques() {
         {suggestion && (
           <div className="suggest" role="group" aria-label="Suggestion d'école">
             <span>Associer à <b>{suggestion.name}</b> ?</span>
-            <button type="button" className="btn sm" onClick={() => set(["schoolId"], suggestion.id)}>Associer</button>
+            <button type="button" className="btn sm" onClick={() => chooseSchool(set, suggestion.id)}>Associer</button>
           </div>
         )}
         {edit && <p className="hint" style={{ marginTop: 0 }}>Choisis une école dans « Techniques d'école » (bloc Identité, bouton « Edit ») pour ajouter ses techniques automatiquement.</p>}

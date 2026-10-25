@@ -5,6 +5,7 @@ import type { Character } from "@carnet/core";
 import { memoryStorage, type LibraryEntry, type Storage } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
+import { clickWounds } from "../helpers/wounds";
 
 const base = () => structuredClone(kakita) as Character;
 const entry = (id: string, patch: Partial<LibraryEntry> = {}): LibraryEntry => ({
@@ -75,7 +76,7 @@ describe("Sauvegarde automatique", () => {
     const s = memoryStorage();
     await s.library.put(entry("a"));
     await mount(s);
-    click("Ajouter 1 blessure");
+    clickWounds("Ajouter 1 blessure");
     click("Point de Vide 2");
     await waitFor(async () => expect((await s.library.get("a"))?.character).toMatchObject({ wounds: 1, voidPoints: 1 }), { timeout: 1500 });
   });
@@ -87,7 +88,7 @@ describe("Sauvegarde automatique", () => {
     const err = console.error;
     console.error = () => {};
     await mount(s);
-    click("Ajouter 1 blessure");
+    clickWounds("Ajouter 1 blessure");
     expect(await screen.findByText(/Échec de l'enregistrement/, {}, { timeout: 1500 })).toBeInTheDocument();
     console.error = err;
   });
@@ -217,7 +218,7 @@ describe("Onglet masqué", () => {
     const s = memoryStorage();
     await s.library.put(entry("a"));
     await mount(s);
-    click("Ajouter 1 blessure");
+    clickWounds("Ajouter 1 blessure");
     Object.defineProperty(document, "visibilityState", { configurable: true, value: "hidden" });
     fireEvent(document, new Event("visibilitychange"));
     await waitFor(async () => expect((await s.library.get("a"))?.character.wounds).toBe(1), { timeout: 200 });
@@ -229,7 +230,7 @@ describe("Onglet masqué", () => {
     const s = memoryStorage();
     await s.library.put(entry("a"));
     await mount(s);
-    click("Ajouter 1 blessure");
+    clickWounds("Ajouter 1 blessure");
     fireEvent(window, new Event("pagehide"));
     await waitFor(async () => expect((await s.library.get("a"))?.character.wounds).toBe(1), { timeout: 200 });
   });

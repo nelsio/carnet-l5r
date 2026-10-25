@@ -18,38 +18,25 @@ const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("butto
 const roller = () => within(screen.getByRole("dialog", { name: "Lanceur de dés" }));
 const woundSummary = () => screen.getByRole("button", { name: /pénalité|Indemne/ });
 
-describe("Multiplicateur de blessures (préférence)", () => {
-  it("le bouton d'en-tête passe de × 2 à × 3 : maximum 52 blessures au lieu de 38 (Terre 2, L25)", async () => {
-    await renderApp();
+describe("Multiplicateur de blessures masqué (annexe E.19 S6)", () => {
+  it("E31 : multiplicateur enregistré à × 3 : pas de bouton goutte ; seuils de blessures à × 2", async () => {
+    const storage = memoryStorage();
+    await storage.prefs.set({ woundMultiplier: 3 });
+    await renderApp(base(), "edit", storage);
+    expect(screen.queryByRole("button", { name: /Blessures : Terre/ })).toBeNull();
     expect(woundSummary()).toHaveTextContent("0 / 38");
-    click("Blessures : Terre × 2");
-    expect(woundSummary()).toHaveTextContent("0 / 52");
-    click("Blessures : Terre × 3");
-    click("Blessures : Terre × 4");
-    click("Blessures : Terre × 5");
-    expect(screen.getByRole("button", { name: "Blessures : Terre × 2" })).toBeInTheDocument();
-  });
-
-  it("le détail des blessures suit le multiplicateur : Égratigné 11–16 en × 3", async () => {
-    await renderApp();
-    click("Blessures : Terre × 2");
     fireEvent.click(woundSummary());
     const rows = within(screen.getByTestId("wound-detail")).getAllByRole("listitem");
-    expect(rows[1]).toHaveTextContent("Égratigné11–16");
+    expect(rows[1]).toHaveTextContent("Égratigné11–14");
   });
 
-  it("mémorisé dans les préférences", async () => {
-    const { storage } = await renderApp();
-    click("Blessures : Terre × 2");
-    await waitFor(async () => expect((await storage.prefs.get()).woundMultiplier).toBe(3));
-  });
-
-  it("repris des préférences au démarrage", async () => {
+  it("la préférence enregistrée est gardée pour le retour du bouton", async () => {
     const storage = memoryStorage();
     await storage.prefs.set({ woundMultiplier: 4 });
     await renderApp(base(), "edit", storage);
-    expect(screen.getByRole("button", { name: "Blessures : Terre × 4" })).toBeInTheDocument();
-    expect(woundSummary()).toHaveTextContent("0 / 66");
+    click("Thème : auto");
+    await waitFor(async () => expect((await storage.prefs.get()).theme).toBe("light"));
+    expect((await storage.prefs.get()).woundMultiplier).toBe(4);
   });
 });
 

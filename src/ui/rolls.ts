@@ -5,7 +5,7 @@ import {
   type ActionDef, type ActiveEffect, type Character, type Maneuver, type Modifier, type Pool, type PoolAction, type SchoolContext,
   rollStance, type CombatSub, type Situation, type Stance,
 } from "@carnet/core";
-import { CALLED_ZONES, KNOCKDOWN_QUADRUPED_COST, TN_PER_RAISE, type CalledZone } from "../rules/l5r4e";
+import { CALLED_ZONES, KNOCKDOWN_QUADRUPED_COST, shownWoundMultiplier, TN_PER_RAISE, type CalledZone } from "../rules/l5r4e";
 
 export interface RollOptions {
   /** ND de base choisi dans l'échelle. */
@@ -131,7 +131,7 @@ export function uiRollStance(ui: { stance: Stance; situation?: Situation; sub?: 
 export function contextOf(
   ui: Pick<CombatUi, "stance" | "mounted" | "centerLastRound"> & { situation?: Situation; sub?: CombatSub; woundMultiplier?: number },
 ): SchoolContext {
-  return schoolContext({ stance: uiRollStance(ui), mounted: ui.mounted, centerLastRound: ui.centerLastRound, woundMultiplier: ui.woundMultiplier });
+  return schoolContext({ stance: uiRollStance(ui), mounted: ui.mounted, centerLastRound: ui.centerLastRound, woundMultiplier: ui.woundMultiplier && shownWoundMultiplier(ui.woundMultiplier) });
 }
 
 /** ND d'armure du personnage : posture, Vide, bonus de jet et techniques d'école. */

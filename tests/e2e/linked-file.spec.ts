@@ -4,6 +4,7 @@
  * un vrai FileSystemFileHandle (écriture, date de modification, rangement dans IndexedDB).
  */
 import { expect, test, type Page } from "@playwright/test";
+import { woundsButton } from "./wounds";
 
 const url = "http://localhost:4173/carnet-l5r.html";
 
@@ -59,18 +60,18 @@ test("lier, écrire à chaque modification, survivre au rechargement, conflit, d
   await expect(page.getByText(`Lié à ${file}`)).toBeVisible();
   await expect.poll(async () => (await readFile(page, file))?.name).toBe("Shiba Tetsu");
 
-  await page.getByRole("button", { name: "Ajouter 1 blessure" }).click();
+  await (await woundsButton(page, "Ajouter 1 blessure")).click();
   await expect.poll(async () => (await readFile(page, file))?.wounds).toBe(1);
 
   // La poignée survit au rechargement (rangée dans IndexedDB).
   await page.reload();
   await expect(page.getByText(`Lié à ${file}`)).toBeVisible();
-  await page.getByRole("button", { name: "Ajouter 1 blessure" }).click();
+  await (await woundsButton(page, "Ajouter 1 blessure")).click();
   await expect.poll(async () => (await readFile(page, file))?.wounds).toBe(2);
 
   // Modification par un autre programme : conflit, rien n'est écrit.
   await writeElsewhere(page, file, { honor: 9 });
-  await page.getByRole("button", { name: "Ajouter 1 blessure" }).click();
+  await (await woundsButton(page, "Ajouter 1 blessure")).click();
   const banner = page.getByRole("alert").filter({ hasText: "Le fichier a été modifié ailleurs" });
   await expect(banner).toBeVisible();
   expect(await readFile(page, file)).toMatchObject({ wounds: 2, honor: 9 });
@@ -83,7 +84,7 @@ test("lier, écrire à chaque modification, survivre au rechargement, conflit, d
   // Délier : le fichier n'est plus touché.
   await page.getByRole("button", { name: "Délier" }).click();
   await expect(page.getByRole("button", { name: "Lier à un fichier…" })).toBeVisible();
-  await page.getByRole("button", { name: "Ajouter 1 blessure" }).click();
+  await (await woundsButton(page, "Ajouter 1 blessure")).click();
   await expect(page.getByText(/Enregistré dans ce navigateur/)).toBeVisible();
   await page.waitForTimeout(700);
   expect((await readFile(page, file))?.wounds).toBe(3);
@@ -99,7 +100,7 @@ test("conflit résolu en chargeant la version du fichier", async ({ page }) => {
   await expect.poll(async () => (await readFile(page, file))?.wounds).toBe(0);
 
   await writeElsewhere(page, file, { name: "Version du Drive", honor: 5 });
-  await page.getByRole("button", { name: "Ajouter 1 blessure" }).click();
+  await (await woundsButton(page, "Ajouter 1 blessure")).click();
   const banner = page.getByRole("alert").filter({ hasText: "Le fichier a été modifié ailleurs" });
   await banner.getByRole("button", { name: "Charger la version du fichier" }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Version du Drive" })).toBeVisible();

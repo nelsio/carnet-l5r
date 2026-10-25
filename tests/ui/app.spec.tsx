@@ -4,6 +4,7 @@ import type { Character } from "@carnet/core";
 import { memoryStorage, type LibraryEntry } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
+import { clickWounds, woundsField } from "../helpers/wounds";
 
 const base = () => structuredClone(kakita) as Character;
 const always = (v: number) => () => v;
@@ -55,11 +56,11 @@ describe("Socle", () => {
 });
 
 describe("Fiche", () => {
-  it("affiche l'en-tête : clan, nom, famille, école et Rang", async () => {
+  it("affiche l'en-tête : clan, nom, école affichée et rang d'école (E.19 S8)", async () => {
     await renderApp();
     expect(screen.getByText("Clan de la Grue")).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 1, name: "Kakita Haruto" })).toBeInTheDocument();
-    expect(screen.getByText("Kakita · École de duellistes Kakita · Rang 1")).toBeInTheDocument();
+    expect(screen.getByText("École de duellistes Kakita · Rang 1")).toBeInTheDocument();
   });
 
   it("U2 : modifier un trait met à jour les réserves des compétences liées", async () => {
@@ -122,11 +123,11 @@ describe("Fiche", () => {
   it("barre d'état : blessures, pénalité et points de Vide", async () => {
     await renderApp();
     expect(screen.getByTestId("armor-tn")).toHaveTextContent("20");
-    fireEvent.change(screen.getByRole("spinbutton", { name: "Blessures subies" }), { target: { value: "11" } });
+    fireEvent.change(woundsField(), { target: { value: "11" } });
     expect(screen.getByRole("button", { name: /Égratigné/ })).toHaveAttribute("aria-expanded", "false");
     expect(screen.getByText("+3", { selector: ".pen b" })).toBeInTheDocument();
-    click("Retirer 1 blessure");
-    expect(screen.getByRole("spinbutton", { name: "Blessures subies" })).toHaveValue(10);
+    clickWounds("Retirer 1 blessure");
+    expect(woundsField()).toHaveValue(10);
     expect(screen.getByText("Points de Vide 2/2")).toBeInTheDocument();
     click("Point de Vide 2");
     expect(screen.getByText("Points de Vide 1/2")).toBeInTheDocument();
@@ -279,7 +280,7 @@ describe("Aide de jeu", () => {
     fireEvent.click(screen.getByTestId("armor-tn").closest("button")!);
     const editor = within(screen.getByRole("group", { name: "Armure" }));
     expect(screen.getByTestId("armor-tn").closest("button")).toHaveAttribute("aria-expanded", "true");
-    fireEvent.change(editor.getByRole("textbox", { name: "Armure" }), { target: { value: "Armure légère" } });
+    fireEvent.change(editor.getByRole("textbox", { name: "Nom" }), { target: { value: "Armure légère" } });
     fireEvent.change(editor.getByRole("spinbutton", { name: "Bonus au ND" }), { target: { value: "5" } });
     fireEvent.change(editor.getByRole("spinbutton", { name: "Réduction" }), { target: { value: "3" } });
     expect(screen.getByTestId("armor-tn")).toHaveTextContent("20");

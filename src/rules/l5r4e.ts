@@ -68,6 +68,12 @@ export const WOUND_FIRST_MULTIPLIER = 5;
 export const WOUND_NEXT_MULTIPLIER = 2;
 /** Multiplicateur des niveaux après Indemne, réglage de préférence (p. 86, E-d) : × 2 par défaut, × 3 à × 5 en option. */
 export const WOUND_MULTIPLIERS = [2, 3, 4, 5] as const;
+/** Bouton du multiplicateur masqué pour le moment (annexe E.19 S6) : l'interface joue à × 2, la préférence reste. */
+export const SHOW_WOUND_MULTIPLIER = false;
+/** Multiplicateur utilisé par l'interface : la préférence si le bouton est affiché, sinon × 2. */
+export function shownWoundMultiplier(n: number): number {
+  return SHOW_WOUND_MULTIPLIER ? n : WOUND_NEXT_MULTIPLIER;
+}
 /** Nouvelle journée (p. 80, 86) : blessures soignées = 2 × Constitution + Rang d'Insight ; Vide plein. */
 export const DAILY_HEALING = { perStamina: 2, perInsight: 1 } as const;
 

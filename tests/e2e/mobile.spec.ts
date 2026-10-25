@@ -2,6 +2,7 @@
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { expect, test, type Locator, type Page } from "@playwright/test";
+import { openWounds, woundsButton, woundsTile } from "./wounds";
 
 const pageUrl = pathToFileURL(resolve("dist/carnet-l5r.html")).href;
 
@@ -115,7 +116,7 @@ test("M2 : la barre de navigation est fixe en bas, sur Fiche, Aide de jeu et Sta
 });
 
 test("M3 (E26) : un appui sur le résumé ouvre le détail, une ligne par niveau sous la barre ; un second le replie", async ({ page }) => {
-  await page.getByRole("button", { name: "Ajouter 1 blessure" }).click();
+  await (await woundsButton(page, "Ajouter 1 blessure")).click();
   const summary = page.locator("button.wsum");
   const track = page.getByLabel("Niveaux de blessure");
   const detail = page.getByTestId("wound-detail");
@@ -196,6 +197,7 @@ test("M7 : en modification, les champs ont une police d'au moins 16 px", async (
 });
 
 test("M8 : cibles tactiles d'au moins 40 × 40 px (−/+, pastilles, onglets)", async ({ page }) => {
+  await openWounds(page);
   const targets = [
     page.getByRole("button", { name: "Retirer 1 blessure" }),
     page.getByRole("button", { name: "Ajouter 1 blessure" }),
@@ -327,13 +329,14 @@ test.describe("M13 à 360 px de large", () => {
 
 test.describe("M11 : en-tête à 360 px de large", () => {
   test.use({ viewport: { width: 360, height: 740 } });
-  test("Bibliothèque, Lanceur de dés, Thème et Blessures en icônes de 40 px sur la ligne du nom, libellés avec l'état", async ({ page }) => {
+  test("Bibliothèque, Lanceur de dés et Thème en icônes de 40 px sur la ligne du nom, libellés avec l'état", async ({ page }) => {
     const buttons = [
       page.getByRole("button", { name: "Bibliothèque" }),
       page.getByRole("button", { name: "Lanceur de dés : affiché" }),
       page.getByRole("button", { name: "Thème : auto" }),
-      page.getByRole("button", { name: "Blessures : Terre × 2" }),
     ];
+    // Multiplicateur de blessures masqué pour le moment : 3 icônes (annexe E.19 S6).
+    await expect(page.locator("header.top .theme-btn")).toHaveCount(3);
     const name = (await page.getByRole("heading", { level: 1 }).boundingBox())!;
     for (const b of buttons) {
       const box = (await b.boundingBox())!;
@@ -408,4 +411,91 @@ test("M15 : bataille de masse, boutons de 40 px, aucun texte tronqué", async ({
 test.describe("M15 à 360 px de large", () => {
   test.use({ viewport: { width: 360, height: 740 } });
   test("bataille de masse, boutons de 40 px, aucun texte tronqué", async ({ page }) => battleFits(page));
+});
+
+/* ---------- v2.8.0 : bloc Armure, tuile Blessures et Vide (annexe E.18, E.19) ---------- */
+
+/** Armure du livre choisie dans le bloc Armure de la fiche. */
+async function wearArmor(page: Page, id: string) {
+  const block = page.getByTestId("block-armor");
+  await block.getByRole("button", { name: "Edit : Armure" }).click();
+  await block.getByRole("combobox", { name: "Armure du livre" }).selectOption(id);
+  await block.getByRole("button", { name: "Terminer : Armure" }).click();
+}
+
+async function setVoidRing(page: Page, n: number) {
+  await page.getByRole("button", { name: "Edit : Anneaux & Traits" }).click();
+  await page.getByRole("spinbutton", { name: "Anneau de Vide" }).fill(String(n));
+  await page.getByRole("button", { name: "Terminer : Anneaux & Traits" }).click();
+}
+
+/** Aucun texte de l'élément ne déborde (pas de « … », pas de coupure invisible). */
+const overflows = (l: Locator) => l.evaluate((root) =>
+  [root, ...root.querySelectorAll("*")].some((e) => e.scrollWidth > e.clientWidth + 0.5 && getComputedStyle(e).overflow !== "visible"));
+
+/** M17 : bloc Vide à droite de la tuile, au plus la moitié de la largeur, pastilles sur une ligne. */
+async function voidFits(page: Page, n: number) {
+  await setVoidRing(page, n);
+  const row = (await page.locator(".status-in").boundingBox())!;
+  const tile = (await woundsTile(page).boundingBox())!;
+  const block = (await page.locator(".vblock").boundingBox())!;
+  expect(block.width, `Vide ${n}`).toBeLessThanOrEqual(row.width / 2 + 0.5);
+  expect(block.x, `Vide ${n} chevauche la tuile`).toBeGreaterThanOrEqual(tile.x + tile.width - 0.5);
+  const pips = await page.getByRole("button", { name: /^Point de Vide/ }).evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().top)));
+  expect(pips).toHaveLength(n);
+  expect(new Set(pips).size, `${n} pastilles sur une ligne`).toBe(1);
+  await expect(page.locator(".vblock .vshort")).toHaveText(new RegExp(`^Vide \\d/${n}$`));
+  await expect(page.locator(".status-in > div > .label").filter({ hasText: /^Blessures$/ })).toHaveCount(0);
+  await noHorizontalScroll(page, `Vide ${n}`);
+}
+
+for (const width of [360, 390]) {
+  test.describe(`M17 à ${width} px de large`, () => {
+    test.use({ viewport: { width, height: 780 } });
+    test("bloc Vide ≤ 50 % à droite de la tuile, Vide 2 puis 6 ; pas de libellé « Blessures »", async ({ page }) => {
+      await voidFits(page, 2);
+      await voidFits(page, 6);
+    });
+  });
+}
+
+test.describe("M18 et M16 à 360 px de large", () => {
+  test.use({ viewport: { width: 360, height: 780 } });
+
+  test("M18 : tuile Blessures, + deux fois, puis 12 dégâts avec armure légère ; Vide 6 : tuile sur 2 lignes", async ({ page }) => {
+    await wearArmor(page, "light");
+    const tile = woundsTile(page);
+    const row = (await page.locator(".status-in").boundingBox())!;
+    const box = (await tile.boundingBox())!;
+    // De la marge gauche jusqu'au bloc Vide.
+    expect(Math.abs(box.x - row.x)).toBeLessThanOrEqual(1);
+    await (await woundsButton(page, "Ajouter 1 blessure")).click();
+    await page.getByRole("button", { name: "Ajouter 1 blessure" }).click();
+    await expect(tile).toContainText("2/38");
+    const panel = page.getByRole("group", { name: "Encaisser des dégâts" });
+    await expect(panel.getByText("Ajuster")).toBeVisible();
+    await panel.getByRole("spinbutton", { name: "Dégâts de l'attaque" }).fill("12");
+    await panel.getByRole("button", { name: "Encaisser" }).click();
+    await expect(tile).toContainText("11/38");
+    await expect(panel).toHaveCount(0);
+
+    await setVoidRing(page, 6);
+    const line2 = tile.locator(".wt2");
+    const h = await line2.evaluate((e) => ({ height: e.getBoundingClientRect().height, line: parseFloat(getComputedStyle(e).lineHeight) || 0, size: parseFloat(getComputedStyle(e).fontSize) }));
+    expect(h.height).toBeLessThanOrEqual(h.size * 1.6);
+    expect(h.size).toBeLessThanOrEqual(14);
+    expect(await overflows(tile), "tuile tronquée").toBe(false);
+  });
+
+  test("M16 : bloc Armure, ND et Réduction côte à côte, règle spéciale lisible, aucun texte tronqué", async ({ page }) => {
+    await wearArmor(page, "light");
+    const block = page.getByTestId("armor-block");
+    const tn = (await block.getByTestId("armor-block-tn").boundingBox())!;
+    const red = (await block.getByTestId("armor-block-reduction").boundingBox())!;
+    expect(Math.abs(tn.y - red.y)).toBeLessThanOrEqual(1);
+    expect(red.x).toBeGreaterThan(tn.x + tn.width);
+    await expect(block.getByTestId("armor-rule")).toBeVisible();
+    expect(await overflows(block), "bloc Armure tronqué").toBe(false);
+    await noHorizontalScroll(page, "bloc Armure");
+  });
 });

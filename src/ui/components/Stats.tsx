@@ -2,7 +2,7 @@ import {
   attackTrait, computePool, DEFAULT_SAMPLES, defaultModifiers, emphasisMatches, poolStats, schoolOf, woundState,
   type Character, type Pool, type PoolAction,
 } from "@carnet/core";
-import { TRAIT_LABELS } from "../../rules/l5r4e";
+import { shownWoundMultiplier, TRAIT_LABELS } from "../../rules/l5r4e";
 import { pct } from "../format";
 import { poolLabel } from "../rolls";
 import { useCharacter, useStore } from "../store";
@@ -39,7 +39,7 @@ export function Stats() {
   const { state, dispatch } = useStore();
   const c = useCharacter();
   const opts = state.ui.stats;
-  const currentPenalty = woundState(c, { woundMultiplier: state.ui.woundMultiplier }).penalty ?? 0;
+  const currentPenalty = woundState(c, { woundMultiplier: shownWoundMultiplier(state.ui.woundMultiplier) }).penalty ?? 0;
   const penalty = opts.penalty ? currentPenalty : 0;
   const rows = buildRows(c, opts.voidPoint, opts.emphasis);
   const set = (patch: Partial<typeof opts>) => dispatch({ type: "statsOption", patch });

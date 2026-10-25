@@ -66,26 +66,26 @@ describe("Maîtrises au lanceur (annexe E.4)", () => {
 });
 
 describe("Armure du livre (annexe E.5)", () => {
-  it("la liste remplit nom, bonus et réduction (modifiables) ; l'effet s'affiche ; catalogId enregistré", async () => {
+  it("la liste remplit nom, bonus et réduction ; l'effet s'affiche ; modifier le bonus en fait une armure personnalisée (E.18)", async () => {
     const { storage } = await renderApp();
     fireEvent.click(screen.getByTestId("armor-tn").closest("button")!);
     const editor = within(screen.getByRole("group", { name: "Armure" }));
     expect(editor.getByRole("combobox", { name: "Armure du livre" })).toHaveValue("");
     fireEvent.change(editor.getByRole("combobox", { name: "Armure du livre" }), { target: { value: "heavy" } });
-    expect(editor.getByRole("textbox", { name: "Armure" })).toHaveValue("Armure lourde");
+    expect(editor.getByRole("textbox", { name: "Nom" })).toHaveValue("Armure lourde");
     expect(editor.getByRole("spinbutton", { name: "Bonus au ND" })).toHaveValue(10);
     expect(editor.getByRole("spinbutton", { name: "Réduction" })).toHaveValue(5);
     expect(screen.getByTestId("armor-tn")).toHaveTextContent("30");
     expect(editor.getByTestId("armor-effect")).toHaveTextContent("Armure lourde : +5 au ND des jets d'Agilité et de Réflexes.");
-    // Modifiable ensuite : l'armure reste celle du livre.
-    fireEvent.change(editor.getByRole("spinbutton", { name: "Bonus au ND" }), { target: { value: "8" } });
-    expect(editor.getByRole("combobox", { name: "Armure du livre" })).toHaveValue("heavy");
     await vi.waitFor(async () => expect((await storage.library.get("kakita"))?.character.armor)
-      .toEqual({ name: "Armure lourde", bonus: 8, reduction: 5, catalogId: "heavy" }));
-    // « Personnalisée » retire l'armure du livre, garde les valeurs.
-    fireEvent.change(editor.getByRole("combobox", { name: "Armure du livre" }), { target: { value: "" } });
+      .toEqual({ name: "Armure lourde", bonus: 10, reduction: 5, catalogId: "heavy" }));
+    // Modifier ensuite le bonus en fait une armure personnalisée : catalogId retiré, valeurs gardées (E.18, E.14).
+    fireEvent.change(editor.getByRole("spinbutton", { name: "Bonus au ND" }), { target: { value: "8" } });
+    expect(editor.getByRole("combobox", { name: "Armure du livre" })).toHaveValue("");
     expect(editor.queryByTestId("armor-effect")).toBeNull();
-    expect(editor.getByRole("spinbutton", { name: "Bonus au ND" })).toHaveValue(8);
+    expect(editor.getByRole("spinbutton", { name: "Réduction" })).toHaveValue(5);
+    await vi.waitFor(async () => expect((await storage.library.get("kakita"))?.character.armor)
+      .toEqual({ name: "Armure lourde", bonus: 8, reduction: 5 }));
   });
 
   it("armure lourde : ND final de l'attaque « + 5 armure » et note dans le lanceur", async () => {
@@ -98,13 +98,13 @@ describe("Armure du livre (annexe E.5)", () => {
     expect(roller().getByTestId("armor-note")).toHaveTextContent("Armure lourde : +5 au ND (Agilité, Réflexes).");
   });
 
-  it("fiche, bloc Identité : la liste en édition, l'effet en lecture", async () => {
+  it("fiche, bloc Armure : la règle spéciale en lecture, la liste en édition (E.18)", async () => {
     const c = base();
     c.armor = { name: "Armure légère", bonus: 5, reduction: 3, catalogId: "light" };
     await renderApp(c);
-    expect(within(screen.getByTestId("block-identity")).getByTestId("armor-effect"))
-      .toHaveTextContent("Armure légère : +5 au ND des jets d'Athlétisme et de Discrétion.");
-    click("Edit : Identité & réputation");
-    expect(within(screen.getByTestId("block-identity")).getByRole("combobox", { name: "Armure du livre" })).toHaveValue("light");
+    const block = within(screen.getByTestId("block-armor"));
+    expect(block.getByTestId("armor-rule")).toHaveTextContent("Règle spéciale : +5 au ND des jets d'Athlétisme et de Discrétion.");
+    click("Edit : Armure");
+    expect(block.getByRole("combobox", { name: "Armure du livre" })).toHaveValue("light");
   });
 });

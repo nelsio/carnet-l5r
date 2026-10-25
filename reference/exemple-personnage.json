@@ -20,7 +20,7 @@
   "voidRing": 2,
   "voidPoints": 2,
   "wounds": 0,
-  "armor": { "name": "Armure légère", "bonus": 5, "reduction": 3 },
+  "armor": { "name": "Armure légère", "bonus": 5, "reduction": 3, "catalogId": "light" },
   "skills": [
     { "name": "Iaijutsu", "rank": 3, "trait": "reflexes", "emphases": ["Concentration"] },
     { "name": "Kenjutsu", "rank": 2, "trait": "agility", "emphases": ["Katana"] },

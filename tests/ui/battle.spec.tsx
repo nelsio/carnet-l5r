@@ -5,6 +5,7 @@ import type { Character } from "@carnet/core";
 import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
+import { woundsField } from "../helpers/wounds";
 
 const base = () => structuredClone(kakita) as Character;
 
@@ -87,7 +88,7 @@ describe("Bataille de masse (E.8)", () => {
     fireEvent.change(box.getByRole("spinbutton", { name: "Total des dés de blessures" }), { target: { value: "14" } });
     expect(box.getByTestId("damage-preview")).toHaveTextContent("Réduction 3 → +11 blessure(s)");
     fireEvent.click(box.getByRole("button", { name: "Encaisser" }));
-    expect(screen.getByRole("spinbutton", { name: "Blessures subies" })).toHaveValue(11);
+    expect(woundsField()).toHaveValue(11);
     expect(panel().getByTestId("battle-wounds-taken")).toBeInTheDocument();
   });
 
@@ -108,7 +109,7 @@ describe("Bataille de masse (E.8)", () => {
     const box = within(panel().getByRole("group", { name: "Encaisser des dégâts" }));
     expect(box.getByRole("spinbutton", { name: "Total des dés de blessures" })).toHaveValue(20);
     fireEvent.click(box.getByRole("button", { name: "Encaisser" }));
-    expect(screen.getByRole("spinbutton", { name: "Blessures subies" })).toHaveValue(20);
+    expect(woundsField()).toHaveValue(20);
   });
 
   it("« Nouveau round » efface le jet, garde l'engagement", async () => {

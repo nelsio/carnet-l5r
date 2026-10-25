@@ -5,6 +5,7 @@ import type { Character } from "@carnet/core";
 import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
+import { openWounds, woundsField } from "../helpers/wounds";
 
 const base = () => structuredClone(kakita) as Character;
 const always = (v: number) => () => v;
@@ -148,19 +149,19 @@ describe("Vide, Feinte, Garde, encaissement (F3 à F6)", () => {
 
   it("L15 : encaisser 12 dégâts, Réduction 3 → +9 blessures ; avec le Vide → +0 et un point dépensé", async () => {
     await renderApp({ ...base(), armor: { name: "Armure légère", bonus: 5, reduction: 3 } });
-    click("Encaisser des dégâts");
+    openWounds();
     const box = within(screen.getByRole("group", { name: "Encaisser des dégâts" }));
-    fireEvent.change(box.getByRole("spinbutton", { name: "Dégâts reçus" }), { target: { value: "12" } });
+    fireEvent.change(box.getByRole("spinbutton", { name: "Dégâts de l'attaque" }), { target: { value: "12" } });
     expect(box.getByTestId("damage-preview")).toHaveTextContent("Réduction 3 → +9 blessure(s)");
     fireEvent.click(box.getByRole("button", { name: "Encaisser" }));
-    expect(screen.getByRole("spinbutton", { name: "Blessures subies" })).toHaveValue(9);
-    click("Encaisser des dégâts");
+    expect(woundsField()).toHaveValue(9);
+    openWounds();
     const again = within(screen.getByRole("group", { name: "Encaisser des dégâts" }));
-    fireEvent.change(again.getByRole("spinbutton", { name: "Dégâts reçus" }), { target: { value: "12" } });
+    fireEvent.change(again.getByRole("spinbutton", { name: "Dégâts de l'attaque" }), { target: { value: "12" } });
     fireEvent.click(again.getByRole("checkbox", { name: /Vide : −10 blessures/ }));
     expect(again.getByTestId("damage-preview")).toHaveTextContent("+0");
     fireEvent.click(again.getByRole("button", { name: "Encaisser" }));
-    expect(screen.getByRole("spinbutton", { name: "Blessures subies" })).toHaveValue(9);
+    expect(woundsField()).toHaveValue(9);
     expect(screen.getByText("Points de Vide 1/2")).toBeInTheDocument();
   });
 });

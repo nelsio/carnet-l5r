@@ -2,6 +2,7 @@
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
+import { openWounds, woundsButton } from "./wounds";
 
 const targets = [
   { id: "E1", label: "en file://, réseau coupé", url: pathToFileURL(resolve("dist/carnet-l5r.html")).href, offline: true },
@@ -30,13 +31,14 @@ for (const t of targets) {
       await page.getByRole("spinbutton", { name: "Agilité" }).fill("4");
       await page.getByRole("button", { name: "Terminer : Anneaux & Traits" }).click();
       await page.getByRole("button", { name: "Terminer : Identité & réputation" }).click();
-      await page.getByRole("button", { name: "Ajouter 1 blessure" }).click();
+      await (await woundsButton(page, "Ajouter 1 blessure")).click();
       await expect(page.getByText(/Enregistré dans ce navigateur/)).toBeVisible();
       await expect(page.getByRole("alert")).toHaveCount(0);
 
       await page.reload();
       await expect(page.getByRole("heading", { level: 1, name: "Doji Ayame" })).toBeVisible();
       await expect(page.getByText("Clan de la Grue")).toBeVisible();
+      await openWounds(page);
       await expect(page.getByRole("spinbutton", { name: "Blessures subies" })).toHaveValue("1");
       await page.getByRole("button", { name: "Bibliothèque" }).click();
       await expect(page.getByRole("listitem")).toHaveCount(1);
