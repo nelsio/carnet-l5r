@@ -117,7 +117,7 @@ describe("Renommage proposé (vocabularyChanges, updateVocabulary)", () => {
       const after = updateVocabulary(before);
       before.skills.forEach((s, i) => {
         const a = skill(s.name, s.trait);
-        expect(computePool(after, { ...a, skill: after.skills[i].name }, {}), `${school.id} ${s.name}`).toEqual(computePool(before, a, {}));
+        expect(computePool(after, skill(after.skills[i].name, s.trait), {}), `${school.id} ${s.name}`).toEqual(computePool(before, a, {}));
       });
     }
   });
