@@ -12,5 +12,6 @@ export * from "./modifiers";
 export * from "./schools";
 export * from "./combat";
 export * from "./recovery";
+export * from "./vocabulary";
 export { DAMAGE_MANEUVER_ID, DEFAULT_MANEUVERS, DISARM_MANEUVER_ID } from "../rules/l5r4e";
 export type { ActionDef, CombatSub, Situation, Stance } from "../rules/l5r4e";

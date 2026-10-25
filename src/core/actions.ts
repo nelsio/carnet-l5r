@@ -45,12 +45,12 @@ function loreActions(c: Character): ActionDef[] {
   }));
 }
 
-/** Une action par Représentation de la fiche (« Représentation : Conteur »). */
+/** Une action par Représentation de la fiche (« Représentation : Conte »). */
 function performActions(c: Character): ActionDef[] {
   return skillsStarting(c, "Représentation").map((s): ActionDef => ({
     id: `perform-${s.name}`, situation: "court", kind: "skill", skill: s.name, trait: "awareness", tn: 15,
     label: `Se produire · ${detail(s.name)}`,
-    description: `${s.name} (Intuition). ND selon le public ; chaque augmentation marque davantage les esprits.`,
+    description: `${s.name} (Vigilance). ND selon le public ; chaque augmentation marque davantage les esprits.`,
   }));
 }
 

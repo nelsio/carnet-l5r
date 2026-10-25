@@ -17,7 +17,7 @@ export const TRAIT_LABELS: Record<RollTrait, string> = {
   agility: "Agilité",
   intelligence: "Intelligence",
   reflexes: "Réflexes",
-  awareness: "Intuition",
+  awareness: "Vigilance",
   void: "Vide",
 };
 
@@ -112,7 +112,7 @@ export const ARMOR_CATALOG: readonly CatalogArmor[] = [
   { id: "none", name: "Aucune", bonus: 0, reduction: 0 },
   { id: "ashigaru", name: "Armure d'ashigaru", bonus: 3, reduction: 1 },
   {
-    id: "light", name: "Armure légère", bonus: 5, reduction: 3, tnSkills: ["Athlétisme", "Furtivité"],
+    id: "light", name: "Armure légère", bonus: 5, reduction: 3, tnSkills: ["Athlétisme", "Discrétion"],
     summary: "+5 au ND des jets d'Athlétisme et de Discrétion.",
   },
   {
@@ -291,25 +291,25 @@ export const FIXED_ACTIONS: readonly ActionDef[] = [
   { id: "notice", situation: "investigation", label: "Remarquer un détail", kind: "skill", skill: "Investigation", trait: "perception", emphasisHint: "Remarquer", tn: 15, description: "Indice discret, objet dissimulé à la vue, comportement suspect. ND 10 évident, 20 bien caché." },
   { id: "search", situation: "investigation", label: "Fouiller un lieu", kind: "skill", skill: "Investigation", trait: "perception", emphasisHint: "Fouille", tn: 15, description: "Fouille méthodique d'une pièce ou d'un corps. Prends du temps : le MJ peut accorder des augmentations gratuites." },
   { id: "interrogate", situation: "investigation", label: "Interroger un témoin", kind: "skill", skill: "Investigation", trait: "awareness", emphasisHint: "Interrogatoire", tn: 15, description: "Questionner pour obtenir des faits. Un témoin réticent oppose sa Volonté ou Étiquette." },
-  { id: "lie", situation: "investigation", label: "Percer un mensonge", kind: "skill", skill: "Investigation", trait: "awareness", emphasisHint: "Interrogatoire", tn: "opposed", description: "Jet en opposition contre Sincérité (Intuition) de l'interlocuteur." },
-  { id: "court", situation: "investigation", label: "Obtenir des informations en cour", kind: "skill", skill: "Courtoisie", trait: "awareness", tn: 15, description: "Conversation polie, rumeurs, faveurs. Chaque augmentation donne un détail de plus." },
+  { id: "lie", situation: "investigation", label: "Percer un mensonge", kind: "skill", skill: "Investigation", trait: "awareness", emphasisHint: "Interrogatoire", tn: "opposed", description: "Jet en opposition contre Sincérité (Vigilance) de l'interlocuteur." },
+  { id: "court", situation: "investigation", label: "Obtenir des informations en cour", kind: "skill", skill: "Courtisan", trait: "awareness", tn: 15, description: "Conversation polie, rumeurs, faveurs. Chaque augmentation donne un détail de plus." },
   { id: "etiquette", situation: "investigation", label: "Garder contenance", kind: "skill", skill: "Étiquette", trait: "awareness", tn: 15, description: "Ne rien laisser paraître, éviter un faux pas qui coûte de l'Honneur." },
   { id: "lore", situation: "investigation", label: "Se souvenir (Connaissance)", kind: "skill", skill: "Connaissance", trait: "intelligence", tn: 15, description: "Nomme ta Connaissance précise dans la fiche (ex. « Connaissance : Héraldique »). Sinon, jet sans compétence." },
   // Enquête, groupe Repos (annexe E.6)
   { id: MEDITATE_ACTION_ID, situation: "investigation", group: "Repos", label: "Méditer (récupérer du Vide)", kind: "skill", skill: "Méditation", trait: "void", emphasisHint: "Récupération du Vide", tn: 20, description: "Une heure de méditation, une fois par jour. Réussite : tu récupères des points de Vide, sans dépasser ton Anneau de Vide." },
   // Cour (lot 11) : jets sociaux, le plus souvent en opposition. Les Représentations viennent de la fiche (core/actions).
-  { id: "persuade", situation: "court", label: "Convaincre, manipuler", kind: "skill", skill: "Courtoisie", trait: "awareness", emphasisHint: "Manipulation", tn: "opposed", description: "Courtoisie (Intuition) contre Étiquette (Intuition ou Volonté) de l'interlocuteur." },
-  { id: "resist", situation: "court", label: "Résister à une influence", kind: "skill", skill: "Étiquette", trait: "awareness", emphasisHint: "Politesse", tn: "opposed", description: "Étiquette (Intuition ou Volonté) contre la Courtoisie, l'Intimidation ou la Tentation adverse." },
-  { id: "sincerity", situation: "court", label: "Être cru", kind: "skill", skill: "Sincérité", trait: "awareness", tn: "opposed", description: "Sincérité (Intuition) contre Investigation (Intuition). Choisis la spécialisation : Honnêteté pour la vérité, Duperie pour un mensonge." },
+  { id: "persuade", situation: "court", label: "Convaincre, manipuler", kind: "skill", skill: "Courtisan", trait: "awareness", emphasisHint: "Manipulation", tn: "opposed", description: "Courtisan (Vigilance) contre Étiquette (Vigilance ou Volonté) de l'interlocuteur." },
+  { id: "resist", situation: "court", label: "Résister à une influence", kind: "skill", skill: "Étiquette", trait: "awareness", emphasisHint: "Courtoisie", tn: "opposed", description: "Étiquette (Vigilance ou Volonté) contre le Courtisan, l'Intimidation ou la Tentation adverse." },
+  { id: "sincerity", situation: "court", label: "Être cru", kind: "skill", skill: "Sincérité", trait: "awareness", tn: "opposed", description: "Sincérité (Vigilance) contre Investigation (Vigilance). Choisis la spécialisation : Honnêteté pour la vérité, Duperie pour un mensonge." },
   { id: "intimidate", situation: "court", label: "Intimider", kind: "skill", skill: "Intimidation", trait: "willpower", emphasisHint: "Contrôle", tn: "opposed", description: "Intimidation (Volonté) contre Étiquette (Volonté). Peut coûter de l'Honneur." },
-  { id: "tempt", situation: "court", label: "Tenter, séduire", kind: "skill", skill: "Tentation", trait: "awareness", tn: "opposed", description: "Tentation (Intuition) contre Étiquette (Volonté). Compétence basse : peut coûter de l'Honneur." },
-  { id: "act", situation: "court", label: "Jouer un rôle", kind: "skill", skill: "Comédie", trait: "awareness", tn: "opposed", description: "Comédie (Intuition) contre Investigation (Perception) de qui t'observe." },
+  { id: "tempt", situation: "court", label: "Tenter, séduire", kind: "skill", skill: "Tentation", trait: "awareness", tn: "opposed", description: "Tentation (Vigilance) contre Étiquette (Volonté). Compétence basse : peut coûter de l'Honneur." },
+  { id: "act", situation: "court", label: "Jouer un rôle", kind: "skill", skill: "Comédie", trait: "awareness", tn: "opposed", description: "Comédie (Vigilance) contre Investigation (Perception) de qui t'observe." },
   { id: "trade", situation: "court", label: "Marchander, estimer", kind: "skill", skill: "Commerce", trait: "intelligence", emphasisHint: "Estimation", tn: 15, description: "Estimer la valeur d'un objet ou négocier un prix. Compétence marchande : peut coûter de l'Honneur en public." },
   // Déplacement
   { id: "move", situation: "movement", label: "Se déplacer en combat", kind: "move", tn: null, description: "Terrain modéré ou difficile : l'Anneau d'Eau compte 1 ou 2 rangs de moins." },
   { id: "athletics", situation: "movement", label: "Courir, grimper, sauter", kind: "skill", skill: "Athlétisme", trait: "strength", tn: 15, description: "Escalade d'un mur 15, falaise 25. Course prolongée : Constitution au lieu de Force." },
   { id: "ride", situation: "movement", label: "Chevaucher en terrain difficile", kind: "skill", skill: "Équitation", trait: "agility", tn: 15, description: "Poursuite, saut d'obstacle, combat monté. Garder le contrôle d'une monture effrayée : ND 20." },
-  { id: "stealth", situation: "movement", label: "Se déplacer discrètement", kind: "skill", skill: "Furtivité", trait: "agility", tn: "opposed", description: "En opposition contre Investigation (Perception) des gardes." },
+  { id: "stealth", situation: "movement", label: "Se déplacer discrètement", kind: "skill", skill: "Discrétion", trait: "agility", tn: "opposed", description: "En opposition contre Investigation (Perception) des gardes." },
   { id: "track", situation: "movement", label: "Pister, s'orienter", kind: "skill", skill: "Chasse", trait: "perception", tn: 15, description: "Suivre une piste, trouver un abri ou de l'eau. Piste fraîche 10, sous la pluie 25." },
   { id: "march", situation: "movement", label: "Endurer une marche forcée", kind: "trait", trait: "stamina", tn: 15, description: "Jet de Trait pur : Constitution gardée Constitution. Échec : fatigue (+5 au ND des jets suivants)." },
   // Escarmouche
@@ -329,14 +329,28 @@ export const FIXED_ACTIONS: readonly ActionDef[] = [
 
 /**
  * Noms de compétence équivalents (édition française, ancien libellé, anglais), le premier faisant foi
- * pour le catalogue actuel. La fiche d'exemple (annexe E.9 S4) emploie déjà le vocabulaire de l'annexe E.7.
+ * pour le catalogue (vocabulaire de l'annexe E.7). L'ancien libellé reste reconnu : une fiche v2.5 marche sans renommage.
  */
 export const SKILL_ALIASES: readonly (readonly string[])[] = [
-  ["Courtoisie", "Courtisan", "Courtier"],
-  ["Furtivité", "Discrétion", "Stealth"],
-  ["Représentation : Conteur", "Représentation : Conte", "Perform: Storytelling"],
-  ["Représentation : Éloquence", "Représentation : Art oratoire", "Perform: Oratory"],
+  ["Courtisan", "Courtoisie", "Courtier"],
+  ["Discrétion", "Furtivité", "Stealth"],
+  ["Représentation : Conte", "Représentation : Conteur", "Perform: Storytelling"],
+  ["Représentation : Art oratoire", "Représentation : Éloquence", "Perform: Oratory"],
 ];
+
+/**
+ * Renommages proposés à l'ouverture d'une fiche (annexe E.7) : ancien libellé → libellé de l'édition française.
+ * La spécialisation Politesse ne change que sous Étiquette ; « Courtoisie » y reste une spécialisation.
+ */
+export const VOCABULARY_UPDATES = {
+  skills: [
+    ["Courtoisie", "Courtisan"],
+    ["Furtivité", "Discrétion"],
+    ["Représentation : Conteur", "Représentation : Conte"],
+    ["Représentation : Éloquence", "Représentation : Art oratoire"],
+  ],
+  emphases: [{ skill: "Étiquette", from: "Politesse", to: "Courtoisie" }],
+} as const;
 
 /* ---------- Bonus de jet (HANDOFF annexe B) ---------- */
 
@@ -346,7 +360,7 @@ export const SKILL_ALIASES: readonly (readonly string[])[] = [
  */
 export const SOCIAL_SKILLS: readonly string[] = [
   "Comédie", "Acting",
-  "Courtoisie", "Courtisan", "Courtier",
+  "Courtisan", "Courtoisie", "Courtier",
   "Étiquette",
   "Sincérité", "Sincerity",
   "Intimidation",

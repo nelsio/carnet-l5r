@@ -5,17 +5,17 @@
     {
       "id": "yasuki-courtisan", "clan": "Crabe", "name": "École de courtisans Yasuki", "class": "Courtisan",
       "classWords": ["courtisan", "courtisane", "courtier", "marchand"],
-      "skills": ["Commerce", "Courtoisie", "Défense", "Étiquette", "Intimidation", "Sincérité"],
+      "skills": ["Commerce", "Courtisan", "Défense", "Étiquette", "Intimidation", "Sincérité"],
       "ranks": [
-        { "rank": 1, "name": "La Voie de la Carpe", "summary": "1 augmentation gratuite en Commerce, sans perte d'Honneur ni de Gloire en public. Commerce/Perception contre Étiquette/Intuition : deviner ce que veut quelqu'un.",
+        { "rank": 1, "name": "La Voie de la Carpe", "summary": "1 augmentation gratuite en Commerce, sans perte d'Honneur ni de Gloire en public. Commerce/Perception contre Étiquette/Vigilance : deviner ce que veut quelqu'un.",
           "effects": [
             { "kind": "roll", "on": ["skill:Commerce"], "freeRaises": 1, "mode": "auto" },
-            { "kind": "reminder", "context": "social", "text": "Commerce en public sans perte d'Honneur ni de Gloire ; Commerce/Perception contre Étiquette/Intuition pour deviner ce que veut quelqu'un." }
+            { "kind": "reminder", "context": "social", "text": "Commerce en public sans perte d'Honneur ni de Gloire ; Commerce/Perception contre Étiquette/Vigilance pour deviner ce que veut quelqu'un." }
           ] },
         { "rank": 2, "name": "Faites ce que nous disons", "summary": "Relance d'un jet de Sincérité ou d'Intimidation raté, Rang d'école fois par séance (le second résultat compte).",
           "effects": [ { "kind": "reminder", "context": "social", "text": "Relance d'un jet de Sincérité ou d'Intimidation raté : {n} fois par séance, le second résultat compte.", "value": { "ref": "schoolRank" } } ] },
-        { "rank": 3, "name": "Les Trésors de la Carpe", "summary": "Commerce/Intuition ND 20 pour trouver un objet rare ; les augmentations améliorent la qualité.",
-          "effects": [ { "kind": "reminder", "context": "social", "text": "Trouver un objet rare : Commerce/Intuition ND 20, les augmentations améliorent la qualité." } ] },
+        { "rank": 3, "name": "Les Trésors de la Carpe", "summary": "Commerce/Vigilance ND 20 pour trouver un objet rare ; les augmentations améliorent la qualité.",
+          "effects": [ { "kind": "reminder", "context": "social", "text": "Trouver un objet rare : Commerce/Vigilance ND 20, les augmentations améliorent la qualité." } ] },
         { "rank": 4, "name": "Les Ruses de la Carpe", "summary": "+5 × Rang d'école au ND des jets sociaux qui cherchent à te tromper.",
           "effects": [ { "kind": "reminder", "context": "social", "text": "+{n} au ND de qui tente de te tromper.", "value": { "ref": "schoolRank", "mult": 5 } } ] },
         { "rank": 5, "name": "Ce qui est à toi est à moi", "summary": "+5g0 aux jets sociaux opposés contre qui tu as fourni un objet dont il avait besoin, pendant 24 heures.",
@@ -25,30 +25,30 @@
     {
       "id": "doji-courtisan", "clan": "Grue", "name": "École de courtisans Doji", "class": "Courtisan",
       "classWords": ["courtisan", "courtisane", "courtier"],
-      "skills": ["Calligraphie", "Courtoisie", "Étiquette", "Représentation : Conteur", "Sincérité", "Cérémonie du thé"],
+      "skills": ["Calligraphie", "Courtisan", "Étiquette", "Représentation : Conte", "Sincérité", "Cérémonie du thé"],
       "ranks": [
-        { "rank": 1, "name": "L'Âme de l'Honneur", "summary": "Honneur 6,0 ou plus : 1 augmentation gratuite en Courtoisie, Sincérité et Étiquette. Courtoisie (Manipulation)/Intuition contre Étiquette (Politesse)/Intuition : deviner la faveur dont quelqu'un a besoin.",
+        { "rank": 1, "name": "L'Âme de l'Honneur", "summary": "Honneur 6,0 ou plus : 1 augmentation gratuite en Courtisan, Sincérité et Étiquette. Courtisan (Manipulation)/Vigilance contre Étiquette (Courtoisie)/Vigilance : deviner la faveur dont quelqu'un a besoin.",
           "effects": [
-            { "kind": "roll", "on": ["skill:Courtoisie", "skill:Sincérité", "skill:Étiquette"], "freeRaises": 1, "when": { "honorMin": 6 }, "mode": "auto" },
-            { "kind": "reminder", "context": "social", "text": "Courtoisie (Manipulation)/Intuition contre Étiquette (Politesse)/Intuition : deviner la faveur dont quelqu'un a besoin." }
+            { "kind": "roll", "on": ["skill:Courtisan", "skill:Sincérité", "skill:Étiquette"], "freeRaises": 1, "when": { "honorMin": 6 }, "mode": "auto" },
+            { "kind": "reminder", "context": "social", "text": "Courtisan (Manipulation)/Vigilance contre Étiquette (Courtoisie)/Vigilance : deviner la faveur dont quelqu'un a besoin." }
           ] },
-        { "rank": 2, "name": "Parler en silence", "summary": "Courtoisie/Intelligence ND 15 : transmettre une idée simple sans parler à un Doji formé ou à un courtisan de rang 5 ; augmentations pour les idées complexes.",
-          "effects": [ { "kind": "reminder", "context": "social", "text": "Langage silencieux : Courtoisie/Intelligence ND 15, augmentations pour une idée complexe." } ] },
-        { "rank": 3, "name": "Le Cadeau parfait", "summary": "En cour ou en ville, Courtoisie/Intuition ND 20 : trouver le cadeau ou la faveur qui convient ; accepté, il donne un Allié (Dévotion 1) sans coût en XP.",
-          "effects": [ { "kind": "reminder", "context": "social", "text": "Cadeau parfait : Courtoisie/Intuition ND 20, chaque augmentation le rend plus rare." } ] },
-        { "rank": 4, "name": "La Voix de l'Honneur", "summary": "Courtoisie (Manipulation)/Intuition contre Étiquette (Politesse)/Intuition : l'adversaire doit reconnaître que sa position heurte l'Honneur, ou commettre un impair.",
-          "effects": [ { "kind": "reminder", "context": "social", "text": "Voix de l'Honneur : Courtoisie (Manipulation)/Intuition contre Étiquette (Politesse)/Intuition." } ] },
-        { "rank": 5, "name": "Le Don de la Dame", "summary": "Courtoisie (Manipulation)/Intuition contre Étiquette (Politesse)/Volonté, +5g0 si la cible est un allié : elle suit ton conseil s'il respecte ses loyautés.",
+        { "rank": 2, "name": "Parler en silence", "summary": "Courtisan/Intelligence ND 15 : transmettre une idée simple sans parler à un Doji formé ou à un courtisan de rang 5 ; augmentations pour les idées complexes.",
+          "effects": [ { "kind": "reminder", "context": "social", "text": "Langage silencieux : Courtisan/Intelligence ND 15, augmentations pour une idée complexe." } ] },
+        { "rank": 3, "name": "Le Cadeau parfait", "summary": "En cour ou en ville, Courtisan/Vigilance ND 20 : trouver le cadeau ou la faveur qui convient ; accepté, il donne un Allié (Dévotion 1) sans coût en XP.",
+          "effects": [ { "kind": "reminder", "context": "social", "text": "Cadeau parfait : Courtisan/Vigilance ND 20, chaque augmentation le rend plus rare." } ] },
+        { "rank": 4, "name": "La Voix de l'Honneur", "summary": "Courtisan (Manipulation)/Vigilance contre Étiquette (Courtoisie)/Vigilance : l'adversaire doit reconnaître que sa position heurte l'Honneur, ou commettre un impair.",
+          "effects": [ { "kind": "reminder", "context": "social", "text": "Voix de l'Honneur : Courtisan (Manipulation)/Vigilance contre Étiquette (Courtoisie)/Vigilance." } ] },
+        { "rank": 5, "name": "Le Don de la Dame", "summary": "Courtisan (Manipulation)/Vigilance contre Étiquette (Courtoisie)/Volonté, +5g0 si la cible est un allié : elle suit ton conseil s'il respecte ses loyautés.",
           "effects": [
-            { "kind": "roll", "on": ["skill:Courtoisie"], "rolled": 5, "mode": "optional", "label": "Conseil à un allié" },
-            { "kind": "reminder", "context": "social", "text": "Don de la Dame : Courtoisie (Manipulation)/Intuition contre Étiquette (Politesse)/Volonté." }
+            { "kind": "roll", "on": ["skill:Courtisan"], "rolled": 5, "mode": "optional", "label": "Conseil à un allié" },
+            { "kind": "reminder", "context": "social", "text": "Don de la Dame : Courtisan (Manipulation)/Vigilance contre Étiquette (Courtoisie)/Volonté." }
           ] }
       ]
     },
     {
       "id": "kitsuki-enqueteur", "clan": "Dragon", "name": "École d'enquêteurs Kitsuki", "class": "Courtisan",
       "classWords": ["enqueteur", "enqueteuse", "investigator", "magistrat", "courtisan", "courtier"],
-      "skills": ["Courtoisie", "Étiquette", "Investigation", "Kenjutsu", "Méditation", "Sincérité"],
+      "skills": ["Courtisan", "Étiquette", "Investigation", "Kenjutsu", "Méditation", "Sincérité"],
       "ranks": [
         { "rank": 1, "name": "La Méthode Kitsuki", "summary": "1 augmentation gratuite en Investigation. + Perception au ND d'armure en escarmouche.",
           "effects": [
@@ -62,8 +62,8 @@
           ] },
         { "rank": 3, "name": "Connaître le rythme du cœur", "summary": "Après une courte conversation, Investigation (Remarquer)/Perception contre Intelligence × 5 de la cible : sa personnalité et ses motivations.",
           "effects": [ { "kind": "reminder", "context": "social", "text": "Lire quelqu'un : Investigation (Remarquer)/Perception, ND = Intelligence de la cible × 5." } ] },
-        { "rank": 4, "name": "Trouver le chemin", "summary": "Investigation (Interrogatoire)/Intelligence contre Étiquette (Politesse)/Intelligence : un allié ou ennemi de la cible, un de plus par augmentation ; une fois par jour et par cible.",
-          "effects": [ { "kind": "reminder", "context": "social", "text": "Trouver les liens : Investigation (Interrogatoire)/Intelligence contre Étiquette (Politesse)/Intelligence, une fois par jour et par cible." } ] },
+        { "rank": 4, "name": "Trouver le chemin", "summary": "Investigation (Interrogatoire)/Intelligence contre Étiquette (Courtoisie)/Intelligence : un allié ou ennemi de la cible, un de plus par augmentation ; une fois par jour et par cible.",
+          "effects": [ { "kind": "reminder", "context": "social", "text": "Trouver les liens : Investigation (Interrogatoire)/Intelligence contre Étiquette (Courtoisie)/Intelligence, une fois par jour et par cible." } ] },
         { "rank": 5, "name": "Les Yeux trahissent le cœur", "summary": "Jet automatique Investigation (Interrogatoire)/Perception contre Sincérité (Duperie)/Volonté quand on te ment ; +5g0 si tu sais déjà qu'on te ment.",
           "effects": [
             { "kind": "roll", "on": ["skill:Investigation"], "rolled": 5, "mode": "optional", "label": "Tu sais déjà qu'on te ment" },
@@ -74,24 +74,24 @@
     {
       "id": "ikoma-barde", "clan": "Lion", "name": "École de bardes Ikoma", "class": "Courtisan",
       "classWords": ["barde", "bard", "courtisan", "courtier"],
-      "skills": ["Courtoisie", "Étiquette", "Connaissance : Histoire", "Représentation : Conteur", "Sincérité"],
+      "skills": ["Courtisan", "Étiquette", "Connaissance : Histoire", "Représentation : Conte", "Sincérité"],
       "ranks": [
-        { "rank": 1, "name": "Le Héraut de gloire", "summary": "Mémoire parfaite offerte. Représentation : Conteur/Intuition ND 20 pour louer quelqu'un en public : il gagne Rang d'école points de Gloire (une fois par mois et par personne).",
-          "effects": [ { "kind": "reminder", "context": "social", "text": "Louer quelqu'un : Représentation : Conteur/Intuition ND 20, +{n} points de Gloire.", "value": { "ref": "schoolRank" } } ] },
+        { "rank": 1, "name": "Le Héraut de gloire", "summary": "Mémoire parfaite offerte. Représentation : Conte/Vigilance ND 20 pour louer quelqu'un en public : il gagne Rang d'école points de Gloire (une fois par mois et par personne).",
+          "effects": [ { "kind": "reminder", "context": "social", "text": "Louer quelqu'un : Représentation : Conte/Vigilance ND 20, +{n} points de Gloire.", "value": { "ref": "schoolRank" } } ] },
         { "rank": 2, "name": "Le Cœur du Lion", "summary": "Montrer ses émotions pour un Lion ou une cause honorable ne coûte rien. +5 × Rang d'école au ND de l'Intimidation et de la Tentation contre toi.",
           "effects": [ { "kind": "reminder", "context": "social", "text": "+{n} au ND de l'Intimidation et de la Tentation contre toi.", "value": { "ref": "schoolRank", "mult": 5 } } ] },
-        { "rank": 3, "name": "La Voix des ancêtres", "summary": "Avant une bataille, Représentation : Éloquence/Intuition ND 15 + 5 par personne (+5 par non-Lion) : chacun ajoute son Rang d'Honneur à un jet de compétence.",
-          "effects": [ { "kind": "reminder", "context": "combat", "text": "Avant la bataille : Représentation : Éloquence/Intuition, ND 15 + 5 par personne inspirée (+5 par non-Lion)." } ] },
-        { "rank": 4, "name": "La Force de la tradition", "summary": "Rang d'école fois par séance, action simple, Représentation : Conteur/Intuition ND 25 : un allié relance son prochain échec du jour avec ton Rang d'Honneur en dés en plus ; échec : −2 Honneur.",
-          "effects": [ { "kind": "reminder", "context": "social", "text": "Encourager un allié : {n} fois par séance, Représentation : Conteur/Intuition ND 25.", "value": { "ref": "schoolRank" } } ] },
-        { "rank": 5, "name": "Chaque Lion est ton frère", "summary": "Cinq fois par séance, sur un jet social opposé, citer un précédent historique : + rang de Représentation : Conteur en dés lancés.",
-          "effects": [ { "kind": "roll", "on": ["social"], "rolled": { "ref": "skill:Représentation : Conteur" }, "mode": "optional", "label": "Précédent historique" } ] }
+        { "rank": 3, "name": "La Voix des ancêtres", "summary": "Avant une bataille, Représentation : Art oratoire/Vigilance ND 15 + 5 par personne (+5 par non-Lion) : chacun ajoute son Rang d'Honneur à un jet de compétence.",
+          "effects": [ { "kind": "reminder", "context": "combat", "text": "Avant la bataille : Représentation : Art oratoire/Vigilance, ND 15 + 5 par personne inspirée (+5 par non-Lion)." } ] },
+        { "rank": 4, "name": "La Force de la tradition", "summary": "Rang d'école fois par séance, action simple, Représentation : Conte/Vigilance ND 25 : un allié relance son prochain échec du jour avec ton Rang d'Honneur en dés en plus ; échec : −2 Honneur.",
+          "effects": [ { "kind": "reminder", "context": "social", "text": "Encourager un allié : {n} fois par séance, Représentation : Conte/Vigilance ND 25.", "value": { "ref": "schoolRank" } } ] },
+        { "rank": 5, "name": "Chaque Lion est ton frère", "summary": "Cinq fois par séance, sur un jet social opposé, citer un précédent historique : + rang de Représentation : Conte en dés lancés.",
+          "effects": [ { "kind": "roll", "on": ["social"], "rolled": { "ref": "skill:Représentation : Conte" }, "mode": "optional", "label": "Précédent historique" } ] }
       ]
     },
     {
       "id": "yoritomo-courtisan", "clan": "Mante", "name": "École de courtisans Yoritomo", "class": "Courtisan",
       "classWords": ["courtisan", "courtisane", "courtier"],
-      "skills": ["Commerce", "Courtoisie", "Défense", "Étiquette", "Intimidation", "Sincérité"],
+      "skills": ["Commerce", "Courtisan", "Défense", "Étiquette", "Intimidation", "Sincérité"],
       "ranks": [
         { "rank": 1, "name": "Le Devoir avant l'Honneur", "summary": "Commerce et Intimidation (Contrôle) sans perte d'Honneur. + Rang d'école augmentations gratuites aux jets sociaux contre un criminel ou un hors-la-loi.",
           "effects": [ { "kind": "roll", "on": ["social"], "freeRaises": { "ref": "schoolRank" }, "mode": "optional", "label": "Cible criminelle ou hors-la-loi" } ] },
@@ -102,8 +102,8 @@
           ] },
         { "rank": 3, "name": "Commander aux vents", "summary": "Rang d'école fois par séance, relancer une Sincérité ratée en Intimidation (Contrôle).",
           "effects": [ { "kind": "reminder", "context": "social", "text": "Sincérité ratée relancée en Intimidation (Contrôle) : {n} fois par séance.", "value": { "ref": "schoolRank" } } ] },
-        { "rank": 4, "name": "La Volonté de la tempête", "summary": "Intimidation (Contrôle)/Volonté contre Étiquette (Politesse)/Volonté : l'adversaire ne dépense plus de Vide pendant une heure et subit −3g0 à ses jets sociaux.",
-          "effects": [ { "kind": "reminder", "context": "social", "text": "Intimidation (Contrôle)/Volonté contre Étiquette (Politesse)/Volonté : plus de Vide pendant une heure, −3g0 aux jets sociaux de la cible." } ] },
+        { "rank": 4, "name": "La Volonté de la tempête", "summary": "Intimidation (Contrôle)/Volonté contre Étiquette (Courtoisie)/Volonté : l'adversaire ne dépense plus de Vide pendant une heure et subit −3g0 à ses jets sociaux.",
+          "effects": [ { "kind": "reminder", "context": "social", "text": "Intimidation (Contrôle)/Volonté contre Étiquette (Courtoisie)/Volonté : plus de Vide pendant une heure, −3g0 aux jets sociaux de la cible." } ] },
         { "rank": 5, "name": "La Force en toute chose", "summary": "+5g0 en Intimidation, et pour résister à l'Intimidation, à la Tentation et à la Peur.",
           "effects": [
             { "kind": "roll", "on": ["skill:Intimidation"], "rolled": 5, "mode": "auto" },
@@ -114,7 +114,7 @@
     {
       "id": "asako-maitre-du-savoir", "clan": "Phénix", "name": "École de maîtres du savoir Asako", "class": "Courtisan",
       "classWords": ["maitre", "savoir", "loremaster", "courtisan", "courtier"],
-      "skills": ["Courtoisie", "Étiquette", "Connaissance : Histoire", "Connaissance : Théologie", "Méditation", "Sincérité"],
+      "skills": ["Courtisan", "Étiquette", "Connaissance : Histoire", "Connaissance : Théologie", "Méditation", "Sincérité"],
       "ranks": [
         { "rank": 1, "name": "Le Temple de l'âme", "summary": "1 augmentation gratuite aux jets de Connaissance. Un point de Vide dépensé en Étiquette donne +3g1 au lieu de +1g1.",
           "effects": [
@@ -134,59 +134,59 @@
     {
       "id": "bayushi-courtisan", "clan": "Scorpion", "name": "École de courtisans Bayushi", "class": "Courtisan",
       "classWords": ["courtisan", "courtisane", "courtier"],
-      "skills": ["Calligraphie", "Courtoisie", "Étiquette", "Investigation", "Sincérité", "Tentation"],
+      "skills": ["Calligraphie", "Courtisan", "Étiquette", "Investigation", "Sincérité", "Tentation"],
       "ranks": [
-        { "rank": 1, "name": "Ta faiblesse est ma force", "summary": "1 augmentation gratuite par 3 points de désavantages mentaux et sociaux de la cible (arrondi au plus proche, 5 au plus) aux jets sociaux opposés ; 1 augmentation gratuite en Courtoisie pour répandre une rumeur.",
+        { "rank": 1, "name": "Ta faiblesse est ma force", "summary": "1 augmentation gratuite par 3 points de désavantages mentaux et sociaux de la cible (arrondi au plus proche, 5 au plus) aux jets sociaux opposés ; 1 augmentation gratuite en Courtisan pour répandre une rumeur.",
           "effects": [
             { "kind": "roll", "on": ["social"], "freeRaises": { "ref": "input", "div": 3, "round": "nearest", "max": 5 }, "mode": "optional", "label": "Faiblesses de la cible", "input": "Points de désavantages mentaux et sociaux de la cible" },
-            { "kind": "roll", "on": ["skill:Courtoisie"], "freeRaises": 1, "mode": "optional", "label": "Répandre une rumeur" }
+            { "kind": "roll", "on": ["skill:Courtisan"], "freeRaises": 1, "mode": "optional", "label": "Répandre une rumeur" }
           ] },
-        { "rank": 2, "name": "Eaux peu profondes", "summary": "Investigation/Intuition contre Étiquette/Intuition : les compétences mentale et sociale les plus faibles de la cible ; un point de Vide pour les suivantes.",
-          "effects": [ { "kind": "reminder", "context": "social", "text": "Sonder : Investigation/Intuition contre Étiquette/Intuition (Vide : une compétence de plus)." } ] },
-        { "rank": 3, "name": "Les secrets sont des taches de naissance", "summary": "Courtoisie (Manipulation)/Intuition contre Étiquette (Politesse)/Intuition : un désavantage mental ou social de la cible ; Chantage (2 points) possible.",
-          "effects": [ { "kind": "reminder", "context": "social", "text": "Révéler un secret : Courtoisie (Manipulation)/Intuition contre Étiquette (Politesse)/Intuition." } ] },
+        { "rank": 2, "name": "Eaux peu profondes", "summary": "Investigation/Vigilance contre Étiquette/Vigilance : les compétences mentale et sociale les plus faibles de la cible ; un point de Vide pour les suivantes.",
+          "effects": [ { "kind": "reminder", "context": "social", "text": "Sonder : Investigation/Vigilance contre Étiquette/Vigilance (Vide : une compétence de plus)." } ] },
+        { "rank": 3, "name": "Les secrets sont des taches de naissance", "summary": "Courtisan (Manipulation)/Vigilance contre Étiquette (Courtoisie)/Vigilance : un désavantage mental ou social de la cible ; Chantage (2 points) possible.",
+          "effects": [ { "kind": "reminder", "context": "social", "text": "Révéler un secret : Courtisan (Manipulation)/Vigilance contre Étiquette (Courtoisie)/Vigilance." } ] },
         { "rank": 4, "name": "La Douce Piqûre de l'examen", "summary": "Contre une cible que tu fais chanter, ses dés n'explosent pas aux jets sociaux opposés ; un point de Vide pour lui imposer le trait mental de ton choix.",
           "effects": [ { "kind": "reminder", "context": "social", "text": "Cible sous Chantage : ses dés n'explosent pas ; Vide : tu choisis son trait mental." } ] },
-        { "rank": 5, "name": "Plus de masques", "summary": "Rang d'école fois par séance, Courtoisie (Ragots)/Intuition contre Étiquette (Politesse)/Intuition, +5g0 si tu fais chanter la cible : un désavantage social pour un mois.",
+        { "rank": 5, "name": "Plus de masques", "summary": "Rang d'école fois par séance, Courtisan (Ragots)/Vigilance contre Étiquette (Courtoisie)/Vigilance, +5g0 si tu fais chanter la cible : un désavantage social pour un mois.",
           "effects": [
             { "kind": "roll", "on": ["social"], "rolled": 5, "mode": "optional", "label": "Cible sous Chantage" },
-            { "kind": "reminder", "context": "social", "text": "Plus de masques : {n} fois par séance, Courtoisie (Ragots)/Intuition contre Étiquette (Politesse)/Intuition.", "value": { "ref": "schoolRank" } }
+            { "kind": "reminder", "context": "social", "text": "Plus de masques : {n} fois par séance, Courtisan (Ragots)/Vigilance contre Étiquette (Courtoisie)/Vigilance.", "value": { "ref": "schoolRank" } }
           ] }
       ]
     },
     {
       "id": "ide-emissaire", "clan": "Licorne", "name": "École d'émissaires Ide", "class": "Courtisan",
       "classWords": ["emissaire", "emissary", "courtisan", "courtier"],
-      "skills": ["Calligraphie", "Commerce", "Courtoisie", "Étiquette", "Équitation", "Sincérité"],
+      "skills": ["Calligraphie", "Commerce", "Courtisan", "Étiquette", "Équitation", "Sincérité"],
       "ranks": [
-        { "rank": 1, "name": "Le Cœur parle", "summary": "Étiquette (Politesse)/Intuition ND 20 pour ne pas offenser par mégarde. 1 augmentation gratuite en Sincérité (Honnêteté) ; +5 au ND en Sincérité (Duperie).",
+        { "rank": 1, "name": "Le Cœur parle", "summary": "Étiquette (Courtoisie)/Vigilance ND 20 pour ne pas offenser par mégarde. 1 augmentation gratuite en Sincérité (Honnêteté) ; +5 au ND en Sincérité (Duperie).",
           "effects": [
             { "kind": "roll", "on": ["skill:Sincérité"], "freeRaises": 1, "when": { "emphasis": ["Honnêteté"] }, "mode": "auto" },
             { "kind": "roll", "on": ["skill:Sincérité"], "tn": 5, "when": { "emphasis": ["Duperie"] }, "mode": "auto" }
           ] },
-        { "rank": 2, "name": "Percer les voiles", "summary": "Étiquette/Intuition contre Étiquette/Volonté : les émotions réelles de la cible, un détail de plus par augmentation.",
-          "effects": [ { "kind": "reminder", "context": "social", "text": "Percer les voiles : Étiquette/Intuition contre Étiquette/Volonté." } ] },
-        { "rank": 3, "name": "Le Cœur écoute", "summary": "Dix minutes de conversation, Sincérité (Honnêteté)/Intuition contre Étiquette (Politesse)/Volonté : la cible t'est mieux disposée ; deux augmentations : alliée pour la journée.",
-          "effects": [ { "kind": "reminder", "context": "social", "text": "Le cœur écoute : Sincérité (Honnêteté)/Intuition contre Étiquette (Politesse)/Volonté (deux augmentations : alliée pour la journée)." } ] },
+        { "rank": 2, "name": "Percer les voiles", "summary": "Étiquette/Vigilance contre Étiquette/Volonté : les émotions réelles de la cible, un détail de plus par augmentation.",
+          "effects": [ { "kind": "reminder", "context": "social", "text": "Percer les voiles : Étiquette/Vigilance contre Étiquette/Volonté." } ] },
+        { "rank": 3, "name": "Le Cœur écoute", "summary": "Dix minutes de conversation, Sincérité (Honnêteté)/Vigilance contre Étiquette (Courtoisie)/Volonté : la cible t'est mieux disposée ; deux augmentations : alliée pour la journée.",
+          "effects": [ { "kind": "reminder", "context": "social", "text": "Le cœur écoute : Sincérité (Honnêteté)/Vigilance contre Étiquette (Courtoisie)/Volonté (deux augmentations : alliée pour la journée)." } ] },
         { "rank": 4, "name": "Répondre au cœur", "summary": "+ Rang d'école en dés lancés aux jets des techniques de rang 2 et 3.",
           "effects": [ { "kind": "roll", "on": ["skill:Étiquette", "skill:Sincérité"], "rolled": { "ref": "schoolRank" }, "mode": "optional", "label": "Technique de rang 2 ou 3" } ] },
-        { "rank": 5, "name": "La Main immobile de la paix", "summary": "Un point de Vide, Sincérité (Honnêteté)/Intuition contre Étiquette (Politesse)/Intuition : la cible ne peut te nuire pendant 2 × Rang d'école heures si tu restes pacifique (Honneur 2,0 ou plus).",
-          "effects": [ { "kind": "reminder", "context": "social", "text": "Main de la paix : Vide, Sincérité (Honnêteté)/Intuition contre Étiquette (Politesse)/Intuition, {n} heures sans hostilité.", "value": { "ref": "schoolRank", "mult": 2 } } ] }
+        { "rank": 5, "name": "La Main immobile de la paix", "summary": "Un point de Vide, Sincérité (Honnêteté)/Vigilance contre Étiquette (Courtoisie)/Vigilance : la cible ne peut te nuire pendant 2 × Rang d'école heures si tu restes pacifique (Honneur 2,0 ou plus).",
+          "effects": [ { "kind": "reminder", "context": "social", "text": "Main de la paix : Vide, Sincérité (Honnêteté)/Vigilance contre Étiquette (Courtoisie)/Vigilance, {n} heures sans hostilité.", "value": { "ref": "schoolRank", "mult": 2 } } ] }
       ]
     },
     {
       "id": "otomo-courtisan", "clan": "Impérial", "name": "École de courtisans Otomo", "class": "Courtisan",
       "classWords": ["courtisan", "courtisane", "courtier"],
-      "skills": ["Courtoisie", "Défense", "Étiquette", "Intimidation", "Investigation", "Sincérité"],
+      "skills": ["Courtisan", "Défense", "Étiquette", "Intimidation", "Investigation", "Sincérité"],
       "ranks": [
-        { "rank": 1, "name": "La Voix du Ciel", "summary": "Intimidation (Contrôle) sans perte d'Honneur. Courtoisie (Manipulation)/Intuition contre Étiquette (Politesse)/Intuition : provoquer une querelle entre clans.",
-          "effects": [ { "kind": "reminder", "context": "social", "text": "Semer la discorde : Courtoisie (Manipulation)/Intuition contre Étiquette (Politesse)/Intuition." } ] },
-        { "rank": 2, "name": "Le Destin n'a pas de secret", "summary": "Un point de Vide, Courtoisie/Intuition ND 25 : apprendre une information cruciale.",
-          "effects": [ { "kind": "reminder", "context": "social", "text": "Vide, Courtoisie/Intuition ND 25 : une information cruciale." } ] },
-        { "rank": 3, "name": "La Voix de mon maître", "summary": "Action complexe, Intimidation (Contrôle)/Volonté contre Étiquette (Politesse)/Volonté d'un samouraï d'Honneur 1,0 ou plus : il ne bouge, n'attaque ni ne lance de sort au prochain tour.",
-          "effects": [ { "kind": "reminder", "context": "combat", "text": "Action complexe : Intimidation (Contrôle)/Volonté contre Étiquette (Politesse)/Volonté, la cible est immobilisée au prochain tour." } ] },
-        { "rank": 4, "name": "La Protection de l'Empereur", "summary": "Pendant un débat, un point de Vide, Courtoisie (Manipulation)/Intuition contre Étiquette (Politesse)/Intuition : l'adversaire cède ou perd 5 points d'Honneur.",
-          "effects": [ { "kind": "reminder", "context": "social", "text": "Vide, Courtoisie (Manipulation)/Intuition contre Étiquette (Politesse)/Intuition : céder ou perdre 5 Honneur." } ] },
+        { "rank": 1, "name": "La Voix du Ciel", "summary": "Intimidation (Contrôle) sans perte d'Honneur. Courtisan (Manipulation)/Vigilance contre Étiquette (Courtoisie)/Vigilance : provoquer une querelle entre clans.",
+          "effects": [ { "kind": "reminder", "context": "social", "text": "Semer la discorde : Courtisan (Manipulation)/Vigilance contre Étiquette (Courtoisie)/Vigilance." } ] },
+        { "rank": 2, "name": "Le Destin n'a pas de secret", "summary": "Un point de Vide, Courtisan/Vigilance ND 25 : apprendre une information cruciale.",
+          "effects": [ { "kind": "reminder", "context": "social", "text": "Vide, Courtisan/Vigilance ND 25 : une information cruciale." } ] },
+        { "rank": 3, "name": "La Voix de mon maître", "summary": "Action complexe, Intimidation (Contrôle)/Volonté contre Étiquette (Courtoisie)/Volonté d'un samouraï d'Honneur 1,0 ou plus : il ne bouge, n'attaque ni ne lance de sort au prochain tour.",
+          "effects": [ { "kind": "reminder", "context": "combat", "text": "Action complexe : Intimidation (Contrôle)/Volonté contre Étiquette (Courtoisie)/Volonté, la cible est immobilisée au prochain tour." } ] },
+        { "rank": 4, "name": "La Protection de l'Empereur", "summary": "Pendant un débat, un point de Vide, Courtisan (Manipulation)/Vigilance contre Étiquette (Courtoisie)/Vigilance : l'adversaire cède ou perd 5 points d'Honneur.",
+          "effects": [ { "kind": "reminder", "context": "social", "text": "Vide, Courtisan (Manipulation)/Vigilance contre Étiquette (Courtoisie)/Vigilance : céder ou perdre 5 Honneur." } ] },
         { "rank": 5, "name": "Les Vertus du commandement", "summary": "+5g0 aux jets sociaux opposés contre qui révère l'autorité impériale.",
           "effects": [ { "kind": "roll", "on": ["social"], "rolled": 5, "mode": "optional", "label": "Cible qui révère l'autorité impériale" } ] }
       ]
@@ -194,27 +194,27 @@
     {
       "id": "miya-heraut", "clan": "Impérial", "name": "École de hérauts Miya", "class": "Courtisan",
       "classWords": ["heraut", "herald", "courtisan", "courtier"],
-      "skills": ["Courtoisie", "Défense", "Étiquette", "Équitation", "Connaissance : Héraldique", "Sincérité"],
+      "skills": ["Courtisan", "Défense", "Étiquette", "Équitation", "Connaissance : Héraldique", "Sincérité"],
       "ranks": [
         { "rank": 1, "name": "La Voix de l'Empereur", "summary": "Un point de Vide : Connaissance du terrain pour la province jusqu'au prochain sommeil. Qui t'attaque en révérant l'Empereur perd 2 × Rang d'école points d'Honneur.",
           "effects": [ { "kind": "reminder", "context": "combat", "text": "Qui t'attaque en révérant l'Empereur perd {n} points d'Honneur.", "value": { "ref": "schoolRank", "mult": 2 } } ] },
-        { "rank": 2, "name": "Les Yeux de l'Empereur", "summary": "+ Rang d'Honneur aux jets d'Étiquette (Politesse) pour résister à une influence.",
+        { "rank": 2, "name": "Les Yeux de l'Empereur", "summary": "+ Rang d'Honneur aux jets d'Étiquette (Courtoisie) pour résister à une influence.",
           "effects": [ { "kind": "roll", "on": ["skill:Étiquette"], "flat": { "ref": "honor" }, "mode": "optional", "label": "Résister à une influence" } ] },
         { "rank": 3, "name": "La Main de l'Empereur", "summary": "Un point de Vide, action gratuite : qui révère l'Empereur ne peut te blesser jusqu'aux prochaines réactions, si tu ne combats pas.",
           "effects": [ { "kind": "reminder", "context": "combat", "text": "Vide, action gratuite : protégé jusqu'aux prochaines réactions si tu ne combats pas." } ] },
-        { "rank": 4, "name": "La Bénédiction de l'Empereur", "summary": "Rang d'école fois par séance, action complexe, Courtoisie (Rhétorique)/Intuition contre Étiquette (Politesse)/Volonté d'un samouraï d'Honneur 1,0 ou plus : il cesse d'attaquer pendant une minute.",
-          "effects": [ { "kind": "reminder", "context": "combat", "text": "{n} fois par séance, action complexe : Courtoisie (Rhétorique)/Intuition contre Étiquette (Politesse)/Volonté, la cible cesse d'attaquer une minute.", "value": { "ref": "schoolRank" } } ] },
-        { "rank": 5, "name": "La Gloire de l'Empereur", "summary": "+5g0 en Courtoisie et en Étiquette contre une cible d'Honneur 1,0 ou plus.",
-          "effects": [ { "kind": "roll", "on": ["skill:Courtoisie", "skill:Étiquette"], "rolled": 5, "mode": "optional", "label": "Cible d'Honneur 1,0 ou plus" } ] }
+        { "rank": 4, "name": "La Bénédiction de l'Empereur", "summary": "Rang d'école fois par séance, action complexe, Courtisan (Rhétorique)/Vigilance contre Étiquette (Courtoisie)/Volonté d'un samouraï d'Honneur 1,0 ou plus : il cesse d'attaquer pendant une minute.",
+          "effects": [ { "kind": "reminder", "context": "combat", "text": "{n} fois par séance, action complexe : Courtisan (Rhétorique)/Vigilance contre Étiquette (Courtoisie)/Volonté, la cible cesse d'attaquer une minute.", "value": { "ref": "schoolRank" } } ] },
+        { "rank": 5, "name": "La Gloire de l'Empereur", "summary": "+5g0 en Courtisan et en Étiquette contre une cible d'Honneur 1,0 ou plus.",
+          "effects": [ { "kind": "roll", "on": ["skill:Courtisan", "skill:Étiquette"], "rolled": 5, "mode": "optional", "label": "Cible d'Honneur 1,0 ou plus" } ] }
       ]
     },
     {
       "id": "shosuro-infiltre", "clan": "Scorpion", "name": "École d'infiltrés Shosuro", "class": "Ninja",
       "classWords": ["infiltre", "infiltree", "infiltrator", "ninja"],
       "ranks": [
-        { "rank": 1, "name": "La Voie des ombres", "summary": "Compétences basses et Ninjutsu sans perte d'Honneur. +2g0 en Furtivité.",
+        { "rank": 1, "name": "La Voie des ombres", "summary": "Compétences basses et Ninjutsu sans perte d'Honneur. +2g0 en Discrétion.",
           "effects": [
-            { "kind": "roll", "on": ["skill:Furtivité"], "rolled": 2, "mode": "auto" },
+            { "kind": "roll", "on": ["skill:Discrétion"], "rolled": 2, "mode": "auto" },
             { "kind": "reminder", "context": "combat", "text": "Compétences basses et Ninjutsu sans perte d'Honneur." }
           ] },
         { "rank": 2, "name": "Frapper depuis l'ombre", "summary": "Contre une cible qui ne te voit pas : augmentations non limitées et + Rang d'école en dés lancés à l'attaque.",
@@ -233,7 +233,7 @@
     {
       "id": "shosuro-acteur", "clan": "Scorpion", "name": "École d'acteurs Shosuro", "class": "Ninja",
       "classWords": ["acteur", "actrice", "actor"],
-      "skills": ["Comédie", "Étiquette", "Couteaux", "Méditation", "Sincérité", "Furtivité"],
+      "skills": ["Comédie", "Étiquette", "Couteaux", "Méditation", "Sincérité", "Discrétion"],
       "ranks": [
         { "rank": 1, "name": "Le Premier Visage", "summary": "Une persona. Un point de Vide dépensé en Comédie ou en Sincérité (Duperie) donne +3g1 au lieu de +1g1.",
           "effects": [

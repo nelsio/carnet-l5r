@@ -6,7 +6,7 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document.
 
-**État au 25/10/2026 :** version publiée **v2.5.0**, lots 1 à 11 livrés (§11), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures) et v2.5.0 (récupération) livrées ; v2.6 et v2.7 à implémenter.
+**État au 25/10/2026 :** version publiée **v2.6.0**, lots 1 à 11 livrés (§11), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération) et v2.6.0 (vocabulaire français) livrées ; v2.7 à implémenter.
 
 **Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie).
 
@@ -147,7 +147,7 @@ Toutes les fonctions sont pures. Le hasard est **injecté** (`rng: () => number`
 ### 4.1 Fonctions exposées
 | Fonction | Contrat |
 |---|---|
-| `rings(c)` | Terre = min(Constitution, Volonté) ; Eau = min(Force, Perception) ; Feu = min(Agilité, Intelligence) ; Air = min(Réflexes, Intuition) ; Vide = `voidRing`. |
+| `rings(c)` | Terre = min(Constitution, Volonté) ; Eau = min(Force, Perception) ; Feu = min(Agilité, Intelligence) ; Air = min(Réflexes, Vigilance) ; Vide = `voidRing`. |
 | `findSkill(c, name)` | Comparaison normalisée : minuscules, sans accents, espaces rognés. |
 | `parseDR(s)` | `"3k2"`/`"3g2"` → `{rolled:3, kept:2}` ; invalide → `{0,0}`. |
 | `applyTenDiceRule(r, k)` | Règle du livre de base 4e (§4.7). Renvoie `{rolled, kept, bonus}`. |
@@ -459,7 +459,7 @@ Depuis un fichier (bouton ou glisser-déposer). Trois destinations :
 
 « Terminé » = tests verts, `tsc --noEmit` sans erreur, lint propre, CI verte.
 
-État en v2.5.0 : **446 tests Vitest** (moteur, stockage, interface) et **56 tests Playwright** (chromium, iPhone 13, Pixel 7), lignes de `src/core` couvertes à 100 %.
+État en v2.6.0 : **466 tests Vitest** (moteur, stockage, interface) et **56 tests Playwright** (chromium, iPhone 13, Pixel 7), lignes de `src/core` couvertes à 100 %.
 
 ### 10.1 Moteur (`tests/core.rules.spec.ts`) — fourni, 80 tests
 - C'est la **spécification exécutable** du moteur. Elle a été validée contre une implémentation de référence : 80 tests sur 80 passent (v1.1 : règle des dix dés du livre, maîtrise 7+).
@@ -560,7 +560,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 11. **v2.1 — techniques des courtisans et de Shosuro** : même moteur, nouvelles entrées de catalogue (compétences sociales, Connaissance, conditions d'Honneur, spécialisations). Annexe D (validée le 24/10/2026) : catalogue `src/rules/ecoles-courtisans.json` (12 écoles), situation Cour, spécialisation choisie au lanceur → cas T25 à T42, E20 à E23 ; tag `v2.1.0`. Aucun changement de format de fiche (`schemaVersion` reste 2).
    - **v2.1.1** (patch) : carte « Nouveau round » entre l'Initiative et la Posture, avec une description de deux lignes au plus sur mobile (§6.2, M12) ; test du fichier lié rendu robuste (lecture du fichier avant sa première écriture).
    - **v2.1.2** (patch) : Statistiques devient une vue à part (en-tête sur bureau, barre du bas sur mobile) ; les 4 onglets de situation tiennent sur une ligne à 360 px (§7, M13).
-12. **v2.2 à v2.7 — règles du livre, combat complet, ergonomie** : annexe E (validée le 24/10/2026). Six versions : correctifs de règles et retouches d'interface (v2.2.0, **livrée**, tag `v2.2.0`, écarts en E.12), combat complet (v2.3.0, **livrée**, tag `v2.3.0`, écarts en E.13), maîtrises et armures (v2.4.0, **livrée**, tag `v2.4.0`, écarts en E.14), récupération (v2.5.0, **livrée**, tag `v2.5.0`, écarts en E.15), vocabulaire français (v2.6.0), bataille de masse (v2.7.0) → cas L1 à L27, E24 à E28.
+12. **v2.2 à v2.7 — règles du livre, combat complet, ergonomie** : annexe E (validée le 24/10/2026). Six versions : correctifs de règles et retouches d'interface (v2.2.0, **livrée**, tag `v2.2.0`, écarts en E.12), combat complet (v2.3.0, **livrée**, tag `v2.3.0`, écarts en E.13), maîtrises et armures (v2.4.0, **livrée**, tag `v2.4.0`, écarts en E.14), récupération (v2.5.0, **livrée**, tag `v2.5.0`, écarts en E.15), vocabulaire français (v2.6.0, **livrée**, tag `v2.6.0`, écarts en E.16), bataille de masse (v2.7.0) → cas L1 à L27, E24 à E28.
 13. **À définir** : voies alternatives et écoles avancées (exclues en D-a), shugenja et sorts (hors périmètre, §1), compteurs « N fois par séance » (D-g).
 
 ---
@@ -623,7 +623,7 @@ interface Modifier {
 ```
 
 ### Règles
-- **Portée** : `all` = jets de compétence et de trait ; `skill` = cette compétence ; `trait` = jets sur ce trait (compétence ou trait pur) ; `social` = compétences sociales (`SOCIAL_SKILLS` : Comédie, Courtoisie, Étiquette, Sincérité, Intimidation, Tentation, Représentation et ses spécialités) ; `attack` = attaques ; `damage` = dégâts ; `initiative` ; `armor` = ND d'armure ; `wounds` = pénalité de blessure (réduite de `flat`, jamais sous 0, toujours appliquée). Ni `armor` ni `wounds` ne concernent un jet.
+- **Portée** : `all` = jets de compétence et de trait ; `skill` = cette compétence ; `trait` = jets sur ce trait (compétence ou trait pur) ; `social` = compétences sociales (`SOCIAL_SKILLS` : Comédie, Courtisan (ou Courtoisie), Étiquette, Sincérité, Intimidation, Tentation, Représentation et ses spécialités) ; `attack` = attaques ; `damage` = dégâts ; `initiative` ; `armor` = ND d'armure ; `wounds` = pénalité de blessure (réduite de `flat`, jamais sous 0, toujours appliquée). Ni `armor` ni `wounds` ne concernent un jet.
 - **Posture** : un bonus avec `stance` ne s'applique que dans cette posture (jets et ND d'armure). Hors du lanceur (fiche, statistiques), la posture de référence est Attaque.
 - **ND** : `tn` s'ajoute au ND final des jets concernés (`targetNumber({…, modifier})`).
 - **Ordre** dans `computePool` : posture → dés ± → **bonus de jet** → point de Vide → règle des dix dés. Un malus ne descend jamais sous 0 dé. Le bonus fixe s'ajoute au total ; les augmentations gratuites s'ajoutent à celles saisies.
@@ -1160,3 +1160,10 @@ Interface et mobile :
 - **Nouvelle journée** : `newDay(c)` et `dailyHealing(c)` dans `src/core/recovery.ts` (données `DAILY_HEALING`). Bouton « Nouvelle journée… » en tête de fiche (fiche modifiable seulement, absent en consultation), aperçu (« Vide 0 → 2 ; blessures 20 → 15 ») puis « Confirmer la nouvelle journée » ou « Annuler ». Remet aussi à zéro les effets du round (Vide en armure, Défense totale, Garde, Centre), les dégâts en attente et le duel en cours, en plus de l'initiative, du Vide d'Initiative et des compteurs.
 - **Méditation** : action `meditate` du catalogue (Méditation/Vide ND 20, spécialisation « Récupération du Vide »), champ facultatif `ActionDef.group` titré dans la liste d'actions (« Repos »). Le bouton « Réussi : +N point(s) de Vide » est dans le lanceur, **que le lanceur de dés soit affiché ou non** (jet aux vrais dés) ; désactivé quand le Vide est plein et en consultation. `meditate(c)` lit `meditationVoidPoints` (v2.4).
 - **Tests** : `tests/core.recovery.spec.ts` (L17, L18, L25) et `tests/ui/recovery.spec.tsx` (préférence, nouvelle journée, méditation) ; M11 vérifie aussi le nouveau bouton d'en-tête.
+
+### E.16 Écarts de mise en œuvre (v2.6.0)
+- **Catalogues** : actions, `ARMOR_CATALOG`, `ecoles-bushi.json` (Hida R1 : sauf Discrétion) et `ecoles-courtisans.json` emploient Vigilance, Courtisan, Étiquette (Courtoisie), Discrétion, Représentation : Conte et Art oratoire. `reference/` est inchangé ; les tableaux des annexes C et D gardent l'ancien vocabulaire (cas T1 à T42 tels que validés).
+- **Alias** : `SKILL_ALIASES` met le nouveau nom en premier, puis l'ancien libellé français, puis l'anglais ; `EMPHASIS_ALIASES` : Courtoisie, Politesse, Courtesy. Une fiche v2.5 répond donc aux actions et techniques sans renommage.
+- **Renommage** : données `VOCABULARY_UPDATES` (`src/rules/l5r4e.ts`), moteur `vocabularyChanges(c)` et `updateVocabulary(c)` (`src/core/vocabulary.ts`). Sont renommés : les noms de compétence, la spécialisation Politesse **sous Étiquette seulement**, et la compétence visée par un bonus de jet (`modifiers[].skill`). Comparaison normalisée (accents, casse) ; une compétence n'est pas renommée si la fiche porte déjà le nouveau nom (pas de doublon), une spécialisation non plus.
+- **Bandeau** : en tête de fiche, fiche modifiable seulement (absent en consultation). « Mettre à jour le vocabulaire (Courtoisie → Courtisan, …) » avec **Plus tard** et **Mettre à jour…** ; l'aperçu liste chaque renommage (« Compétence : « Courtoisie » → « Courtisan » », « Spécialisation (Étiquette) : … », « Bonus « Voix » : … ») avec **Annuler** et **Renommer**. Après renommage, **Annuler le renommage** rend la fiche d'avant tant qu'elle n'a pas changé depuis. État dans `ui.vocabulary` (action `vocabulary` : `update`, `undo`, `hide`), remis à zéro à l'ouverture d'une fiche. Pas de fenêtre d'import : le renommage ne change que des libellés, l'aperçu tient dans le bandeau.
+- **Tests** : `tests/core.vocabulary.spec.ts` (L23, libellés, alias, cas limites, non-régression de toutes les écoles avant et après renommage) et `tests/ui/vocabulary.spec.tsx` (bandeau, aperçu, renommage, annulation, consultation, Vigilance). Les tests existants gardent leurs fiches à l'ancien vocabulaire, couvertes par les alias.

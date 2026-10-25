@@ -136,7 +136,7 @@ export const EMPHASIS_ALIASES: readonly (readonly string[])[] = [
   ["Contrôle", "Control"],
   ["Manipulation"],
   ["Ragots", "Gossip"],
-  ["Politesse", "Courtesy", "Courtoisie"],
+  ["Courtoisie", "Politesse", "Courtesy"],
   ["Rhétorique", "Rhetoric"],
 ];
 

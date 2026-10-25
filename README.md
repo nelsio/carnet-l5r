@@ -48,6 +48,7 @@ Les fiches enregistrées hors ligne restent **propres à ce fichier, sur cet app
 - Les tuiles **ND armure** et **Réduction** ouvrent l'**éditeur d'armure** : nom de l'armure, bonus au ND, réduction. Le ND d'armure lui-même est calculé (`5 × Réflexes + 5 + bonus`, puis posture et Vide).
 - La liste **Armure du livre** (éditeur d'armure, ou bloc Identité en modification) remplit ces trois champs, que tu peux ensuite retoucher : aucune, ashigaru, légère, lourde, cavalerie. Son effet suit : armure légère `+5` au ND d'Athlétisme et de Discrétion ; armure lourde `+5` au ND des jets d'Agilité et de Réflexes (sauf école Hida) ; cavalerie `+12` au ND d'armure à cheval, et comme une lourde à pied.
 - **Nouvelle journée…** (en tête de fiche) : après une nuit de repos, un aperçu puis **Confirmer** remet tes points de Vide au maximum, soigne `2 × Constitution + Rang` blessures, et remet l'initiative et les compteurs d'escarmouche à zéro.
+- Les libellés suivent l'**édition française** : trait **Vigilance**, compétences **Courtisan**, **Discrétion**, **Représentation : Conte** et **Représentation : Art oratoire**, spécialisation **Courtoisie** d'Étiquette. Une fiche qui emploie encore les anciens noms (Courtoisie, Furtivité, Conteur, Éloquence, Politesse) marche telle quelle ; un bandeau propose **Mettre à jour…** : aperçu des renommages, puis **Renommer** (annulable tout de suite par **Annuler le renommage**) ou **Plus tard**.
 - Le bouton **Blessures : Terre × 2** de l'en-tête règle la taille des niveaux après Indemne (`× 2` du livre, ou `× 3` à `× 5` pour des personnages plus résistants) ; Indemne reste `Terre × 5`. Ce réglage est mémorisé sur l'appareil, pour toutes les fiches.
 
 ## 4. Jouer avec l'aide de jeu
@@ -56,9 +57,9 @@ L'onglet **Aide de jeu** (dans la barre du bas sur mobile) propose les jets de c
 
 | Situation | Contenu |
 |---|---|
-| **Enquête** | Remarquer, fouiller, interroger, percer un mensonge, Courtoisie, Étiquette, une action **« Se souvenir »** par compétence `Connaissance : …` de ta fiche, et dans **Repos**, **Méditer** (Méditation/Vide ND 20 : le bouton **Réussi** te rend 1 point de Vide, 2 avec Méditation 3, 3 avec Méditation 7). |
-| **Cour** | Jets sociaux : Courtoisie, Étiquette, Sincérité, Intimidation, Tentation, Comédie, Commerce, et une action **« Se produire »** par compétence `Représentation : …`. |
-| **Déplacement** | Distances en combat (pieds et mètres), Athlétisme, Équitation, Furtivité, Chasse, marche forcée. |
+| **Enquête** | Remarquer, fouiller, interroger, percer un mensonge, Courtisan, Étiquette, une action **« Se souvenir »** par compétence `Connaissance : …` de ta fiche, et dans **Repos**, **Méditer** (Méditation/Vide ND 20 : le bouton **Réussi** te rend 1 point de Vide, 2 avec Méditation 3, 3 avec Méditation 7). |
+| **Cour** | Jets sociaux : Courtisan, Étiquette, Sincérité, Intimidation, Tentation, Comédie, Commerce, et une action **« Se produire »** par compétence `Représentation : …`. |
+| **Déplacement** | Distances en combat (pieds et mètres), Athlétisme, Équitation, Discrétion, Chasse, marche forcée. |
 | **Combat** | **Escarmouche**, **Duel iaijutsu** et **Bataille**. |
 
 En **Escarmouche**, de haut en bas :

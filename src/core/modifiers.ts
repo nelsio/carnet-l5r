@@ -7,7 +7,7 @@ export function modifiersOf(c: Character): Modifier[] {
   return c.modifiers ?? [];
 }
 
-/** Compétence sociale (Courtoisie, Étiquette, Sincérité, Intimidation…), y compris Représentation : X. */
+/** Compétence sociale (Courtisan, Étiquette, Sincérité, Intimidation…), y compris Représentation : X. */
 export function isSocialSkill(name: string): boolean {
   const n = normalize(name);
   return SOCIAL_SKILLS.some((s) => {
