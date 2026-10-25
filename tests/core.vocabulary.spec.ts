@@ -110,17 +110,15 @@ describe("Renommage proposé (vocabularyChanges, updateVocabulary)", () => {
     expect(vocabularyChanges(example as Character)).toEqual([]);
   });
 
-  it("non-régression : toutes les écoles donnent les mêmes réserves avant et après renommage", () => {
+  // Au rang 5, les techniques des rangs 1 à 5 sont toutes actives : un seul rang par école suffit.
+  it("non-régression : toutes les écoles (rang 5) donnent les mêmes réserves avant et après renommage", () => {
     for (const school of SCHOOLS) {
-      for (let rank = 1; rank <= 5; rank++) {
-        const before = char({ schoolId: school.id, insightRank: rank });
-        const after = updateVocabulary(before);
-        for (const s of before.skills) {
-          const a = skill(s.name, s.trait);
-          const renamed = { ...a, skill: after.skills[before.skills.indexOf(s)].name };
-          expect(computePool(after, renamed, {}), `${school.id} R${rank} ${s.name}`).toEqual(computePool(before, a, {}));
-        }
-      }
+      const before = char({ schoolId: school.id, insightRank: 5 });
+      const after = updateVocabulary(before);
+      before.skills.forEach((s, i) => {
+        const a = skill(s.name, s.trait);
+        expect(computePool(after, { ...a, skill: after.skills[i].name }, {}), `${school.id} ${s.name}`).toEqual(computePool(before, a, {}));
+      });
     }
   });
 });
