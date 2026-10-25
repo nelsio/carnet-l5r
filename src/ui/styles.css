@@ -369,6 +369,9 @@ header.top + main{margin-top:18px}
 /* ---------- Blocs de la fiche : « Edit » par bloc (annexe E.9 S2) ---------- */
 .panel.editing{border-color:var(--gold)}
 .readonly-head{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between}
+/* Nouvelle journée et groupes d'actions (annexe E.6) */
+.day-head{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between}
+.actgroup{margin:10px 0 0}
 
 /* ---------- Détail des blessures sur mobile : une ligne par niveau (annexe E.9 S3) ---------- */
 .wdetail{display:none}

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { clanAccent } from "@carnet/core";
+import { WOUND_MULTIPLIERS } from "../../rules/l5r4e";
 import { useStore } from "../store";
 import { NEXT_THEME, THEME_LABELS } from "../theme";
 
@@ -33,6 +34,10 @@ export function Header() {
           onClick={() => dispatch({ type: "diceRoller", show: !ui.showDiceRoller })}
         />
         <HeaderButton icon={ICONS.theme} label={`Thème : ${THEME_LABELS[ui.theme]}`} onClick={() => dispatch({ type: "theme", theme: NEXT_THEME[ui.theme] })} />
+        <HeaderButton
+          icon={ICONS.wounds} label={`Blessures : Terre × ${ui.woundMultiplier}`}
+          onClick={() => dispatch({ type: "woundMultiplier", value: nextWoundMultiplier(ui.woundMultiplier) })}
+        />
         {c && (
           <div className="tabs" role="group" aria-label="Vue">
             <button type="button" aria-pressed={ui.view === "sheet"} onClick={() => dispatch({ type: "view", view: "sheet" })}>Fiche</button>
@@ -61,7 +66,14 @@ const ICONS = {
       <path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor" />
     </>
   ),
+  wounds: <path d="M12 3.5c3.2 4.2 6 7.4 6 10.6a6 6 0 0 1-12 0c0-3.2 2.8-6.4 6-10.6z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />,
 };
+
+/** Multiplicateur de blessures suivant (× 2 → × 3 → × 4 → × 5 → × 2), réglage de préférence (annexe E.6). */
+function nextWoundMultiplier(n: number): number {
+  const i = WOUND_MULTIPLIERS.indexOf(n as (typeof WOUND_MULTIPLIERS)[number]);
+  return WOUND_MULTIPLIERS[(i + 1) % WOUND_MULTIPLIERS.length];
+}
 
 /** Icône + texte sur bureau, icône seule sur mobile ; le texte reste le nom accessible (HANDOFF §6.2, §7). */
 function HeaderButton({ icon, label, pressed, onClick }: { icon: ReactNode; label: string; pressed?: boolean; onClick: () => void }) {

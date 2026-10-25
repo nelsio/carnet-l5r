@@ -1,11 +1,11 @@
 import { useEffect, useRef } from "react";
 import {
   applicableModifiers, armorRollTn, bowStrength, DAMAGE_MANEUVER_ID, describeEffect, focusOutcome, opposedMargin, opposedVerdict, stanceRestriction, woundEffectNote, describeModifier, effectOn, findSkill, fullDefenseBonus, maneuverCost, maneuverFreeRaises, modifierTN,
-  formatDice, isRanged, isSocialSkill, poolStats, reminderText, rollDice, schoolContext, schoolReminders, verdict, voidMultiplier,
+  formatDice, isRanged, isSocialSkill, meditationVoidPoints, poolStats, reminderText, rollDice, schoolContext, schoolReminders, verdict, voidMultiplier,
   voidPointBonus, voidSpendBonus, voidSpendOption, woundState,
   type ActionDef, type ActiveEffect, type Character, type Pool,
 } from "@carnet/core";
-import { CALLED_ZONES, CENTER_BONUS, COMBAT_SUBS, MELEE_TARGET_PENALTY, SITUATIONS, TN_PER_RAISE, TN_SCALE, TRAIT_LABELS, type CalledZone } from "../../rules/l5r4e";
+import { CALLED_ZONES, CENTER_BONUS, COMBAT_SUBS, MEDITATE_ACTION_ID, MELEE_TARGET_PENALTY, SITUATIONS, TN_PER_RAISE, TN_SCALE, TRAIT_LABELS, type CalledZone } from "../../rules/l5r4e";
 import { pct } from "../format";
 import {
   activeModifiers, calledRaises, contextOf, effectiveManeuvers, finalTN, isActive, isUnskilled, maneuverCosts, poolFor, rollWoundPenalty,
@@ -288,6 +288,7 @@ export function Roller() {
       )}
       {freeToTn > 0 && typeof tn === "number" && <div className="hint">{freeToTn} augmentation(s) gratuite(s) déduites du ND (−{TN_PER_RAISE * freeToTn}).</div>}
       {ws.penalty === null && <div className="hint" style={{ color: "var(--bad)" }}>Ton personnage est hors de combat.</div>}
+      {a.id === MEDITATE_ACTION_ID && <MeditationSuccess />}
 
       {ui.showDiceRoller && (
         <>
@@ -311,6 +312,22 @@ export function Roller() {
         </div>
       )}
     </>
+  );
+}
+
+/** Méditation réussie (annexe E.6) : points de Vide rendus, plafonnés à l'Anneau de Vide ; rien en consultation. */
+function MeditationSuccess() {
+  const { state, dispatch } = useStore();
+  const c = useCharacter();
+  const points = meditationVoidPoints(c);
+  const full = c.voidPoints >= c.voidRing;
+  return (
+    <div className="tnline" style={{ marginTop: 10 }}>
+      <span className="muted">{full ? `Vide plein (${c.voidPoints}/${c.voidRing}).` : `Vide ${c.voidPoints}/${c.voidRing}.`}</span>
+      <button type="button" className="btn sm gold" disabled={full || state.mode === "readonly"} onClick={() => dispatch({ type: "meditate" })}>
+        Réussi : +{points} point{points > 1 ? "s" : ""} de Vide
+      </button>
+    </div>
   );
 }
 

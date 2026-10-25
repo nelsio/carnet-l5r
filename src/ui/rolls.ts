@@ -128,8 +128,10 @@ export function uiRollStance(ui: { stance: Stance; situation?: Situation; sub?: 
   return rollStance({ stance: ui.stance, sub: ui.situation === "combat" ? ui.sub : undefined });
 }
 
-export function contextOf(ui: Pick<CombatUi, "stance" | "mounted" | "centerLastRound"> & { situation?: Situation; sub?: CombatSub }): SchoolContext {
-  return schoolContext({ stance: uiRollStance(ui), mounted: ui.mounted, centerLastRound: ui.centerLastRound });
+export function contextOf(
+  ui: Pick<CombatUi, "stance" | "mounted" | "centerLastRound"> & { situation?: Situation; sub?: CombatSub; woundMultiplier?: number },
+): SchoolContext {
+  return schoolContext({ stance: uiRollStance(ui), mounted: ui.mounted, centerLastRound: ui.centerLastRound, woundMultiplier: ui.woundMultiplier });
 }
 
 /** ND d'armure du personnage : posture, Vide, bonus de jet et techniques d'école. */

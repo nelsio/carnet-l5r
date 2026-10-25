@@ -16,6 +16,8 @@ export interface SchoolContext {
   centerLastRound: boolean;
   /** Spécialisation choisie au lanceur (annexe D-c) ; absente hors lanceur. */
   emphasis?: string;
+  /** Multiplicateur de blessures des préférences (annexe E-d) ; absent : Terre × 2. */
+  woundMultiplier?: number;
 }
 
 /** Contexte de référence hors lanceur (fiche, statistiques) : posture Attaque, non monté. */
@@ -43,6 +45,7 @@ export function schoolContext(ctx: Partial<SchoolContext> = {}): SchoolContext {
     centerLastRound: ctx.centerLastRound ?? false,
   };
   if (ctx.emphasis) out.emphasis = ctx.emphasis;
+  if (ctx.woundMultiplier) out.woundMultiplier = ctx.woundMultiplier;
   return out;
 }
 

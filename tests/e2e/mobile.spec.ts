@@ -327,11 +327,12 @@ test.describe("M13 à 360 px de large", () => {
 
 test.describe("M11 : en-tête à 360 px de large", () => {
   test.use({ viewport: { width: 360, height: 740 } });
-  test("Bibliothèque, Lanceur de dés et Thème en icônes de 40 px sur la ligne du nom, libellés avec l'état", async ({ page }) => {
+  test("Bibliothèque, Lanceur de dés, Thème et Blessures en icônes de 40 px sur la ligne du nom, libellés avec l'état", async ({ page }) => {
     const buttons = [
       page.getByRole("button", { name: "Bibliothèque" }),
       page.getByRole("button", { name: "Lanceur de dés : affiché" }),
       page.getByRole("button", { name: "Thème : auto" }),
+      page.getByRole("button", { name: "Blessures : Terre × 2" }),
     ];
     const name = (await page.getByRole("heading", { level: 1 }).boundingBox())!;
     for (const b of buttons) {
