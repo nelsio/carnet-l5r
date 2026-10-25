@@ -1126,6 +1126,9 @@ Interface et mobile :
 | P14 | Multiplicateur de blessures | Préférence, × 2 (E-d) |
 | P15 | Libellés français définitifs (E.7) | Ceux du fichier de techniques français |
 | P16 | Kyujutsu 7 et plafond de Force (C11) : le +1 s'ajoute-t-il avant ou après le plafond ? | Avant le plafond (un archer faible n'en profite pas) |
+| P17 | **Tranché le 25/10/2026** : les dés de blessures de la bataille de masse n'explosent pas, comme le dé de bataille (E-g). | Décision retenue |
+| P18 | **Tranché le 25/10/2026** : la Réduction (armure, techniques) s'applique aux blessures de bataille, encaissées comme des dégâts (F6). | Décision retenue |
+| P19 | **Tranché le 25/10/2026** : la Gloire gagnée en bataille est affichée, pas ajoutée à la fiche. | Décision retenue |
 
 ### E.12 Écarts de mise en œuvre (v2.2.0)
 - **L1** : les dés de plus des maîtrises Kenjutsu 3 et 7 (+1g0) viennent avec le catalogue de maîtrises (E.4, v2.4) ; la v2.2.0 livre l'explosion sur 9 (Kenjutsu 7 : 5g2 sur 9).
@@ -1174,7 +1177,7 @@ Interface et mobile :
 - **Moteur** (`src/core/battle.ts`) : `armyStatus(gap)` (écart ≥ 5 : gagne ; ≤ −5 : perd ; sinon égalité), `battleRollBonus(c)` et `battleRollTotal(c, die)` (1d10 + Anneau d'Eau + Bataille), `battleOutcome(total, engagement, status)` (case, ligne, colonne et décalage) et `rollBattleDice(n, rng)`. Un total sous 1 (Tacticien −5) prend la **première** ligne, au-delà de 30 la dernière.
 - **Panneau « Bataille de masse »** dans l'aide de jeu, sous « Nouveau round », en Bataille seulement : case « Je commande l'armée » (écart de Commandement saisi, négatif si tu perds, → « Ton armée gagne / Égalité / Ton armée perd ») ou boutons Gagne / Égalité / Perd ; boutons d'engagement ; jet de bataille ; case de la table. Le « i » du panneau détaille l'engagement et le calcul (« Total 14 (Tacticien +5) → ligne 13-15 ; colonne Engagé, décalée de 1 »). La carte d'information « Niveau d'engagement » est retirée, son contenu passe dans le panneau.
 - **Jet de bataille** : un champ « Total du jet » (1d10 + Eau + Bataille, **sans** le Tacticien) toujours modifiable ; avec le lanceur affiché, « Lancer 1d10 » le remplit et affiche le d10. **Tacticien** : case, puis +5 ou −5 (+5 par défaut), ajouté au total pour lire la table.
-- **Dés de blessures** : **sans explosion**, comme le dé de bataille (E-g) ; additionnés. L'encaissement réutilise le composant **Encaisser** de la barre d'état (F6 : Réduction, Vide −10), pré-rempli par « Lancer les dés de blessures (Nd10) » avec le lanceur affiché, à saisir sinon. Après l'encaissement, « Blessures du tour encaissées » ; rien à encaisser en consultation.
-- **Gloire et événements** (Duel, Occasion héroïque) : affichés seulement ; la Gloire de la fiche n'est pas modifiée.
+- **Dés de blessures** : **sans explosion**, comme le dé de bataille (E-g, P17) ; additionnés. L'encaissement réutilise le composant **Encaisser** de la barre d'état (F6 : Réduction, Vide −10 ; la Réduction s'applique, P18), pré-rempli par « Lancer les dés de blessures (Nd10) » avec le lanceur affiché, à saisir sinon. Après l'encaissement, « Blessures du tour encaissées » ; rien à encaisser en consultation.
+- **Gloire et événements** (Duel, Occasion héroïque) : affichés seulement ; la Gloire de la fiche n'est pas modifiée (P19).
 - **État** : `ui.battle` (non persisté). « Nouveau round » efface l'écart, le jet et les dés de blessures, et garde le commandement, l'état choisi, l'engagement et le Tacticien ; « Nouvelle journée » remet tout à zéro. Changer l'état, l'engagement ou le jet remet à zéro les dés de blessures du tour.
 - **Tests** : `tests/core.battle.spec.ts` (L19, table, commandement, jet, bornes) et `tests/ui/battle.spec.tsx` (panneau, L19, commandement, vrais dés, lanceur et Tacticien, nouveau round, consultation) ; Playwright M15 (mobile et 360 px).
