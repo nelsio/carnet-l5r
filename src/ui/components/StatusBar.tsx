@@ -1,11 +1,12 @@
 import { useState } from "react";
 import {
-  armorEffects, movement, totalReduction, voidMultiplier, woundsFromDamage, resolveValue, schoolArmorBonus, schoolReduction, woundPenaltyAt, woundState,
+  armorEffects, catalogArmor, movement, totalReduction, voidMultiplier, woundsFromDamage, resolveValue, schoolArmorBonus, schoolReduction, woundPenaltyAt, woundState,
   type Character,
 } from "@carnet/core";
 import { ARMOR_TN, VOID_COMBAT, WOUND_LEVELS } from "../../rules/l5r4e";
 import { contextOf, currentArmorTN, selectedKeys } from "../rolls";
 import { useCharacter, useStore } from "../store";
+import { ArmorCatalogSelect, ArmorEffect } from "./ArmorCatalog";
 import { NumberField } from "./fields";
 import { LinkBanner } from "./LinkBanner";
 
@@ -162,6 +163,7 @@ function ArmorEditor({ tn }: { tn: number }) {
   const set = (field: "name" | "bonus" | "reduction", value: unknown) => dispatch({ type: "set", path: ["armor", field], value });
   return (
     <div className="armedit" role="group" aria-label="Armure">
+      <div style={{ gridColumn: "1/-1" }}><ArmorCatalogSelect /></div>
       <label className="field"><span className="label">Armure</span>
         <input className="in" type="text" maxLength={80} value={c.armor.name} onChange={(e) => set("name", e.target.value)} />
       </label>
@@ -174,7 +176,8 @@ function ArmorEditor({ tn }: { tn: number }) {
       <p className="hint" style={{ gridColumn: "1/-1", margin: 0 }}>
         ND d'armure = 5 × Réflexes {c.traits.reflexes} + 5 + bonus {c.armor.bonus}{tn !== armorBase(c) ? " ± posture, Vide et bonus" : ""} = <b className="mono">{tn}</b>.
         {" "}La réduction se retire de chaque jet de dégâts reçu.
-        {techArmor !== 0 && <> Techniques d'école : +{techArmor} au ND d'armure{techAuto.length ? ` (dont ${techAuto.map((e) => e.kind === "armor" ? `+${resolveValue(e.value, c)} · ${e.source}` : "").join(", ")})` : ""}.</>}
+        {catalogArmor(c)?.summary && <> <ArmorEffect /></>}
+        {techArmor !== 0 && <> Techniques et maîtrises : +{techArmor} au ND d'armure{techAuto.length ? ` (dont ${techAuto.map((e) => e.kind === "armor" ? `+${resolveValue(e.value, c)} · ${e.source}` : "").join(", ")})` : ""}.</>}
         {techReduction !== 0 && <> Techniques d'école : +{techReduction} de Réduction (total {c.armor.reduction + techReduction}).</>}
       </p>
       <button type="button" className="btn sm" style={{ justifySelf: "end", gridColumn: "1/-1" }} onClick={() => dispatch({ type: "toggleArmorEdit" })}>Fermer</button>

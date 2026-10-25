@@ -46,6 +46,7 @@ Les fiches enregistrées hors ligne restent **propres à ce fichier, sur cet app
   - **points de Vide** : une pastille par point, un appui en dépense ou en rend ;
   - quatre tuiles : **Dépl.** (`10/20 pi` = action libre / action simple), **ND armure**, **Réduction** et **Pénalité** (en rouge dès qu'elle dépasse `0`).
 - Les tuiles **ND armure** et **Réduction** ouvrent l'**éditeur d'armure** : nom de l'armure, bonus au ND, réduction. Le ND d'armure lui-même est calculé (`5 × Réflexes + 5 + bonus`, puis posture et Vide).
+- La liste **Armure du livre** (éditeur d'armure, ou bloc Identité en modification) remplit ces trois champs, que tu peux ensuite retoucher : aucune, ashigaru, légère, lourde, cavalerie. Son effet suit : armure légère `+5` au ND d'Athlétisme et de Discrétion ; armure lourde `+5` au ND des jets d'Agilité et de Réflexes (sauf école Hida) ; cavalerie `+12` au ND d'armure à cheval, et comme une lourde à pied.
 
 ## 4. Jouer avec l'aide de jeu
 
@@ -112,6 +113,8 @@ Comment elles s'appliquent :
 - les armes ont des **mots-clés** (Samouraï, Lourde, Petite, Arc…), pré-remplis pour les armes connues : ils décident des techniques qui s'appliquent.
 
 Une fiche d'une version précédente propose d'**associer** l'école reconnue dans son nom (« Associer à École de bushi Kakita ? ») : **rien ne change sans ta confirmation**.
+
+**Maîtrises de compétence** (v2.4) : selon le rang de **chaque compétence** de ta fiche, quelle que soit ton école, l'outil applique ses maîtrises. Par exemple Kenjutsu 3 donne `+1g0` aux dégâts des épées et Kenjutsu 7 les fait exploser sur 9 ; Défense 5 ajoute `+3` au ND d'armure en Défense ; Bataille 5 ajoute son rang à l'Initiative ; Athlétisme 3 et 5 effacent la pénalité de terrain ; toute compétence au rang 10 gagne une augmentation gratuite. Dans le lanceur, elles portent le badge **Maîtrise** (« `+1g0` · Kenjutsu 3 ») ; celles qui dépendent de la situation (Armes d'hast) se cochent, celles sans effet chiffré rejoignent les **rappels**.
 
 > Les résumés sont **écrits pour l'outil** et restent **à vérifier dans ton livre**, qui fait foi.
 

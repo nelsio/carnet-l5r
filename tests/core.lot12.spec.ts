@@ -1,7 +1,7 @@
 /**
  * Lot 12, v2.2.0 (HANDOFF annexe E.2, E.9, E.10) : correctifs de règles d'après le livre.
  * Personnage : reference/perso-test-ecoles.json (sans école sauf mention), posture Attaque, terrain normal.
- * L1 : les dés de plus des maîtrises Kenjutsu 3 et 7 (+1g0) arrivent en v2.4 (E.4) ; ici, l'explosion sur 9.
+ * L1 : depuis la v2.4.0, les maîtrises Kenjutsu 3 et 7 ajoutent +1g0 (catalogue de maîtrises, E.4).
  */
 import { describe, expect, it } from "vitest";
 import {
@@ -41,12 +41,14 @@ const asModifier = (t: typeof earthStrength) => ({
 });
 
 describe("Lot 12, v2.2.0 : correctifs de règles (annexe E.2)", () => {
-  it("L1 : dégâts katana, Kenjutsu 2 → 5g2 sur 10 ; Kenjutsu 7 → explose sur 9 (C1)", () => {
+  it("L1 : dégâts katana, Kenjutsu 2 → 5g2 sur 10 ; 3 → 6g2 sur 10 ; 7 → 6g2 sur 9 (C1, maîtrises E.4)", () => {
     const c = char();
     expect(show(c, damage(c, "Katana"))).toBe("5g2");
     expect(computePool(c, damage(c, "Katana"), {}).explodeOn).toBe(10);
+    const three = withSkill(c, "Kenjutsu", 3);
+    expect(computePool(three, damage(three, "Katana"), {})).toMatchObject({ rolled: 6, kept: 2, explodeOn: 10 });
     const master = withSkill(c, "Kenjutsu", 7);
-    expect(computePool(master, damage(master, "Katana"), {})).toMatchObject({ rolled: 5, kept: 2, explodeOn: 9 });
+    expect(computePool(master, damage(master, "Katana"), {})).toMatchObject({ rolled: 6, kept: 2, explodeOn: 9 });
     expect(computePool(withSkill(c, "Kenjutsu", 6), damage(c, "Katana"), {}).explodeOn).toBe(10);
   });
 

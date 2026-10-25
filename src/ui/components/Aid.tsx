@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import {
   armorEffects, describeModifier, fullAttackAllowed, guardRule, initiativeScore, isSimpleAttack, stanceRestriction, modifiersOf, movement, movementBonus, movementWater, resolveValue,
-  reminderText, rings, schoolOf, schoolReminders, stackCount, stackEffects, stackMax, voidMultiplier,
+  reminderText, rings, schoolOf, schoolReminders, stackCount, stackEffects, stackMax, terrainWaiver, voidMultiplier,
   type ActionDef, type ActiveEffect,
 } from "@carnet/core";
 import { CENTER_BONUS, COMBAT_SUBS, SITUATIONS, STANCES, TERRAINS, VOID_COMBAT } from "../../rules/l5r4e";
@@ -235,10 +235,12 @@ function RemindersPanel() {
   const reminders = schoolReminders(c, contexts);
   if (!reminders.length) return null;
   const details = !!state.ui.info.reminders;
+  // Rappels des techniques d'école et des maîtrises de compétence (annexe E.4).
+  const title = reminders.every((e) => e.mastery) ? "Rappels de maîtrise" : reminders.some((e) => e.mastery) ? "Rappels" : "Rappels d'école";
   return (
     <div className="panel" style={{ padding: 12 }}>
       <div className="panel-head" style={{ marginBottom: 6 }}>
-        <span className="panel-title"><span className="label">Rappels d'école</span><InfoButton panel="reminders" label="Rappels d'école" /></span>
+        <span className="panel-title"><span className="label">{title}</span><InfoButton panel="reminders" label={title} /></span>
         <span className="muted" style={{ fontSize: 12 }}>{reminders.length}</span>
       </div>
       <div className="rems">
@@ -314,6 +316,7 @@ function MovePanel() {
   const m = movement(c, terrain);
   const water = movementWater(c, terrain);
   const bonus = movementBonus(c, contextOf(state.ui));
+  const waiver = terrain === "normal" ? undefined : terrainWaiver(c, terrain);
   const tiles = [
     { label: "Action libre", ft: m.free, note: "1 fois par round" },
     { label: "Action simple", ft: m.simple, note: "Eau × 10" },
@@ -348,6 +351,7 @@ function MovePanel() {
         ))}
       </div>
       {bonus > 0 && <p className="hint" style={{ margin: "6px 0 0", color: "var(--gold)" }}>+{bonus} pieds par tour (technique d'école), sans dépasser le maximum.</p>}
+      {waiver && <p className="hint" data-testid="terrain-waiver" style={{ margin: "6px 0 0", color: "var(--gold)" }}>Maîtrise {waiver.source} : terrain {TERRAINS.find((t) => t.id === terrain)?.label.toLowerCase()} sans pénalité.</p>}
       {details && (
         <p className="hint" style={{ marginBottom: 0 }}>
           Terrain modéré (broussailles, foule) : Anneau d'Eau −1 ; difficile (eau, escaliers, marais) : −2, avec 1 au minimum (livre p. 87).

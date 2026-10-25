@@ -1,13 +1,13 @@
 import {
-  ARMOR_TN, CENTER_BONUS, DEAD_LABEL, DISARM_DAMAGE, DUEL_ASSESSMENT_WIN, FULL_DEFENSE_DIVISOR, MELEE_TARGET_PENALTY, MASTERY, MOVEMENT, POOL_BONUS, RANGED_PATTERN, RINGS, SKILL_ALIASES,
+  ARMOR_CATALOG, ARMOR_ROLL_TN, ARMOR_TN, CENTER_BONUS, DEAD_LABEL, DISARM_DAMAGE, DUEL_ASSESSMENT_WIN, FULL_DEFENSE_DIVISOR, HEAVY_ARMOR_TRAITS, MELEE_TARGET_PENALTY, MOVEMENT, POOL_BONUS, RANGED_PATTERN, RINGS, SKILL_ALIASES,
   TERRAINS, TN_PER_RAISE, WOUND_FIRST_MULTIPLIER, WOUND_LEVELS, WOUND_NEXT_MULTIPLIER,
-  type RingKey, type Stance, type Terrain,
+  type CatalogArmor, type RingKey, type Stance, type Terrain,
 } from "../rules/l5r4e";
 import { describeModifier, woundPenaltyReduction } from "./modifiers";
 import type { Character, Maneuver, Modifier, RollTrait, Skill, TraitKey, WeaponKeyword } from "./schema";
 import {
-  catalogWeapon, describeEffect, effectOn, guardRule, maneuverCost, resolveValue, rollEffects, sameEmphasis, schoolArmorBonus, schoolContext, skillIs,
-  voidMultiplier, voidPointBonus, voidSpendBonus, voidSpendOption, woundEffects, type ActiveEffect, type SchoolContext,
+  bowStrengthBonus, catalogWeapon, describeEffect, effectOn, guardRule, heavyArmorWaiver, maneuverCost, resolveValue, rollEffects, sameEmphasis, schoolArmorBonus, schoolContext, skillIs,
+  terrainWaiver, voidMultiplier, voidPointBonus, voidSpendBonus, voidSpendOption, woundEffects, type ActiveEffect, type SchoolContext,
 } from "./schools";
 
 export type Rng = () => number;
@@ -38,6 +38,8 @@ export interface Pool extends TenDice {
   voidBlocked?: boolean;
   /** Point de Vide permis aux dégâts grâce au katana (C2). */
   katanaVoid?: boolean;
+  /** Modification du ND par l'armure portée : armure légère, armure lourde (annexe E.5). */
+  armorTn?: number;
   /** Avertissements de l'arme (Force insuffisante pour le dai-kyu). */
   warnings?: string[];
 }
@@ -219,11 +221,6 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
       const strength = isRanged(action.weapon) ? bowStrength(c, action.weapon, notes) : c.traits.strength;
       rolled = strength + dr.rolled;
       kept = dr.kept;
-      const mastery = damageMastery(c, action.weapon);
-      if (mastery) {
-        explodeOn = 9;
-        notes.push(`Maîtrise ${mastery.name} ${mastery.rank} : les dés explosent sur 9 et 10`);
-      }
       break;
     }
     case "initiative":
@@ -265,7 +262,7 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
     freeRaises += m.freeRaises;
     notes.push(`${m.name} : ${describeModifier(m)}`);
   }
-  // Techniques d'école : effets d'office et effets cochés.
+  // Techniques d'école et maîtrises : effets d'office et effets cochés. Les dégâts d'un Désarmement n'en reçoivent aucun.
   const ctx = schoolContext({
     stance: mods.stance, mounted: mods.mounted, centerLastRound: mods.centerLastRound, emphasis: mods.emphasis,
   });
@@ -274,7 +271,7 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
   let techFlat = 0;
   let techTn = 0;
   let unlimitedRaises = false;
-  for (const e of rollEffects(c, action, ctx)) {
+  for (const e of disarmed ? [] : rollEffects(c, action, ctx)) {
     ("mode" in e && e.mode === "auto" ? applied : optional).push(e);
     if (e.kind !== "roll" || !effectOn(e, mods.selected)) continue;
     const input = mods.inputs?.[e.key];
@@ -284,7 +281,13 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
     freeRaises += resolveValue(e.freeRaises, c, input);
     techTn += resolveValue(e.tn, c, input);
     unlimitedRaises ||= !!e.unlimitedRaises;
-    notes.push(`${e.source} : ${describeEffect(e, c, input)}`);
+    if (e.explodeOn && explodes) {
+      // Maîtrise Kenjutsu ou Armes lourdes 7 (C1, E.4).
+      explodeOn = Math.min(explodeOn, e.explodeOn);
+      notes.push(`Maîtrise ${e.source} : les dés explosent sur ${e.explodeOn} et 10`);
+    } else {
+      notes.push(`${e.source} : ${describeEffect(e, c, input)}`);
+    }
   }
   const vm = voidMultiplier(c);
   // Dégâts : pas de point de Vide, sauf au katana, et un seul (C2).
@@ -316,7 +319,44 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
   if (katana) pool.katanaVoid = true;
   const w = action.kind === "skill" || action.kind === "damage" ? action.weapon : undefined;
   if (w) applyWeaponRules(c, w, action.kind === "skill" && !!action.attack, !!mods.mounted, pool);
+  const armor = armorRollTn(c, action, !!mods.mounted);
+  if (armor.tn) {
+    pool.armorTn = armor.tn;
+    pool.notes.push(...armor.notes);
+  }
   return pool;
+}
+
+/** Armure du catalogue portée (annexe E.5), d'après `armor.catalogId`. */
+export function catalogArmor(c: Character): CatalogArmor | undefined {
+  const id = c.armor.catalogId;
+  return id ? ARMOR_CATALOG.find((a) => a.id === id) : undefined;
+}
+
+/**
+ * Malus de l'armure au ND de ce jet (annexe E.5) : armure légère, +5 en Athlétisme et Discrétion ;
+ * armure lourde (cavalerie à pied), +5 aux jets d'Agilité et de Réflexes, sauf technique qui le lève (Hida R1).
+ */
+export function armorRollTn(c: Character, action: PoolAction, mounted = false): { tn: number; notes: string[] } {
+  const armor = catalogArmor(c);
+  const out = { tn: 0, notes: [] as string[] };
+  if (!armor || (action.kind !== "skill" && action.kind !== "trait")) return out;
+  const skill = action.kind === "skill" ? action.skill : undefined;
+  if (skill && armor.tnSkills?.some((s) => skillIs(skill, s))) {
+    out.tn += ARMOR_ROLL_TN;
+    out.notes.push(`${armor.name} : +${ARMOR_ROLL_TN} au ND`);
+  }
+  const heavy = armor.heavy === "always" || (armor.heavy === "onFoot" && !mounted);
+  if (heavy && HEAVY_ARMOR_TRAITS.includes(action.trait)) {
+    const waiver = heavyArmorWaiver(c, skill);
+    if (waiver) {
+      out.notes.push(`${armor.name} : malus ignoré (${waiver.source})`);
+    } else {
+      out.tn += ARMOR_ROLL_TN;
+      out.notes.push(`${armor.name} : +${ARMOR_ROLL_TN} au ND (Agilité, Réflexes${armor.heavy === "onFoot" ? ", à pied" : ""})`);
+    }
+  }
+  return out;
 }
 
 /** Arme du catalogue portant ce nom (règles propres à l'arme). */
@@ -327,25 +367,16 @@ export function isKatanaVoid(w: WeaponLike): boolean {
   return bookWeapon(w)?.special === "katanaVoid";
 }
 
-/** Maîtrise qui fait exploser les dégâts de cette arme sur 9 (Kenjutsu ou Armes lourdes au rang 7, C1). */
-export function damageMastery(c: Character, w: WeaponLike): Skill | undefined {
-  const { skills, rank } = MASTERY.explodeOn9;
-  if (!skills.some((s) => skillIs(w.skill, s))) return undefined;
-  const skill = findSkill(c, w.skill);
-  return skill && skill.rank >= rank ? skill : undefined;
-}
-
 /**
- * Force effective d'un arc (C11) : force de l'arc, +1 avec Kyujutsu 7, plafonnée par la Force du personnage
+ * Force effective d'un arc (C11) : force de l'arc, +1 avec la maîtrise Kyujutsu 7, plafonnée par la Force du personnage
  * (le +1 s'ajoute avant le plafond, HANDOFF P16).
  */
 export function bowStrength(c: Character, w: WeaponLike, notes: string[] = []): number {
   let s = w.bowStrength ?? 0;
-  const m = MASTERY.bowStrength;
-  const skill = skillIs(w.skill, m.skill) ? findSkill(c, w.skill) : undefined;
-  if (skill && skill.rank >= m.rank) {
-    s += m.bonus;
-    notes.push(`Maîtrise ${skill.name} ${skill.rank} : force de l'arc +${m.bonus}`);
+  const bonus = bowStrengthBonus(c, w);
+  if (bonus.value) {
+    s += bonus.value;
+    notes.push(`Maîtrise ${bonus.source} : force de l'arc +${bonus.value}`);
   }
   if (s > c.traits.strength) {
     notes.push(`Force ${c.traits.strength} : l'arc de force ${s} tire à ${c.traits.strength}`);
@@ -466,7 +497,7 @@ export function fullDefenseBonus(total: number): number {
 }
 
 export function armorTN(c: Character, state: CombatState): number {
-  let tn = ARMOR_TN.perReflexes * c.traits.reflexes + ARMOR_TN.base + c.armor.bonus;
+  let tn = ARMOR_TN.perReflexes * c.traits.reflexes + ARMOR_TN.base + c.armor.bonus + mountedArmorBonus(c, !!state.mounted);
   switch (state.stance) {
     case "fullAttack":
       tn += ARMOR_TN.fullAttackModifier;
@@ -482,6 +513,12 @@ export function armorTN(c: Character, state: CombatState): number {
   if (state.guard) tn -= guardRule(c).selfPenalty;
   const ctx =schoolContext({ stance: state.stance, mounted: state.mounted, centerLastRound: state.centerLastRound });
   return tn + (state.bonus ?? 0) + schoolArmorBonus(c, ctx, state.selected, state.stacks);
+}
+
+/** Bonus d'armure en plus à cheval : armure de cavalerie, +12 au lieu de +4 (annexe E.5). */
+export function mountedArmorBonus(c: Character, mounted: boolean): number {
+  const armor = catalogArmor(c);
+  return mounted && armor?.bonusMounted !== undefined ? armor.bonusMounted - armor.bonus : 0;
 }
 
 /**
@@ -512,9 +549,12 @@ export function raiseCapExceeded(c: Character, called: number): boolean {
   return called > c.voidRing;
 }
 
-/** Anneau d'Eau compté pour les distances : 1 ou 2 rangs de moins en terrain modéré ou difficile, 1 au minimum (C4). */
+/**
+ * Anneau d'Eau compté pour les distances : 1 ou 2 rangs de moins en terrain modéré ou difficile, 1 au minimum (C4) ;
+ * sans pénalité avec la maîtrise d'Athlétisme (3 : modéré, 5 : difficile).
+ */
 export function movementWater(c: Character, terrain: Terrain = "normal"): number {
-  const malus = TERRAINS.find((t) => t.id === terrain)?.waterMalus ?? 0;
+  const malus = terrainWaiver(c, terrain) ? 0 : (TERRAINS.find((t) => t.id === terrain)?.waterMalus ?? 0);
   return Math.max(1, rings(c).water - malus);
 }
 

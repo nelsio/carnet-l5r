@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import {
-  applicableModifiers, bowStrength, DAMAGE_MANEUVER_ID, describeEffect, focusOutcome, opposedMargin, opposedVerdict, stanceRestriction, woundEffectNote, describeModifier, effectOn, findSkill, fullDefenseBonus, maneuverCost, maneuverFreeRaises, modifierTN,
+  applicableModifiers, armorRollTn, bowStrength, DAMAGE_MANEUVER_ID, describeEffect, focusOutcome, opposedMargin, opposedVerdict, stanceRestriction, woundEffectNote, describeModifier, effectOn, findSkill, fullDefenseBonus, maneuverCost, maneuverFreeRaises, modifierTN,
   formatDice, isRanged, isSocialSkill, poolStats, reminderText, rollDice, schoolContext, schoolReminders, verdict, voidMultiplier,
   voidPointBonus, voidSpendBonus, voidSpendOption, woundState,
   type ActionDef, type ActiveEffect, type Character, type Pool,
@@ -52,7 +52,7 @@ export function Roller() {
   // Augmentations gratuites converties en baisse du ND (F8).
   const tnOffered = pool.canRaise && totalFree > 0 && (a.tn === "target" || a.tn === "assessment" || typeof a.tn === "number");
   const freeToTn = opts.freeToTn && tnOffered ? totalFree : 0;
-  const tnContext = { effects, selected, stacks: ui.stacks, ctx, techTn: pool.techTn, weaponTn: pool.weaponTn, freeToTn };
+  const tnContext = { effects, selected, stacks: ui.stacks, ctx, techTn: pool.techTn, weaponTn: pool.weaponTn, armorTn: pool.armorTn, freeToTn };
   const bonuses = applicableModifiers(c, toPoolAction(a), stance);
   const bonusTN = modifierTN(active) + (pool.techTn ?? 0);
   const restriction = ui.situation === "combat" ? stanceRestriction(pa, { stance: ui.stance, mounted: ui.mounted, sub: ui.sub }) : null;
@@ -111,7 +111,11 @@ export function Roller() {
       </div>
       {chips.length > 0 && (
         <div className="tchips" data-testid="tech-chips">
-          {chips.map((e) => <span key={e.key} className="tchip" title={e.technique}>{describeEffect(e, c, ui.techInputs[e.key])} · {e.source}</span>)}
+          {chips.map((e) => (
+            <span key={e.key} className={`tchip${e.mastery ? " mastery" : ""}`} title={e.technique}>
+              {e.mastery && <b className="tag">Maîtrise</b>}{describeEffect(e, c, ui.techInputs[e.key])} · {e.source}
+            </span>
+          ))}
         </div>
       )}
       <ManualLine pool={pool} emphasis={opts.emphasis && emphasisOffered} flat={opts.flat} free={bonusFree} />
@@ -127,6 +131,7 @@ export function Roller() {
       {pool.notes.filter((n) => n.startsWith("Force ") || n.includes("force de l'arc") || n.startsWith("Désarmement")).map((n) => (
         <div key={n} className="hint" data-testid="weapon-note" style={{ color: "var(--gold)" }}>{n}.</div>
       ))}
+      {armorRollTn(c, pa, ui.mounted).notes.map((n) => <div key={n} className="hint" data-testid="armor-note">{n}.</div>)}
       {pool.warnings?.map((w) => <div key={w} className="hint" data-testid="weapon-warning" style={{ color: "var(--bad)" }}>{w}</div>)}
       {!pool.canRaise && a.kind === "skill" && <div className="hint" style={{ color: "var(--bad)" }}>Sans compétence : pas d'explosion, pas d'augmentation.</div>}
 
@@ -264,7 +269,7 @@ export function Roller() {
           <span>ND final</span>
           <span className="mono">
             <b style={{ fontSize: 18 }} data-testid="final-tn">{tn}</b>{" "}
-            <span className="muted">= {base}{raises ? ` + ${TN_PER_RAISE * raises} augm.` : ""}{penalty ? ` + ${penalty} blessures` : ""}{bonusTN ? ` ${bonusTN > 0 ? "+" : "−"} ${Math.abs(bonusTN)} bonus` : ""}{weaponTn ? ` + ${weaponTn} arc` : ""}</span>
+            <span className="muted">= {base}{raises ? ` + ${TN_PER_RAISE * raises} augm.` : ""}{penalty ? ` + ${penalty} blessures` : ""}{bonusTN ? ` ${bonusTN > 0 ? "+" : "−"} ${Math.abs(bonusTN)} bonus` : ""}{weaponTn ? ` + ${weaponTn} arc` : ""}{pool.armorTn ? ` + ${pool.armorTn} armure` : ""}</span>
           </span>
         </div>
       )}

@@ -8,7 +8,8 @@
 import type { TraitKey, WeaponKeyword } from "../core/schema";
 import bushi from "./ecoles-bushi.json";
 import courtiers from "./ecoles-courtisans.json";
-import type { RingKey, Stance } from "./l5r4e";
+import masteries from "./maitrises.json";
+import type { RingKey, Stance, Terrain } from "./l5r4e";
 
 /**
  * Valeur fixe, ou calculée depuis la fiche : `ref` × `mult` ÷ `div` + `add`, plancher `min`, plafond `max`.
@@ -27,7 +28,10 @@ export interface When {
   /** Posture Centre, ou Centre au round précédent. */
   centerOrAfter?: boolean;
   skillGroup?: "bugei";
-  weapon?: { keywordsAny?: WeaponKeyword[]; melee?: boolean; ranged?: boolean; unarmed?: boolean };
+  /**
+   * Arme du jet : `skill`, compétence de l'arme (maîtrises, annexe E.4) ; `names`, un de ces mots dans son nom (sai, jitte).
+   */
+  weapon?: { keywordsAny?: WeaponKeyword[]; melee?: boolean; ranged?: boolean; unarmed?: boolean; skill?: string; names?: string[] };
   /** Honneur non arrondi au moins égal (Doji R1). */
   honorMin?: number;
   /** Spécialisation choisie au lanceur parmi ces noms (alias FR/EN, annexe D-d). */
@@ -51,6 +55,8 @@ export type Effect =
     tn?: Value;
     /** Augmentations non limitées par l'Anneau de Vide (Shosuro). */
     unlimitedRaises?: boolean;
+    /** Les dés explosent dès cette face (maîtrises Kenjutsu et Armes lourdes 7). */
+    explodeOn?: number;
     when?: When; mode: EffectMode; void?: number; label?: string; input?: string;
   }
   | { kind: "armor"; value: Value; when?: When; mode: EffectMode; stack?: { max: Value; label: string }; label?: string }
@@ -77,6 +83,14 @@ export type Effect =
   /** Concentration en duel (F10) : écart pour frapper en premier, puis une augmentation gratuite par tranche (Kakita R3). */
   | { kind: "duelFocus"; threshold: number; per: number }
   | { kind: "verdict"; rule: "baseTnSuccess"; when?: When }
+  /** Force de l'arc augmentée, avant le plafond de la Force (maîtrise Kyujutsu 7, HANDOFF P16). */
+  | { kind: "bowStrength"; value: number }
+  /** Terrains sans pénalité de déplacement (maîtrise Athlétisme 3 et 5). */
+  | { kind: "terrain"; ignore: Terrain[] }
+  /** Points de Vide rendus par une méditation réussie (maîtrise Méditation 3 et 7, annexe E.6). */
+  | { kind: "voidRecovery"; points: number }
+  /** Pas de malus d'armure lourde, sauf sur ces compétences (Hida R1 : Discrétion). */
+  | { kind: "heavyArmor"; except: string[] }
   /** Rappel ; `{n}` dans le texte est remplacé par `value` calculée (« +10 au ND… »). */
   | { kind: "reminder"; context: ReminderContext; text?: string; value?: Value };
 
@@ -96,6 +110,17 @@ export interface CatalogWeapon {
   name: string; keywords: WeaponKeyword[]; skill: string; dr: string; bowStrength?: number;
   special?: "katanaVoid"; tnMounted?: number; tnOnFoot?: number; minStrength?: number;
 }
+
+/**
+ * Maîtrise de compétence (annexe E.4) : effets acquis au rang `rank` de la compétence `skill` (« * » : toutes).
+ * Dans `on`, « own » désigne les jets de la compétence maîtrisée. Sans effet : règle déjà portée par le moteur
+ * (Iaijutsu 7, Équitation 3), listée pour mémoire.
+ */
+export interface Mastery { skill: string; rank: number; summary: string; effects: (Effect | MasteryRoll)[] }
+type MasteryRoll = Omit<Extract<Effect, { kind: "roll" }>, "on"> & { on: (On | "own")[] };
+
+/** Maîtrises de compétence, par compétence puis par rang. */
+export const MASTERIES = masteries.masteries as unknown as readonly Mastery[];
 
 /** Écoles bushi (lot 10), puis courtisans et Shosuro (lot 11). */
 export const SCHOOLS = [...bushi.schools, ...courtiers.schools] as unknown as readonly School[];

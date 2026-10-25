@@ -206,6 +206,8 @@ export interface TnContext {
   techTn?: number;
   /** Modification du ND par l'arme (`Pool.weaponTn` : yumi monté, dai-kyu à pied). */
   weaponTn?: number;
+  /** Modification du ND par l'armure portée (`Pool.armorTn`, annexe E.5). */
+  armorTn?: number;
   /** Augmentations gratuites converties en baisse du ND (F8). */
   freeToTn?: number;
 }
@@ -229,6 +231,6 @@ export function finalTN(
     base: targetBaseTN(c, a, opts, t.stacks),
     calledRaises: calledRaises(c, a, opts, selection, t.effects, t.selected),
     woundPenalty: rollWoundPenalty(c, t),
-    modifier: modifierTN(active) + (t.techTn ?? 0) + (t.weaponTn ?? 0) - TN_PER_RAISE * (t.freeToTn ?? 0),
+    modifier: modifierTN(active) + (t.techTn ?? 0) + (t.weaponTn ?? 0) + (t.armorTn ?? 0) - TN_PER_RAISE * (t.freeToTn ?? 0),
   });
 }

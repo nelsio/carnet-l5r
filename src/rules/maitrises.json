@@ -1,0 +1,80 @@
+{
+  "_source": "Livre de base 4e, maîtrises des compétences (p. 135-144), HANDOFF annexe E.4. Effets chiffrés et résumés écrits pour l'outil, aucun texte du livre. « * » : toute compétence ; « own » dans `on` : les jets de la compétence maîtrisée.",
+  "masteries": [
+    { "skill": "*", "rank": 10, "summary": "1 augmentation gratuite aux jets de cette compétence.",
+      "effects": [ { "kind": "roll", "on": ["own"], "freeRaises": 1, "mode": "auto" } ] },
+
+    { "skill": "Kenjutsu", "rank": 3, "summary": "+1g0 aux dégâts des épées.",
+      "effects": [ { "kind": "roll", "on": ["damage"], "rolled": 1, "when": { "weapon": { "skill": "Kenjutsu" } }, "mode": "auto" } ] },
+    { "skill": "Kenjutsu", "rank": 7, "summary": "Les dés de dégâts des épées explosent sur 9 et 10.",
+      "effects": [ { "kind": "roll", "on": ["damage"], "explodeOn": 9, "when": { "weapon": { "skill": "Kenjutsu" } }, "mode": "auto" } ] },
+
+    { "skill": "Armes lourdes", "rank": 3, "summary": "La Réduction de la cible compte 2 de moins contre tes armes lourdes.",
+      "effects": [ { "kind": "reminder", "context": "combat", "text": "Armes lourdes : Réduction de la cible −2." } ] },
+    { "skill": "Armes lourdes", "rank": 5, "summary": "1 augmentation gratuite pour un Renversement avec une arme lourde.",
+      "effects": [ { "kind": "maneuver", "freeRaisesFor": { "maneuver": "knockdown", "count": 1 }, "when": { "weapon": { "skill": "Armes lourdes" } }, "mode": "auto" } ] },
+    { "skill": "Armes lourdes", "rank": 7, "summary": "Les dés de dégâts des armes lourdes explosent sur 9 et 10.",
+      "effects": [ { "kind": "roll", "on": ["damage"], "explodeOn": 9, "when": { "weapon": { "skill": "Armes lourdes" } }, "mode": "auto" } ] },
+
+    { "skill": "Kyujutsu", "rank": 7, "summary": "Force de l'arc +1 (toujours plafonnée par ta Force).",
+      "effects": [ { "kind": "bowStrength", "value": 1 } ] },
+
+    { "skill": "Jiujutsu", "rank": 3, "summary": "+1g0 aux dégâts à mains nues.",
+      "effects": [ { "kind": "roll", "on": ["damage"], "rolled": 1, "when": { "weapon": { "unarmed": true } }, "mode": "auto" } ] },
+    { "skill": "Jiujutsu", "rank": 5, "summary": "1 augmentation gratuite pour établir ou tenir une lutte.",
+      "effects": [ { "kind": "reminder", "context": "combat", "text": "Jiujutsu : 1 augmentation gratuite aux jets de lutte." } ] },
+    { "skill": "Jiujutsu", "rank": 7, "summary": "+0g1 de plus aux dégâts à mains nues.",
+      "effects": [ { "kind": "roll", "on": ["damage"], "kept": 1, "when": { "weapon": { "unarmed": true } }, "mode": "auto" } ] },
+
+    { "skill": "Ninjutsu", "rank": 3, "summary": "+1g0 aux dégâts des armes ninja.",
+      "effects": [ { "kind": "roll", "on": ["damage"], "rolled": 1, "when": { "weapon": { "skill": "Ninjutsu" } }, "mode": "auto" } ] },
+    { "skill": "Ninjutsu", "rank": 7, "summary": "+0g1 de plus aux dégâts des armes ninja.",
+      "effects": [ { "kind": "roll", "on": ["damage"], "kept": 1, "when": { "weapon": { "skill": "Ninjutsu" } }, "mode": "auto" } ] },
+
+    { "skill": "Défense", "rank": 3, "summary": "En Défense totale, tu peux garder le jet de Défense d'un round sur l'autre.",
+      "effects": [ { "kind": "reminder", "context": "combat", "text": "Défense : en Défense totale, tu peux garder ton jet de Défense au round suivant." } ] },
+    { "skill": "Défense", "rank": 5, "summary": "+3 au ND d'armure en Défense et en Défense totale.",
+      "effects": [ { "kind": "armor", "value": 3, "when": { "stance": ["defense", "fullDefense"] }, "mode": "auto" } ] },
+    { "skill": "Défense", "rank": 7, "summary": "En Défense totale, tu peux faire une action simple.",
+      "effects": [ { "kind": "reminder", "context": "combat", "text": "Défense : une action simple permise en Défense totale." } ] },
+
+    { "skill": "Iaijutsu", "rank": 5, "summary": "1 augmentation gratuite à la Concentration.",
+      "effects": [ { "kind": "roll", "on": ["focus"], "freeRaises": 1, "mode": "auto" } ] },
+    { "skill": "Iaijutsu", "rank": 7, "summary": "Évaluation gagnée de 10 ou plus : +2g2 à la Concentration au lieu de +1g1.",
+      "effects": [] },
+
+    { "skill": "Équitation", "rank": 3, "summary": "Posture Assaut permise à cheval.",
+      "effects": [] },
+
+    { "skill": "Armes d'hast", "rank": 3, "summary": "+5 à l'Initiative au premier round d'une escarmouche.",
+      "effects": [ { "kind": "roll", "on": ["initiative"], "flat": 5, "mode": "optional", "label": "Premier round (Armes d'hast)" } ] },
+    { "skill": "Armes d'hast", "rank": 5, "summary": "+1g0 aux dégâts d'une arme d'hast contre un cavalier ou une créature plus grande.",
+      "effects": [ { "kind": "roll", "on": ["damage"], "rolled": 1, "when": { "weapon": { "skill": "Armes d'hast" } }, "mode": "optional", "label": "Cible montée ou plus grande" } ] },
+
+    { "skill": "Lances", "rank": 3, "summary": "Au premier round, ta lance ignore 3 points de Réduction.",
+      "effects": [ { "kind": "reminder", "context": "combat", "text": "Lances : au premier round, ignore 3 points de Réduction de la cible." } ] },
+
+    { "skill": "Bâtons", "rank": 5, "summary": "1 augmentation gratuite pour un Renversement avec un bâton.",
+      "effects": [ { "kind": "maneuver", "freeRaisesFor": { "maneuver": "knockdown", "count": 1 }, "when": { "weapon": { "skill": "Bâtons" } }, "mode": "auto" } ] },
+    { "skill": "Bâtons", "rank": 7, "summary": "+1g0 aux dégâts d'un bâton petit.",
+      "effects": [ { "kind": "roll", "on": ["damage"], "rolled": 1, "when": { "weapon": { "skill": "Bâtons", "keywordsAny": ["petite"] } }, "mode": "auto" } ] },
+
+    { "skill": "Couteaux", "rank": 5, "summary": "Sai et jitte : 1 augmentation gratuite pour un Désarmement.",
+      "effects": [ { "kind": "maneuver", "freeRaisesFor": { "maneuver": "disarm", "count": 1 }, "when": { "weapon": { "skill": "Couteaux", "names": ["sai", "jitte"] } }, "mode": "auto" } ] },
+    { "skill": "Couteaux", "rank": 7, "summary": "Couteaux : 1 augmentation gratuite pour une Attaque supplémentaire.",
+      "effects": [ { "kind": "maneuver", "freeRaisesFor": { "maneuver": "extra", "count": 1 }, "when": { "weapon": { "skill": "Couteaux" } }, "mode": "auto" } ] },
+
+    { "skill": "Bataille", "rank": 5, "summary": "+ rang de Bataille au score d'Initiative en escarmouche.",
+      "effects": [ { "kind": "roll", "on": ["initiative"], "flat": { "ref": "skill:Bataille" }, "mode": "auto" } ] },
+
+    { "skill": "Athlétisme", "rank": 3, "summary": "Terrain modéré sans pénalité de déplacement.",
+      "effects": [ { "kind": "terrain", "ignore": ["moderate"] } ] },
+    { "skill": "Athlétisme", "rank": 5, "summary": "Terrain difficile sans pénalité de déplacement.",
+      "effects": [ { "kind": "terrain", "ignore": ["moderate", "difficult"] } ] },
+
+    { "skill": "Méditation", "rank": 3, "summary": "La méditation rend 2 points de Vide.",
+      "effects": [ { "kind": "voidRecovery", "points": 2 } ] },
+    { "skill": "Méditation", "rank": 7, "summary": "La méditation rend 3 points de Vide.",
+      "effects": [ { "kind": "voidRecovery", "points": 3 } ] }
+  ]
+}

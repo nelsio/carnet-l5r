@@ -199,7 +199,7 @@ describe("Aide de jeu", () => {
     expect(screen.queryByText("+2g0 en attente")).toBeNull();
   });
 
-  it("E11 : Kenjutsu 7 → note de maîtrise ; un 9 en dégâts est relancé (9 + 4 = 13)", async () => {
+  it("E11 : Kenjutsu 7 → note de maîtrise, 6g2 (Kenjutsu 3 : +1g0) ; un 9 en dégâts est relancé (9 + 4 = 13)", async () => {
     const c = base();
     c.skills.find((s) => s.name === "Kenjutsu")!.rank = 7;
     c.weapons[0]!.skill = "  kenjutsu ";
@@ -211,7 +211,7 @@ describe("Aide de jeu", () => {
     expect(roller().getByTestId("mastery")).toHaveTextContent("Maîtrise Kenjutsu 7 : les dés explosent sur 9 et 10");
     expect(roller().getByTitle("Explose sur 9")).toHaveTextContent("9+");
     showDice();
-    click("Lancer 5g2");
+    click("Lancer 6g2");
     const die = roller().getByTitle("9 + 4");
     expect(die).toHaveTextContent(/^13/);
     expect(within(die).getByText("9+4")).toBeInTheDocument();
