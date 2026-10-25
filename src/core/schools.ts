@@ -420,12 +420,6 @@ export function reminderText(e: ActiveEffect, c: Character): string {
   return e.text.replace("{n}", String(resolveValue(e.value, c)));
 }
 
-/** L'école a-t-elle des effets qui dépendent d'une monture ? */
-export function hasMountedEffects(c: Character): boolean {
-  const mentions = (w?: When): boolean => !!w && (w.mounted !== undefined || !!w.anyOf?.some(mentions));
-  return activeEffects(c).some((e) => "when" in e && mentions(e.when));
-}
-
 export type TechniqueCategory = "auto" | "à cocher" | "rappel" | "texte";
 
 /** Badges d'un rang : effets d'office, à cocher, rappels, ou purement descriptif. */

@@ -354,14 +354,6 @@ export function bowStrength(c: Character, w: WeaponLike, notes: string[] = []): 
   return s;
 }
 
-/** La fiche porte-t-elle une arme dont le ND dépend de la monture (yumi, dai-kyu) ? */
-export function hasMountRules(c: Character): boolean {
-  return c.weapons.some((w) => {
-    const book = bookWeapon(w);
-    return !!(book?.tnMounted || book?.tnOnFoot);
-  });
-}
-
 /** Règles d'arme du livre : ND des arcs selon la monture, Force minimale (C12). */
 function applyWeaponRules(c: Character, w: WeaponLike, attack: boolean, mounted: boolean, pool: Pool): void {
   const book = bookWeapon(w);

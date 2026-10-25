@@ -55,15 +55,16 @@ test("E18 : Kakita 2 en Centre : étiquette Kakita R1, case « Initiative plus b
   await chooseSchool(page, "École de bushi Kakita", "2");
   await skirmish(page);
   await page.getByRole("group", { name: "Posture" }).getByRole("button", { name: /^Centre/ }).click();
-  await page.getByRole("button", { name: /^Attaque · Katana/ }).click();
+  // En Centre, la carte est grisée (annexe E.3 F2) : « Lancer quand même ».
+  await page.getByRole("button", { name: "Lancer quand même : Attaque · Katana" }).click();
   const roller = page.getByRole("dialog", { name: "Lanceur de dés" });
   await expect(roller.getByTestId("tech-chips")).toContainText("+1g1 +2 · Kakita R1");
   const box = roller.getByRole("checkbox", { name: /Cible à l'Initiative plus basse/ });
   await expect(box).not.toBeChecked();
   await box.check();
   await expect(roller.getByTestId("pool")).toHaveText("8g4");
-  await page.getByRole("button", { name: /^Dégâts · Katana/ }).click();
-  await page.getByRole("button", { name: /^Attaque · Katana/ }).click();
+  await page.getByRole("button", { name: "Lancer quand même : Dégâts · Katana" }).click();
+  await page.getByRole("button", { name: "Lancer quand même : Attaque · Katana" }).click();
   await expect(roller.getByRole("checkbox", { name: /Cible à l'Initiative plus basse/ })).not.toBeChecked();
 });
 

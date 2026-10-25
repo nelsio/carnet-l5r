@@ -60,13 +60,15 @@ L'onglet **Aide de jeu** (dans la barre du bas sur mobile) propose les jets de c
 
 En **Escarmouche**, de haut en bas :
 
-1. **Initiative** : à lancer au début du combat, elle affiche ensuite ton score.
+1. **Initiative** : à lancer au début du combat, elle affiche ensuite ton score (avec `+10` au round qui suit le Centre, et `+10` par point de Vide dépensé pour l'escarmouche).
 2. **Nouveau round** : efface le Vide en armure et la Défense totale ; **garde l'initiative et les compteurs**.
-3. **Posture** : Attaque, Assaut, Défense, Défense totale, Centre ; le **ND d'armure** se met à jour.
-4. **Dépenser du Vide** : `+1g1` au jet, `+10` au ND d'armure, compétence jouée au rang 1, ou capacité payée en Vide.
-5. Les **attaques** de chaque arme, avec leurs **dégâts** juste dessous (`└`).
+3. **Posture** : Attaque, Assaut, Défense, Défense totale, Centre ; le **ND d'armure** se met à jour. Dessous : la case **Monté** (pas d'Assaut à cheval sans Équitation 3) et **Je garde un allié** (ton ND d'armure `−5`, le sien `+10`).
+4. **Dépenser du Vide** : `+1g1` au jet, `+10` au ND d'armure, compétence jouée au rang 1, capacité payée en Vide, `+10` à l'Initiative ou échange d'Initiative.
+5. Les **attaques** de chaque arme, avec leurs **dégâts** juste dessous (`└`). Une action que ta posture interdit (attaque en Défense, tir en Assaut, tout sauf l'Initiative en Centre) est **grisée** avec la raison, et reste jouable par **Lancer quand même**.
 
-En **Duel iaijutsu**, les étapes Évaluation → Concentration → Frappe remplacent l'initiative et la posture ; en **Bataille**, il n'y a pas d'initiative, et les jets de commandement et de bataille personnelle s'ajoutent à la posture et aux attaques. **Nouveau round** et **Dépenser du Vide** restent présents partout.
+Au round qui suit le Centre, le lanceur propose le **Bonus de Centre** (`+1g1` et ton Anneau de Vide au total, sur un seul jet). Une **Feinte** réussie pré-remplit son bonus sur les dégâts. Pour **encaisser** un coup, le bouton **Dégâts…** de la barre d'état retire ta Réduction (et `10` avec un point de Vide) et ajoute les blessures.
+
+En **Duel iaijutsu**, les étapes Évaluation → Concentration → Frappe remplacent l'initiative et la posture (Centre implicite) : coche une Évaluation **gagnée de 10 ou plus**, saisis l'**écart de Concentration**, et les augmentations gratuites passent sur la Frappe ; en **Bataille**, il n'y a pas d'initiative, et les jets de commandement et de bataille personnelle s'ajoutent à la posture et aux attaques. **Nouveau round** et **Dépenser du Vide** restent présents partout.
 
 Les boutons **« i »** affichent ou masquent le détail des postures, des dépenses de Vide, du déplacement et des rappels d'école.
 

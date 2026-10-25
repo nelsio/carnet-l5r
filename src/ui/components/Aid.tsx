@@ -393,7 +393,7 @@ function ActionCard({ action: a }: { action: ActionDef }) {
     : null;
   if (blocked) {
     return (
-      <div className={["act", "blocked", child ? "child" : ""].filter(Boolean).join(" ")} data-testid={`blocked-${a.id}`} aria-disabled="true">
+      <div className={["act", "blocked", child ? "child" : ""].filter(Boolean).join(" ")} data-testid={`blocked-${a.id}`}>
         <span className="t">{a.label}</span>
         <span className="p">{p ? poolLabel(p) : ""}</span>
         <span className="d">
