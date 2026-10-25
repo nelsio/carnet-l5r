@@ -72,6 +72,7 @@ export function useLibrary(
       if (cancelled) return;
       if (prefs.theme) dispatch({ type: "theme", theme: prefs.theme });
       if (prefs.showDiceRoller) dispatch({ type: "diceRoller", show: true });
+      if (prefs.woundMultiplier) dispatch({ type: "woundMultiplier", value: prefs.woundMultiplier });
       setEntries(list);
       const last = list.find((e) => e.id === prefs.lastOpenedId) ?? list[0];
       if (last) await openEntry(last);
@@ -83,11 +84,11 @@ export function useLibrary(
     };
   }, [storage, dispatch, openEntry]);
 
-  // Thème et lanceur de dés mémorisés dans les préférences.
-  const { theme, showDiceRoller } = state.ui;
+  // Thème, lanceur de dés et multiplicateur de blessures mémorisés dans les préférences.
+  const { theme, showDiceRoller, woundMultiplier } = state.ui;
   useEffect(() => {
-    if (ready) void storage.prefs.set({ theme, showDiceRoller });
-  }, [ready, theme, showDiceRoller, storage]);
+    if (ready) void storage.prefs.set({ theme, showDiceRoller, woundMultiplier });
+  }, [ready, theme, showDiceRoller, woundMultiplier, storage]);
 
   /** Bilan de l'écriture du fichier lié. */
   const applyReport = useCallback((report: SaveReport) => {

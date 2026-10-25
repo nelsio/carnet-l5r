@@ -65,6 +65,10 @@ export const DEAD_LABEL = "Mort";
 /** Seuils cumulés : Indemne jusqu'à Terre × 5, puis Terre × 2 de plus par niveau. */
 export const WOUND_FIRST_MULTIPLIER = 5;
 export const WOUND_NEXT_MULTIPLIER = 2;
+/** Multiplicateur des niveaux après Indemne, réglage de préférence (p. 86, E-d) : × 2 par défaut, × 3 à × 5 en option. */
+export const WOUND_MULTIPLIERS = [2, 3, 4, 5] as const;
+/** Nouvelle journée (p. 80, 86) : blessures soignées = 2 × Constitution + Rang d'Insight ; Vide plein. */
+export const DAILY_HEALING = { perStamina: 2, perInsight: 1 } as const;
 
 /** ND d'armure : 5 × Réflexes + 5 + bonus d'armure, puis posture et Vide. */
 export const ARMOR_TN = {
@@ -173,6 +177,8 @@ export const DUEL_FOCUS = { threshold: 5, per: 5 } as const;
 export const DUEL_ASSESSMENT_WIN = { margin: 10, rolled: 1, kept: 1, masterySkill: "Iaijutsu", masteryRank: 7, masteryRolled: 2, masteryKept: 2 } as const;
 /** Méditation réussie (p. 139) : points de Vide rendus sans maîtrise (2 et 3 avec Méditation 3 et 7, E.4). */
 export const MEDITATION_VOID_POINTS = 1;
+/** Action « Méditer » de l'Enquête (E.6) : bouton « Réussi » au lanceur. */
+export const MEDITATE_ACTION_ID = "meditate";
 /** Tir sur une cible engagée au corps à corps (p. 84) : −10 au total. */
 export const MELEE_TARGET_PENALTY = 10;
 /** Niveaux de blessure à rappel (p. 84) : Estropié, À terre. */
@@ -261,6 +267,8 @@ export interface ActionDef {
   dr?: string;
   /** Arme utilisée, pour les attaques et dégâts générés depuis la fiche. */
   weapon?: WeaponLike;
+  /** Groupe de la situation, titré dans la liste d'actions (« Repos »). */
+  group?: string;
   description: string;
 }
 
@@ -287,6 +295,8 @@ export const FIXED_ACTIONS: readonly ActionDef[] = [
   { id: "court", situation: "investigation", label: "Obtenir des informations en cour", kind: "skill", skill: "Courtoisie", trait: "awareness", tn: 15, description: "Conversation polie, rumeurs, faveurs. Chaque augmentation donne un détail de plus." },
   { id: "etiquette", situation: "investigation", label: "Garder contenance", kind: "skill", skill: "Étiquette", trait: "awareness", tn: 15, description: "Ne rien laisser paraître, éviter un faux pas qui coûte de l'Honneur." },
   { id: "lore", situation: "investigation", label: "Se souvenir (Connaissance)", kind: "skill", skill: "Connaissance", trait: "intelligence", tn: 15, description: "Nomme ta Connaissance précise dans la fiche (ex. « Connaissance : Héraldique »). Sinon, jet sans compétence." },
+  // Enquête, groupe Repos (annexe E.6)
+  { id: MEDITATE_ACTION_ID, situation: "investigation", group: "Repos", label: "Méditer (récupérer du Vide)", kind: "skill", skill: "Méditation", trait: "void", emphasisHint: "Récupération du Vide", tn: 20, description: "Une heure de méditation, une fois par jour. Réussite : tu récupères des points de Vide, sans dépasser ton Anneau de Vide." },
   // Cour (lot 11) : jets sociaux, le plus souvent en opposition. Les Représentations viennent de la fiche (core/actions).
   { id: "persuade", situation: "court", label: "Convaincre, manipuler", kind: "skill", skill: "Courtoisie", trait: "awareness", emphasisHint: "Manipulation", tn: "opposed", description: "Courtoisie (Intuition) contre Étiquette (Intuition ou Volonté) de l'interlocuteur." },
   { id: "resist", situation: "court", label: "Résister à une influence", kind: "skill", skill: "Étiquette", trait: "awareness", emphasisHint: "Politesse", tn: "opposed", description: "Étiquette (Intuition ou Volonté) contre la Courtoisie, l'Intimidation ou la Tentation adverse." },

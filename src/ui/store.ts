@@ -4,10 +4,10 @@
  */
 import { createContext, useContext, type Dispatch } from "react";
 import {
-  activeEffects, buildActions, DAMAGE_MANEUVER_ID, DISARM_MANEUVER_ID, emphasisMatches, matchingEmphasis, voidSpendOption,
+  activeEffects, buildActions, DAMAGE_MANEUVER_ID, DISARM_MANEUVER_ID, emphasisMatches, matchingEmphasis, meditate, newDay, voidSpendOption,
   feintBonus, focusOutcome, fullAttackAllowed, fullDefenseBonus, woundsFromDamage, type ActionDef, type Character, type CombatSub, type RollResult, type Situation, type Stance,
 } from "@carnet/core";
-import { FEINT_MANEUVER_ID, type Terrain } from "../rules/l5r4e";
+import { FEINT_MANEUVER_ID, WOUND_MULTIPLIERS, WOUND_NEXT_MULTIPLIER, type Terrain } from "../rules/l5r4e";
 import type { LibraryEntry } from "../storage";
 import { DEFAULT_ROLL_OPTIONS, effectiveManeuvers, isRollable, isUnskilled, toPoolAction, type RollOptions } from "./rolls";
 
@@ -51,6 +51,8 @@ export interface UiState {
   theme: Theme;
   /** Préférence : bouton « Lancer » et résultats affichés. */
   showDiceRoller: boolean;
+  /** Préférence : niveaux de blessure après Indemne à Terre × 2 (défaut) à × 5 (annexe E.6). */
+  woundMultiplier: number;
   /** Détails dépliés par le « i » de chaque panneau (non persisté). */
   info: Partial<Record<InfoPanel, boolean>>;
   /** Éditeur d'armure ouvert sous les tuiles de la barre d'état. */
@@ -124,6 +126,7 @@ export const HISTORY_SIZE = 6;
 export const initialUi: UiState = {
   theme: "auto",
   showDiceRoller: false,
+  woundMultiplier: WOUND_NEXT_MULTIPLIER,
   info: {},
   armorEdit: false,
   view: "sheet",
@@ -176,6 +179,11 @@ export type AppAction =
   | { type: "pip"; index: number }
   | { type: "theme"; theme: Theme }
   | { type: "diceRoller"; show: boolean }
+  | { type: "woundMultiplier"; value: number }
+  /** Nouvelle journée (annexe E.6) : Vide plein, blessures soignées, initiative et compteurs à zéro. */
+  | { type: "newDay" }
+  /** Méditation réussie : points de Vide rendus. */
+  | { type: "meditate" }
   | { type: "toggleInfo"; panel: InfoPanel }
   | { type: "toggleArmorEdit" }
   | { type: "view"; view: View }
@@ -276,6 +284,8 @@ function uiReducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
     case "theme": return withUi({ theme: action.theme });
     case "diceRoller": return withUi({ showDiceRoller: action.show });
+    case "woundMultiplier":
+      return (WOUND_MULTIPLIERS as readonly number[]).includes(action.value) ? withUi({ woundMultiplier: action.value }) : state;
     case "toggleInfo": return withUi({ info: { ...ui.info, [action.panel]: !ui.info[action.panel] } });
     case "toggleArmorEdit": return withUi({ armorEdit: state.mode === "edit" && !ui.armorEdit });
     case "view":
@@ -324,11 +334,11 @@ function uiReducer(state: AppState, action: AppAction): AppState {
 }
 
 /** État d'interface conservé d'une fiche à l'autre : préférences et détails dépliés. */
-const kept = (ui: UiState): Pick<UiState, "theme" | "showDiceRoller" | "info"> =>
-  ({ theme: ui.theme, showDiceRoller: ui.showDiceRoller, info: ui.info });
+const kept = (ui: UiState): Pick<UiState, "theme" | "showDiceRoller" | "woundMultiplier" | "info"> =>
+  ({ theme: ui.theme, showDiceRoller: ui.showDiceRoller, woundMultiplier: ui.woundMultiplier, info: ui.info });
 
 /** Actions qui modifient la fiche : refusées en consultation. */
-const EDITING = new Set<AppAction["type"]>(["set", "add", "remove", "wounds", "pip", "toggleBlockEdit", "replaceCharacter"]);
+const EDITING = new Set<AppAction["type"]>(["set", "add", "remove", "wounds", "pip", "toggleBlockEdit", "replaceCharacter", "newDay", "meditate"]);
 
 export function reducer(state: AppState, action: AppAction): AppState {
   const { character: c, ui } = state;
@@ -358,6 +368,19 @@ export function reducer(state: AppState, action: AppAction): AppState {
       return { ...state, character: { ...c, wounds: Math.max(0, Math.floor(action.value) || 0) } };
     case "pip":
       return { ...state, character: { ...c, voidPoints: c.voidPoints === action.index + 1 ? action.index : action.index + 1 } };
+    case "newDay":
+      // Une nouvelle journée clôt les escarmouches : initiative, Vide d'Initiative, effets du round et compteurs.
+      return {
+        ...state, character: newDay(c),
+        ui: {
+          ...ui, initiative: null, voidInitiative: 0, stacks: {}, voidArmor: false, voidSpentThisRound: false,
+          fullDefenseBonus: 0, centerLastRound: false, centerBonusUsed: false, schoolArmor: {}, guard: false,
+          focusGap: null, assessmentWon: false, pendingDamage: null,
+          stance: ui.stance === "fullDefense" ? "defense" : ui.stance,
+        },
+      };
+    case "meditate":
+      return { ...state, character: meditate(c) };
     case "toggleBlockEdit": {
       const editing = new Set(ui.editing);
       if (!editing.delete(action.block)) editing.add(action.block);

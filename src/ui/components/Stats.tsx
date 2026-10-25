@@ -39,7 +39,7 @@ export function Stats() {
   const { state, dispatch } = useStore();
   const c = useCharacter();
   const opts = state.ui.stats;
-  const currentPenalty = woundState(c).penalty ?? 0;
+  const currentPenalty = woundState(c, { woundMultiplier: state.ui.woundMultiplier }).penalty ?? 0;
   const penalty = opts.penalty ? currentPenalty : 0;
   const rows = buildRows(c, opts.voidPoint, opts.emphasis);
   const set = (patch: Partial<typeof opts>) => dispatch({ type: "statsOption", patch });

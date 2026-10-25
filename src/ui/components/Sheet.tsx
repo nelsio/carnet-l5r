@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
 import {
-  activeEffects, attackTrait, catalogGap, catalogWeapon, reminderText, computePool, defaultModifiers, isRanged, parseDR, parseWeaponKeywords, rings, ROLL_TRAITS, schoolOf,
+  activeEffects, attackTrait, catalogGap, catalogWeapon, dailyHealing, reminderText, computePool, defaultModifiers, isRanged, parseDR, parseWeaponKeywords, rings, ROLL_TRAITS, schoolOf,
   schoolRankOf, schoolsByClan, suggestSchool, techniqueCategories, weaponKeywords,
   type Character, type PoolAction, type RollTrait, type TraitKey,
 } from "@carnet/core";
@@ -44,6 +44,7 @@ export function Sheet() {
           <button type="button" className="btn" onClick={() => void library.makeEditableCopy()}>Rendre modifiable</button>
         </div>
       )}
+      {!readonly && <NewDay />}
       <Block id="rings" title={<>Anneaux &amp; Traits</>} label="Anneaux & Traits"><Rings /></Block>
       <Block id="identity" title={<>Identité &amp; réputation</>} label="Identité & réputation"><Identity /></Block>
       <div className="grid cols-2">
@@ -449,6 +450,34 @@ function LongText({ field, label }: { field: "advantages" | "disadvantages" | "n
     <label className="field"><span className="label">{label}</span><textarea className="in" value={c[field]} onChange={(e) => set([field], e.target.value)} /></label>
   ) : (
     <div><div className="label">{label}</div><div className="prose">{c[field] || "—"}</div></div>
+  );
+}
+
+/** « Nouvelle journée » (annexe E.6), avec confirmation intégrée : Vide plein, blessures soignées, initiative à zéro. */
+function NewDay() {
+  const { c, dispatch } = useSheet();
+  const [confirm, setConfirm] = useState(false);
+  const healed = Math.min(c.wounds, dailyHealing(c));
+  return (
+    <div className="day-head" role="group" aria-label="Nouvelle journée">
+      {confirm ? (
+        <>
+          <p className="hint" style={{ margin: 0 }} data-testid="new-day-preview">
+            Vide {c.voidPoints} → {c.voidRing} ; blessures {c.wounds} → {c.wounds - healed} (−{healed} : 2 × Constitution {c.traits.stamina} + Rang {c.insightRank}) ;
+            {" "}initiative et compteurs d'escarmouche remis à zéro.
+          </p>
+          <span style={{ display: "flex", gap: 8 }}>
+            <button type="button" className="btn" onClick={() => setConfirm(false)}>Annuler</button>
+            <button type="button" className="btn gold" onClick={() => { dispatch({ type: "newDay" }); setConfirm(false); }}>Confirmer la nouvelle journée</button>
+          </span>
+        </>
+      ) : (
+        <>
+          <p className="hint" style={{ margin: 0 }}>Après une nuit de repos : Vide plein, blessures soignées.</p>
+          <button type="button" className="btn" onClick={() => setConfirm(true)}>Nouvelle journée…</button>
+        </>
+      )}
+    </div>
   );
 }
 

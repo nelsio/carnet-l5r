@@ -28,11 +28,13 @@ export interface LibraryStore {
   remove(id: string): Promise<void>;
 }
 
-/** Préférences, dans un magasin séparé : thème, lanceur de dés, dernière fiche ouverte. */
+/** Préférences, dans un magasin séparé : thème, lanceur de dés, multiplicateur de blessures, dernière fiche ouverte. */
 export interface Prefs {
   theme?: "auto" | "light" | "dark";
   /** Bouton « Lancer » et résultats dans les lanceurs ; masqué par défaut (HANDOFF §6.2). */
   showDiceRoller?: boolean;
+  /** Multiplicateur des niveaux de blessure après Indemne : Terre × 2 par défaut (annexe E-d). */
+  woundMultiplier?: number;
   lastOpenedId?: string;
   persistRequested?: boolean;
 }

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { Fragment, useEffect } from "react";
 import {
   armorEffects, describeModifier, fullAttackAllowed, guardRule, initiativeScore, isSimpleAttack, stanceRestriction, modifiersOf, movement, movementBonus, movementWater, resolveValue,
   reminderText, rings, schoolOf, schoolReminders, stackCount, stackEffects, stackMax, terrainWaiver, voidMultiplier,
@@ -62,7 +62,12 @@ export function Aid() {
           {combat && <VoidPanel />}
           {(combat || ui.situation === "court") && <RemindersPanel />}
           <div className="actions">
-            {actions.filter((a) => a.kind !== "initiative").map((a) => <ActionCard key={a.id} action={a} />)}
+            {actions.filter((a) => a.kind !== "initiative").map((a, i, list) => (
+              // Titre de groupe avant la première action du groupe (« Repos », annexe E.6).
+              a.group && a.group !== list[i - 1]?.group
+                ? <Fragment key={a.id}><h3 className="label actgroup">{a.group}</h3><ActionCard action={a} /></Fragment>
+                : <ActionCard key={a.id} action={a} />
+            ))}
             {combat && !c.weapons.length && <p className="muted">Ajoute des armes dans la fiche pour voir les attaques.</p>}
           </div>
         </div>

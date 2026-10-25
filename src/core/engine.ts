@@ -458,12 +458,16 @@ export interface WoundState {
   status: "ok" | "out" | "dead";
 }
 
-/** Seuils des niveaux de blessure, avec les blessures en plus par niveau des techniques (Daidoji R1). */
+/**
+ * Seuils des niveaux de blessure, avec les blessures en plus par niveau des techniques (Daidoji R1).
+ * Après Indemne (Terre × 5), chaque niveau vaut Terre × le multiplicateur des préférences (× 2 par défaut, E.6).
+ */
 export function woundThresholds(c: Character, ctx: Partial<SchoolContext> = {}): number[] {
   const earth = rings(c).earth;
   const { perLevel } = woundEffects(c, schoolContext(ctx));
+  const next = ctx.woundMultiplier ?? WOUND_NEXT_MULTIPLIER;
   let cap = 0;
-  return WOUND_LEVELS.map((_, i) => (cap += earth * (i === 0 ? WOUND_FIRST_MULTIPLIER : WOUND_NEXT_MULTIPLIER) + perLevel));
+  return WOUND_LEVELS.map((_, i) => (cap += earth * (i === 0 ? WOUND_FIRST_MULTIPLIER : next) + perLevel));
 }
 
 /** État de blessure ; la posture compte pour les pénalités ignorées (Matsu R4). Hors lanceur : posture Attaque. */
