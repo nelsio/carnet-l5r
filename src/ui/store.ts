@@ -5,7 +5,8 @@
 import { createContext, useContext, type Dispatch } from "react";
 import {
   activeEffects, buildActions, DAMAGE_MANEUVER_ID, DISARM_MANEUVER_ID, emphasisMatches, matchingEmphasis, meditate, newDay, voidSpendOption,
-  feintBonus, focusOutcome, fullAttackAllowed, fullDefenseBonus, updateVocabulary, woundsFromDamage, type ActionDef, type Character, type CombatSub, type RollResult, type Situation, type Stance,
+  feintBonus, focusOutcome, fullAttackAllowed, fullDefenseBonus, updateVocabulary, woundsFromDamage, type ActionDef, type ArmyStatus, type Character, type CombatSub,
+  type Engagement, type RollResult, type Situation, type Stance,
 } from "@carnet/core";
 import { FEINT_MANEUVER_ID, WOUND_MULTIPLIERS, WOUND_NEXT_MULTIPLIER, type Terrain } from "../rules/l5r4e";
 import type { LibraryEntry } from "../storage";
@@ -20,7 +21,7 @@ export type BlockId = "rings" | "identity" | "skills" | "weapons" | "techniques"
 /** Bloc ouvert à la création d'une fiche : le nom en premier. */
 export const NEW_CHARACTER_BLOCK: BlockId = "identity";
 /** Panneaux de l'aide de jeu dotés d'un bouton « i » (HANDOFF §6.2). */
-export type InfoPanel = "stance" | "void" | "move" | "reminders";
+export type InfoPanel = "stance" | "void" | "move" | "reminders" | "battle";
 type Path = readonly (string | number)[];
 
 export interface RollRecord {
@@ -112,7 +113,33 @@ export interface UiState {
    * le renommage, qui reste annulable tant que la fiche n'a pas changé depuis.
    */
   vocabulary: { hidden: boolean; undo: { before: Character; after: Character } | null };
+  /** Bataille de masse (annexe E.8). */
+  battle: BattleState;
 }
+
+/** Bataille de masse (annexe E.8) : un tour de bataille, effacé par « Nouveau round » sauf l'engagement et le commandement. */
+export interface BattleState {
+  /** Tu commandes : l'état de l'armée vient de l'écart de Commandement ; sinon, il se choisit. */
+  commanding: boolean;
+  /** Écart de Commandement (ton total − adverse), négatif si tu perds. */
+  gap: number | null;
+  status: ArmyStatus;
+  engagement: Engagement;
+  /** Avantage Tacticien : +5, −5, ou 0 sans l'avantage. */
+  tactician: number;
+  /** d10 tiré par l'outil (lanceur affiché). */
+  die: number | null;
+  /** Total du jet de bataille, 1d10 + Eau + Bataille, sans le Tacticien. */
+  total: number | null;
+  /** Dés de blessures tirés par l'outil. */
+  woundDice: number[] | null;
+  /** Blessures du tour déjà encaissées. */
+  woundsTaken: boolean;
+}
+
+export const initialBattle: BattleState = {
+  commanding: false, gap: null, status: "stalemate", engagement: "engaged", tactician: 0, die: null, total: null, woundDice: null, woundsTaken: false,
+};
 
 export type Screen = "library" | "character";
 export type EntryMode = "edit" | "readonly";
@@ -167,6 +194,7 @@ export const initialUi: UiState = {
   schoolArmor: {},
   stacks: {},
   vocabulary: { hidden: false, undo: null },
+  battle: initialBattle,
 };
 
 export function initialState(): AppState {
@@ -200,6 +228,8 @@ export type AppAction =
   | { type: "takeDamage"; damage: number; voidSpent: boolean }
   | { type: "assessmentWon"; on: boolean }
   | { type: "focusGap"; gap: number | null }
+  /** Bataille de masse (annexe E.8) : les dés sont tirés avant le dispatch. */
+  | { type: "battle"; patch: Partial<BattleState> }
   | { type: "situation"; situation: AidSituation }
   | { type: "sub"; sub: CombatSub }
   | { type: "stance"; stance: Stance }
@@ -324,6 +354,7 @@ function uiReducer(state: AppState, action: AppAction): AppState {
     case "guard": return withUi({ guard: action.on && ui.stance !== "fullAttack" });
     case "assessmentWon": return withUi({ assessmentWon: action.on });
     case "focusGap": return withUi({ focusGap: action.gap });
+    case "battle": return withUi({ battle: { ...ui.battle, ...action.patch } });
     case "terrain": return withUi({ terrain: action.terrain });
     case "toggleTechnique": return withUi({ techToggles: { ...ui.techToggles, [action.key]: action.on } });
     case "techniqueInput": return withUi({ techInputs: { ...ui.techInputs, [action.key]: action.value } });
@@ -336,6 +367,8 @@ function uiReducer(state: AppState, action: AppAction): AppState {
         voidArmor: false, voidSpentThisRound: false, fullDefenseBonus: 0,
         centerLastRound: ui.stance === "center", centerBonusUsed: false, schoolArmor: {},
         stance: ui.stance === "fullDefense" ? "defense" : ui.stance,
+        // Bataille : nouveau tour, nouveaux jets ; l'engagement, le commandement et le Tacticien restent.
+        battle: { ...ui.battle, gap: null, die: null, total: null, woundDice: null, woundsTaken: false },
       });
     default: return state;
   }
@@ -383,7 +416,7 @@ export function reducer(state: AppState, action: AppAction): AppState {
         ui: {
           ...ui, initiative: null, voidInitiative: 0, stacks: {}, voidArmor: false, voidSpentThisRound: false,
           fullDefenseBonus: 0, centerLastRound: false, centerBonusUsed: false, schoolArmor: {}, guard: false,
-          focusGap: null, assessmentWon: false, pendingDamage: null,
+          focusGap: null, assessmentWon: false, pendingDamage: null, battle: initialBattle,
           stance: ui.stance === "fullDefense" ? "defense" : ui.stance,
         },
       };

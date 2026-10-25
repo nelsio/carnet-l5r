@@ -5,6 +5,7 @@
  */
 import type { Maneuver, RollTrait, TraitKey } from "../core/schema";
 import type { WeaponLike } from "../core/engine";
+import battleTable from "./table-bataille.json";
 
 export type RingKey = "earth" | "water" | "fire" | "air" | "void";
 export type Stance = "attack" | "fullAttack" | "defense" | "fullDefense" | "center";
@@ -187,6 +188,41 @@ export const WOUND_EFFECT_NOTES: Readonly<Record<string, string>> = {
   "À terre": "À terre : actions gratuites seulement, en dépensant 1 point de Vide pour chacune.",
 };
 
+/* ---------- Bataille de masse (annexe E.8, v2.7.0) ---------- */
+
+export type Engagement = "reserves" | "disengaged" | "engaged" | "heavilyEngaged";
+export type ArmyStatus = "winning" | "stalemate" | "losing";
+export type BattleEvent = "duel" | "heroic";
+/** Case de la table : dés de blessures, Gloire gagnée, événement éventuel. */
+export interface BattleCell { wounds: number; glory: number; event: BattleEvent | null }
+
+export const ENGAGEMENTS: readonly { id: Engagement; label: string }[] = [
+  { id: "reserves", label: "Réserve" },
+  { id: "disengaged", label: "Désengagé" },
+  { id: "engaged", label: "Engagé" },
+  { id: "heavilyEngaged", label: "Fortement engagé" },
+];
+export const ARMY_STATUSES: readonly { id: ArmyStatus; label: string; verdict: string }[] = [
+  { id: "winning", label: "Gagne", verdict: "Ton armée gagne" },
+  { id: "stalemate", label: "Égalité", verdict: "Égalité" },
+  { id: "losing", label: "Perd", verdict: "Ton armée perd" },
+];
+/** Commandement (p. 238) : Bataille/Perception en opposition, 5 d'écart pour que ton armée l'emporte. */
+export const BATTLE_COMMAND = { skill: "Bataille", margin: 5 } as const;
+/** Jet de bataille (p. 240) : 1d10 sans explosion (E-g) + Anneau d'Eau + Bataille ; avantage Tacticien ±5. */
+export const BATTLE_ROLL = { skill: "Bataille", tactician: 5 } as const;
+/** Colonne de la table : indice d'engagement + décalage de l'état de l'armée (`table-bataille.json`). */
+export const BATTLE_COLUMNS = {
+  engagement: battleTable.engagement as readonly Engagement[],
+  statusOffset: battleTable.statusOffset as Readonly<Record<ArmyStatus, number>>,
+};
+export const BATTLE_EVENT_LABELS = battleTable.events as Readonly<Record<BattleEvent, string>>;
+/** Table de bataille de masse (p. 242 du PDF), lignes par total croissant ; au-delà de 30, la dernière ligne. */
+export const BATTLE_TABLE: readonly { min: number; max: number; cells: readonly BattleCell[] }[] = battleTable.rows.map((r) => ({
+  min: r.min, max: r.max,
+  cells: r.cells.map(([wounds, glory, event]) => ({ wounds: Number(wounds), glory: Number(glory), event: (event ?? null) as BattleEvent | null })),
+}));
+
 /** Manœuvres par défaut (coût en augmentations). */
 export const DEFAULT_MANEUVERS: readonly Maneuver[] = [
   { id: "dmg", name: "Augmentation des dégâts", cost: 1, stackable: true, effect: "+1g0 aux dégâts par augmentation (cumulable)." },
@@ -323,8 +359,7 @@ export const FIXED_ACTIONS: readonly ActionDef[] = [
   { id: "focus", situation: "combat", sub: "duel", label: "2 · Concentration", kind: "skill", skill: "Iaijutsu", trait: "void", tn: "opposed", description: "Jets en opposition à chaque échange. Le vainqueur frappe en premier ; l'écart se convertit en augmentations gratuites pour la Frappe." },
   { id: "strike", situation: "combat", sub: "duel", label: "3 · Frappe", kind: "skill", skill: "Iaijutsu", trait: "reflexes", tn: "target", attack: true, description: "Iaijutsu (Réflexes) contre le ND d'armure. Ajoute tes augmentations gratuites de la Concentration." },
   // Bataille
-  { id: "tactics", situation: "combat", sub: "battle", label: "Commander / lire le champ", kind: "skill", skill: "Bataille", trait: "perception", tn: "opposed", description: "Commandants : jets en opposition chaque tour. 5 d'écart pour l'emporter ; sinon, égalité." },
-  { id: "engagement", situation: "combat", sub: "battle", label: "Niveau d'engagement", kind: "info", tn: null, description: "Réserve → Désengagé → Engagé → Fortement engagé. Plus tu t'engages, plus tu gagnes de Gloire et d'opportunités, plus tu risques de blessures." },
+  { id: "tactics", situation: "combat", sub: "battle", label: "Commander / lire le champ", kind: "skill", skill: "Bataille", trait: "perception", tn: "opposed", description: "Commandants : jets en opposition à chaque tour. Saisis l'écart dans le panneau Bataille de masse : 5 d'écart pour l'emporter, sinon égalité." },
 ];
 
 /**

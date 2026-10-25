@@ -1,15 +1,18 @@
 import { Fragment, useEffect } from "react";
 import {
-  armorEffects, describeModifier, fullAttackAllowed, guardRule, initiativeScore, isSimpleAttack, stanceRestriction, modifiersOf, movement, movementBonus, movementWater, resolveValue,
+  armorEffects, armyStatus, battleOutcome, battleRollBonus, battleRollTotal, describeModifier, rollBattleDice, fullAttackAllowed, guardRule, initiativeScore, isSimpleAttack, stanceRestriction, modifiersOf, movement, movementBonus, movementWater, resolveValue,
   reminderText, rings, schoolOf, schoolReminders, stackCount, stackEffects, stackMax, terrainWaiver, voidMultiplier,
   type ActionDef, type ActiveEffect,
 } from "@carnet/core";
-import { CENTER_BONUS, COMBAT_SUBS, SITUATIONS, STANCES, TERRAINS, VOID_COMBAT } from "../../rules/l5r4e";
+import {
+  ARMY_STATUSES, BATTLE_COMMAND, BATTLE_EVENT_LABELS, BATTLE_ROLL, CENTER_BONUS, COMBAT_SUBS, ENGAGEMENTS, SITUATIONS, STANCES, TERRAINS, VOID_COMBAT,
+} from "../../rules/l5r4e";
 import type { ReminderContext } from "../../rules/ecoles";
 import { toMeters } from "../format";
 import { contextOf, currentArmorTN, DEFAULT_ROLL_OPTIONS, isActive, isRollable, poolFor, poolLabel, toPoolAction, uiRollStance } from "../rolls";
-import { currentActions, useCharacter, useStore, type AidSituation, type InfoPanel } from "../store";
+import { currentActions, useCharacter, useStore, type AidSituation, type BattleState, type InfoPanel } from "../store";
 import { Roller } from "./Roller";
+import { TakeDamage } from "./StatusBar";
 
 const AID_SITUATIONS: readonly { id: AidSituation; label: string }[] = SITUATIONS;
 
@@ -58,6 +61,7 @@ export function Aid() {
         <div className="grid" style={{ gap: 12 }}>
           {initiative && <InitiativeCard action={initiative} />}
           {combat && <RoundPanel />}
+          {combat && ui.sub === "battle" && <BattlePanel />}
           {combat && ui.sub !== "duel" && <StancePanel />}
           {combat && <VoidPanel />}
           {(combat || ui.situation === "court") && <RemindersPanel />}
@@ -256,6 +260,138 @@ function RemindersPanel() {
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+const plural = (n: number, one: string, many: string) => `${n} ${n > 1 ? many : one}`;
+/** Saisie d'un entier facultatif : vide → `null`. */
+const optionalInt = (v: string, min?: number) => (v === "" ? null : Math.max(min ?? -Infinity, Math.trunc(Number(v)) || 0));
+
+/**
+ * Bataille de masse (annexe E.8) : état de l'armée (commandement ou choix), engagement, jet de bataille,
+ * case de la table, puis dés de blessures encaissés comme des dégâts (F6).
+ */
+function BattlePanel() {
+  const { state, dispatch, rng } = useStore();
+  const c = useCharacter();
+  const { ui } = state;
+  const b = ui.battle;
+  const details = !!ui.info.battle;
+  // Un nouveau jet ou une nouvelle case remet à zéro les dés de blessures du tour.
+  const set = (patch: Partial<BattleState>) => dispatch({ type: "battle", patch: { woundDice: null, woundsTaken: false, ...patch } });
+  const status = b.commanding ? (b.gap === null ? null : armyStatus(b.gap)) : b.status;
+  const { water, skill } = battleRollBonus(c);
+  const total = b.total === null ? null : b.total + b.tactician;
+  const outcome = total !== null && status ? battleOutcome(total, b.engagement, status) : null;
+  const woundSum = b.woundDice?.reduce((s, d) => s + d, 0) ?? 0;
+  const roll = () => {
+    const [die] = rollBattleDice(1, rng);
+    set({ die, total: battleRollTotal(c, die) });
+  };
+  return (
+    <div className="panel battle" style={{ padding: 12 }} role="group" aria-label="Bataille de masse">
+      <div className="panel-head" style={{ marginBottom: 8 }}>
+        <span className="panel-title"><span className="label">Bataille de masse</span><InfoButton panel="battle" label="Bataille de masse" /></span>
+      </div>
+
+      <label className="chk">
+        <input type="checkbox" checked={b.commanding} onChange={(e) => set({ commanding: e.target.checked })} /> Je commande l'armée
+      </label>
+      {b.commanding ? (
+        <div style={{ marginTop: 6 }}>
+          <label className="field" style={{ maxWidth: 260 }}>
+            <span className="label">Écart de Commandement (ton total − adverse)</span>
+            <input
+              className="in mono" type="number" aria-label="Écart de Commandement" value={b.gap ?? ""}
+              onChange={(e) => set({ gap: optionalInt(e.target.value) })}
+            />
+          </label>
+          <div className="hint" data-testid="army-status">
+            {status
+              ? <b>{ARMY_STATUSES.find((s) => s.id === status)?.verdict}</b>
+              : `Bataille/Perception en opposition avec le commandant adverse : ${BATTLE_COMMAND.margin} d'écart pour l'emporter.`}
+          </div>
+        </div>
+      ) : (
+        <div className="terrain" role="group" aria-label="État de l'armée" style={{ marginTop: 6 }}>
+          {ARMY_STATUSES.map((s) => (
+            <button key={s.id} type="button" aria-pressed={b.status === s.id} onClick={() => set({ status: s.id })}>{s.label}</button>
+          ))}
+        </div>
+      )}
+
+      <div className="label" style={{ marginTop: 8 }}>Engagement</div>
+      <div className="terrain seg4" role="group" aria-label="Engagement">
+        {ENGAGEMENTS.map((e) => (
+          <button key={e.id} type="button" aria-pressed={b.engagement === e.id} onClick={() => set({ engagement: e.id })}>{e.label}</button>
+        ))}
+      </div>
+      {details && (
+        <p className="hint" style={{ marginTop: 0 }}>
+          Plus tu t'engages, plus tu gagnes de Gloire et d'occasions, plus tu risques de blessures. Une armée à égalité ou qui perd décale la colonne d'un ou deux crans.
+        </p>
+      )}
+
+      <div className="label" style={{ marginTop: 8 }}>Jet de bataille</div>
+      <div className="hint" style={{ marginTop: 0 }} data-testid="battle-roll">
+        1d10 (sans explosion) + Eau {water} + Bataille {skill}{b.die !== null ? ` · d10 : ${b.die}` : ""}
+      </div>
+      <div className="battleroll">
+        <label className="field">
+          <span className="label">Total du jet</span>
+          <input
+            className="in mono" type="number" min={0} aria-label="Total du jet de bataille" value={b.total ?? ""}
+            onChange={(e) => set({ die: null, total: optionalInt(e.target.value, 0) })}
+          />
+        </label>
+        {ui.showDiceRoller && <button type="button" className="btn sm" onClick={roll}>Lancer 1d10</button>}
+        <label className="chk">
+          <input type="checkbox" checked={b.tactician !== 0} onChange={(e) => set({ tactician: e.target.checked ? BATTLE_ROLL.tactician : 0 })} /> Tacticien
+        </label>
+        {b.tactician !== 0 && (
+          <span className="stepper" role="group" aria-label="Tacticien">
+            {[BATTLE_ROLL.tactician, -BATTLE_ROLL.tactician].map((t) => (
+              <button key={t} type="button" aria-pressed={b.tactician === t} onClick={() => set({ tactician: t })}>{t > 0 ? `+${t}` : `−${-t}`}</button>
+            ))}
+          </span>
+        )}
+      </div>
+
+      {outcome && total !== null && (
+        <div className="battleres" data-testid="battle-outcome">
+          <b>{outcome.wounds ? plural(outcome.wounds, "dé de blessures", "dés de blessures") : "Aucun dé de blessures"}, {outcome.glory} Gloire</b>
+          {outcome.event && <>, <b className="tag">{BATTLE_EVENT_LABELS[outcome.event]}</b></>}
+          {details && (
+            <div className="muted" style={{ fontSize: 13 }}>
+              Total {total}{b.tactician ? ` (Tacticien ${b.tactician > 0 ? "+" : "−"}${Math.abs(b.tactician)})` : ""} → ligne {outcome.row.min}-{outcome.row.max} ;
+              {" "}colonne {ENGAGEMENTS.find((e) => e.id === b.engagement)?.label}{outcome.shift ? `, décalée de ${outcome.shift}` : ""}.
+            </div>
+          )}
+        </div>
+      )}
+      {outcome && outcome.wounds > 0 && state.mode === "edit" && (
+        b.woundsTaken ? <p className="hint" data-testid="battle-wounds-taken">Blessures du tour encaissées.</p> : (
+          <div style={{ marginTop: 8 }}>
+            {ui.showDiceRoller ? (
+              <>
+                <button type="button" className="btn sm" onClick={() => dispatch({ type: "battle", patch: { woundDice: rollBattleDice(outcome.wounds, rng) } })}>
+                  Lancer les dés de blessures ({outcome.wounds}d10)
+                </button>
+                {b.woundDice && (
+                  <div className="dice" aria-label="Dés de blessures" data-testid="battle-wound-dice">
+                    {b.woundDice.map((d, i) => <span key={i} className="die kept">{d}</span>)}
+                  </div>
+                )}
+              </>
+            ) : <p className="hint" style={{ marginTop: 0 }}>Lance {outcome.wounds}d10 et additionne-les, puis encaisse le total.</p>}
+            <TakeDamage
+              key={b.woundDice?.join(",") ?? "manual"} initial={woundSum} label="Total des dés de blessures"
+              onDone={() => dispatch({ type: "battle", patch: { woundsTaken: true } })}
+            />
+          </div>
+        )
+      )}
     </div>
   );
 }

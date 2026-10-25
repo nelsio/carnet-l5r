@@ -113,16 +113,19 @@ export function StatusBar() {
   );
 }
 
-/** Encaisser des dégâts (annexe E.3 F6) : dégâts − Réduction (− 10 avec un point de Vide) en blessures. */
-function TakeDamage({ onDone }: { onDone: () => void }) {
+/**
+ * Encaisser des dégâts (annexe E.3 F6) : dégâts − Réduction (− 10 avec un point de Vide) en blessures.
+ * Repris par la bataille de masse pour ses dés de blessures (E.8), pré-remplis par `initial`.
+ */
+export function TakeDamage({ onDone, initial = 0, label = "Dégâts reçus" }: { onDone: () => void; initial?: number; label?: string }) {
   const { dispatch } = useStore();
   const c = useCharacter();
-  const [damage, setDamage] = useState(0);
+  const [damage, setDamage] = useState(initial);
   const [voidSpent, setVoidSpent] = useState(false);
   const added = woundsFromDamage(c, damage, voidSpent && c.voidPoints >= 1);
   return (
     <div className="dmgedit" role="group" aria-label="Encaisser des dégâts">
-      <label className="field"><span className="label">Dégâts reçus</span>
+      <label className="field"><span className="label">{label}</span>
         <NumberField className="in mono" min={0} value={damage} onChange={setDamage} />
       </label>
       <label className="chk">
