@@ -420,3 +420,49 @@ header.top + main{margin-top:18px}
   .terrain.seg4{grid-template-columns:repeat(2,minmax(0,1fr))}
   .terrain.seg4 button,.battle .terrain button,.battleroll .btn{min-height:40px}
 }
+
+/* ---------- v2.8.0 : tuile Blessures, Vide, bloc Armure (annexe E.18, E.19) ---------- */
+/* Tuile « Blessures » : même dessin que les tuiles de combat ; ouvre Ajuster / Encaisser (S14) */
+.vshort{display:none}
+.wtile{display:grid;gap:1px;min-width:150px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:3px 8px;line-height:1.2;text-align:left;color:inherit;font:inherit}
+.wtile.on{border-color:var(--gold);background:var(--gold-soft)}
+.wt1{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.wt1 .label{font-size:9.5px;letter-spacing:.08em}
+.wt1 b{font-size:15px}
+.wt2{font-size:13px;font-weight:600;white-space:nowrap}
+.dmgedit.withcounter .field{max-width:180px}
+.dmgedit.withcounter .field .label{white-space:nowrap}
+.dmgedit.withcounter .adjust{flex:1 1 100%;display:flex;justify-content:space-between;align-items:center;gap:8px;padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.armedit .armcat{grid-column:1/-1}
+/* Bloc Armure de la fiche */
+.armname{margin-bottom:8px}
+.armname b{font-family:var(--f-display);font-size:18px}
+.armstats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.armstats div{display:grid;align-content:start;gap:2px;background:var(--bg);border-radius:6px;padding:10px 12px;min-width:0}
+.armstats b{font-family:var(--f-mono);font-size:26px;line-height:1.1}
+.armstats .muted{font-size:13px;overflow-wrap:anywhere}
+.armrule{border-left:3px solid var(--gold);padding-left:10px;margin:10px 0 0}
+.armform{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+@media (max-width:720px){
+  /* Tuile jusqu'au bloc Vide, qui prend sa largeur utile, au plus la moitié (S11, S14) */
+  .status-in{grid-template-columns:minmax(0,1fr) fit-content(50%)}
+  .wtile{min-width:0;container-type:inline-size;padding:5px 8px}
+  .wt2{font-size:min(14px,100cqi / 9.4)}
+  .vlong{display:none}
+  .vshort{display:inline}
+  .vblock{min-width:0}
+  .vblock .label{text-align:right;white-space:nowrap}
+  .voidpips{display:grid;grid-template-columns:repeat(var(--n),minmax(0,40px));justify-content:end;margin-left:0}
+  .pip{width:auto;min-width:0}
+  .pip::before{inset:auto;left:50%;top:50%;width:65%;max-width:26px;aspect-ratio:1;transform:translate(-50%,-50%)}
+  /* Détail des blessures : une seule carte, lignes séparées par un pointillé (S13) */
+  .status.exp .wdetail{gap:0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:4px 6px}
+  .wdl{border:0;border-radius:6px;background:transparent}
+  .wdl + .wdl{border-top:1px dashed var(--line);border-radius:0}
+  .wdl.past{background:transparent;opacity:.5}
+  .wdl.cur{border-radius:6px;background:color-mix(in srgb,var(--bad) 14%,var(--surface))}
+  .wdl.cur,.wdl.cur + .wdl{border-top-color:transparent}
+  .wdl.cur .wp{font-weight:800}
+  .armform{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .armform .armcat{grid-column:1/-1}
+}

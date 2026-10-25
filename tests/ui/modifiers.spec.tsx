@@ -5,6 +5,7 @@ import type { Character, Modifier } from "@carnet/core";
 import { memoryStorage, type LibraryEntry } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
+import { woundsField } from "../helpers/wounds";
 
 const base = () => structuredClone(kakita) as Character;
 const mod = (patch: Partial<Modifier>): Modifier => ({
@@ -162,7 +163,7 @@ describe("Catalogue : Force de la Terre, Aspect dérangeant", () => {
   it("Force de la Terre : la pénalité de blessure baisse de 3", async () => {
     await mount();
     await addFromCatalogue("force-de-la-terre");
-    fireEvent.change(screen.getByRole("spinbutton", { name: "Blessures subies" }), { target: { value: "18" } });
+    fireEvent.change(woundsField(), { target: { value: "18" } });
     expect(screen.getByText("+2", { selector: ".pen b" })).toBeInTheDocument();
     expect(screen.getByText("-3 à la pénalité de blessure")).toBeInTheDocument();
   });

@@ -17,7 +17,7 @@ export type View = "sheet" | "aid" | "stats";
 export type AidSituation = Situation;
 export type ListKey = "skills" | "weapons" | "techniques" | "maneuvers" | "modifiers";
 /** Blocs modifiables de la fiche (annexe E.9 S2). */
-export type BlockId = "rings" | "identity" | "skills" | "weapons" | "techniques" | "modifiers" | "notes";
+export type BlockId = "rings" | "identity" | "skills" | "weapons" | "armor" | "techniques" | "modifiers" | "notes";
 /** Bloc ouvert à la création d'une fiche : le nom en premier. */
 export const NEW_CHARACTER_BLOCK: BlockId = "identity";
 /** Panneaux de l'aide de jeu dotés d'un bouton « i » (HANDOFF §6.2). */

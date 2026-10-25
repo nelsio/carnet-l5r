@@ -42,14 +42,14 @@ Les fiches enregistrées hors ligne restent **propres à ce fichier, sur cet app
 - Chaque bloc de la fiche a son bouton **Edit** : il passe ce bloc en saisie, **Terminer** le repasse en lecture. Plusieurs blocs peuvent être ouverts ensemble. Les réserves (`5g3`, `6g2`…) se recalculent à chaque changement.
 - Une arme du livre saisie avec d'autres valeurs (VD, mots-clés) est signalée : **Mettre à jour** reprend celles du livre.
 - La **barre d'état**, en haut, reste visible partout :
-  - **blessures** avec les boutons `−` / `+`, et la piste des 8 niveaux avec leur pénalité effective (sur mobile, un appui sur le résumé ouvre le détail : une ligne par niveau, avec l'intervalle de blessures) ;
+  - la tuile **Blessures** (`2/38` : blessures subies / maximum) ouvre, sous la barre, **Ajuster** (`−`, le total, `+` : corrections et soins) puis **Dégâts de l'attaque** (Réduction et Vide appliqués, **Encaisser**) ; la piste des 8 niveaux montre leur pénalité effective (sur mobile, un appui sur le résumé ouvre le détail : une ligne par niveau, avec l'intervalle de blessures) ;
   - **points de Vide** : une pastille par point, un appui en dépense ou en rend ;
   - quatre tuiles : **Dépl.** (`10/20 pi` = action libre / action simple), **ND armure**, **Réduction** et **Pénalité** (en rouge dès qu'elle dépasse `0`).
-- Les tuiles **ND armure** et **Réduction** ouvrent l'**éditeur d'armure** : nom de l'armure, bonus au ND, réduction. Le ND d'armure lui-même est calculé (`5 × Réflexes + 5 + bonus`, puis posture et Vide).
-- La liste **Armure du livre** (éditeur d'armure, ou bloc Identité en modification) remplit ces trois champs, que tu peux ensuite retoucher : aucune, ashigaru, légère, lourde, cavalerie. Son effet suit : armure légère `+5` au ND d'Athlétisme et de Discrétion ; armure lourde `+5` au ND des jets d'Agilité et de Réflexes (sauf école Hida) ; cavalerie `+12` au ND d'armure à cheval, et comme une lourde à pied.
+- Le bloc **Armure** de la fiche (v2.8) détaille ton armure : « armure du livre » ou « armure personnalisée », **ND d'armure** en posture Attaque (`5 × Réflexes 3 + 5 + armure 5 = 25`, plus les bonus d'office de tes techniques), **Réduction** (armure et techniques), et la **règle spéciale** de l'armure du livre. Son bouton **Edit**, comme les tuiles **ND armure** et **Réduction** de la barre d'état, ouvre l'éditeur : nom, bonus au ND, Réduction.
+- La liste **Armure du livre** remplit ces trois champs : aucune, ashigaru, légère, lourde, cavalerie. Son effet suit : armure légère `+5` au ND d'Athlétisme et de Discrétion ; armure lourde `+5` au ND des jets d'Agilité et de Réflexes (sauf école Hida) ; cavalerie `+12` au ND d'armure à cheval, et comme une lourde à pied. Retoucher ensuite le bonus ou la Réduction en fait une **armure personnalisée**, sans effet.
 - **Nouvelle journée…** (en tête de fiche) : après une nuit de repos, un aperçu puis **Confirmer** remet tes points de Vide au maximum, soigne `2 × Constitution + Rang` blessures, et remet l'initiative et les compteurs d'escarmouche à zéro.
 - Les libellés suivent l'**édition française** : trait **Vigilance**, compétences **Courtisan**, **Discrétion**, **Représentation : Conte** et **Représentation : Art oratoire**, spécialisation **Courtoisie** d'Étiquette. Une fiche qui emploie encore les anciens noms (Courtoisie, Furtivité, Conteur, Éloquence, Politesse) marche telle quelle ; un bandeau propose **Mettre à jour…** : aperçu des renommages, puis **Renommer** (annulable tout de suite par **Annuler le renommage**) ou **Plus tard**.
-- Le bouton **Blessures : Terre × 2** de l'en-tête règle la taille des niveaux après Indemne (`× 2` du livre, ou `× 3` à `× 5` pour des personnages plus résistants) ; Indemne reste `Terre × 5`. Ce réglage est mémorisé sur l'appareil, pour toutes les fiches.
+- Les niveaux de blessure suivent le livre : Indemne jusqu'à `Terre × 5`, puis `Terre × 2` par niveau. (Le réglage `× 3` à `× 5` de la v2.5 est masqué pour le moment.)
 
 ## 4. Jouer avec l'aide de jeu
 
@@ -70,7 +70,7 @@ En **Escarmouche**, de haut en bas :
 4. **Dépenser du Vide** : `+1g1` au jet, `+10` au ND d'armure, compétence jouée au rang 1, capacité payée en Vide, `+10` à l'Initiative ou échange d'Initiative.
 5. Les **attaques** de chaque arme, avec leurs **dégâts** juste dessous (`└`). Une action que ta posture interdit (attaque en Défense, tir en Assaut, tout sauf l'Initiative en Centre) est **grisée** avec la raison, et reste jouable par **Lancer quand même**.
 
-Au round qui suit le Centre, le lanceur propose le **Bonus de Centre** (`+1g1` et ton Anneau de Vide au total, sur un seul jet). Une **Feinte** réussie pré-remplit son bonus sur les dégâts. Pour **encaisser** un coup, le bouton **Dégâts…** de la barre d'état retire ta Réduction (et `10` avec un point de Vide) et ajoute les blessures.
+Au round qui suit le Centre, le lanceur propose le **Bonus de Centre** (`+1g1` et ton Anneau de Vide au total, sur un seul jet). Une **Feinte** réussie pré-remplit son bonus sur les dégâts. Pour **encaisser** un coup, la tuile **Blessures** de la barre d'état, puis **Dégâts de l'attaque**, retire ta Réduction (et `10` avec un point de Vide) et ajoute les blessures.
 
 En **Duel iaijutsu**, les étapes Évaluation → Concentration → Frappe remplacent l'initiative et la posture (Centre implicite) : coche une Évaluation **gagnée de 10 ou plus**, saisis l'**écart de Concentration**, et les augmentations gratuites passent sur la Frappe. **Nouveau round** et **Dépenser du Vide** restent présents partout.
 
@@ -107,7 +107,7 @@ La page **Statistiques**, à côté de **Fiche** et **Aide de jeu** (dans la bar
 
 ## 7. Techniques d'école
 
-Sur la fiche, en modification, choisis ton école dans **Techniques d'école** (bloc Identité). Le **Rang d'école** vaut ton Rang d'Insight, sauf si tu le changes.
+Sur la fiche, en modification, choisis ton école dans **Techniques d'école** (bloc Identité) : **École (nom affiché)** prend le nom du livre, que tu peux ensuite changer. Le **Rang d'école** vaut ton Rang d'Insight, sauf si tu le changes ; l'en-tête affiche « École de bushi Kakita · Rang 1 ».
 
 Le catalogue compte **26 écoles** :
 

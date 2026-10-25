@@ -6,7 +6,7 @@ import {
 import { ARMOR_TN, VOID_COMBAT, WOUND_LEVELS } from "../../rules/l5r4e";
 import { contextOf, currentArmorTN, selectedKeys } from "../rolls";
 import { useCharacter, useStore } from "../store";
-import { ArmorCatalogSelect, ArmorEffect } from "./ArmorCatalog";
+import { ArmorEffect, ArmorFields } from "./ArmorCatalog";
 import { NumberField } from "./fields";
 import { LinkBanner } from "./LinkBanner";
 
@@ -67,30 +67,21 @@ export function StatusBar() {
             ))}
           </ol>
         )}
-        <div>
-          <div className="label">Blessures</div>
-          <div className="stepper">
-            {readonly ? (
-              <b className="stat-big" aria-label="Blessures subies">{c.wounds}</b>
-            ) : (
-              <>
-                <button type="button" aria-label="Retirer 1 blessure" onClick={() => dispatch({ type: "wounds", value: c.wounds - 1 })}>−</button>
-                <NumberField
-                  className="in mono" style={{ width: 56, textAlign: "center" }} min={0} aria-label="Blessures subies"
-                  value={c.wounds} onChange={(n) => dispatch({ type: "wounds", value: n })}
-                />
-                <button type="button" aria-label="Ajouter 1 blessure" onClick={() => dispatch({ type: "wounds", value: c.wounds + 1 })}>+</button>
-                <button
-                  type="button" className={`dmgbtn${damageOpen ? " on" : ""}`} aria-expanded={damageOpen} aria-label="Encaisser des dégâts"
-                  title="Encaisser des dégâts" onClick={() => setDamageOpen(!damageOpen)}
-                >Dégâts…</button>
-              </>
-            )}
-          </div>
-        </div>
-        <div>
-          <div className="label">Points de Vide {c.voidPoints}/{c.voidRing}</div>
-          <div className="voidpips">
+        {readonly ? (
+          <div><span className="label">Blessures</span> <b className="stat-big" aria-label="Blessures subies">{c.wounds}</b></div>
+        ) : (
+          // Tuile « Blessures » : ouvre Ajuster / Encaisser sous la barre (annexe E.19 S14).
+          <button
+            type="button" className={`wtile${damageOpen ? " on" : ""}`} aria-expanded={damageOpen}
+            aria-label="Blessures : ajuster ou encaisser des dégâts" onClick={() => setDamageOpen(!damageOpen)}
+          >
+            <span className="wt1"><span className="label">Blessures</span><b className="mono">{c.wounds}/{maxWounds}</b></span>
+            <span className="wt2">Ajuster / Encaisser {damageOpen ? "▴" : "▾"}</span>
+          </button>
+        )}
+        <div className="vblock">
+          <div className="label"><span className="vlong">Points de Vide {c.voidPoints}/{c.voidRing}</span><span className="vshort">Vide {c.voidPoints}/{c.voidRing}</span></div>
+          <div className="voidpips" style={{ ["--n" as string]: c.voidRing }}>
             {Array.from({ length: c.voidRing }, (_, i) => (
               <button
                 key={i} type="button" className={`pip${i < c.voidPoints ? " on" : ""}`}
@@ -106,7 +97,7 @@ export function StatusBar() {
           <ArmorTile label="Réduction" value={reduction} testId="armor-reduction" readonly={readonly} />
           <div className={ws.penalty ? "pen" : ""}><span className="label">Pénalité</span><b>{ws.penalty === null ? "—" : `+${ws.penalty}`}</b></div>
         </div>
-        {damageOpen && !readonly && <TakeDamage onDone={() => setDamageOpen(false)} />}
+        {damageOpen && !readonly && <TakeDamage counter label="Dégâts de l'attaque" onDone={() => setDamageOpen(false)} />}
         {ui.armorEdit && !readonly && <ArmorEditor tn={tn} />}
       </div>
     </div>
@@ -116,15 +107,31 @@ export function StatusBar() {
 /**
  * Encaisser des dégâts (annexe E.3 F6) : dégâts − Réduction (− 10 avec un point de Vide) en blessures.
  * Repris par la bataille de masse pour ses dés de blessures (E.8), pré-remplis par `initial`.
+ * `counter` : ligne « Ajuster » en tête (−, champ, +), pour la tuile Blessures de la barre d'état (annexe E.19 S14).
  */
-export function TakeDamage({ onDone, initial = 0, label = "Dégâts reçus" }: { onDone: () => void; initial?: number; label?: string }) {
+export function TakeDamage({ onDone, initial = 0, label = "Dégâts reçus", counter = false }: {
+  onDone: () => void; initial?: number; label?: string; counter?: boolean;
+}) {
   const { dispatch } = useStore();
   const c = useCharacter();
   const [damage, setDamage] = useState(initial);
   const [voidSpent, setVoidSpent] = useState(false);
   const added = woundsFromDamage(c, damage, voidSpent && c.voidPoints >= 1);
   return (
-    <div className="dmgedit" role="group" aria-label="Encaisser des dégâts">
+    <div className={`dmgedit${counter ? " withcounter" : ""}`} role="group" aria-label="Encaisser des dégâts">
+      {counter && (
+        <div className="adjust">
+          <span className="label">Ajuster</span>
+          <div className="stepper">
+            <button type="button" aria-label="Retirer 1 blessure" onClick={() => dispatch({ type: "wounds", value: c.wounds - 1 })}>−</button>
+            <NumberField
+              className="in mono" style={{ width: 56, textAlign: "center" }} min={0} aria-label="Blessures subies"
+              value={c.wounds} onChange={(n) => dispatch({ type: "wounds", value: n })}
+            />
+            <button type="button" aria-label="Ajouter 1 blessure" onClick={() => dispatch({ type: "wounds", value: c.wounds + 1 })}>+</button>
+          </div>
+        </div>
+      )}
       <label className="field"><span className="label">{label}</span>
         <NumberField className="in mono" min={0} value={damage} onChange={setDamage} />
       </label>
@@ -163,19 +170,9 @@ function ArmorEditor({ tn }: { tn: number }) {
   const techReduction = schoolReduction(c);
   const techArmor = schoolArmorBonus(c, contextOf(ui), selectedKeys(ui.schoolArmor), ui.stacks);
   const techAuto = armorEffects(c, contextOf(ui)).filter((e) => e.kind === "armor" && e.mode === "auto" && !e.stack);
-  const set = (field: "name" | "bonus" | "reduction", value: unknown) => dispatch({ type: "set", path: ["armor", field], value });
   return (
     <div className="armedit" role="group" aria-label="Armure">
-      <div style={{ gridColumn: "1/-1" }}><ArmorCatalogSelect /></div>
-      <label className="field"><span className="label">Armure</span>
-        <input className="in" type="text" maxLength={80} value={c.armor.name} onChange={(e) => set("name", e.target.value)} />
-      </label>
-      <label className="field"><span className="label">Bonus au ND</span>
-        <NumberField className="in mono" min={0} value={c.armor.bonus} onChange={(n) => set("bonus", n)} />
-      </label>
-      <label className="field"><span className="label">Réduction</span>
-        <NumberField className="in mono" min={0} value={c.armor.reduction} onChange={(n) => set("reduction", n)} />
-      </label>
+      <ArmorFields />
       <p className="hint" style={{ gridColumn: "1/-1", margin: 0 }}>
         ND d'armure = 5 × Réflexes {c.traits.reflexes} + 5 + bonus {c.armor.bonus}{tn !== armorBase(c) ? " ± posture, Vide et bonus" : ""} = <b className="mono">{tn}</b>.
         {" "}La réduction se retire de chaque jet de dégâts reçu.

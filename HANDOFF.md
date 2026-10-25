@@ -6,7 +6,7 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document.
 
-**État au 25/10/2026 :** version publiée **v2.7.0**, lots 1 à 12 livrés (§11), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français) et v2.7.0 (bataille de masse).
+**État au 25/10/2026 :** version publiée **v2.8.0**, lots 1 à 12 livrés (§11), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
 
 **Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie).
 
@@ -459,7 +459,7 @@ Depuis un fichier (bouton ou glisser-déposer). Trois destinations :
 
 « Terminé » = tests verts, `tsc --noEmit` sans erreur, lint propre, CI verte.
 
-État en v2.7.0 : **493 tests Vitest** (moteur, stockage, interface) et **60 tests Playwright** (chromium, iPhone 13, Pixel 7), lignes de `src/core` couvertes à 100 %.
+État en v2.8.0 : **509 tests Vitest** (moteur, stockage, interface) et **70 tests Playwright** (chromium, iPhone 13, Pixel 7), lignes de `src/core` couvertes à 100 %.
 
 ### 10.1 Moteur (`tests/core.rules.spec.ts`) — fourni, 80 tests
 - C'est la **spécification exécutable** du moteur. Elle a été validée contre une implémentation de référence : 80 tests sur 80 passent (v1.1 : règle des dix dés du livre, maîtrise 7+).
@@ -541,6 +541,7 @@ Ces cas complètent la spec fournie. L'agent les écrit dans `tests/core.modifie
 | M13 | Aide de jeu sur mobile, et à 360 px de large | Les 4 onglets de situation (Enquête, Cour, Déplacement, Combat) sur une ligne, sans défilement ni texte tronqué, zones de 40 px de haut ; Statistiques est dans la barre du bas |
 | M14 | Bonus de jet sur mobile, et à 360 px de large (E24) | Chaque bonus sur 3 lignes (nom et source, effet, cible et note), aucun texte tronqué |
 | M15 | Bataille de masse sur mobile, et à 360 px de large (E.8) | Panneau rempli (jet, résultat, dés de blessures, Encaisser) sans défilement horizontal ; boutons d'état et d'engagement de 40 px de haut, sans texte tronqué |
+| M16 à M18 | Bloc Armure, bloc Vide et tuile Blessures à 360 et 390 px (E.18, E.19) | Voir les tableaux de tests des annexes E.18 et E.19 |
 
 ---
 
@@ -551,7 +552,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 1. **Socle** : Vite + React + TypeScript strict, ESLint, Vitest, `vite-plugin-singlefile`, workflow `ci.yml`.
 2. **Moteur** : schéma Zod, migrations, données de règles, moteur → `core.rules.spec.ts` vert.
 3. **Interface bureau** : portage du prototype en composants, thème, clans. Revue visuelle par comparaison avec `reference/prototype.html`.
-4. **Mobile** : §7 → tests M1 à M9 (M10 à M15 ajoutés ensuite).
+4. **Mobile** : §7 → tests M1 à M9 (M10 à M18 ajoutés ensuite).
 5. **Stockage** : bibliothèque IndexedDB, écran Bibliothèque, mode consultation → S1, S2, U1.
 6. **Import / export** : fusion avec aperçu, trois destinations → U5, E3 à E5.
 7. **Fichier lié** : File System Access, reprise de permission, conflits → S3 à S5, U6.
@@ -561,7 +562,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 11. **v2.1 — techniques des courtisans et de Shosuro** : même moteur, nouvelles entrées de catalogue (compétences sociales, Connaissance, conditions d'Honneur, spécialisations). Annexe D (validée le 24/10/2026) : catalogue `src/rules/ecoles-courtisans.json` (12 écoles), situation Cour, spécialisation choisie au lanceur → cas T25 à T42, E20 à E23 ; tag `v2.1.0`. Aucun changement de format de fiche (`schemaVersion` reste 2).
    - **v2.1.1** (patch) : carte « Nouveau round » entre l'Initiative et la Posture, avec une description de deux lignes au plus sur mobile (§6.2, M12) ; test du fichier lié rendu robuste (lecture du fichier avant sa première écriture).
    - **v2.1.2** (patch) : Statistiques devient une vue à part (en-tête sur bureau, barre du bas sur mobile) ; les 4 onglets de situation tiennent sur une ligne à 360 px (§7, M13).
-12. **v2.2 à v2.7 — règles du livre, combat complet, ergonomie** : annexe E (validée le 24/10/2026). Six versions : correctifs de règles et retouches d'interface (v2.2.0, **livrée**, tag `v2.2.0`, écarts en E.12), combat complet (v2.3.0, **livrée**, tag `v2.3.0`, écarts en E.13), maîtrises et armures (v2.4.0, **livrée**, tag `v2.4.0`, écarts en E.14), récupération (v2.5.0, **livrée**, tag `v2.5.0`, écarts en E.15), vocabulaire français (v2.6.0, **livrée**, tag `v2.6.0`, écarts en E.16), bataille de masse (v2.7.0, **livrée**, tag `v2.7.0`, écarts en E.17) → cas L1 à L27, E24 à E28.
+12. **v2.2 à v2.8 — règles du livre, combat complet, ergonomie** : annexe E (validée le 24/10/2026). Sept versions : correctifs de règles et retouches d'interface (v2.2.0, **livrée**, tag `v2.2.0`, écarts en E.12), combat complet (v2.3.0, **livrée**, tag `v2.3.0`, écarts en E.13), maîtrises et armures (v2.4.0, **livrée**, tag `v2.4.0`, écarts en E.14), récupération (v2.5.0, **livrée**, tag `v2.5.0`, écarts en E.15), vocabulaire français (v2.6.0, **livrée**, tag `v2.6.0`, écarts en E.16), bataille de masse (v2.7.0, **livrée**, tag `v2.7.0`, écarts en E.17), bloc Armure et retouches d'interface (v2.8.0, **livrée**, E.18 et E.19, écarts en E.20) → cas L1 à L28, E24 à E34, M16 à M18.
 13. **À définir** : voies alternatives et écoles avancées (exclues en D-a), shugenja et sorts (hors périmètre, §1), compteurs « N fois par séance » (D-g).
 
 ---
@@ -1181,3 +1182,68 @@ Interface et mobile :
 - **Gloire et événements** (Duel, Occasion héroïque) : affichés seulement ; la Gloire de la fiche n'est pas modifiée (P19).
 - **État** : `ui.battle` (non persisté). « Nouveau round » efface l'écart, le jet et les dés de blessures, et garde le commandement, l'état choisi, l'engagement et le Tacticien ; « Nouvelle journée » remet tout à zéro. Changer l'état, l'engagement ou le jet remet à zéro les dés de blessures du tour.
 - **Tests** : `tests/core.battle.spec.ts` (L19, table, commandement, jet, bornes) et `tests/ui/battle.spec.tsx` (panneau, L19, commandement, vrais dés, lanceur et Tacticien, nouveau round, consultation) ; Playwright M15 (mobile et 360 px).
+
+### E.18 v2.8.0 — Bloc « Armure » de la fiche
+Statut : **validé par Nelson le 24/10/2026**, absent de la v2.7.0 (ajouté au HANDOFF de conception après le départ du lot 12). Une PR, version **v2.8.0**, format de fiche inchangé (`schemaVersion` 2, `armor.catalogId` déjà présent).
+
+- **Place** : nouveau bloc « Armure » de la fiche, entre « Armes » et « Techniques d'école », avec son bouton **Edit** (S2). Les champs Armure, Bonus d'armure et Réduction **sortent du bloc Identité**.
+- **Lecture** :
+  - nom de l'armure, avec l'étiquette « armure du livre » (`catalogId` présent) ou « armure personnalisée » ;
+  - **ND d'armure détaillé**, posture de référence Attaque : « 5 × Réflexes 3 + 5 + armure 5 = 25 », puis les bonus automatiques des techniques et maîtrises (« + 3 Défense 5 » s'il y a lieu) ; armure de cavalerie : valeur à cheval en plus ;
+  - **Réduction totale** : armure + techniques (« armure 3 + Hida R2 2 = 5 ») ;
+  - **règle spéciale** de l'armure du catalogue (`ARMOR_CATALOG`), résumée (« +5 au ND des jets d'Athlétisme et de Discrétion »), avec la technique qui l'annule (« Hida R1 : ignorée sauf Discrétion ») ;
+  - bonus d'armure à cocher en combat (techniques, bonus de jet `armor` facultatifs), en rappel : « À cocher en combat (panneau Posture) : … ».
+- **Édition** : composant `ArmorCatalog` (liste « Armure du livre ») puis nom, bonus au ND, Réduction, comme l'éditeur de la barre d'état. Choisir une armure du livre remplit les trois valeurs ; modifier ensuite bonus ou Réduction retire `catalogId` (« armure personnalisée », E.14).
+- **Barre d'état** : les tuiles ND armure et Réduction ouvrent toujours l'éditeur rapide ; bloc et éditeur restent synchronisés.
+- **Consultation** : bloc en lecture, sans bouton Edit.
+- **Fiche d'exemple** : `reference/exemple-personnage.json` porte désormais `"catalogId": "light"` sur son armure légère (fourni), pour afficher « armure du livre » et sa règle spéciale.
+
+Tests :
+| # | Cas | Attendu |
+|---|---|---|
+| L28 | Bloc Armure : armure légère, Réflexes 3 ; Athlétisme/Force ; Hida R1 avec armure lourde : Discrétion, Kenjutsu | ND 25, Réduction 3 ; ND du jet +5 ; Discrétion ND +5, Kenjutsu sans pénalité |
+| E29 | Fiche : bloc Armure, Edit, choix « Armure lourde » puis bonus modifié à 8 | ND +10 / Réduction 5, puis « armure personnalisée » ; barre d'état à jour |
+| E30 | Identité en édition | plus de champs d'armure |
+| M16 | Bloc Armure sur mobile, à 360 px | ND et Réduction côte à côte, règle spéciale lisible, aucun texte tronqué |
+
+### E.19 v2.8.0 — Retouches d'interface (25/10/2026)
+Demandées par Nelson le 25/10/2026 après essai de la v2.7.0. Même PR que E.18.
+
+| # | Retouche | Comportement attendu |
+|---|---|---|
+| S6 | **Multiplicateur de blessures masqué** | Le bouton d'en-tête « Blessures : Terre × N » (goutte) est **retiré de l'affichage pour le moment**. Le moteur et la préférence restent (`woundMultiplier`, L25 inchangé côté moteur), mais l'interface utilise **× 2** quelle que soit la valeur enregistrée, tant que le bouton est masqué (constante `SHOW_WOUND_MULTIPLIER = false`). M11 : l'en-tête mobile revient à 3 icônes. |
+| S7 | **Nom sur deux lignes au plus** | Le nom du samouraï (`h1` de l'en-tête) tient en **2 lignes maximum** : la taille de police baisse de 1 px en 1 px jusqu'à ce qu'il tienne, **sans minimum** (garde-fou technique à 8 px) et **sans coupure « … »**. Recalcul au changement de nom et de largeur de fenêtre. |
+| S8 | **Sous-titre de l'en-tête** | Sous le nom, seulement **le nom d'école affiché et le rang d'école** : « École de bushi Kakita · Rang 1 » (espace insécable dans « Rang 1 »), le rang étant `schoolRankOf(c)` (rang d'école saisi, sinon Rang d'Insight). Plus de famille. Sans école affichée : « Rang 1 ». Le clan reste au-dessus du nom. |
+| S9 | **École (nom affiché) pré-remplie** | Dans le bloc Identité en édition, choisir une école dans « Techniques d'école » remplit **« École (nom affiché) »** avec le nom de l'école du catalogue (« École de bushi Kakita »). Le champ reste modifiable ensuite ; il n'est réécrit qu'au prochain changement de « Techniques d'école ». Choisir « — Aucune » ne vide pas le champ. Même chose pour le bouton « Associer » du bloc Techniques d'école. Le bloc Techniques d'école garde son bouton Edit et sa liste « Autres techniques, kata, sorts » (S10 proposée puis abandonnée le 25/10/2026). |
+| S11 | **Ligne Blessures et Vide** | Le libellé « Blessures » au-dessus du compteur est **retiré**. La ligne ne contient plus que la tuile **« Blessures »** (S14) et le bloc Vide. **Mobile** : le bloc « Vide N/M » (libellé court, « Points de » masqué) occupe **au plus la moitié de la largeur** ; les pastilles se répartissent sur cette largeur (`repeat(N, minmax(0, 40px))`, rond visible à 65 %) et **rétrécissent** au lieu de déborder. Bureau : libellé « Points de Vide N/M » inchangé. |
+| S12 | **Pas de séparateur (mobile)** | Essayé puis retiré le 25/10/2026 : aucun filet entre la ligne « Blessures… / Vide » et les tuiles Dépl., ND armure, Réduction, Pénalité. |
+| S13 | **Détail des blessures (mobile), dessin** | Retour au dessin de la maquette du 24/10 (préféré par Nelson) : **une seule carte** (fond `--surface`, filet, coins 8 px), une ligne par niveau séparée par un **pointillé**, colonnes nom / intervalle / pénalité ; niveau courant sur fond rouge pâle, en gras, coins arrondis ; niveaux dépassés atténués (50 %). Plus de cartes séparées par ligne. |
+| S14 | **Tuile et panneau « Blessures »** | Le bouton « Dégâts… » devient une **tuile « Blessures »**, même dessin que les tuiles de combat (fond `--surface`, filet, coins 6 px) : ligne 1, libellé « BLESSURES » à gauche et total « 2/38 » à droite (mono) ; ligne 2, « Ajuster / Encaisser ▾ » (▴ ouvert). **Mobile** : la tuile occupe toute la colonne de gauche **jusqu'au bloc Vide** (colonnes `minmax(0, 1fr) fit-content(50 %)` : le Vide prend sa largeur utile, au plus la moitié) ; la tuile reste **toujours sur deux lignes** : si la place manque, la police de la 2e ligne baisse avec la largeur de la tuile (`container-type: inline-size`, `font-size: min(14px, 100cqi / 9.4)`), jamais de retour à la ligne ni de « … ». Bureau : tuile compacte (150 px mini). Elle ouvre la ligne pleine largeur sous la barre, qui contient **en tête « Ajuster » avec −, le champ et +** (corrections, soins, blessures sans Réduction), un pointillé, puis **« Dégâts de l'attaque »** (Réduction et Vide −10 appliqués), Vide −10, aperçu et « Encaisser ». Le panneau reste ouvert après −, + ou une saisie ; « Encaisser » le referme. La bataille de masse réutilise le panneau **sans** la ligne − / + (`counter` faux). Consultation : nombre affiché, pas de tuile. Noms accessibles : « Blessures : ajuster ou encaisser des dégâts », « Blessures subies » pour le champ. |
+
+Tests :
+| # | Cas | Attendu |
+|---|---|---|
+| E31 | En-tête, multiplicateur enregistré à × 3 | pas de bouton goutte ; seuils de blessures à × 2 |
+| E32 | Nom « Kakita Haruto no Hikaru-sama des Plaines du Matin » à 360 px et 1200 px | 2 lignes au plus, nom complet affiché sans « … » (360 px : police réduite, environ 12 px) |
+| E33 | En-tête de la fiche d'exemple | sous-titre « École de bushi Kakita · Rang 1 » |
+| E34 | Identité : choisir Hiruma, renommer « École Hiruma (variante) », puis choisir Kakita | champ = nom Hiruma, puis texte saisi gardé, puis nom Kakita |
+| M17 | Barre d'état à 360 et 390 px, Anneau de Vide 2 puis 6 | bloc Vide ≤ 50 % de la largeur, à droite de « Dégâts… » sans chevauchement ; 6 pastilles sur une ligne, réduites ; pas de libellé « Blessures » |
+| M18 | Barre d'état à 360 px : tuile « Blessures », + deux fois, puis 12 dégâts avec armure légère ; Vide 2 puis 6 | tuile de la marge gauche jusqu'au Vide, « 2/38 » ; panneau Ajuster / Dégâts de l'attaque ; « Encaisser » : 11 blessures, panneau refermé ; avec 6 points de Vide, tuile toujours sur 2 lignes (police de la 2e ligne réduite), aucun « … » |
+
+**Prototype v2.8.0** : `reference/prototype.html` = v2.7.0 en ligne + E.18 et E.19, construit à partir d'une branche locale non poussée (`proto-v2.8`). Points d'implémentation retenus dans ce prototype, à reprendre ou améliorer :
+- `SHOW_WOUND_MULTIPLIER` et `shownWoundMultiplier(n)` dans `src/rules/l5r4e.ts`, utilisés par `contextOf` et les statistiques ; bouton d'en-tête rendu seulement si la constante est vraie.
+- Panneau Blessures : prop `counter` de `TakeDamage` (barre d'état : vrai ; bataille : faux).
+- `FitName` dans `Header.tsx` : paliers de 1 px sans minimum (garde-fou 8 px), pas de coupure, recalcul au redimensionnement.
+- Bloc Armure : composant `Armor` dans `Sheet.tsx`, `BlockId` « armor » ; le ND affiché = 5 × Réflexes + 5 + bonus + `schoolArmorBonus` d'office (posture Attaque), sans les bonus de jet `armor` à cocher.
+- Tests existants à mettre à jour (échouent avec ces changements, comportement voulu) : en-tête « famille, école et Rang » (`tests/ui/app.spec.tsx`), armure dans le bloc Identité (`tests/ui/masteries.spec.tsx`), bouton du multiplicateur (4 cas de `tests/ui/recovery.spec.tsx`, à garder côté moteur pour L25).
+
+### E.20 Écarts de mise en œuvre (v2.8.0)
+- **Moteur** : `armorSheet(c)` dans `src/core/armor.ts` réunit le bloc Armure : armure du livre, ND en posture Attaque (`5 × Réflexes + 5 + bonus`, puis les bonus d'office : techniques et maîtrises `auto`, et bonus de jet `armor` en mode « toujours », comme la tuile ND armure de la barre d'état sans rien de coché), ND à cheval pour l'armure de cavalerie (« ; à cheval 32 »), Réduction (armure, puis chaque technique avec sa source), technique qui lève le malus d'armure lourde (affichée seulement avec une armure lourde ou de cavalerie), et bonus à cocher en combat (techniques facultatives, compteurs « +5 × Touches au corps à corps », bonus de jet facultatifs).
+- **Édition** : `ArmorFields` (`ArmorCatalog.tsx`) sert au bloc Armure et à l'éditeur de la barre d'état ; le champ du nom s'appelle « Nom » dans les deux. Changer le bonus ou la Réduction retire `catalogId` ; changer le nom le garde.
+- **Fiche d'exemple** : `reference/exemple-personnage.json` ne portait pas encore `"catalogId": "light"` : ajouté dans cette PR (la fiche téléchargeable de la Bibliothèque la reprend).
+- **Identité** : le bloc ne montre plus l'armure, ni en lecture ni en édition.
+- **Vide** : le libellé existe en deux versions, « Points de Vide N/M » (bureau) et « Vide N/M » (mobile), l'une ou l'autre masquée par le CSS.
+- **Tuile Blessures** : le panneau de la barre d'état intitule son champ « Dégâts de l'attaque » ; la bataille de masse garde son libellé (pas de ligne Ajuster). En consultation : « Blessures » et le nombre, sans tuile.
+- **Nom** (`FitName`) : recalcul aussi après le chargement des polices embarquées (`document.fonts.ready`), qui change la largeur du texte.
+- **École** : `chooseSchool` remplit « École (nom affiché) » pour la liste « Techniques d'école » et le bouton « Associer ».
+- **Tests** : `tests/core.armor.spec.ts` (L28, Réduction des techniques, bonus d'office, cavalerie, bonus à cocher) ; `tests/ui/v280.spec.tsx` (bloc Armure, E29, E30, consultation, E33, E34, « Associer », tuile Blessures) ; E31 remplace les 4 cas du bouton multiplicateur de `tests/ui/recovery.spec.tsx` (L25 reste côté moteur) ; Playwright E32 (`tests/e2e/header.spec.ts`), M16 à M18 (`tests/e2e/mobile.spec.ts`), M8 et M11 mis à jour (panneau Blessures ouvert, 3 icônes d'en-tête). Les tests qui utilisaient −, + ou « Blessures subies » ouvrent d'abord la tuile (`tests/helpers/wounds.ts`, `tests/e2e/wounds.ts`).

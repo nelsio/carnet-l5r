@@ -6,6 +6,7 @@ import { memoryStorage, type LibraryEntry, type Storage } from "../../src/storag
 import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
 import { FakeHandle } from "../helpers/fakeHandle";
+import { clickWounds, woundsField } from "../helpers/wounds";
 
 const base = () => structuredClone(kakita) as Character;
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
@@ -60,7 +61,7 @@ describe("Fiche liée", () => {
     const { handle, storage } = await linked();
     expect(handle.content).toBe(serializeCharacter(base()));
     expect(screen.getByText("kakita-haruto-l5r.json")).toBeInTheDocument();
-    click("Ajouter 1 blessure");
+    clickWounds("Ajouter 1 blessure");
     await waitFor(() => expect(JSON.parse(handle.content).wounds).toBe(1), T);
     expect((await storage.library.get("a"))?.linkedFile?.name).toBe("kakita-haruto-l5r.json");
   });
@@ -70,7 +71,7 @@ describe("Fiche liée", () => {
     click("Délier");
     await waitFor(async () => expect((await storage.library.get("a"))?.linkedFile).toBeUndefined());
     const before = handle.content;
-    click("Ajouter 1 blessure");
+    clickWounds("Ajouter 1 blessure");
     await waitFor(async () => expect((await storage.library.get("a"))?.character.wounds).toBe(1), T);
     expect(handle.content).toBe(before);
     expect(screen.getByRole("button", { name: "Lier à un fichier…" })).toBeInTheDocument();
@@ -83,7 +84,7 @@ describe("Fiche liée", () => {
     const writes = handle.writes;
     await mount({ storage, handle });
     const resume = screen.getByRole("button", { name: "Reprendre l'enregistrement dans kakita-haruto-l5r.json" });
-    click("Ajouter 1 blessure");
+    clickWounds("Ajouter 1 blessure");
     await waitFor(async () => expect((await storage.library.get("a"))?.character.wounds).toBe(1), T);
     expect(handle.writes).toBe(writes);
 
@@ -107,7 +108,7 @@ describe("Conflit : fichier modifié ailleurs", () => {
   async function conflict() {
     const r = await linked();
     r.handle.touchElsewhere(serializeCharacter({ ...base(), honor: 8, notes: "Note ajoutée sur l'autre ordinateur" }));
-    click("Ajouter 1 blessure");
+    clickWounds("Ajouter 1 blessure");
     const banner = await screen.findByRole("alert", {}, T);
     expect(banner).toHaveTextContent("Le fichier a été modifié ailleurs");
     // Rien n'est écrit dans le fichier ; la fiche reste dans le navigateur.
@@ -121,7 +122,7 @@ describe("Conflit : fichier modifié ailleurs", () => {
     fireEvent.click(within(banner).getByRole("button", { name: "Charger la version du fichier" }));
     await waitFor(() => expect(screen.queryByRole("alert")).toBeNull());
     expect(screen.getByText("Note ajoutée sur l'autre ordinateur")).toBeInTheDocument();
-    expect(screen.getByRole("spinbutton", { name: "Blessures subies" })).toHaveValue(0);
+    expect(woundsField()).toHaveValue(0);
     await waitFor(async () => expect((await storage.library.get("a"))?.character.honor).toBe(8), T);
     expect(JSON.parse(handle.content).honor).toBe(8);
   });
@@ -158,7 +159,7 @@ describe("Conflit : fichier modifié ailleurs", () => {
   it("un fichier lié qui ne contient pas une fiche valide est signalé", async () => {
     const r = await linked();
     r.handle.touchElsewhere("{ cassé");
-    click("Ajouter 1 blessure");
+    clickWounds("Ajouter 1 blessure");
     const banner = await screen.findByRole("alert", {}, T);
     fireEvent.click(within(banner).getByRole("button", { name: "Charger la version du fichier" }));
     expect(await screen.findByText(/ne contient pas une fiche valide/)).toBeInTheDocument();
