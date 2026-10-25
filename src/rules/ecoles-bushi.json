@@ -8,7 +8,7 @@
         { "rank": 1, "name": "La Voie du Crabe",
           "summary": "Pas de pénalité de ND d'armure lourde (sauf Discrétion). +1g0 aux dégâts avec une arme lourde.",
           "effects": [ { "kind": "roll", "on": ["damage"], "rolled": 1, "when": { "weapon": { "keywordsAny": ["lourde"] } }, "mode": "auto" },
-                       { "kind": "heavyArmor", "except": ["Furtivité"] } ] },
+                       { "kind": "heavyArmor", "except": ["Discrétion"] } ] },
         { "rank": 2, "name": "La Montagne ne bouge pas",
           "summary": "Réduction augmentée de l'Anneau de Terre.",
           "effects": [ { "kind": "reduction", "value": { "ref": "ring:earth" }, "mode": "auto" } ] },

@@ -5,7 +5,7 @@
 import { createContext, useContext, type Dispatch } from "react";
 import {
   activeEffects, buildActions, DAMAGE_MANEUVER_ID, DISARM_MANEUVER_ID, emphasisMatches, matchingEmphasis, meditate, newDay, voidSpendOption,
-  feintBonus, focusOutcome, fullAttackAllowed, fullDefenseBonus, woundsFromDamage, type ActionDef, type Character, type CombatSub, type RollResult, type Situation, type Stance,
+  feintBonus, focusOutcome, fullAttackAllowed, fullDefenseBonus, updateVocabulary, woundsFromDamage, type ActionDef, type Character, type CombatSub, type RollResult, type Situation, type Stance,
 } from "@carnet/core";
 import { FEINT_MANEUVER_ID, WOUND_MULTIPLIERS, WOUND_NEXT_MULTIPLIER, type Terrain } from "../rules/l5r4e";
 import type { LibraryEntry } from "../storage";
@@ -107,6 +107,11 @@ export interface UiState {
   schoolArmor: Record<string, boolean>;
   /** Compteurs des techniques cumulables (gardés jusqu'à la remise à zéro). */
   stacks: Record<string, number>;
+  /**
+   * Vocabulaire de l'édition française (annexe E.7) : bandeau masqué (« Plus tard »), et fiches d'avant et d'après
+   * le renommage, qui reste annulable tant que la fiche n'a pas changé depuis.
+   */
+  vocabulary: { hidden: boolean; undo: { before: Character; after: Character } | null };
 }
 
 export type Screen = "library" | "character";
@@ -161,6 +166,7 @@ export const initialUi: UiState = {
   techInputs: {},
   schoolArmor: {},
   stacks: {},
+  vocabulary: { hidden: false, undo: null },
 };
 
 export function initialState(): AppState {
@@ -214,6 +220,8 @@ export type AppAction =
   | { type: "toggleSchoolArmor"; key: string; on: boolean }
   | { type: "stack"; key: string; count: number }
   | { type: "resetStacks" }
+  /** Vocabulaire (annexe E.7) : renommer, annuler le renommage, masquer le bandeau. */
+  | { type: "vocabulary"; op: "update" | "undo" | "hide" }
   | { type: "rolled"; result: RollResult; tn: number | null | "opposed"; raises: number; free?: number; baseTn?: number; baseSuccess?: boolean };
 
 /** Copie immuable avec une valeur remplacée au chemin donné. */
@@ -338,7 +346,7 @@ const kept = (ui: UiState): Pick<UiState, "theme" | "showDiceRoller" | "woundMul
   ({ theme: ui.theme, showDiceRoller: ui.showDiceRoller, woundMultiplier: ui.woundMultiplier, info: ui.info });
 
 /** Actions qui modifient la fiche : refusées en consultation. */
-const EDITING = new Set<AppAction["type"]>(["set", "add", "remove", "wounds", "pip", "toggleBlockEdit", "replaceCharacter", "newDay", "meditate"]);
+const EDITING = new Set<AppAction["type"]>(["set", "add", "remove", "wounds", "pip", "toggleBlockEdit", "replaceCharacter", "newDay", "meditate", "vocabulary"]);
 
 export function reducer(state: AppState, action: AppAction): AppState {
   const { character: c, ui } = state;
@@ -379,6 +387,17 @@ export function reducer(state: AppState, action: AppAction): AppState {
           stance: ui.stance === "fullDefense" ? "defense" : ui.stance,
         },
       };
+    case "vocabulary": {
+      const { undo } = ui.vocabulary;
+      if (action.op === "update") {
+        const after = updateVocabulary(c);
+        return { ...state, character: after, ui: { ...ui, vocabulary: { hidden: false, undo: { before: c, after } } } };
+      }
+      if (action.op === "undo" && undo?.after === c) {
+        return { ...state, character: undo.before, ui: { ...ui, vocabulary: { hidden: true, undo: null } } };
+      }
+      return { ...state, ui: { ...ui, vocabulary: { hidden: true, undo: null } } };
+    }
     case "meditate":
       return { ...state, character: meditate(c) };
     case "toggleBlockEdit": {

@@ -372,6 +372,9 @@ header.top + main{margin-top:18px}
 /* Nouvelle journée et groupes d'actions (annexe E.6) */
 .day-head{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between}
 .actgroup{margin:10px 0 0}
+/* Vocabulaire de l'édition française (annexe E.7) */
+.vocab-head{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;border-left:3px solid var(--gold);padding-left:10px}
+.vocab-head .import-preview{flex:1 1 100%}
 
 /* ---------- Détail des blessures sur mobile : une ligne par niveau (annexe E.9 S3) ---------- */
 .wdetail{display:none}
