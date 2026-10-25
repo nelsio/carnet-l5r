@@ -1,15 +1,15 @@
 import { useEffect, useRef } from "react";
 import {
-  applicableModifiers, bowStrength, describeEffect, describeModifier, effectOn, findSkill, fullDefenseBonus, maneuverCost, maneuverFreeRaises, modifierTN,
+  applicableModifiers, bowStrength, DAMAGE_MANEUVER_ID, describeEffect, focusOutcome, opposedMargin, opposedVerdict, stanceRestriction, woundEffectNote, describeModifier, effectOn, findSkill, fullDefenseBonus, maneuverCost, maneuverFreeRaises, modifierTN,
   formatDice, isRanged, isSocialSkill, poolStats, reminderText, rollDice, schoolContext, schoolReminders, verdict, voidMultiplier,
   voidPointBonus, voidSpendBonus, voidSpendOption, woundState,
   type ActionDef, type ActiveEffect, type Character, type Pool,
 } from "@carnet/core";
-import { CALLED_ZONES, COMBAT_SUBS, SITUATIONS, TN_PER_RAISE, TN_SCALE, TRAIT_LABELS, type CalledZone } from "../../rules/l5r4e";
+import { CALLED_ZONES, CENTER_BONUS, COMBAT_SUBS, MELEE_TARGET_PENALTY, SITUATIONS, TN_PER_RAISE, TN_SCALE, TRAIT_LABELS, type CalledZone } from "../../rules/l5r4e";
 import { pct } from "../format";
 import {
   activeModifiers, calledRaises, contextOf, effectiveManeuvers, finalTN, isActive, isUnskilled, maneuverCosts, poolFor, rollWoundPenalty,
-  selectedKeys, targetBaseTN, toPoolAction, type RollOptions,
+  selectedKeys, targetBaseTN, toPoolAction, uiRollStance, type RollOptions,
 } from "../rolls";
 import { selectedAction, useCharacter, useStore, type RollRecord } from "../store";
 import { NumberField } from "./fields";
@@ -38,15 +38,26 @@ export function Roller() {
   const ctx = schoolContext({ ...contextOf(ui), emphasis: opts.emphasisName });
   const pa = toPoolAction(a);
   const selected = selectedKeys(ui.techToggles);
-  const active = activeModifiers(c, a, ui.modifierToggles, ui.stance);
-  const pool = poolFor(c, a, opts, ui.stance, active, {
-    mounted: ui.mounted, centerLastRound: ui.centerLastRound, selected, inputs: ui.techInputs,
+  const stance = uiRollStance(ui);
+  const duel = ui.situation === "combat" && ui.sub === "duel";
+  // Bonus de Centre (F1) : au round qui suit le Centre, sur un seul jet.
+  const centerOffered = ui.situation === "combat" && !duel && ui.centerLastRound && !ui.centerBonusUsed && a.kind !== "damage";
+  const active = activeModifiers(c, a, ui.modifierToggles, stance);
+  const pool = poolFor(c, a, { ...opts, centerBonus: centerOffered && opts.centerBonus }, stance, active, {
+    mounted: ui.mounted, centerLastRound: ui.centerLastRound, selected, inputs: ui.techInputs, assessmentWon: duel && ui.assessmentWon,
   });
   const effects = [...(pool.applied ?? []), ...(pool.optional ?? [])];
-  const tnContext = { effects, selected, stacks: ui.stacks, ctx, techTn: pool.techTn, weaponTn: pool.weaponTn };
-  const bonuses = applicableModifiers(c, toPoolAction(a), ui.stance);
-  const bonusTN = modifierTN(active) + (pool.techTn ?? 0);
   const bonusFree = pool.canRaise ? (pool.freeRaises ?? 0) : 0;
+  const totalFree = opts.free + bonusFree;
+  // Augmentations gratuites converties en baisse du ND (F8).
+  const tnOffered = pool.canRaise && totalFree > 0 && (a.tn === "target" || a.tn === "assessment" || typeof a.tn === "number");
+  const freeToTn = opts.freeToTn && tnOffered ? totalFree : 0;
+  const tnContext = { effects, selected, stacks: ui.stacks, ctx, techTn: pool.techTn, weaponTn: pool.weaponTn, freeToTn };
+  const bonuses = applicableModifiers(c, toPoolAction(a), stance);
+  const bonusTN = modifierTN(active) + (pool.techTn ?? 0);
+  const restriction = ui.situation === "combat" ? stanceRestriction(pa, { stance: ui.stance, mounted: ui.mounted, sub: ui.sub }) : null;
+  const ranged = pa.kind === "skill" && !!pa.attack && !!pa.weapon && isRanged(pa.weapon);
+  const woundNote = woundEffectNote(woundState(c, ctx).label);
   const set = (patch: Partial<RollOptions>) => dispatch({ type: "option", patch });
   const ws = woundState(c, ctx);
   const penalty = rollWoundPenalty(c, tnContext);
@@ -77,7 +88,7 @@ export function Roller() {
     const baseTn = typeof tn === "number" ? tn - TN_PER_RAISE * raises : undefined;
     const baseSuccess = baseTn !== undefined && typeof tn === "number"
       && verdict(c, toPoolAction(a), ctx, result.total, tn, baseTn) === "baseSuccess";
-    dispatch({ type: "rolled", result, tn, raises, free: opts.free + bonusFree, baseTn, baseSuccess });
+    dispatch({ type: "rolled", result, tn, raises, free: freeToTn ? 0 : totalFree, baseTn, baseSuccess });
   };
 
   return (
@@ -88,6 +99,12 @@ export function Roller() {
       </div>
       <div className="label">{context}</div>
       <h2 style={{ margin: "2px 0 8px" }}>{a.label}</h2>
+      {restriction && (
+        <div className="hint" data-testid="stance-restriction" style={{ color: "var(--bad)", marginTop: 0 }}>
+          {restriction} Tu peux lancer quand même si le MJ l'accepte.
+        </div>
+      )}
+      {woundNote && <div className="hint" data-testid="wound-note" style={{ color: "var(--bad)", marginTop: 0 }}>{woundNote}</div>}
       <div style={{ display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
         <span className="poolbig" data-testid="pool">{formatDice(pool.rolled, pool.kept)}</span>
         <span className="muted" style={{ fontSize: 13 }}>{poolOrigin(c, a, opts)}{pool.bonus ? ` · ${pool.bonus > 0 ? "+" : ""}${pool.bonus} au total` : ""}</span>
@@ -181,6 +198,31 @@ export function Roller() {
             {" "}Spécialisation : relancer les 1 {a.emphasisHint && <span className="muted">({a.emphasisHint})</span>}
           </label>
         )}
+        {centerOffered && (
+          <label className="chk">
+            <input type="checkbox" checked={opts.centerBonus} onChange={(e) => set({ centerBonus: e.target.checked })} />
+            {" "}Bonus de Centre <span className="muted">· +{CENTER_BONUS.rolled}g{CENTER_BONUS.kept} +{c.voidRing} sur ce seul jet</span>
+          </label>
+        )}
+        {ranged && (
+          <label className="chk">
+            <input type="checkbox" checked={opts.meleeTarget} onChange={(e) => set({ meleeTarget: e.target.checked })} />
+            {" "}Cible au corps à corps <span className="muted">· −{MELEE_TARGET_PENALTY} au total</span>
+          </label>
+        )}
+        {tnOffered && (
+          <label className="chk">
+            <input type="checkbox" checked={opts.freeToTn} onChange={(e) => set({ freeToTn: e.target.checked })} />
+            {" "}Utiliser les augmentations gratuites pour baisser le ND <span className="muted">· −{TN_PER_RAISE * totalFree}</span>
+          </label>
+        )}
+        {duel && a.id === "assess" && (
+          <label className="chk">
+            <input type="checkbox" checked={ui.assessmentWon} onChange={(e) => dispatch({ type: "assessmentWon", on: e.target.checked })} />
+            {" "}Gagnée de 10 ou plus <span className="muted">· bonus à la Concentration</span>
+          </label>
+        )}
+        {duel && a.id === "focus" && <FocusGap />}
       </div>
 
       {bonuses.length > 0 && (
@@ -226,6 +268,20 @@ export function Roller() {
           </span>
         </div>
       )}
+      {tn === "opposed" && (
+        <div className="tnline" style={{ marginTop: 10 }}>
+          <span>{raises > 0 ? <>Bats l'adversaire d'au moins <b data-testid="opposed-margin">{opposedMargin(raises)}</b></> : "Bats le total adverse"}</span>
+          <label className="mono" style={{ display: "flex", gap: 6, alignItems: "center" }}>
+            <span className="muted" style={{ fontFamily: "var(--f-body)", fontSize: 13 }}>Total adverse</span>
+            <input
+              className="in mono" type="number" min={0} style={{ width: 72 }} aria-label="Total adverse"
+              value={opts.opponentTotal ?? ""}
+              onChange={(e) => set({ opponentTotal: e.target.value === "" ? null : Math.max(0, Math.trunc(Number(e.target.value)) || 0) })}
+            />
+          </label>
+        </div>
+      )}
+      {freeToTn > 0 && typeof tn === "number" && <div className="hint">{freeToTn} augmentation(s) gratuite(s) déduites du ND (−{TN_PER_RAISE * freeToTn}).</div>}
       {ws.penalty === null && <div className="hint" style={{ color: "var(--bad)" }}>Ton personnage est hors de combat.</div>}
 
       {ui.showDiceRoller && (
@@ -250,6 +306,32 @@ export function Roller() {
         </div>
       )}
     </>
+  );
+}
+
+/** Concentration en duel (F10) : écart saisi → qui frappe en premier, augmentations gratuites pour la Frappe. */
+function FocusGap() {
+  const { state, dispatch } = useStore();
+  const c = useCharacter();
+  const gap = state.ui.focusGap;
+  const outcome = gap === null ? null : focusOutcome(c, gap);
+  return (
+    <div>
+      <label className="field" style={{ maxWidth: 260 }}>
+        <span className="label">Écart de Concentration (ton total − adverse)</span>
+        <input
+          className="in mono" type="number" min={0} aria-label="Écart de Concentration" value={gap ?? ""}
+          onChange={(e) => dispatch({ type: "focusGap", gap: e.target.value === "" ? null : Math.max(0, Math.trunc(Number(e.target.value)) || 0) })}
+        />
+      </label>
+      {outcome && (
+        <div className="hint" data-testid="focus-outcome" style={{ color: outcome.first ? "var(--gold)" : undefined }}>
+          {outcome.first
+            ? `Tu frappes en premier, ${outcome.freeRaises} augmentation(s) gratuite(s) pré-remplie(s) sur la Frappe.`
+            : `Frappe simultanée (il faut ${outcome.threshold} d'écart pour frapper en premier).`}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -398,6 +480,11 @@ function ManeuverPicker({ effects }: { effects: readonly ActiveEffect[] }) {
           {describeEffect(e, c)} · {e.source} : déduites du coût de la manœuvre.
         </div>
       ))}
+      {(sel[DAMAGE_MANEUVER_ID] ?? 0) > 0 && (
+        <div className="hint" data-testid="damage-raises-note" style={{ marginTop: 4 }}>
+          Toutes tes augmentations de dégâts du round comptent comme un seul effet pour les réductions de coût de manœuvre.
+        </div>
+      )}
       {list.filter((m) => sel[m.id]).map((m) => (
         <div key={m.id} className="hint" style={{ marginTop: 4 }}>• <b>{m.name}</b> : {m.effect}</div>
       ))}
@@ -436,6 +523,7 @@ function RollOutcome({ roll: r }: { roll: RollRecord }) {
           )}
           {r.maneuvers.length > 0 && <div className="hint">{ok ? "Manœuvres réussies" : "Manœuvres perdues"} : {r.maneuvers.join(", ")}.</div>}
           {r.damageDice > 0 && !r.disarm && <div className="hint">+{r.damageDice}g0 pré-rempli sur le prochain jet de dégâts.</div>}
+          {r.feint ? <div className="hint" data-testid="feint-note">Feinte réussie : +{r.feint} pré-rempli sur le prochain jet de dégâts.</div> : null}
           {r.disarm && <div className="hint" data-testid="disarm-note">Désarmement réussi : le prochain jet de dégâts est 2g1 sans la Force, sans augmentation de dégâts.</div>}
           {ok && !r.raises && margin >= TN_PER_RAISE && r.kind !== "damage" && (
             <div className="hint">Marge de {margin} : tu aurais pu annoncer {Math.floor(margin / TN_PER_RAISE)} augmentation(s).</div>
@@ -445,8 +533,14 @@ function RollOutcome({ roll: r }: { roll: RollRecord }) {
         <div className="verdict">
           {total}{" "}
           <span className="muted" style={{ fontSize: 15, fontFamily: "var(--f-body)" }}>
-            {r.tn === "opposed" ? "à comparer au jet adverse" : r.kind === "damage" ? "blessures infligées" : r.kind === "initiative" ? "initiative" : ""}
+            {r.tn === "opposed" ? (r.opponent === undefined ? "à comparer au jet adverse" : `contre ${r.opponent}`) : r.kind === "damage" ? "blessures infligées" : r.kind === "initiative" ? "initiative" : ""}
           </span>
+        </div>
+      )}
+      {r.tn === "opposed" && r.opponent !== undefined && (
+        <div className={`verdict ${opposedVerdict(total, r.opponent, r.raises) === "win" ? "ok" : opposedVerdict(total, r.opponent, r.raises) === "lose" ? "ko" : ""}`} data-testid="opposed-verdict">
+          {{ win: "Tu l'emportes", tie: "Égalité", lose: "L'adversaire l'emporte" }[opposedVerdict(total, r.opponent, r.raises)]}
+          {r.raises > 0 && <span className="muted" style={{ fontSize: 14 }}> · il fallait {opposedMargin(r.raises)} d'écart</span>}
         </div>
       )}
       {r.fullDefense && <div className="hint">+{fullDefenseBonus(total)} au ND d'armure ce round (posture Défense totale activée).</div>}

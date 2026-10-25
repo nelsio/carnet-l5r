@@ -1,5 +1,5 @@
 /** Techniques d'école : moteur d'effets du catalogue bushi (HANDOFF annexe C.4). */
-import { DEFAULT_MANEUVERS, type RingKey, type Stance } from "../rules/l5r4e";
+import { DEFAULT_MANEUVERS, DUEL_FOCUS, GUARD, type RingKey, type Stance } from "../rules/l5r4e";
 import { isSocialSkill } from "./modifiers";
 import {
   BUGEI_SKILLS, EMPHASIS_ALIASES, SCHOOLS, WEAPON_CATALOG,
@@ -352,6 +352,24 @@ export function voidSpendBonus(
   return { rolled: per.rolled * spend.points, kept: per.kept * spend.points };
 }
 
+export interface GuardRule { selfPenalty: number; allyBonus: number; extraRound: boolean; free: boolean; source?: string }
+
+/**
+ * Garde (annexe E.3 F5) : règle du livre, ou celle d'une technique (Daidoji R2 : pas de malus, allié +15, un round de plus ;
+ * Shiba R1 : action gratuite, allié +5). La technique de rang le plus haut l'emporte.
+ */
+export function guardRule(c: Character): GuardRule {
+  const e = activeEffects(c).filter((x) => x.kind === "guard").pop();
+  if (!e || e.kind !== "guard") return { ...GUARD, extraRound: false, free: false };
+  return { selfPenalty: e.selfPenalty, allyBonus: e.allyBonus, extraRound: !!e.extraRound, free: !!e.free, source: e.source };
+}
+
+/** Concentration en duel (F10) : écart pour frapper en premier et tranche par augmentation gratuite (Kakita R3). */
+export function duelFocusRule(c: Character): { threshold: number; per: number; source?: string } {
+  const e = activeEffects(c).find((x) => x.kind === "duelFocus");
+  return e && e.kind === "duelFocus" ? { threshold: e.threshold, per: e.per, source: e.source } : { ...DUEL_FOCUS };
+}
+
 /** Badge « Attaque : Action simple ». */
 export function isSimpleAttack(c: Character, a: PoolAction, ctx: SchoolContext): boolean {
   return a.kind === "skill" && !!a.attack && activeEffects(c).some((e) => e.kind === "simpleAttack" && whenOk(e.when, c, a, ctx));
@@ -400,12 +418,6 @@ export function schoolReminders(c: Character, contexts: readonly ReminderContext
 export function reminderText(e: ActiveEffect, c: Character): string {
   if (e.kind !== "reminder" || !e.text) return e.summary;
   return e.text.replace("{n}", String(resolveValue(e.value, c)));
-}
-
-/** L'école a-t-elle des effets qui dépendent d'une monture ? */
-export function hasMountedEffects(c: Character): boolean {
-  const mentions = (w?: When): boolean => !!w && (w.mounted !== undefined || !!w.anyOf?.some(mentions));
-  return activeEffects(c).some((e) => "when" in e && mentions(e.when));
 }
 
 export type TechniqueCategory = "auto" | "à cocher" | "rappel" | "texte";

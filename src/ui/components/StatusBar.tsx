@@ -1,8 +1,9 @@
+import { useState } from "react";
 import {
-  armorEffects, movement, resolveValue, schoolArmorBonus, schoolReduction, woundPenaltyAt, woundState,
+  armorEffects, movement, totalReduction, voidMultiplier, woundsFromDamage, resolveValue, schoolArmorBonus, schoolReduction, woundPenaltyAt, woundState,
   type Character,
 } from "@carnet/core";
-import { ARMOR_TN, WOUND_LEVELS } from "../../rules/l5r4e";
+import { ARMOR_TN, VOID_COMBAT, WOUND_LEVELS } from "../../rules/l5r4e";
 import { contextOf, currentArmorTN, selectedKeys } from "../rolls";
 import { useCharacter, useStore } from "../store";
 import { NumberField } from "./fields";
@@ -21,6 +22,7 @@ export function StatusBar() {
   // Fiche en consultation : blessures et Vide affichés, mais ni modifiables ni cliquables (HANDOFF §6.1).
   const readonly = state.mode === "readonly";
   const maxWounds = ws.thresholds[ws.thresholds.length - 1];
+  const [damageOpen, setDamageOpen] = useState(false);
   // Pénalités effectives de chaque niveau, même calcul que la tuile Pénalité (annexe E.9 S5).
   const levels = WOUND_LEVELS.map((w, i) => {
     const penalty = woundPenaltyAt(c, i, contextOf(ui));
@@ -77,6 +79,10 @@ export function StatusBar() {
                   value={c.wounds} onChange={(n) => dispatch({ type: "wounds", value: n })}
                 />
                 <button type="button" aria-label="Ajouter 1 blessure" onClick={() => dispatch({ type: "wounds", value: c.wounds + 1 })}>+</button>
+                <button
+                  type="button" className={`dmgbtn${damageOpen ? " on" : ""}`} aria-expanded={damageOpen} aria-label="Encaisser des dégâts"
+                  title="Encaisser des dégâts" onClick={() => setDamageOpen(!damageOpen)}
+                >Dégâts…</button>
               </>
             )}
           </div>
@@ -99,8 +105,36 @@ export function StatusBar() {
           <ArmorTile label="Réduction" value={reduction} testId="armor-reduction" readonly={readonly} />
           <div className={ws.penalty ? "pen" : ""}><span className="label">Pénalité</span><b>{ws.penalty === null ? "—" : `+${ws.penalty}`}</b></div>
         </div>
+        {damageOpen && !readonly && <TakeDamage onDone={() => setDamageOpen(false)} />}
         {ui.armorEdit && !readonly && <ArmorEditor tn={tn} />}
       </div>
+    </div>
+  );
+}
+
+/** Encaisser des dégâts (annexe E.3 F6) : dégâts − Réduction (− 10 avec un point de Vide) en blessures. */
+function TakeDamage({ onDone }: { onDone: () => void }) {
+  const { dispatch } = useStore();
+  const c = useCharacter();
+  const [damage, setDamage] = useState(0);
+  const [voidSpent, setVoidSpent] = useState(false);
+  const added = woundsFromDamage(c, damage, voidSpent && c.voidPoints >= 1);
+  return (
+    <div className="dmgedit" role="group" aria-label="Encaisser des dégâts">
+      <label className="field"><span className="label">Dégâts reçus</span>
+        <NumberField className="in mono" min={0} value={damage} onChange={setDamage} />
+      </label>
+      <label className="chk">
+        <input type="checkbox" checked={voidSpent} disabled={c.voidPoints < 1} onChange={(e) => setVoidSpent(e.target.checked)} />
+        {" "}Vide : −{VOID_COMBAT.wounds * voidMultiplier(c)} blessures
+      </label>
+      <span className="muted" data-testid="damage-preview">
+        Réduction {totalReduction(c)} → <b className="mono" style={{ color: "var(--ink)" }}>+{added}</b> blessure(s)
+      </span>
+      <button
+        type="button" className="btn sm gold" disabled={damage <= 0}
+        onClick={() => { dispatch({ type: "takeDamage", damage, voidSpent }); onDone(); }}
+      >Encaisser</button>
     </div>
   );
 }

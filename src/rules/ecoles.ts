@@ -69,6 +69,13 @@ export type Effect =
   | { kind: "voidDouble" }
   | { kind: "keyword"; weaponKeyword: WeaponKeyword; adds: WeaponKeyword }
   | { kind: "simpleAttack"; when?: When }
+  /**
+   * Garde (annexe E.3 F5) : malus à ton ND d'armure, bonus de l'allié gardé ; `extraRound` : dure un round de plus
+   * (Daidoji R2) ; `free` : action gratuite (Shiba R1).
+   */
+  | { kind: "guard"; selfPenalty: number; allyBonus: number; extraRound?: boolean; free?: boolean }
+  /** Concentration en duel (F10) : écart pour frapper en premier, puis une augmentation gratuite par tranche (Kakita R3). */
+  | { kind: "duelFocus"; threshold: number; per: number }
   | { kind: "verdict"; rule: "baseTnSuccess"; when?: When }
   /** Rappel ; `{n}` dans le texte est remplacé par `value` calculée (« +10 au ND… »). */
   | { kind: "reminder"; context: ReminderContext; text?: string; value?: Value };

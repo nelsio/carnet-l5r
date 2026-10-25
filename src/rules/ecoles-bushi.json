@@ -55,7 +55,7 @@
           "effects": [ { "kind": "roll", "on": ["attack"], "rolled": 2, "mode": "optional", "label": "Cible à l'Initiative plus basse" } ] },
         { "rank": 3, "name": "Premier et dernier coup",
           "summary": "En duel, tu frappes en premier avec 3 de marge à la Concentration, et gagnes une augmentation gratuite par tranche de 3 (au lieu de 5).",
-          "effects": [ { "kind": "reminder", "context": "duel" } ] },
+          "effects": [ { "kind": "duelFocus", "threshold": 3, "per": 3 } ] },
         { "rank": 4, "name": "Un coup, deux entailles",
           "summary": "Attaque en Action simple avec une arme Samouraï.",
           "effects": [ { "kind": "simpleAttack", "when": { "weapon": { "keywordsAny": ["samourai"] } } } ] },
@@ -74,7 +74,7 @@
             { "kind": "roll", "on": ["attack"], "rolled": 1, "when": { "stance": ["attack"] }, "mode": "auto" } ] },
         { "rank": 2, "name": "Le Bouclier de la foi",
           "summary": "Manœuvre de garde : dure un round de plus, +5 au bonus de ND (ta cible +15, aucune pénalité pour toi).",
-          "effects": [] },
+          "effects": [ { "kind": "guard", "selfPenalty": 0, "allyBonus": 15, "extraRound": true } ] },
         { "rank": 3, "name": "Frapper sous le voile",
           "summary": "Attaque au corps à corps en Action simple en posture Attaque.",
           "effects": [ { "kind": "simpleAttack", "when": { "stance": ["attack"], "weapon": { "melee": true } } } ] },
@@ -222,7 +222,9 @@
       "ranks": [
         { "rank": 1, "name": "La Voie du Phénix",
           "summary": "Tu peux dépenser 2 points de Vide pour +2g2 sur un jet. Garde en action gratuite (ta cible n'a que +5 au ND).",
-          "effects": [ { "kind": "void", "points": 2, "rolled": 2, "kept": 2, "label": "+2g2 au jet (2 points)" } ] },
+          "effects": [
+            { "kind": "void", "points": 2, "rolled": 2, "kept": 2, "label": "+2g2 au jet (2 points)" },
+            { "kind": "guard", "selfPenalty": 5, "allyBonus": 5, "free": true } ] },
         { "rank": 2, "name": "Danser avec les éléments",
           "summary": "Une cible à 9 m : ND de ses sorts (lancés ou subis) ±5 ; idem pour les sorts qui te visent.",
           "effects": [] },

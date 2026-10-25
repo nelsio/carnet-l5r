@@ -6,7 +6,7 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document.
 
-**État au 24/10/2026 :** version publiée **v2.2.0**, lots 1 à 11 livrés (§11), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) : v2.2.0 livrée (correctifs de règles et retouches d'interface) ; v2.3 à v2.7 à implémenter.
+**État au 24/10/2026 :** version publiée **v2.3.0**, lots 1 à 11 livrés (§11), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) : v2.2.0 (correctifs de règles et retouches d'interface) et v2.3.0 (combat complet) livrées ; v2.4 à v2.7 à implémenter.
 
 **Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie).
 
@@ -459,7 +459,7 @@ Depuis un fichier (bouton ou glisser-déposer). Trois destinations :
 
 « Terminé » = tests verts, `tsc --noEmit` sans erreur, lint propre, CI verte.
 
-État en v2.1.2 : **339 tests Vitest** (moteur, stockage, interface) et **52 tests Playwright** (chromium, iPhone 13, Pixel 7), lignes de `src/core` couvertes à 100 %.
+État en v2.3.0 : **393 tests Vitest** (moteur, stockage, interface) et **56 tests Playwright** (chromium, iPhone 13, Pixel 7), lignes de `src/core` couvertes à 100 %.
 
 ### 10.1 Moteur (`tests/core.rules.spec.ts`) — fourni, 80 tests
 - C'est la **spécification exécutable** du moteur. Elle a été validée contre une implémentation de référence : 80 tests sur 80 passent (v1.1 : règle des dix dés du livre, maîtrise 7+).
@@ -560,7 +560,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 11. **v2.1 — techniques des courtisans et de Shosuro** : même moteur, nouvelles entrées de catalogue (compétences sociales, Connaissance, conditions d'Honneur, spécialisations). Annexe D (validée le 24/10/2026) : catalogue `src/rules/ecoles-courtisans.json` (12 écoles), situation Cour, spécialisation choisie au lanceur → cas T25 à T42, E20 à E23 ; tag `v2.1.0`. Aucun changement de format de fiche (`schemaVersion` reste 2).
    - **v2.1.1** (patch) : carte « Nouveau round » entre l'Initiative et la Posture, avec une description de deux lignes au plus sur mobile (§6.2, M12) ; test du fichier lié rendu robuste (lecture du fichier avant sa première écriture).
    - **v2.1.2** (patch) : Statistiques devient une vue à part (en-tête sur bureau, barre du bas sur mobile) ; les 4 onglets de situation tiennent sur une ligne à 360 px (§7, M13).
-12. **v2.2 à v2.7 — règles du livre, combat complet, ergonomie** : annexe E (validée le 24/10/2026). Six versions : correctifs de règles et retouches d'interface (v2.2.0, **livrée**, tag `v2.2.0`, écarts en E.12), combat complet (v2.3.0), maîtrises et armures (v2.4.0), récupération (v2.5.0), vocabulaire français (v2.6.0), bataille de masse (v2.7.0) → cas L1 à L27, E24 à E28.
+12. **v2.2 à v2.7 — règles du livre, combat complet, ergonomie** : annexe E (validée le 24/10/2026). Six versions : correctifs de règles et retouches d'interface (v2.2.0, **livrée**, tag `v2.2.0`, écarts en E.12), combat complet (v2.3.0, **livrée**, tag `v2.3.0`, écarts en E.13), maîtrises et armures (v2.4.0), récupération (v2.5.0), vocabulaire français (v2.6.0), bataille de masse (v2.7.0) → cas L1 à L27, E24 à E28.
 13. **À définir** : voies alternatives et écoles avancées (exclues en D-a), shugenja et sorts (hors périmètre, §1), compteurs « N fois par séance » (D-g).
 
 ---
@@ -1134,3 +1134,12 @@ Interface et mobile :
 - **Désarmement** (C6) : les dégâts liés passent à 2g1 sans la Force ni dés en plus ; le point de Vide n'y est pas proposé, même au katana.
 - **Seuil de douleur bas** : ajouté au catalogue nommé des bonus (`appliesTo: wounds`, +5 à chaque niveau sauf Indemne), pour S5.
 - **Écart d'arme** (C8) : signalé dans le bloc Armes en lecture, fiche modifiable seulement ; « Mettre à jour » reprend VD et mots-clés du livre, pas la compétence.
+
+### E.13 Écarts de mise en œuvre (v2.3.0)
+- **Logique de combat** dans `src/core/combat.ts` : restrictions de posture, Initiative, Feinte, encaissement, Concentration, opposition. Garde et Concentration lisent des effets de catalogue (`guard` : Daidoji R2, Shiba R1 ; `duelFocus` : Kakita R3, qui n'est plus un simple rappel).
+- **Case « Monté »** : toujours dans le panneau Posture (F2 en a besoin pour toutes les fiches), plus dans l'encart « Techniques d'école ».
+- **Encaisser** (F6) : un bouton « Dégâts… » à côté du compteur ouvre une ligne pleine largeur (dégâts, Vide −10, aperçu, « Encaisser »), comme l'éditeur d'armure, pour ne pas grandir la barre collante sur mobile. Le −10 du Vide est doublé par Shiba R5, comme le Vide en armure.
+- **+10 Initiative (Vide)** : cumulable, remis à zéro par un nouveau jet d'Initiative (nouvelle escarmouche). « Échanger l'Initiative » dépense le point ; l'échange se fait à la main.
+- **Opposition** (F7) : sans augmentation, un total égal donne « Égalité » ; avec N augmentations, il faut au moins 5 × N d'écart.
+- **Augmentations gratuites → ND** (F8) : toutes les augmentations gratuites du jet (saisies et techniques) sont converties ; elles ne comptent plus au résultat.
+- **Garde de Daidoji R2** : le « round de plus » est affiché ; la case reste cochée tant que tu ne la décoches pas (« Nouveau round » ne la touche pas).

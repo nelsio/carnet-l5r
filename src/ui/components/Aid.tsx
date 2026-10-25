@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 import {
-  armorEffects, describeModifier, hasMountedEffects, hasMountRules, isSimpleAttack, modifiersOf, movement, movementBonus, movementWater, resolveValue,
+  armorEffects, describeModifier, fullAttackAllowed, guardRule, initiativeScore, isSimpleAttack, stanceRestriction, modifiersOf, movement, movementBonus, movementWater, resolveValue,
   reminderText, rings, schoolOf, schoolReminders, stackCount, stackEffects, stackMax, voidMultiplier,
   type ActionDef, type ActiveEffect,
 } from "@carnet/core";
-import { COMBAT_SUBS, SITUATIONS, STANCES, TERRAINS } from "../../rules/l5r4e";
+import { CENTER_BONUS, COMBAT_SUBS, SITUATIONS, STANCES, TERRAINS, VOID_COMBAT } from "../../rules/l5r4e";
 import type { ReminderContext } from "../../rules/ecoles";
 import { toMeters } from "../format";
-import { contextOf, currentArmorTN, DEFAULT_ROLL_OPTIONS, isActive, isRollable, poolFor, poolLabel, toPoolAction } from "../rolls";
+import { contextOf, currentArmorTN, DEFAULT_ROLL_OPTIONS, isActive, isRollable, poolFor, poolLabel, toPoolAction, uiRollStance } from "../rolls";
 import { currentActions, useCharacter, useStore, type AidSituation, type InfoPanel } from "../store";
 import { Roller } from "./Roller";
 
@@ -78,12 +78,19 @@ export function Aid() {
 function InitiativeCard({ action }: { action: ActionDef }) {
   const { state, dispatch } = useStore();
   const c = useCharacter();
+  const { ui } = state;
   const p = poolFor(c, action, DEFAULT_ROLL_OPTIONS, "attack");
   const dice = poolLabel(p);
-  const value = state.ui.initiative;
+  // Centre au round précédent : +10 ce round (F1) ; Vide : +10 pour l'escarmouche (F3).
+  const center = ui.centerLastRound && ui.sub !== "duel";
+  const value = ui.initiative === null ? null : initiativeScore(c, ui.initiative, { centerLastRound: center, voidPoints: ui.voidInitiative });
+  const tags = [center ? `+${CENTER_BONUS.initiative} Centre` : "", ui.voidInitiative ? `+${VOID_COMBAT.initiative * voidMultiplier(c) * ui.voidInitiative} Vide` : ""].filter(Boolean);
   return (
-    <button type="button" className="act" aria-pressed={state.ui.selectedId === action.id} onClick={() => dispatch({ type: "select", id: action.id })}>
-      <span className="t">Initiative <span className="muted" style={{ fontWeight: 500 }}>· une fois par combat</span></span>
+    <button type="button" className="act" aria-pressed={ui.selectedId === action.id} onClick={() => dispatch({ type: "select", id: action.id })}>
+      <span className="t">
+        Initiative <span className="muted" style={{ fontWeight: 500 }}>· une fois par combat</span>
+        {tags.map((t) => <span key={t} className="tag" data-testid="initiative-bonus"> {t}</span>)}
+      </span>
       <span className="p" data-testid="initiative">{value !== null ? <span style={{ color: "var(--ink)", fontSize: 20 }}>{value}</span> : dice}</span>
       <span className="d">
         {value !== null
@@ -110,11 +117,26 @@ function StancePanel() {
         </span>
       </div>
       <div className="stance" role="group" aria-label="Posture">
-        {STANCES.map((s) => (
-          <button key={s.id} type="button" aria-pressed={ui.stance === s.id} onClick={() => dispatch({ type: "stance", stance: s.id })}>
-            <b>{s.label}</b>{ui.info.stance && <span className="muted">{s.description}</span>}
-          </button>
-        ))}
+        {STANCES.map((s) => {
+          // Assaut monté : seulement avec Équitation 3 (F2).
+          const locked = s.id === "fullAttack" && !fullAttackAllowed(c, ui.mounted);
+          return (
+            <button
+              key={s.id} type="button" aria-pressed={ui.stance === s.id} disabled={locked}
+              title={locked ? "Assaut à cheval : Équitation 3 requise" : undefined}
+              onClick={() => dispatch({ type: "stance", stance: s.id })}
+            >
+              <b>{s.label}</b>{ui.info.stance && <span className="muted">{s.description}</span>}
+            </button>
+          );
+        })}
+      </div>
+      <div className="grid" style={{ gap: 4, marginTop: 8 }}>
+        <label className="chk">
+          <input type="checkbox" checked={ui.mounted} onChange={(e) => dispatch({ type: "mounted", on: e.target.checked })} /> Monté
+          {ui.mounted && !fullAttackAllowed(c, true) && <span className="muted"> · Assaut impossible sans Équitation 3</span>}
+        </label>
+        <GuardBox />
       </div>
       {armorMods.length > 0 && (
         <div className="grid" style={{ gap: 4, marginTop: 8 }}>
@@ -136,22 +158,15 @@ function SchoolCombat() {
   const { state, dispatch } = useStore();
   const c = useCharacter();
   const { ui } = state;
-  const school = !!schoolOf(c);
-  // Case « Monté » : techniques montées, ou arc dont le ND dépend de la monture (annexe E.2 C12).
-  const mounted = hasMountedEffects(c) || hasMountRules(c);
-  if (!school && !mounted) return null;
+  if (!schoolOf(c)) return null;
   const armor = armorEffects(c, contextOf(ui));
   // Compteurs : ND d'armure valables dans la posture, et ND de la cible (toujours).
   const stacked = [...armor.filter((e) => "stack" in e && e.stack), ...stackEffects(c).filter((e) => e.kind === "targetTn")];
   const boxes = armor.filter((e) => e.kind === "armor" && !e.stack && e.mode === "optional");
-  if (!mounted && !ui.centerLastRound && !stacked.length && !boxes.length) return null;
-  const title = school ? "Techniques d'école" : "Monture";
+  if (!ui.centerLastRound && !stacked.length && !boxes.length) return null;
   return (
-    <div className="techbox" role="group" aria-label={title}>
-      <div className="label">{title}</div>
-      {mounted && (
-        <label className="chk"><input type="checkbox" checked={ui.mounted} onChange={(e) => dispatch({ type: "mounted", on: e.target.checked })} /> Monté</label>
-      )}
+    <div className="techbox" role="group" aria-label="Techniques d'école">
+      <div className="label">Techniques d'école</div>
       {ui.centerLastRound && <span className="tag" style={{ justifySelf: "start" }}>Bonus de Centre du round précédent actif</span>}
       {stacked.map((e) => <StackRow key={e.key} effect={e} />)}
       {boxes.map((e) => e.kind === "armor" && (
@@ -162,6 +177,29 @@ function SchoolCombat() {
       ))}
       {stacked.some((e) => (ui.stacks[e.key] ?? 0) > 0) && (
         <button type="button" className="btn sm" style={{ justifySelf: "start" }} onClick={() => dispatch({ type: "resetStacks" })}>Fin de l'escarmouche : compteurs à zéro</button>
+      )}
+    </div>
+  );
+}
+
+/** « Je garde un allié » (F5) : indisponible en Assaut ; Daidoji R2 et Shiba R1 changent les valeurs. */
+function GuardBox() {
+  const { state, dispatch } = useStore();
+  const c = useCharacter();
+  const { ui } = state;
+  const g = guardRule(c);
+  const assault = ui.stance === "fullAttack";
+  return (
+    <div>
+      <label className="chk">
+        <input type="checkbox" checked={ui.guard} disabled={assault} onChange={(e) => dispatch({ type: "guard", on: e.target.checked })} />
+        {" "}Je garde un allié <span className="muted">· {g.free ? "action gratuite" : "action simple"}{assault ? " · impossible en Assaut" : ""}</span>
+      </label>
+      {ui.guard && (
+        <div className="hint" data-testid="guard-note" style={{ margin: "2px 0 0 24px" }}>
+          {g.selfPenalty ? `Ton ND d'armure −${g.selfPenalty}` : "Aucune pénalité pour toi"} jusqu'à ton tour suivant
+          {g.extraRound ? " (un round de plus)" : ""} ; ton allié : +{g.allyBonus} au ND d'armure{g.source ? ` · ${g.source}` : ""}.
+        </div>
       )}
     </div>
   );
@@ -253,6 +291,16 @@ function VoidPanel() {
         <button type="button" disabled={none} onClick={() => dispatch({ type: "voidTechnique" })}>
           <b>Activer une capacité</b>{details && <span className="muted">Technique, kata ou avantage payé en Vide.</span>}
         </button>
+        {ui.situation === "combat" && ui.sub === "skirmish" && (
+          <>
+            <button type="button" disabled={none} onClick={() => dispatch({ type: "voidInitiative" })}>
+              <b>+{VOID_COMBAT.initiative * voidMultiplier(c)} Initiative (escarmouche)</b>{details && <span className="muted">Jusqu'à la fin de l'escarmouche.</span>}
+            </button>
+            <button type="button" disabled={none} onClick={() => dispatch({ type: "voidTechnique" })}>
+              <b>Échanger l'Initiative</b>{details && <span className="muted">Avec un allié consentant ; échangez vos scores à la main.</span>}
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
@@ -332,12 +380,29 @@ function ActionCard({ action: a }: { action: ActionDef }) {
       <div className="act info"><span className="t">{a.label}</span><span /><span className="d">{a.description}</span></div>
     );
   }
+  const stance = uiRollStance(ui);
   const p = isRollable(a)
-    ? poolFor(c, a, DEFAULT_ROLL_OPTIONS, ui.stance, undefined, { mounted: ui.mounted, centerLastRound: ui.centerLastRound })
+    ? poolFor(c, a, DEFAULT_ROLL_OPTIONS, stance, undefined, { mounted: ui.mounted, centerLastRound: ui.centerLastRound, assessmentWon: ui.assessmentWon })
     : null;
   const simple = a.attack && isSimpleAttack(c, toPoolAction(a), contextOf(ui));
   const child = a.kind === "damage";
   const pending = child && ui.pendingDamage && ui.pendingDamage.parent === a.parent ? ui.pendingDamage.dice : 0;
+  // Posture qui empêche l'action (F2) : carte grisée avec la raison, jamais bloquée.
+  const blocked = ui.situation === "combat" && isRollable(a)
+    ? stanceRestriction(toPoolAction(a), { stance: ui.stance, mounted: ui.mounted, sub: ui.sub })
+    : null;
+  if (blocked) {
+    return (
+      <div className={["act", "blocked", child ? "child" : ""].filter(Boolean).join(" ")} data-testid={`blocked-${a.id}`}>
+        <span className="t">{a.label}</span>
+        <span className="p">{p ? poolLabel(p) : ""}</span>
+        <span className="d">
+          <span className="reason">{blocked}</span>{" "}
+          <button type="button" className="linkbtn" aria-label={`Lancer quand même : ${a.label}`} onClick={() => dispatch({ type: "select", id: a.id })}>Lancer quand même</button>
+        </span>
+      </div>
+    );
+  }
   return (
     <button
       type="button"

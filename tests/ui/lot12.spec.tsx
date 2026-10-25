@@ -191,17 +191,12 @@ describe("Lanceur : correctifs de règles (annexe E.2)", () => {
     click(/^Tir · Yumi/);
     fireEvent.change(roller().getByRole("spinbutton", { name: "ND d'armure cible" }), { target: { value: "20" } });
     expect(screen.getByTestId("final-tn")).toHaveTextContent("20");
-    // Sans école, la case « Monté » est proposée pour l'arc.
-    fireEvent.click(within(screen.getByRole("group", { name: "Monture" })).getByRole("checkbox", { name: "Monté" }));
+    // La case « Monté » est dans le panneau Posture, même sans école (annexe E.3 F2).
+    fireEvent.click(screen.getByRole("checkbox", { name: /^Monté/ }));
     expect(screen.getByTestId("final-tn")).toHaveTextContent("30");
     expect(roller().getByText(/\+ 10 arc/)).toBeInTheDocument();
   });
 
-  it("une fiche sans école ni arc n'affiche pas de case « Monté »", async () => {
-    await renderApp();
-    toCombat();
-    expect(screen.queryByRole("checkbox", { name: "Monté" })).toBeNull();
-  });
 
   it("L8 : terrain modéré puis difficile, Eau 2 → distances de l'Anneau 1", async () => {
     await renderApp();

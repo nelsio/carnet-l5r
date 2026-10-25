@@ -1,12 +1,12 @@
 import {
-  ARMOR_TN, DEAD_LABEL, DISARM_DAMAGE, FULL_DEFENSE_DIVISOR, MASTERY, MOVEMENT, POOL_BONUS, RANGED_PATTERN, RINGS, SKILL_ALIASES,
+  ARMOR_TN, CENTER_BONUS, DEAD_LABEL, DISARM_DAMAGE, DUEL_ASSESSMENT_WIN, FULL_DEFENSE_DIVISOR, MELEE_TARGET_PENALTY, MASTERY, MOVEMENT, POOL_BONUS, RANGED_PATTERN, RINGS, SKILL_ALIASES,
   TERRAINS, TN_PER_RAISE, WOUND_FIRST_MULTIPLIER, WOUND_LEVELS, WOUND_NEXT_MULTIPLIER,
   type RingKey, type Stance, type Terrain,
 } from "../rules/l5r4e";
 import { describeModifier, woundPenaltyReduction } from "./modifiers";
 import type { Character, Maneuver, Modifier, RollTrait, Skill, TraitKey, WeaponKeyword } from "./schema";
 import {
-  catalogWeapon, describeEffect, effectOn, maneuverCost, resolveValue, rollEffects, sameEmphasis, schoolArmorBonus, schoolContext, skillIs,
+  catalogWeapon, describeEffect, effectOn, guardRule, maneuverCost, resolveValue, rollEffects, sameEmphasis, schoolArmorBonus, schoolContext, skillIs,
   voidMultiplier, voidPointBonus, voidSpendBonus, voidSpendOption, woundEffects, type ActiveEffect, type SchoolContext,
 } from "./schools";
 
@@ -73,6 +73,12 @@ export interface PoolMods {
   emphasis?: string;
   /** Dégâts après un Désarmement réussi : 2g1 sans la Force ni dés en plus (annexe E.2 C6). */
   disarm?: boolean;
+  /** Bonus de Centre du round précédent, sur un seul jet : +1g1 et + Anneau de Vide au total (E.3 F1). */
+  centerBonus?: boolean;
+  /** Évaluation du duel gagnée de 10 ou plus : bonus à la Concentration (F10). */
+  assessmentWon?: boolean;
+  /** Tir sur une cible engagée au corps à corps : −10 au total (F9). */
+  meleeTarget?: boolean;
 }
 
 export interface CombatState {
@@ -88,6 +94,8 @@ export interface CombatState {
   selected?: ReadonlySet<string>;
   /** Compteurs des techniques cumulables (Hiruma R2), par clé d'effet. */
   stacks?: Readonly<Record<string, number>>;
+  /** Tu gardes un allié : ton ND d'armure baisse (sauf Daidoji R2), annexe E.3 F5. */
+  guard?: boolean;
 }
 
 /** Minuscules, sans accents, espaces rognés et réduits. */
@@ -232,6 +240,24 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
   }
   let flat = 0;
   let freeRaises = 0;
+  if (mods.centerBonus && action.kind !== "damage") {
+    rolled += CENTER_BONUS.rolled;
+    kept += CENTER_BONUS.kept;
+    flat += c.voidRing;
+    notes.push(`Bonus de Centre : +${CENTER_BONUS.rolled}g${CENTER_BONUS.kept} +${c.voidRing}`);
+  }
+  if (mods.assessmentWon && action.kind === "skill" && action.focus) {
+    const w = DUEL_ASSESSMENT_WIN;
+    const master = (findSkill(c, w.masterySkill)?.rank ?? 0) >= w.masteryRank;
+    const [r, k] = master ? [w.masteryRolled, w.masteryKept] : [w.rolled, w.kept];
+    rolled += r;
+    kept += k;
+    notes.push(`Évaluation gagnée de ${w.margin} ou plus : +${r}g${k}`);
+  }
+  if (mods.meleeTarget && action.kind === "skill" && action.attack && action.weapon && isRanged(action.weapon)) {
+    flat -= MELEE_TARGET_PENALTY;
+    notes.push(`Cible au corps à corps : −${MELEE_TARGET_PENALTY}`);
+  }
   for (const m of mods.modifiers ?? []) {
     rolled = Math.max(0, rolled + m.rolled);
     kept = Math.max(0, kept + m.kept);
@@ -326,14 +352,6 @@ export function bowStrength(c: Character, w: WeaponLike, notes: string[] = []): 
     s = c.traits.strength;
   }
   return s;
-}
-
-/** La fiche porte-t-elle une arme dont le ND dépend de la monture (yumi, dai-kyu) ? */
-export function hasMountRules(c: Character): boolean {
-  return c.weapons.some((w) => {
-    const book = bookWeapon(w);
-    return !!(book?.tnMounted || book?.tnOnFoot);
-  });
 }
 
 /** Règles d'arme du livre : ND des arcs selon la monture, Force minimale (C12). */
@@ -461,7 +479,8 @@ export function armorTN(c: Character, state: CombatState): number {
       break;
   }
   if (state.voidArmor) tn += ARMOR_TN.voidArmorBonus * voidMultiplier(c);
-  const ctx = schoolContext({ stance: state.stance, mounted: state.mounted, centerLastRound: state.centerLastRound });
+  if (state.guard) tn -= guardRule(c).selfPenalty;
+  const ctx =schoolContext({ stance: state.stance, mounted: state.mounted, centerLastRound: state.centerLastRound });
   return tn + (state.bonus ?? 0) + schoolArmorBonus(c, ctx, state.selected, state.stacks);
 }
 
