@@ -407,3 +407,16 @@ header.top + main{margin-top:18px}
 .act.blocked .reason{color:var(--bad);font-weight:600}
 .linkbtn{background:none;border:0;padding:0;color:var(--gold);text-decoration:underline;font:inherit;cursor:pointer}
 @media (max-width:720px){.linkbtn{min-height:40px}}
+
+/* ---------- Bataille de masse (annexe E.8, v2.7.0) ---------- */
+.terrain.seg4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.battleroll{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:flex-end}
+.battleroll .field{max-width:140px}
+.battle .stepper button[aria-pressed="true"]{border-color:var(--gold);background:var(--gold-soft)}
+.battleres{border:1px solid var(--gold);background:var(--gold-soft);border-radius:8px;padding:8px 10px;margin-top:10px}
+.battle .dmgedit{margin-top:8px}
+.battle .dmgedit .field{max-width:200px}
+@media (max-width:720px){
+  .terrain.seg4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .terrain.seg4 button,.battle .terrain button,.battleroll .btn{min-height:40px}
+}

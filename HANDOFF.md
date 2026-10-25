@@ -6,7 +6,7 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document.
 
-**État au 25/10/2026 :** version publiée **v2.6.0**, lots 1 à 11 livrés (§11), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération) et v2.6.0 (vocabulaire français) livrées ; v2.7 à implémenter.
+**État au 25/10/2026 :** version publiée **v2.7.0**, lots 1 à 12 livrés (§11), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français) et v2.7.0 (bataille de masse).
 
 **Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie).
 
@@ -459,7 +459,7 @@ Depuis un fichier (bouton ou glisser-déposer). Trois destinations :
 
 « Terminé » = tests verts, `tsc --noEmit` sans erreur, lint propre, CI verte.
 
-État en v2.6.0 : **466 tests Vitest** (moteur, stockage, interface) et **56 tests Playwright** (chromium, iPhone 13, Pixel 7), lignes de `src/core` couvertes à 100 %.
+État en v2.7.0 : **493 tests Vitest** (moteur, stockage, interface) et **60 tests Playwright** (chromium, iPhone 13, Pixel 7), lignes de `src/core` couvertes à 100 %.
 
 ### 10.1 Moteur (`tests/core.rules.spec.ts`) — fourni, 80 tests
 - C'est la **spécification exécutable** du moteur. Elle a été validée contre une implémentation de référence : 80 tests sur 80 passent (v1.1 : règle des dix dés du livre, maîtrise 7+).
@@ -540,6 +540,7 @@ Ces cas complètent la spec fournie. L'agent les écrit dans `tests/core.modifie
 | M12 | Combat sur mobile, et à 360 px de large | Carte « Nouveau round » entre l'Initiative et la Posture ; sa description tient sur 2 lignes au plus |
 | M13 | Aide de jeu sur mobile, et à 360 px de large | Les 4 onglets de situation (Enquête, Cour, Déplacement, Combat) sur une ligne, sans défilement ni texte tronqué, zones de 40 px de haut ; Statistiques est dans la barre du bas |
 | M14 | Bonus de jet sur mobile, et à 360 px de large (E24) | Chaque bonus sur 3 lignes (nom et source, effet, cible et note), aucun texte tronqué |
+| M15 | Bataille de masse sur mobile, et à 360 px de large (E.8) | Panneau rempli (jet, résultat, dés de blessures, Encaisser) sans défilement horizontal ; boutons d'état et d'engagement de 40 px de haut, sans texte tronqué |
 
 ---
 
@@ -550,7 +551,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 1. **Socle** : Vite + React + TypeScript strict, ESLint, Vitest, `vite-plugin-singlefile`, workflow `ci.yml`.
 2. **Moteur** : schéma Zod, migrations, données de règles, moteur → `core.rules.spec.ts` vert.
 3. **Interface bureau** : portage du prototype en composants, thème, clans. Revue visuelle par comparaison avec `reference/prototype.html`.
-4. **Mobile** : §7 → tests M1 à M9 (M10 à M14 ajoutés ensuite).
+4. **Mobile** : §7 → tests M1 à M9 (M10 à M15 ajoutés ensuite).
 5. **Stockage** : bibliothèque IndexedDB, écran Bibliothèque, mode consultation → S1, S2, U1.
 6. **Import / export** : fusion avec aperçu, trois destinations → U5, E3 à E5.
 7. **Fichier lié** : File System Access, reprise de permission, conflits → S3 à S5, U6.
@@ -560,7 +561,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 11. **v2.1 — techniques des courtisans et de Shosuro** : même moteur, nouvelles entrées de catalogue (compétences sociales, Connaissance, conditions d'Honneur, spécialisations). Annexe D (validée le 24/10/2026) : catalogue `src/rules/ecoles-courtisans.json` (12 écoles), situation Cour, spécialisation choisie au lanceur → cas T25 à T42, E20 à E23 ; tag `v2.1.0`. Aucun changement de format de fiche (`schemaVersion` reste 2).
    - **v2.1.1** (patch) : carte « Nouveau round » entre l'Initiative et la Posture, avec une description de deux lignes au plus sur mobile (§6.2, M12) ; test du fichier lié rendu robuste (lecture du fichier avant sa première écriture).
    - **v2.1.2** (patch) : Statistiques devient une vue à part (en-tête sur bureau, barre du bas sur mobile) ; les 4 onglets de situation tiennent sur une ligne à 360 px (§7, M13).
-12. **v2.2 à v2.7 — règles du livre, combat complet, ergonomie** : annexe E (validée le 24/10/2026). Six versions : correctifs de règles et retouches d'interface (v2.2.0, **livrée**, tag `v2.2.0`, écarts en E.12), combat complet (v2.3.0, **livrée**, tag `v2.3.0`, écarts en E.13), maîtrises et armures (v2.4.0, **livrée**, tag `v2.4.0`, écarts en E.14), récupération (v2.5.0, **livrée**, tag `v2.5.0`, écarts en E.15), vocabulaire français (v2.6.0, **livrée**, tag `v2.6.0`, écarts en E.16), bataille de masse (v2.7.0) → cas L1 à L27, E24 à E28.
+12. **v2.2 à v2.7 — règles du livre, combat complet, ergonomie** : annexe E (validée le 24/10/2026). Six versions : correctifs de règles et retouches d'interface (v2.2.0, **livrée**, tag `v2.2.0`, écarts en E.12), combat complet (v2.3.0, **livrée**, tag `v2.3.0`, écarts en E.13), maîtrises et armures (v2.4.0, **livrée**, tag `v2.4.0`, écarts en E.14), récupération (v2.5.0, **livrée**, tag `v2.5.0`, écarts en E.15), vocabulaire français (v2.6.0, **livrée**, tag `v2.6.0`, écarts en E.16), bataille de masse (v2.7.0, **livrée**, tag `v2.7.0`, écarts en E.17) → cas L1 à L27, E24 à E28.
 13. **À définir** : voies alternatives et écoles avancées (exclues en D-a), shugenja et sorts (hors périmètre, §1), compteurs « N fois par séance » (D-g).
 
 ---
@@ -1167,3 +1168,13 @@ Interface et mobile :
 - **Renommage** : données `VOCABULARY_UPDATES` (`src/rules/l5r4e.ts`), moteur `vocabularyChanges(c)` et `updateVocabulary(c)` (`src/core/vocabulary.ts`). Sont renommés : les noms de compétence, la spécialisation Politesse **sous Étiquette seulement**, et la compétence visée par un bonus de jet (`modifiers[].skill`). Comparaison normalisée (accents, casse) ; une compétence n'est pas renommée si la fiche porte déjà le nouveau nom (pas de doublon), une spécialisation non plus.
 - **Bandeau** : en tête de fiche, fiche modifiable seulement (absent en consultation). « Mettre à jour le vocabulaire (Courtoisie → Courtisan, …) » avec **Plus tard** et **Mettre à jour…** ; l'aperçu liste chaque renommage (« Compétence : « Courtoisie » → « Courtisan » », « Spécialisation (Étiquette) : … », « Bonus « Voix » : … ») avec **Annuler** et **Renommer**. Après renommage, **Annuler le renommage** rend la fiche d'avant tant qu'elle n'a pas changé depuis. État dans `ui.vocabulary` (action `vocabulary` : `update`, `undo`, `hide`), remis à zéro à l'ouverture d'une fiche. Pas de fenêtre d'import : le renommage ne change que des libellés, l'aperçu tient dans le bandeau.
 - **Tests** : `tests/core.vocabulary.spec.ts` (L23, libellés, alias, cas limites, non-régression de toutes les écoles avant et après renommage) et `tests/ui/vocabulary.spec.tsx` (bandeau, aperçu, renommage, annulation, consultation, Vigilance). Les tests existants gardent leurs fiches à l'ancien vocabulaire, couvertes par les alias.
+
+### E.17 Écarts de mise en œuvre (v2.7.0)
+- **Données** : `src/rules/table-bataille.json`, copie exacte de `reference/` (vérifiée par un test), lue par `src/rules/l5r4e.ts` : `BATTLE_TABLE` (cases `{ wounds, glory, event }`), `BATTLE_COLUMNS` (ordre d'engagement, décalage de l'état), `BATTLE_EVENT_LABELS`, plus `ENGAGEMENTS`, `ARMY_STATUSES`, `BATTLE_COMMAND` (5 d'écart) et `BATTLE_ROLL` (Tacticien ±5).
+- **Moteur** (`src/core/battle.ts`) : `armyStatus(gap)` (écart ≥ 5 : gagne ; ≤ −5 : perd ; sinon égalité), `battleRollBonus(c)` et `battleRollTotal(c, die)` (1d10 + Anneau d'Eau + Bataille), `battleOutcome(total, engagement, status)` (case, ligne, colonne et décalage) et `rollBattleDice(n, rng)`. Un total sous 1 (Tacticien −5) prend la **première** ligne, au-delà de 30 la dernière.
+- **Panneau « Bataille de masse »** dans l'aide de jeu, sous « Nouveau round », en Bataille seulement : case « Je commande l'armée » (écart de Commandement saisi, négatif si tu perds, → « Ton armée gagne / Égalité / Ton armée perd ») ou boutons Gagne / Égalité / Perd ; boutons d'engagement ; jet de bataille ; case de la table. Le « i » du panneau détaille l'engagement et le calcul (« Total 14 (Tacticien +5) → ligne 13-15 ; colonne Engagé, décalée de 1 »). La carte d'information « Niveau d'engagement » est retirée, son contenu passe dans le panneau.
+- **Jet de bataille** : un champ « Total du jet » (1d10 + Eau + Bataille, **sans** le Tacticien) toujours modifiable ; avec le lanceur affiché, « Lancer 1d10 » le remplit et affiche le d10. **Tacticien** : case, puis +5 ou −5 (+5 par défaut), ajouté au total pour lire la table.
+- **Dés de blessures** : **sans explosion**, comme le dé de bataille (E-g) ; additionnés. L'encaissement réutilise le composant **Encaisser** de la barre d'état (F6 : Réduction, Vide −10), pré-rempli par « Lancer les dés de blessures (Nd10) » avec le lanceur affiché, à saisir sinon. Après l'encaissement, « Blessures du tour encaissées » ; rien à encaisser en consultation.
+- **Gloire et événements** (Duel, Occasion héroïque) : affichés seulement ; la Gloire de la fiche n'est pas modifiée.
+- **État** : `ui.battle` (non persisté). « Nouveau round » efface l'écart, le jet et les dés de blessures, et garde le commandement, l'état choisi, l'engagement et le Tacticien ; « Nouvelle journée » remet tout à zéro. Changer l'état, l'engagement ou le jet remet à zéro les dés de blessures du tour.
+- **Tests** : `tests/core.battle.spec.ts` (L19, table, commandement, jet, bornes) et `tests/ui/battle.spec.tsx` (panneau, L19, commandement, vrais dés, lanceur et Tacticien, nouveau round, consultation) ; Playwright M15 (mobile et 360 px).

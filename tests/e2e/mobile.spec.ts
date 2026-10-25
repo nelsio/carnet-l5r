@@ -1,4 +1,4 @@
-/** Version mobile (HANDOFF §7), tests M1 à M14 (§10.5). */
+/** Version mobile (HANDOFF §7), tests M1 à M15 (§10.5). */
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { expect, test, type Locator, type Page } from "@playwright/test";
@@ -380,4 +380,32 @@ test("M14 (E24) : bonus de jet sur 3 lignes, aucun texte tronqué", async ({ pag
 test.describe("M14 à 360 px de large", () => {
   test.use({ viewport: { width: 360, height: 740 } });
   test("bonus de jet sur 3 lignes, aucun texte tronqué", async ({ page }) => modifiersOnThreeLines(page));
+});
+
+/** Bataille de masse (annexe E.8) : panneau rempli (jet, résultat, dés de blessures) sans défilement ni texte tronqué. */
+async function battleFits(page: Page) {
+  await tab(page, "Aide de jeu").click();
+  await page.getByRole("group", { name: "Situation" }).getByRole("button", { name: "Combat", exact: true }).click();
+  await page.getByRole("button", { name: "Bataille", exact: true }).click();
+  const battle = page.getByRole("group", { name: "Bataille de masse" });
+  await battle.getByRole("button", { name: "Lancer 1d10" }).click();
+  await battle.getByRole("checkbox", { name: "Tacticien" }).check();
+  await expect(battle.getByTestId("battle-outcome")).toBeVisible();
+  await battle.getByRole("button", { name: /^Lancer les dés de blessures/ }).click();
+  await expect(battle.getByRole("group", { name: "Encaisser des dégâts" })).toBeVisible();
+  for (const group of ["État de l'armée", "Engagement"]) {
+    for (const b of await battle.getByRole("group", { name: group }).getByRole("button").all()) {
+      const box = (await b.boundingBox())!;
+      expect(box.height, group).toBeGreaterThanOrEqual(40);
+      expect(await b.evaluate((e) => e.scrollWidth > e.clientWidth + 0.5), `${group} tronqué`).toBe(false);
+    }
+  }
+  await noHorizontalScroll(page, "bataille de masse");
+}
+
+test("M15 : bataille de masse, boutons de 40 px, aucun texte tronqué", async ({ page }) => battleFits(page));
+
+test.describe("M15 à 360 px de large", () => {
+  test.use({ viewport: { width: 360, height: 740 } });
+  test("bataille de masse, boutons de 40 px, aucun texte tronqué", async ({ page }) => battleFits(page));
 });

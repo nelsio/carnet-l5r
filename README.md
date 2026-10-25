@@ -72,9 +72,18 @@ En **Escarmouche**, de haut en bas :
 
 Au round qui suit le Centre, le lanceur propose le **Bonus de Centre** (`+1g1` et ton Anneau de Vide au total, sur un seul jet). Une **Feinte** réussie pré-remplit son bonus sur les dégâts. Pour **encaisser** un coup, le bouton **Dégâts…** de la barre d'état retire ta Réduction (et `10` avec un point de Vide) et ajoute les blessures.
 
-En **Duel iaijutsu**, les étapes Évaluation → Concentration → Frappe remplacent l'initiative et la posture (Centre implicite) : coche une Évaluation **gagnée de 10 ou plus**, saisis l'**écart de Concentration**, et les augmentations gratuites passent sur la Frappe ; en **Bataille**, il n'y a pas d'initiative, et les jets de commandement et de bataille personnelle s'ajoutent à la posture et aux attaques. **Nouveau round** et **Dépenser du Vide** restent présents partout.
+En **Duel iaijutsu**, les étapes Évaluation → Concentration → Frappe remplacent l'initiative et la posture (Centre implicite) : coche une Évaluation **gagnée de 10 ou plus**, saisis l'**écart de Concentration**, et les augmentations gratuites passent sur la Frappe. **Nouveau round** et **Dépenser du Vide** restent présents partout.
 
-Les boutons **« i »** affichent ou masquent le détail des postures, des dépenses de Vide, du déplacement et des rappels d'école.
+En **Bataille**, il n'y a pas d'initiative ; le panneau **Bataille de masse** (v2.7) suit un tour de bataille :
+
+1. **État de l'armée** : si tu commandes, coche **Je commande l'armée** et saisis l'écart de ton jet de Commandement (Bataille/Perception) sur celui du commandant adverse : `5` d'écart pour gagner ou perdre, sinon égalité. Sinon, choisis **Gagne**, **Égalité** ou **Perd** selon ce qu'annonce le MJ.
+2. **Engagement** : Réserve, Désengagé, Engagé ou Fortement engagé.
+3. **Jet de bataille** : `1d10` (sans explosion) `+ Eau + Bataille`. Saisis ton total, ou, avec le lanceur affiché, **Lancer 1d10**. L'avantage **Tacticien** ajoute `+5` ou `−5`.
+4. **Résultat** : la case de la table du livre, « 2 dés de blessures, 1 Gloire, Duel ». Lance ces dés (sans explosion, additionnés) puis **Encaisser** : ta Réduction s'applique, comme pour un coup reçu.
+
+**Nouveau round** efface le jet et garde ton engagement.
+
+Les boutons **« i »** affichent ou masquent le détail des postures, des dépenses de Vide, du déplacement, de la bataille de masse et des rappels d'école.
 
 ## 5. Le lanceur : vrais dés ou dés de l'outil
 
