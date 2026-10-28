@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 2,
+  "name": "Kuni Taeko",
+  "clan": "Crabe", "family": "Kuni", "school": "École de shugenja Kuni",
+  "schoolId": "kuni-shugenja", "schoolRank": null,
+  "insightRank": 1,
+  "honor": 4.5, "glory": 1.0, "status": 1.0,
+  "xp": { "total": 40, "spent": 30 },
+  "traits": { "stamina": 3, "willpower": 3, "strength": 2, "perception": 2, "agility": 2, "intelligence": 3, "reflexes": 2, "awareness": 2 },
+  "voidRing": 2, "voidPoints": 2, "wounds": 0,
+  "armor": { "name": "Aucune", "bonus": 0, "reduction": 0, "catalogId": "none" },
+  "skills": [
+    { "name": "Sortilèges", "rank": 3, "trait": "intelligence", "emphases": [] },
+    { "name": "Connaissance : Outremonde", "rank": 2, "trait": "intelligence", "emphases": [] },
+    { "name": "Méditation", "rank": 1, "trait": "void", "emphases": [] }
+  ],
+  "weapons": [ { "name": "Wakizashi", "skill": "Kenjutsu", "dr": "2k2", "keywords": ["samourai", "moyenne"] } ],
+  "techniques": [], "maneuvers": [],
+  "spells": [
+    { "id": "sentir", "name": "Sentir", "element": "all", "mastery": 1, "keywords": [], "range": "Personnel", "area": "Rayon de 50 pieds", "duration": "Instantanée", "raises": "", "memorized": true, "effect": "Perçoit la présence et l'humeur des kami alentour." },
+    { "id": "jade-strike", "name": "Frappe de jade", "element": "earth", "mastery": 1, "keywords": ["Jade"], "range": "100 pieds", "area": "Une cible", "duration": "Instantanée", "raises": "Portée (+10 pieds)\nCibles (+1)", "damage": "2k2", "memorized": true, "effect": "Projectile de jade contre une créature souillée." },
+    { "id": "earth-2", "name": "Mur de terre", "element": "earth", "mastery": 2, "keywords": ["Défense"], "range": "30 pieds", "area": "Mur de 10 × 10 pieds", "duration": "10 minutes", "raises": "Durée (+1 minute)", "memorized": false, "effect": "Dresse un mur de terre." },
+    { "id": "fire-1", "name": "Feux intérieurs", "element": "fire", "mastery": 1, "keywords": ["Bataille"], "range": "50 pieds", "area": "Une cible", "duration": "Instantanée", "raises": "", "damage": "3k2", "memorized": false, "effect": "Une flamme jaillit de la cible." },
+    { "id": "air-1", "name": "Vent favorable", "element": "air", "mastery": 1, "keywords": [], "range": "Contact", "area": "Une cible", "duration": "5 rounds", "raises": "", "memorized": false, "effect": "Note de test : élément de déficience." }
+  ],
+  "spellSlotsUsed": {},
+  "advantages": "", "disadvantages": "", "notes": "Personnage de test des shugenja (annexe F.6)."
+}
