@@ -85,7 +85,7 @@ test("M1 : aucune vue ne défile horizontalement", async ({ page }) => {
   await page.keyboard.press("Escape");
   await tab(page, "Statistiques").click();
   await noHorizontalScroll(page, "Statistiques");
-  await page.getByRole("button", { name: "Bibliothèque" }).click();
+  await page.getByRole("button", { name: "Carnet de Rokugan — ouvrir la bibliothèque" }).click();
   await expect(page.getByRole("heading", { name: "Bibliothèque" })).toBeVisible();
   await noHorizontalScroll(page, "Bibliothèque");
   await page.getByRole("button", { name: /^Supprimer / }).click();
@@ -329,26 +329,29 @@ test.describe("M13 à 360 px de large", () => {
 
 test.describe("M11 : en-tête à 360 px de large", () => {
   test.use({ viewport: { width: 360, height: 740 } });
-  test("Bibliothèque, Lanceur de dés et Thème en icônes de 40 px sur la ligne du nom, libellés avec l'état", async ({ page }) => {
+  test("T7 : sceau de 52 px ; Lanceur de dés et Thème en icônes de 40 px sous le nom, à gauche, libellés avec l'état", async ({ page }) => {
     const buttons = [
-      page.getByRole("button", { name: "Bibliothèque" }),
       page.getByRole("button", { name: "Lanceur de dés : affiché" }),
       page.getByRole("button", { name: "Thème : auto" }),
     ];
-    // Multiplicateur de blessures masqué pour le moment : 3 icônes (annexe E.19 S6).
-    await expect(page.locator("header.top .theme-btn")).toHaveCount(3);
-    const name = (await page.getByRole("heading", { level: 1 }).boundingBox())!;
+    // Multiplicateur de blessures masqué (annexe E.19 S6), Bibliothèque passée au sceau (annexe G) : 2 icônes.
+    await expect(page.locator("header.top .theme-btn")).toHaveCount(2);
+    const seal = (await page.getByRole("button", { name: "Carnet de Rokugan — ouvrir la bibliothèque" }).boundingBox())!;
+    const who = (await page.locator("header.top .who").boundingBox())!;
+    // Boîte du sceau tourné de 3° : un peu plus de 52 px.
+    expect(seal.width).toBeGreaterThanOrEqual(52);
+    expect(seal.width).toBeLessThan(56);
     for (const b of buttons) {
       const box = (await b.boundingBox())!;
       expect(Math.round(box.width)).toBe(40);
       expect(Math.round(box.height)).toBe(40);
-      expect(box.y).toBeLessThan(name.y + name.height);
-      expect(box.y + box.height).toBeGreaterThan(name.y);
+      expect(box.y).toBeGreaterThanOrEqual(who.y + who.height);
       await expect(b.locator(".txt")).toHaveCSS("width", "1px");
     }
+    expect(Math.round((await buttons[0]!.boundingBox())!.x)).toBe(Math.round(who.x));
     const tops = await Promise.all(buttons.map(async (b) => (await b.boundingBox())!.y));
     expect(new Set(tops.map(Math.round)).size).toBe(1);
-    await expect(buttons[1]!).toHaveAttribute("title", "Lanceur de dés : affiché");
+    await expect(buttons[0]!).toHaveAttribute("title", "Lanceur de dés : affiché");
     await noHorizontalScroll(page, "en-tête 360 px");
   });
 });

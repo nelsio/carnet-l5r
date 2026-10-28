@@ -31,7 +31,7 @@ describe("Démarrage", () => {
   it("sans fiche : la Bibliothèque vide invite à créer un personnage", async () => {
     await mount(memoryStorage());
     expect(screen.getByRole("heading", { name: "Aucun personnage dans ce carnet" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Bibliothèque" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /bibliothèque/i })).toBeNull();
   });
 
   it("rouvre la dernière fiche ouverte", async () => {
@@ -113,7 +113,7 @@ describe("Écran Bibliothèque", () => {
     await s.library.put(entry("b", { character: { ...base(), name: "Bayushi Kaede", clan: "Scorpion", school: "École Bayushi" }, mode: "readonly", updatedAt: "2026-10-19T10:00:00.000Z" }));
     await s.prefs.set({ lastOpenedId: "a" });
     await mount(s);
-    click("Bibliothèque");
+    click("Carnet de Rokugan — ouvrir la bibliothèque");
     await screen.findByRole("heading", { name: "Bibliothèque" });
     return s;
   }

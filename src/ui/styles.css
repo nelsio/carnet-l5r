@@ -9,6 +9,7 @@
   --gold:var(--acc-l); --gold-soft:color-mix(in srgb,var(--gold) 15%,var(--surface));
   --earth:#5e6d2c; --water:#245f8c; --fire:#a8382a; --air:#6a7f99; --void:#5d4290;
   --ok:#2e7a4b; --bad:#a8382a;
+  --seal:#a8382a; --seal-ink:#f7f3ea;
   --f-display:"Shippori Mincho B1","Hiragino Mincho ProN","Times New Roman",serif;
   --f-body:"Zen Kaku Gothic New","Segoe UI",system-ui,sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
@@ -16,11 +17,11 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#25272a; --surface:#2f3236; --sunk:#1c1e21; --ink:#e7e5e0; --muted:#a2a19c; --line:#44474c;
   --gold:var(--acc-d);
-  --earth:#9fb25a; --water:#6fb0e0; --fire:#e8735f; --air:#a9bbd2; --void:#a98be0; --ok:#6cc58f; --bad:#f07b68; color-scheme:dark}}
+  --earth:#9fb25a; --water:#6fb0e0; --fire:#e8735f; --air:#a9bbd2; --void:#a98be0; --ok:#6cc58f; --bad:#f07b68; --seal:#b5402f; --seal-ink:#f3ece0; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#25272a; --surface:#2f3236; --sunk:#1c1e21; --ink:#e7e5e0; --muted:#a2a19c; --line:#44474c;
   --gold:var(--acc-d);
-  --earth:#9fb25a; --water:#6fb0e0; --fire:#e8735f; --air:#a9bbd2; --void:#a98be0; --ok:#6cc58f; --bad:#f07b68; color-scheme:dark}
+  --earth:#9fb25a; --water:#6fb0e0; --fire:#e8735f; --air:#a9bbd2; --void:#a98be0; --ok:#6cc58f; --bad:#f07b68; --seal:#b5402f; --seal-ink:#f3ece0; color-scheme:dark}
 :root[data-theme="light"]{color-scheme:light}
 header.top{border-bottom:3px solid var(--gold)}
 .mon{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
@@ -47,6 +48,17 @@ button{cursor:pointer}
 header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;padding-block:22px 14px}
 .who h1{font-size:clamp(26px,5vw,38px);font-weight:800}
 .who .sub{color:var(--muted);margin-top:2px}
+/* Sceau de l'outil et surtitre (annexe G.3) : couleur fixe, indépendante du clan */
+.who{display:flex;align-items:center;gap:16px}
+.who-txt{min-width:0}
+.seal{flex:none;display:grid;place-items:center;width:64px;height:64px;padding:0;border:0;border-radius:8px;
+  background:var(--seal);color:var(--seal-ink);font:800 38px/1 var(--f-display);rotate:-3deg;
+  box-shadow:inset 0 0 0 3px var(--seal),inset 0 0 0 5px var(--seal-ink)}
+button.seal:focus-visible{outline-offset:4px}
+.eyebrow{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin-bottom:4px}
+.eyebrow .mon{margin-bottom:0}
+.brand{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.eyebrow .sep{width:1px;height:12px;background:var(--line)}
 .tabs{display:flex;gap:2px;background:var(--sunk);padding:4px;border-radius:999px}
 .tabs button{border:0;background:transparent;padding:8px 12px;border-radius:999px;font-weight:700;color:var(--muted)}
 .tabs button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
@@ -239,10 +251,17 @@ div.man button{border:0;background:var(--surface);width:24px;height:24px;border-
   .theme-btn{position:relative;width:40px;height:40px;padding:0;justify-content:center;border-radius:50%}
   .theme-btn .txt{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
   .theme-btn .ico{width:20px;height:20px}
-  .top-right{flex-wrap:nowrap;gap:6px}
-  header.top{flex-wrap:nowrap;align-items:center}
-  .who{min-width:0}
+  /* Boutons ronds sous le bloc sceau + nom, alignés à gauche (annexe G.3) */
+  .top-right{flex-wrap:nowrap;gap:6px;width:100%;justify-content:flex-start}
+  header.top{flex-wrap:wrap;align-items:flex-end}
+  .who{min-width:0;gap:12px}
   .who h1{overflow-wrap:anywhere}
+  .seal{width:52px;height:52px;border-radius:7px;font-size:30px}
+  .eyebrow{gap:2px 8px;margin-bottom:2px}
+  .brand{font-size:10px;letter-spacing:.12em}
+  .eyebrow .mon{font-size:10px;letter-spacing:.08em}
+  .eyebrow .mon::before{width:9px;height:9px}
+  .eyebrow .sep{height:10px}
   .ib{width:26px;height:26px}
 
   .status{margin-bottom:12px;padding-block:6px 8px}

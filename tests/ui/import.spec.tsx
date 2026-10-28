@@ -192,7 +192,7 @@ describe("Exemple de fiche", () => {
 
   it("aussi depuis une Bibliothèque déjà remplie", async () => {
     await mount();
-    click("Bibliothèque");
+    click("Carnet de Rokugan — ouvrir la bibliothèque");
     expect(await screen.findByRole("button", { name: "Télécharger un exemple de fiche (JSON)" })).toBeInTheDocument();
   });
 });
