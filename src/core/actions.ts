@@ -5,7 +5,7 @@ import {
 import { attackTrait, isRanged, type WeaponLike } from "./engine";
 import type { Character } from "./schema";
 import { skillIs } from "./schools";
-import { spellActions } from "./spells";
+import { CONCENTRATE_ACTION, skirmishSpellActions, spellActions } from "./spells";
 
 const fixed = (situation: Situation, sub?: CombatSub) =>
   FIXED_ACTIONS.filter((a) => a.situation === situation && a.sub === sub);
@@ -59,7 +59,7 @@ function performActions(c: Character): ActionDef[] {
 export function buildActions(c: Character, situation: Situation, sub?: CombatSub): ActionDef[] {
   if (situation === "investigation") return fixed(situation).flatMap((a) => (a.id === "lore" ? loreActions(c) : [a]));
   if (situation === "court") return [...fixed(situation), ...performActions(c)];
-  if (situation === "magic") return spellActions(c);
+  if (situation === "magic") return [...spellActions(c), CONCENTRATE_ACTION];
   if (situation !== "combat") return fixed(situation);
   switch (sub ?? "skirmish") {
     case "skirmish": {
@@ -70,6 +70,8 @@ export function buildActions(c: Character, situation: Situation, sub?: CombatSub
         ...actions.filter(isInitiative),
         ...c.weapons.flatMap((w) => weaponActions(w, "skirmish")),
         ...actions.filter((a) => !isInitiative(a)),
+        // Sorts du Rouleaux & invocations, après les attaques (v2.12.0).
+        ...skirmishSpellActions(c),
       ];
     }
     case "duel":

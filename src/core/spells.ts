@@ -1,11 +1,13 @@
 /**
  * Magie (HANDOFF annexe F) : Rouleaux & invocations (v2.9.0), écoles de shugenja (v2.10.0),
- * jet de sort et situation « Magie » (v2.11.0).
+ * jet de sort et situation « Magie » (v2.11.0), emplacements et sorts en escarmouche (v2.12.0).
  */
 import type { SpellOption, Spellcasting } from "../rules/ecoles";
-import { ELEMENT_LABELS, SPELL_CAST_TIME_MIN, SPELL_TN, type ActionDef } from "../rules/l5r4e";
+import { CONCENTRATE_ACTION_ID, ELEMENT_LABELS, SPELL_CAST_TIME_MIN, SPELL_CONCENTRATION, SPELL_TN, type ActionDef } from "../rules/l5r4e";
 import { normalize, parseDR, rings, type PoolAction } from "./engine";
-import { SPELL_ELEMENTS, SPELL_RINGS, type Character, type Spell, type SpellElement, type SpellRing } from "./schema";
+import {
+  SPELL_ELEMENTS, SPELL_RINGS, SPELL_SLOT_KEYS, type Character, type Spell, type SpellElement, type SpellRing, type SpellSlotKey,
+} from "./schema";
 import { schoolOf, schoolRankOf } from "./schools";
 
 /** ND d'un sort : 5 + 5 × maîtrise (« Maîtrise 2 · ND 15 »). */
@@ -160,6 +162,76 @@ export function spellActions(c: Character): ActionDef[] {
   });
 }
 
+/** « Rester concentré » après une interruption (F.2) : Volonté, ND 10, ou 5 + dégâts subis. */
+export const CONCENTRATE_ACTION: ActionDef = {
+  id: CONCENTRATE_ACTION_ID, situation: "magic", kind: "trait", trait: "willpower", tn: SPELL_CONCENTRATION.tn, group: "Interruption",
+  label: "Rester concentré (Volonté)",
+  description: `Interrompu pendant l'incantation : Volonté, ND ${SPELL_CONCENTRATION.tn}, ou ${SPELL_CONCENTRATION.base} + dégâts subis. Raté : le sort est perdu, sans dépenser l'emplacement.`,
+};
+
+/** ND de « Rester concentré » : 5 + dégâts subis, ou 10 sans dégâts. */
+export function concentrationTn(damage: number | null): number {
+  return damage && damage > 0 ? SPELL_CONCENTRATION.base + damage : SPELL_CONCENTRATION.tn;
+}
+
+/** Sorts en escarmouche (v2.12.0) : mêmes cartes que la situation Magie, ids préfixés `sk-`, groupe « Sorts ». */
+export function skirmishSpellActions(c: Character): ActionDef[] {
+  return spellActions(c).map((a) => ({
+    ...a, id: `sk-${a.id}`, ...(a.parent ? { parent: `sk-${a.parent}` } : {}), situation: "combat", sub: "skirmish", group: "Sorts",
+  }));
+}
+
+export interface SlotState { max: number; used: number; left: number }
+
+/** Emplacements du jour (F.2) : l'Anneau dans chaque élément (Vide compris), plus autant de libres que l'Anneau de Vide. */
+export function spellSlots(c: Character): Record<SpellSlotKey, SlotState> {
+  const r = rings(c);
+  const used = c.spellSlotsUsed ?? {};
+  const slot = (key: SpellSlotKey): SlotState => {
+    const max = key === "free" ? c.voidRing : r[key];
+    const u = Math.min(max, used[key] ?? 0);
+    return { max, used: u, left: max - u };
+  };
+  return Object.fromEntries(SPELL_SLOT_KEYS.map((k) => [k, slot(k)])) as Record<SpellSlotKey, SlotState>;
+}
+
+/** Emplacement à prendre pour un Anneau : le sien, sinon un libre ; null s'il n'en reste aucun. */
+export function slotFor(c: Character, ring: SpellRing): SpellSlotKey | null {
+  const s = spellSlots(c);
+  if (s[ring].left > 0) return ring;
+  return s.free.left > 0 ? "free" : null;
+}
+
+/** Emplacements d'un lancer : Anneau du jet (élément choisi, ou Anneau d'Agasha) ; un de plus par case Soshi. */
+export function spellSlotNeed(c: Character, a: Omit<SpellAction, "kind">): { ring: SpellRing; count: number } {
+  return { ring: spellCast(c, a).ring, count: 1 + chosenOptions(c, a.options).reduce((n, o) => n + (o.extraSlot ?? 0), 0) };
+}
+
+/** Dépense les emplacements d'un lancer, un à un (le sien puis les libres) ; `taken` dit lesquels, pour les rendre. */
+export function spendSpellSlots(c: Character, ring: SpellRing, count = 1): { character: Character; taken: SpellSlotKey[] } {
+  let character = c;
+  const taken: SpellSlotKey[] = [];
+  for (let i = 0; i < count; i++) {
+    const key = slotFor(character, ring);
+    if (!key) break;
+    character = { ...character, spellSlotsUsed: { ...character.spellSlotsUsed, [key]: (character.spellSlotsUsed?.[key] ?? 0) + 1 } };
+    taken.push(key);
+  }
+  return { character, taken };
+}
+
+/** Rend des emplacements (sort réussi puis interrompu, « Annuler (interrompu) »). */
+export function refundSpellSlots(c: Character, taken: readonly SpellSlotKey[]): Character {
+  const used = { ...c.spellSlotsUsed };
+  for (const key of taken) used[key] = Math.max(0, (used[key] ?? 0) - 1);
+  return { ...c, spellSlotsUsed: used };
+}
+
+/** Éditeur de la barre d'état : emplacements dépensés d'un Anneau, entre 0 et le maximum. */
+export function setSpellSlotsUsed(c: Character, key: SpellSlotKey, used: number): Character {
+  const max = spellSlots(c)[key].max;
+  return { ...c, spellSlotsUsed: { ...c.spellSlotsUsed, [key]: Math.max(0, Math.min(max, used)) } };
+}
 
 /** Sort vierge, avec un identifiant unique (fusion par `id`, §8). */
 export function createSpell(name = "", element: SpellElement = "earth"): Spell {

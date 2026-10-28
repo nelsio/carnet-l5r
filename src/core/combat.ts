@@ -26,6 +26,9 @@ export function rollStance(s: StanceSituation): Stance {
 export function stanceRestriction(a: PoolAction, s: StanceSituation): string | null {
   if (s.sub === "duel") return null;
   const attack = a.kind === "skill" && !!a.attack;
+  // Sorts en escarmouche (annexe F.5, v2.12.0) : ni en Assaut ni en Défense totale ; Centre comme toute action.
+  if (a.kind === "spell" && s.stance === "fullAttack") return "Assaut : attaques seulement, pas de sort.";
+  if (a.kind === "spell" && s.stance === "fullDefense") return "Défense totale : actions gratuites seulement, pas de sort.";
   switch (s.stance) {
     case "center":
       return a.kind === "initiative" ? null : "Posture Centre : aucune action ce round.";

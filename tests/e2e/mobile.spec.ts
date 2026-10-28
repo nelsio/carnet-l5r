@@ -500,7 +500,7 @@ test.describe("M18 et M16 à 360 px de large", () => {
   });
 });
 
-test.describe("M19 (E36, v2.9.0 à v2.11.0) à 360 px de large", () => {
+test.describe("M19 (E36) à 360 px de large", () => {
   test.use({ viewport: { width: 360, height: 740 } });
 
   test("Rouleaux & invocations en édition : sorts universels et un sort complet, aucun débordement", async ({ page }) => {
@@ -516,6 +516,18 @@ test.describe("M19 (E36, v2.9.0 à v2.11.0) à 360 px de large", () => {
     await jade.getByRole("button", { name: "Jade", exact: true }).click();
     await jade.getByRole("textbox", { name: "Portée" }).fill("100 pieds");
     await noHorizontalScroll(page, "Rouleaux & invocations en édition");
+    // v2.12.0 : les 6 tuiles d'emplacements sur une ligne, sans troncature.
+    const tiles = await page.getByRole("button", { name: "Emplacements de sorts restants" }).evaluate((row) =>
+      [...row.querySelectorAll(".slot")].map((t) => ({
+        top: Math.round(t.getBoundingClientRect().top), right: t.getBoundingClientRect().right,
+        truncated: [...t.querySelectorAll("b")].some((b) => b.scrollWidth > b.clientWidth + 0.5),
+      })));
+    expect(tiles).toHaveLength(6);
+    expect(new Set(tiles.map((t) => t.top)).size, "une seule ligne").toBe(1);
+    for (const t of tiles) {
+      expect(t.truncated).toBe(false);
+      expect(t.right).toBeLessThanOrEqual(page.viewportSize()!.width);
+    }
     const vw = page.viewportSize()!.width;
     for (const el of [jade, jade.getByRole("button", { name: "Protection" }), jade.getByRole("textbox", { name: /Autres mots-clés/ })]) {
       const box = (await el.boundingBox())!;

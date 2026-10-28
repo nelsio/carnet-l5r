@@ -1,11 +1,11 @@
 /** Passerelle entre les actions de l'aide de jeu et le moteur de règles. */
 import {
-  applicableModifiers, armorModifierBonus, armorTN, assessmentTN, computePool, createSpell, DEFAULT_MANEUVERS, findSkill, ignoresWoundPenalty,
+  applicableModifiers, armorModifierBonus, armorTN, assessmentTN, computePool, concentrationTn, createSpell, DEFAULT_MANEUVERS, findSkill, ignoresWoundPenalty,
   maneuverFreeRaises, maneuverRaises, modifiersOf, modifierTN, schoolContext, targetNumber, targetTnModifier, woundState,
   type ActionDef, type ActiveEffect, type Character, type Maneuver, type Modifier, type Pool, type PoolAction, type SchoolContext,
   rollStance, type CombatSub, type Situation, type SpellRing, type Stance,
 } from "@carnet/core";
-import { CALLED_ZONES, KNOCKDOWN_QUADRUPED_COST, shownWoundMultiplier, TN_PER_RAISE, type CalledZone } from "../rules/l5r4e";
+import { CALLED_ZONES, CONCENTRATE_ACTION_ID, KNOCKDOWN_QUADRUPED_COST, shownWoundMultiplier, TN_PER_RAISE, type CalledZone } from "../rules/l5r4e";
 
 export interface RollOptions {
   /** ND de base choisi dans l'échelle. */
@@ -48,12 +48,14 @@ export interface RollOptions {
   spellRing: SpellRing | null;
   /** Cases de l'école cochées pour ce sort. */
   spellOptions: Readonly<Record<string, boolean>>;
+  /** « Rester concentré » : dégâts subis (ND 5 + dégâts ; null : ND 10). */
+  damageTaken: number | null;
 }
 
 /** Options du lanceur qui décrivent le sort lancé. */
 export type SpellRollOptions = Pick<RollOptions, "spellElement" | "spellRing" | "spellOptions">;
 
-const SPELL_RESET = { castRaises: 0, spellElement: null, spellRing: null, spellOptions: {} } as const;
+const SPELL_RESET = { castRaises: 0, spellElement: null, spellRing: null, spellOptions: {}, damageTaken: null } as const;
 
 export const DEFAULT_ROLL_OPTIONS: RollOptions = {
   tn: 15, targetTN: 20, opponentRank: 2, raises: 0, free: 0, extraRolled: 0, flat: 0,
@@ -63,7 +65,7 @@ export const DEFAULT_ROLL_OPTIONS: RollOptions = {
 };
 
 /** Options d'un sort remises à zéro à chaque nouvelle action. */
-export const SPELL_ROLL_RESET: Pick<RollOptions, "castRaises" | keyof SpellRollOptions> = SPELL_RESET;
+export const SPELL_ROLL_RESET: Pick<RollOptions, "castRaises" | "damageTaken" | keyof SpellRollOptions> = SPELL_RESET;
 
 /** Coût des manœuvres selon la variante choisie : zone du Coup ciblé, quadrupède renversé. */
 export function maneuverCosts(opts: Pick<RollOptions, "calledZone" | "quadruped">): Record<string, number> {
@@ -210,8 +212,10 @@ export function baseTN(a: ActionDef, opts: RollOptions): number | null | "oppose
     case "opposed": return "opposed";
     case "target": return opts.targetTN;
     case "assessment": return assessmentTN(opts.opponentRank);
-    // ND d'un sort : fixé par sa maîtrise (F.2).
-    default: return a.kind === "spell" ? a.tn : opts.tn;
+    // ND d'un sort : fixé par sa maîtrise (F.2) ; « Rester concentré » : 10, ou 5 + dégâts subis.
+    default:
+      if (a.kind === "spell") return a.tn;
+      return a.id === CONCENTRATE_ACTION_ID ? concentrationTn(opts.damageTaken) : opts.tn;
   }
 }
 

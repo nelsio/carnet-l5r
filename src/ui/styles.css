@@ -497,3 +497,24 @@ header.top + main{margin-top:18px}
 .spellraises{font-size:13.5px}
 .spellraises ul{margin:4px 0 0;padding-left:18px}
 .spelleffect{font-size:13.5px}
+/* ---------- v2.12.0 : emplacements de sorts (annexe F.5) ---------- */
+.slots{grid-column:1/-1;display:grid;grid-template-columns:auto repeat(6,minmax(0,1fr));align-items:stretch;gap:4px;padding:0;border:0;background:0 0;text-align:left;cursor:pointer;color:inherit;font:inherit}
+.slots:disabled{cursor:default}
+.slots .slotlabel{align-self:center;margin-right:4px}
+.slot{display:grid;min-width:0;padding:2px 6px;line-height:1.15;background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--rc,var(--line));border-radius:6px}
+.slot .label{font-size:9.5px;letter-spacing:.06em;white-space:nowrap;overflow:hidden}
+.slot b{font-size:13.5px}
+.slot.empty b{color:var(--bad)}
+.s-air{--rc:var(--air)}.s-earth{--rc:var(--earth)}.s-fire{--rc:var(--fire)}.s-water{--rc:var(--water)}.s-void{--rc:var(--void)}.s-free{--rc:var(--gold)}
+.slots.on .slot{background:var(--gold-soft)}
+.slotedit{grid-column:1/-1;display:grid;gap:6px;margin-top:2px;padding:10px;background:var(--surface);border:1px solid var(--gold);border-radius:8px}
+.slotrow{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14px}
+.spellmanual{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px}
+.spelldone{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13.5px}
+@media (max-width:720px){
+  .slots{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .slots .slotlabel{display:none}
+  .slot{text-align:center;padding:2px 4px}
+  .slot .label{font-size:9px;letter-spacing:.03em}
+  .slotrow .stepper button{width:40px;height:40px}
+}

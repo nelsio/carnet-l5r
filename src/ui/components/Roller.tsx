@@ -2,12 +2,12 @@ import { useEffect, useRef } from "react";
 import {
   applicableModifiers, armorRollTn, bowStrength, DAMAGE_MANEUVER_ID, describeEffect, focusOutcome, opposedMargin, opposedVerdict, stanceRestriction, woundEffectNote, describeModifier, effectOn, findSkill, fullDefenseBonus, maneuverCost, maneuverFreeRaises, modifierTN,
   formatDice, isRanged, isSocialSkill, meditationVoidPoints, poolStats, reminderText, rollDice, schoolContext, schoolReminders, verdict, voidMultiplier,
-  castTime, castTimeLabel, schoolRankOf, spellCast, spellcastingOf, spellOptions, spellRaises, spellRestriction, SPELL_RINGS,
-  voidPointBonus, voidSpendBonus, voidSpendOption, woundState, type Spell, type SpellAction, type SpellRing,
+  castTime, castTimeLabel, concentrationTn, schoolRankOf, slotFor, spellCast, spellcastingOf, spellOptions, spellRaises, spellRestriction, SPELL_RINGS, spellSlotNeed, spellSlots,
+  voidPointBonus, voidSpendBonus, voidSpendOption, woundState, type Spell, type SpellAction, type SpellRing, type SpellSlotKey,
   type ActionDef, type ActiveEffect, type Character, type Pool,
 } from "@carnet/core";
 import type { SpellOption } from "../../rules/ecoles";
-import { CALLED_ZONES, CENTER_BONUS, COMBAT_SUBS, ELEMENT_LABELS, MEDITATE_ACTION_ID, MELEE_TARGET_PENALTY, SITUATIONS, SPELL_CONCENTRATION, TN_PER_RAISE, TN_SCALE, TRAIT_LABELS, type CalledZone } from "../../rules/l5r4e";
+import { CALLED_ZONES, CENTER_BONUS, COMBAT_SUBS, CONCENTRATE_ACTION_ID, ELEMENT_LABELS, MEDITATE_ACTION_ID, MELEE_TARGET_PENALTY, SITUATIONS, SPELL_CONCENTRATION, TN_PER_RAISE, TN_SCALE, TRAIT_LABELS, type CalledZone } from "../../rules/l5r4e";
 import { pct } from "../format";
 import {
   activeModifiers, calledRaises, contextOf, effectiveManeuvers, finalTN, isActive, isUnskilled, maneuverCosts, poolFor, rollWoundPenalty,
@@ -43,7 +43,7 @@ export function Roller() {
   const stance = uiRollStance(ui);
   const duel = ui.situation === "combat" && ui.sub === "duel";
   // Bonus de Centre (F1) : au round qui suit le Centre, sur un seul jet.
-  const centerOffered = ui.situation === "combat" && !duel && ui.centerLastRound && !ui.centerBonusUsed && a.kind !== "damage";
+  const centerOffered = ui.situation === "combat" && !duel && ui.centerLastRound && !ui.centerBonusUsed && a.kind !== "damage" && a.kind !== "spellDamage";
   const active = activeModifiers(c, a, ui.modifierToggles, stance);
   const pool = poolFor(c, a, { ...opts, centerBonus: centerOffered && opts.centerBonus }, stance, active, {
     mounted: ui.mounted, centerLastRound: ui.centerLastRound, selected, inputs: ui.techInputs, assessmentWon: duel && ui.assessmentWon,
@@ -294,6 +294,7 @@ export function Roller() {
       {freeToTn > 0 && typeof tn === "number" && <div className="hint">{freeToTn} augmentation(s) gratuite(s) déduites du ND (−{TN_PER_RAISE * freeToTn}).</div>}
       {ws.penalty === null && <div className="hint" style={{ color: "var(--bad)" }}>Ton personnage est hors de combat.</div>}
       {a.id === MEDITATE_ACTION_ID && <MeditationSuccess />}
+      {a.kind === "spell" && !ui.showDiceRoller && <SpellCastLine action={a} manual />}
 
       {ui.showDiceRoller && (
         <>
@@ -302,6 +303,7 @@ export function Roller() {
           </button>
           <div ref={resultRef} aria-live="polite">
             {lastRoll && lastRoll.actionId === a.id && <RollOutcome roll={lastRoll} />}
+            {lastRoll && lastRoll.actionId === a.id && a.kind === "spell" && <SpellCastLine action={a} />}
           </div>
         </>
       )}
@@ -407,12 +409,63 @@ function poolOrigin(c: Character, a: ActionDef, opts: RollOptions): string {
   }
 }
 
+const slotName = (k: SpellSlotKey) => (k === "free" ? "libre" : ELEMENT_LABELS[k]);
+
+/** Ligne « Emplacement : Feu 2/3 » (« libre 1/2 » si l'élément est épuisé, « aucun emplacement » en rouge), F.5. */
+function SlotLine({ action: a }: { action: ActionDef }) {
+  const { state } = useStore();
+  const c = useCharacter();
+  const need = spellSlotNeed(c, toPoolAction(a, state.ui.opts) as SpellAction);
+  const key = slotFor(c, need.ring);
+  const slot = key && spellSlots(c)[key];
+  return (
+    <div className="tnline" data-testid="spell-slot" style={{ margin: 0, color: slot ? undefined : "var(--bad)" }}>
+      <span>Emplacement</span>
+      <span>
+        {slot && key
+          ? <><b>{slotName(key)}</b> <span className="mono">{slot.left}/{slot.max}</span>{need.count > 1 ? ` · ${need.count} emplacements` : ""}</>
+          : "aucun emplacement"}
+      </span>
+    </div>
+  );
+}
+
+/**
+ * Lancer d'un sort et ses emplacements (F.5) : avec le lanceur de dés, dépensés au lancer ; aux vrais dés,
+ * boutons Réussi et Raté. Un sort réussi puis interrompu rend ses emplacements (« Annuler (interrompu) »).
+ */
+function SpellCastLine({ action: a, manual = false }: { action: ActionDef; manual?: boolean }) {
+  const { state, dispatch } = useStore();
+  const cast = state.ui.spellCast?.actionId === a.id ? state.ui.spellCast : null;
+  const readonly = state.mode === "readonly";
+  const spent = cast && cast.slots.length > 0
+    ? <>{manual ? (cast.success ? "Lancé" : "Raté") + " : emplacement" : "Emplacement dépensé :"} {cast.slots.map(slotName).join(", ")}{manual ? " dépensé." : cast.success === false ? " (raté)" : ""}</>
+    : cast ? "Aucun emplacement dépensé." : null;
+  return (
+    <div className="spellmanual" data-testid="spell-cast">
+      {manual && (
+        <>
+          <span className="muted">Jet aux vrais dés :</span>
+          <button type="button" className="btn sm gold" disabled={readonly} onClick={() => dispatch({ type: "castSpell", success: true })}>Réussi</button>
+          <button type="button" className="btn sm" disabled={readonly} onClick={() => dispatch({ type: "castSpell", success: false })}>Raté</button>
+        </>
+      )}
+      {spent && <span className="spelldone" data-testid="spell-spent">{spent}</span>}
+      {cast?.success && cast.slots.length > 0 && (
+        <button type="button" className="btn sm" onClick={() => dispatch({ type: "cancelCast" })}>Annuler (interrompu)</button>
+      )}
+    </div>
+  );
+}
+
 /** Cases de l'école utiles à ce jet : jet de sort (dés, augmentations, affinité) ou dégâts du sort. */
-const forSpellRoll = (o: SpellOption) => o.rolled !== undefined || o.freeRaises !== undefined || o.extraAffinity !== undefined;
+const forSpellRoll = (o: SpellOption) =>
+  o.rolled !== undefined || o.freeRaises !== undefined || o.extraAffinity !== undefined || o.extraSlot !== undefined;
 const forSpellDamage = (o: SpellOption) => o.damageRolled !== undefined || o.damageKept !== undefined || o.damageFlat !== undefined;
 
 function optionEffect(o: SpellOption, c: Character): string {
   if (o.extraAffinity) return `affinité ${ELEMENT_LABELS[o.extraAffinity]}`;
+  if (o.extraSlot) return `${o.extraSlot} emplacement de plus`;
   if (o.freeRaises) return `${o.freeRaises} augmentation gratuite`;
   if (o.rolled) return `+${o.rolled}g0`;
   if (o.damageFlat === "schoolRank") return `+${schoolRankOf(c)} aux dégâts`;
@@ -505,8 +558,10 @@ function SpellPanel({ action: a, spell }: { action: ActionDef; spell: Spell }) {
       {!spell.memorized && (
         <div className="hint" data-testid="spell-scroll">Sort non mémorisé : lance-le parchemin en main (le mémoriser coûte {spell.mastery} XP).</div>
       )}
+      <SlotLine action={a} />
       <div className="hint">
-        Interrompu pendant l'incantation : jet de Volonté ND {SPELL_CONCENTRATION.tn} (ou {SPELL_CONCENTRATION.base} + dégâts subis) pour ne pas perdre le sort.
+        Interrompu pendant l'incantation : « Rester concentré », Volonté ND {SPELL_CONCENTRATION.tn} (ou {SPELL_CONCENTRATION.base} + dégâts subis) ;
+        {" "}un sort réussi puis interrompu ne consomme pas l'emplacement.
       </div>
       {sc?.reminders?.map((r) => <div key={r} className="hint" style={{ color: "var(--gold)" }}>{r}</div>)}
       {spell.effect && <div className="spelleffect prose" data-testid="spell-effect">{spell.effect}</div>}
@@ -534,6 +589,14 @@ function TnField({ action: a, opts, set }: { action: ActionDef; opts: RollOption
         <div className="field"><span className="label">ND</span><span className="muted" style={{ fontSize: 13, paddingTop: 6 }}>Opposition : compare au jet adverse</span></div>
       );
     default:
+      // Rester concentré : ND 10, ou 5 + dégâts subis (F.2).
+      if (a.id === CONCENTRATE_ACTION_ID) {
+        return (
+          <label className="field"><span className="label">Dégâts subis · ND {concentrationTn(opts.damageTaken)}</span>
+            <NumberField className="in mono" min={0} value={opts.damageTaken ?? 0} onChange={(n) => set({ damageTaken: n || null })} />
+          </label>
+        );
+      }
       // Sort : ND fixé par la maîtrise (F.2).
       if (a.kind === "spell") {
         return (

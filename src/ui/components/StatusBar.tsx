@@ -1,9 +1,10 @@
 import { useState } from "react";
 import {
-  armorEffects, catalogArmor, movement, totalReduction, voidMultiplier, woundsFromDamage, resolveValue, schoolArmorBonus, schoolReduction, woundPenaltyAt, woundState,
+  armorEffects, catalogArmor, isShugenja, movement, totalReduction, voidMultiplier, woundsFromDamage, resolveValue, schoolArmorBonus, schoolReduction,
+  setSpellSlotsUsed, SPELL_SLOT_KEYS, spellSlots, woundPenaltyAt, woundState, type SpellSlotKey,
   type Character,
 } from "@carnet/core";
-import { ARMOR_TN, VOID_COMBAT, WOUND_LEVELS } from "../../rules/l5r4e";
+import { ARMOR_TN, ELEMENT_LABELS, VOID_COMBAT, WOUND_LEVELS } from "../../rules/l5r4e";
 import { contextOf, currentArmorTN, selectedKeys } from "../rolls";
 import { useCharacter, useStore } from "../store";
 import { ArmorEffect, ArmorFields } from "./ArmorCatalog";
@@ -97,10 +98,57 @@ export function StatusBar() {
           <ArmorTile label="Réduction" value={reduction} testId="armor-reduction" readonly={readonly} />
           <div className={ws.penalty ? "pen" : ""}><span className="label">Pénalité</span><b>{ws.penalty === null ? "—" : `+${ws.penalty}`}</b></div>
         </div>
+        {isShugenja(c) && <SpellSlots readonly={readonly} />}
         {damageOpen && !readonly && <TakeDamage counter label="Dégâts de l'attaque" onDone={() => setDamageOpen(false)} />}
         {ui.armorEdit && !readonly && <ArmorEditor tn={tn} />}
       </div>
     </div>
+  );
+}
+
+const slotLabel = (k: SpellSlotKey) => (k === "free" ? "Libres" : ELEMENT_LABELS[k]);
+
+/**
+ * Ligne « Sorts » (annexe F.5) : six mini-tuiles restants/max, à la couleur de l'Anneau ;
+ * un appui ouvre l'éditeur pleine largeur (− / + par ligne). En consultation : affichage seul.
+ */
+function SpellSlots({ readonly }: { readonly: boolean }) {
+  const { dispatch } = useStore();
+  const c = useCharacter();
+  const [open, setOpen] = useState(false);
+  const slots = spellSlots(c);
+  const setUsed = (k: SpellSlotKey, used: number) => dispatch({ type: "set", path: ["spellSlotsUsed"], value: setSpellSlotsUsed(c, k, used).spellSlotsUsed });
+  return (
+    <>
+      <button
+        type="button" className={`slots${open ? " on" : ""}`} aria-expanded={open} disabled={readonly}
+        aria-label="Emplacements de sorts restants" onClick={() => setOpen(!open)}
+      >
+        <span className="label slotlabel">Sorts</span>
+        {SPELL_SLOT_KEYS.map((k) => (
+          <span key={k} className={`slot s-${k}${slots[k].left === 0 ? " empty" : ""}`} data-testid={`slot-${k}`}>
+            <span className="label">{slotLabel(k)}</span>
+            <b className="mono">{slots[k].left}/{slots[k].max}</b>
+          </span>
+        ))}
+      </button>
+      {open && !readonly && (
+        <div className="slotedit" role="group" aria-label="Emplacements de sorts">
+          {SPELL_SLOT_KEYS.map((k) => (
+            <div key={k} className="slotrow">
+              <span>{slotLabel(k)} <span className="muted">· {slots[k].left} restant{slots[k].left > 1 ? "s" : ""} sur {slots[k].max}</span></span>
+              <span className="stepper">
+                <button type="button" aria-label={`Dépenser un emplacement ${slotLabel(k)}`} onClick={() => setUsed(k, slots[k].used + 1)}>−</button>
+                <button type="button" aria-label={`Rendre un emplacement ${slotLabel(k)}`} onClick={() => setUsed(k, slots[k].used - 1)}>+</button>
+              </span>
+            </div>
+          ))}
+          <p className="hint" style={{ margin: 0 }}>
+            Un emplacement par point d'Anneau, plus des emplacements libres égaux à l'Anneau de Vide. « Nouvelle journée » les recharge.
+          </p>
+        </div>
+      )}
+    </>
   );
 }
 

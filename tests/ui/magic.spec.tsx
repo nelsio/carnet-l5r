@@ -36,7 +36,7 @@ describe("Situation « Magie » (F.5)", () => {
     await renderApp(kuni());
     toMagic();
     expect(situations().getAllByRole("button").map((b) => b.textContent)).toEqual(["Enquête", "Cour", "Déplacement", "Combat", "Magie"]);
-    expect(screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent)).toEqual(["Tous", "Air", "Terre", "Feu"]);
+    expect(screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent)).toEqual(["Tous", "Air", "Terre", "Feu", "Interruption"]);
     expect(card("Lancer · Frappe de jade")).toHaveTextContent("5g3");
     expect(card("Lancer · Frappe de jade")).toHaveTextContent("ND 10 · 1 action complexe · Jade · mémorisé");
     expect(screen.getByTestId("blocked-spell-air-1")).toHaveTextContent("2g2");
