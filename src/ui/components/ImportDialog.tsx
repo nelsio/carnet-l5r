@@ -8,7 +8,7 @@ import { useStore, type PendingImport } from "../store";
 type Destination = "new" | "readonly" | "merge";
 
 const LIST_LABELS: Record<string, string> = {
-  skills: "Compétence", weapons: "Arme", techniques: "Technique", maneuvers: "Manœuvre",
+  skills: "Compétence", weapons: "Arme", techniques: "Technique", maneuvers: "Manœuvre", spells: "Sort",
 };
 
 /** Valeur lisible dans l'aperçu. */

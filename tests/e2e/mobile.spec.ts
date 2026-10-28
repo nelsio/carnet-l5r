@@ -499,3 +499,30 @@ test.describe("M18 et M16 à 360 px de large", () => {
     await noHorizontalScroll(page, "bloc Armure");
   });
 });
+
+test.describe("M19 (E36, v2.9.0) à 360 px de large", () => {
+  test.use({ viewport: { width: 360, height: 740 } });
+
+  test("Rouleaux & invocations en édition : sorts universels et un sort complet, aucun débordement", async ({ page }) => {
+    await page.getByRole("button", { name: "Edit : Identité & réputation" }).click();
+    await page.getByRole("textbox", { name: "École (nom affiché)" }).fill("École de shugenja Kuni");
+    await page.getByRole("button", { name: "Terminer : Identité & réputation" }).click();
+    await page.getByRole("button", { name: "Edit : Rouleaux & invocations" }).click();
+    await page.getByRole("button", { name: "Ajouter les sorts universels" }).click();
+    await page.getByRole("button", { name: "+ Sort" }).click();
+    const card = page.getByRole("group", { name: "Sort : ce sort" });
+    await card.getByRole("textbox", { name: "Nom" }).fill("Frappe de jade");
+    const jade = page.getByRole("group", { name: "Sort : Frappe de jade" });
+    await jade.getByRole("button", { name: "Jade", exact: true }).click();
+    await jade.getByRole("textbox", { name: "Portée" }).fill("100 pieds");
+    await noHorizontalScroll(page, "Rouleaux & invocations en édition");
+    const vw = page.viewportSize()!.width;
+    for (const el of [jade, jade.getByRole("button", { name: "Protection" }), jade.getByRole("textbox", { name: /Autres mots-clés/ })]) {
+      const box = (await el.boundingBox())!;
+      expect(box.x + box.width).toBeLessThanOrEqual(vw + 0.5);
+    }
+    await page.getByRole("button", { name: "Terminer : Rouleaux & invocations" }).click();
+    await expect(page.getByTestId("block-magic").locator(".spell")).toHaveCount(4);
+    await noHorizontalScroll(page, "Rouleaux & invocations en lecture");
+  });
+});

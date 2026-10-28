@@ -563,7 +563,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
    - **v2.1.1** (patch) : carte « Nouveau round » entre l'Initiative et la Posture, avec une description de deux lignes au plus sur mobile (§6.2, M12) ; test du fichier lié rendu robuste (lecture du fichier avant sa première écriture).
    - **v2.1.2** (patch) : Statistiques devient une vue à part (en-tête sur bureau, barre du bas sur mobile) ; les 4 onglets de situation tiennent sur une ligne à 360 px (§7, M13).
 12. **v2.2 à v2.8 — règles du livre, combat complet, ergonomie** : annexe E (validée le 24/10/2026). Sept versions : correctifs de règles et retouches d'interface (v2.2.0, **livrée**, tag `v2.2.0`, écarts en E.12), combat complet (v2.3.0, **livrée**, tag `v2.3.0`, écarts en E.13), maîtrises et armures (v2.4.0, **livrée**, tag `v2.4.0`, écarts en E.14), récupération (v2.5.0, **livrée**, tag `v2.5.0`, écarts en E.15), vocabulaire français (v2.6.0, **livrée**, tag `v2.6.0`, écarts en E.16), bataille de masse (v2.7.0, **livrée**, tag `v2.7.0`, écarts en E.17), bloc Armure et retouches d'interface (v2.8.0, **livrée**, E.18 et E.19, écarts en E.20) → cas L1 à L28, E24 à E34, M16 à M18.
-13. **v2.9 à v2.12 — shugenja et Magie** : annexe F (validée le 28/10/2026). Quatre versions : Rouleaux & invocations (v2.9.0), écoles de shugenja (v2.10.0), situation Magie et lanceur de sort (v2.11.0), emplacements et combat (v2.12.0) → cas G1 à G17, E36.
+13. **v2.9 à v2.12 — shugenja et Magie** : annexe F (validée le 28/10/2026). Quatre versions : Rouleaux & invocations (v2.9.0, **livrée**, écarts en F.8), écoles de shugenja (v2.10.0), situation Magie et lanceur de sort (v2.11.0), emplacements et combat (v2.12.0) → cas G1 à G17, E36.
 14. **À définir** : kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts (fichier personnel importable, pas dans le dépôt), compteurs « N fois par séance » (D-g).
 
 ---
@@ -1368,5 +1368,13 @@ Personnage : `reference/perso-test-shugenja.json` (Kuni rang 1, Terre 3, Air 2, 
 |---|---|---|
 | P20 | Noms français : sorts universels, mots-clés, compétence Spellcraft | Sentir, Communier, Invoquer ; Bataille, Artisanat, Défense, Divination, Illusion, Jade, Tonnerre, Voyage, Protection ; « Sortilèges » (alias Spellcraft) |
 | P21 | Rang d'école d'un shugenja avec plusieurs écoles | Rang d'école saisi, sinon Rang d'Insight |
+
+### F.8 Écarts de mise en œuvre (v2.9.0)
+- **Format** : `SpellSchema` dans `src/core/schema.ts`, maîtrise de **1 à 6** comme en F.3 (le prototype acceptait jusqu'à 10) ; VD vide acceptée (champ effacé = absent). `affinity` et `spellSlotsUsed` arrivent avec leurs versions (v2.10.0, v2.12.0) : d'ici là, une fiche qui les porte (dont `perso-test-shugenja.json`) se lit, ils sont ignorés.
+- **Moteur** : `src/core/spells.ts` : `spellTn`, `sortSpells` (universels, puis Air, Terre, Feu, Eau, Vide ; maîtrise ; nom), `spellRaises`, `createSpell`, `isShugenja`. Constantes dans `src/rules/l5r4e.ts` : `ELEMENT_LABELS`, `SPELL_KEYWORDS`, `UNIVERSAL_SPELLS`, `SPELL_TN`.
+- **Shugenja** : sans catalogue d'écoles de shugenja (v2.10.0), la section s'affiche aussi quand « École (nom affiché) » contient « shugenja » (sans accent ni casse) ; elle reste ouverte tant qu'on l'édite, même vidée. Le rappel des sorts de départ de l'école attend aussi la v2.10.0.
+- **Lecture** : les augmentations tiennent sur une ligne, séparées par « · » (comme le prototype) ; une ligne Portée · Zone · Durée seulement si l'un des trois est saisi.
+- **Import** : l'aperçu de fusion nomme un sort ajouté « Sort ».
+- **Tests** : `tests/core.spells.spec.ts` (format, G15, ND, tri, augmentations, shugenja) ; `tests/ui/spells.spec.tsx` (lecture, apparition, édition complète, suppression) ; Playwright M19 (`tests/e2e/mobile.spec.ts`, partie « Rouleaux & invocations en édition » de E36 à 360 px).
 
 **Prototype** : `reference/prototype.html` = v2.8.0 en ligne + annexe F complète (les quatre versions), construit depuis une branche locale non poussée ; fiche de test `reference/perso-test-shugenja.json` (sorts de test : valeurs non vérifiées sur le livre, à ne pas reprendre comme catalogue).

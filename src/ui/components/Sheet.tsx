@@ -1,11 +1,11 @@
 import { useState, type ReactNode } from "react";
 import {
-  activeEffects, armorSheet, attackTrait, catalogGap, catalogWeapon, dailyHealing, reminderText, computePool, defaultModifiers, isRanged, parseDR, parseWeaponKeywords, rings, ROLL_TRAITS, schoolOf,
-  findSchool, schoolRankOf, schoolsByClan, suggestSchool, techniqueCategories, vocabularyChanges, weaponKeywords,
+  activeEffects, armorSheet, attackTrait, catalogGap, catalogWeapon, createSpell, dailyHealing, isShugenja, reminderText, computePool, defaultModifiers, isRanged, parseDR, parseWeaponKeywords, rings, ROLL_TRAITS, schoolOf,
+  findSchool, schoolRankOf, schoolsByClan, sortSpells, SPELL_ELEMENTS, spellRaises, spellTn, suggestSchool, techniqueCategories, vocabularyChanges, weaponKeywords,
   type ArmorPart, type Character, type PoolAction, type RollTrait, type TraitKey, type VocabularyChange,
 } from "@carnet/core";
 import { WEAPON_KEYWORD_LABELS } from "../../rules/ecoles";
-import { RINGS, TRAIT_LABELS, type RingKey } from "../../rules/l5r4e";
+import { ELEMENT_LABELS, RINGS, SPELL_KEYWORDS, TRAIT_LABELS, UNIVERSAL_SPELLS, type RingKey } from "../../rules/l5r4e";
 import { decimal } from "../format";
 import { poolLabel } from "../rolls";
 import { useCharacter, useStore, type BlockId, type ListKey } from "../store";
@@ -33,6 +33,7 @@ const pool = (c: Character, trait: RollTrait, skill: string) => poolLabel(poolOf
 
 export function Sheet() {
   const { state, library } = useStore();
+  const c = useCharacter();
   const readonly = state.mode === "readonly";
   return (
     <div className="grid">
@@ -54,6 +55,9 @@ export function Sheet() {
           <Block id="weapons" title="Armes"><Weapons /></Block>
           <Block id="armor" title="Armure"><Armor /></Block>
           <Block id="techniques" title="Techniques d'école"><Techniques /></Block>
+          {(isShugenja(c) || state.ui.editing.has("magic")) && (
+            <Block id="magic" title={<>Rouleaux &amp; invocations</>} label="Rouleaux & invocations"><Spells /></Block>
+          )}
           <Block id="modifiers" title="Bonus de jet"><Modifiers /></Block>
         </div>
       </div>
@@ -491,6 +495,110 @@ function SchoolTechniques() {
             {valued.filter((e) => e.rank === r.rank).map((e) => (
               <div key={e.key} className="hint" style={{ color: "var(--gold)" }}>→ {reminderText(e, c)}</div>
             ))}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+const isListedKeyword = (k: string) => (SPELL_KEYWORDS as readonly string[]).includes(k);
+
+/** Section « Rouleaux & invocations » (annexe F.5) : sorts en champs libres, recopiés par le joueur. */
+function Spells() {
+  const { c, edit, set, dispatch } = useSheet("magic");
+  const spells = c.spells ?? [];
+  if (edit) {
+    const missing = UNIVERSAL_SPELLS.filter((n) => !spells.some((s) => s.name === n));
+    return (
+      <>
+        {spells.map((s, i) => {
+          const label = s.name || "ce sort";
+          return (
+            <div key={s.id} className="spelledit" role="group" aria-label={`Sort : ${label}`}>
+              <div className="form-grid">
+                <Field label="Nom"><input className="in" type="text" value={s.name} maxLength={120} onChange={(e) => set(["spells", i, "name"], e.target.value)} /></Field>
+                <Field label="Élément">
+                  <select className="in" value={s.element} onChange={(e) => set(["spells", i, "element"], e.target.value)}>
+                    {(["all", ...SPELL_ELEMENTS.filter((x) => x !== "all")] as const).map((x) => <option key={x} value={x}>{ELEMENT_LABELS[x]}</option>)}
+                  </select>
+                </Field>
+                <Field label="Maîtrise"><NumberField min={1} max={6} value={s.mastery} onChange={(n) => set(["spells", i, "mastery"], n)} /></Field>
+                <Field label="VD (dégâts)">
+                  <input className="in mono" type="text" placeholder="—" value={s.damage ?? ""} maxLength={10} onChange={(e) => set(["spells", i, "damage"], e.target.value || undefined)} />
+                </Field>
+                <Field label="Portée"><input className="in" type="text" placeholder="Personnel, contact, 30 pieds…" value={s.range} maxLength={80} onChange={(e) => set(["spells", i, "range"], e.target.value)} /></Field>
+                <Field label="Zone d'effet"><input className="in" type="text" placeholder="Une cible, rayon de 10 pieds…" value={s.area} maxLength={120} onChange={(e) => set(["spells", i, "area"], e.target.value)} /></Field>
+                <Field label="Durée"><input className="in" type="text" placeholder="Instantanée, 5 rounds…" value={s.duration} maxLength={80} onChange={(e) => set(["spells", i, "duration"], e.target.value)} /></Field>
+              </div>
+              <div className="kwpick" role="group" aria-label={`Mots-clés de ${label}`}>
+                <span className="label">Mots-clés</span>
+                {SPELL_KEYWORDS.map((k) => {
+                  const on = s.keywords.includes(k);
+                  return (
+                    <button
+                      key={k} type="button" aria-pressed={on}
+                      onClick={() => set(["spells", i, "keywords"], on ? s.keywords.filter((x) => x !== k) : [...s.keywords, k])}
+                    >{k}</button>
+                  );
+                })}
+                <ListField
+                  aria-label={`Autres mots-clés de ${label}`} placeholder="autres, séparés par des virgules" style={{ maxWidth: 220 }}
+                  value={s.keywords.filter((k) => !isListedKeyword(k))}
+                  onChange={(v) => set(["spells", i, "keywords"], [...s.keywords.filter(isListedKeyword), ...v])}
+                />
+              </div>
+              <div className="form-grid wide">
+                <Field label="Augmentations (une par ligne)">
+                  <textarea className="in" placeholder={"Portée (+10 pieds)\nDurée (+1 round)"} value={s.raises} onChange={(e) => set(["spells", i, "raises"], e.target.value)} />
+                </Field>
+                <Field label="Effet (résumé)"><textarea className="in" value={s.effect} onChange={(e) => set(["spells", i, "effect"], e.target.value)} /></Field>
+              </div>
+              <div className="spellfoot">
+                <label className="chk">
+                  <input type="checkbox" checked={s.memorized} onChange={(e) => set(["spells", i, "memorized"], e.target.checked)} />
+                  {" "}Mémorisé <span className="muted">· {s.mastery} XP</span>
+                </label>
+                <RemoveButton list="spells" index={i} name={s.name} />
+              </div>
+            </div>
+          );
+        })}
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <AddButton list="spells" label="+ Sort" item={() => createSpell()} />
+          {missing.length > 0 && (
+            <button
+              type="button" className="btn sm"
+              onClick={() => missing.forEach((n) => dispatch({ type: "add", list: "spells", item: createSpell(n, "all") }))}
+            >Ajouter les sorts universels</button>
+          )}
+        </div>
+      </>
+    );
+  }
+  if (!spells.length) return <p className="muted">Aucun sort noté. Appuie sur « Edit » pour noter tes rouleaux et invocations.</p>;
+  return (
+    <div className="spells">
+      {sortSpells(spells).map((s) => {
+        const raises = spellRaises(s);
+        const line = [s.range && `Portée ${s.range}`, s.area && `Zone ${s.area}`, s.duration && `Durée ${s.duration}`].filter(Boolean).join(" · ");
+        return (
+          <div key={s.id} className={`spell el-${s.element}`} data-testid={`spell-${s.id}`}>
+            <div className="sp1">
+              <b>{s.name}</b>
+              <span className="tag el">{ELEMENT_LABELS[s.element]}</span>
+              <span className="mono muted">Maîtrise {s.mastery} · ND {spellTn(s.mastery)}</span>
+              <span className={`tag${s.memorized ? " memo" : ""}`}>{s.memorized ? "mémorisé" : "parchemin"}</span>
+            </div>
+            {line && <div className="sp2 muted">{line}</div>}
+            {(s.keywords.length > 0 || s.damage) && (
+              <div className="sp3">
+                {s.keywords.map((k) => <span key={k} className="tag">{k}</span>)}
+                {s.damage && <span className="tag">VD {s.damage}</span>}
+              </div>
+            )}
+            {raises.length > 0 && <div className="sp4"><span className="label">Augm.</span> {raises.join(" · ")}</div>}
+            {s.effect && <div className="prose sp5">{s.effect}</div>}
           </div>
         );
       })}
