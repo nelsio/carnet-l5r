@@ -270,6 +270,9 @@ div.man button{border:0;background:var(--surface);width:24px;height:24px;border-
   /* Situations : les 4 onglets se partagent la largeur, sans défilement (360 px compris) */
   .sit{flex-wrap:nowrap;gap:4px}
   .sit button{flex:1 1 auto;min-width:0;min-height:40px;padding:8px 6px;font-size:14px}
+  /* Cinq onglets (Magie, annexe F.5) : marge de rendu à 360 px */
+  .sit.many{gap:3px}
+  .sit.many button{padding:8px 2px;font-size:13px}
   .act{padding:12px}
   .stance{grid-template-columns:repeat(2,minmax(0,1fr))}
   .stance button{padding:10px}

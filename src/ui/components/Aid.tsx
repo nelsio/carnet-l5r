@@ -37,9 +37,11 @@ export function Aid() {
     };
   }, [ui.sheetOpen, dispatch]);
 
+  const tabs = aidSituations(isShugenja(c));
   const situations = (
-    <div className="sit" role="group" aria-label="Situation">
-      {aidSituations(isShugenja(c)).map((s) => (
+    // Cinq onglets (Magie) : plus serrés sur mobile, pour tenir sur une ligne à 360 px.
+    <div className={`sit${tabs.length > 4 ? " many" : ""}`} role="group" aria-label="Situation">
+      {tabs.map((s) => (
         <button key={s.id} type="button" aria-pressed={ui.situation === s.id} onClick={() => dispatch({ type: "situation", situation: s.id })}>{s.label}</button>
       ))}
     </div>
