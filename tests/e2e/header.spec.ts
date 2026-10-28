@@ -55,7 +55,7 @@ async function create(page: Page, width: number, theme?: "dark") {
 const sealSize = (page: Page) => page.getByRole("button", { name: SEAL }).evaluate((b) => (b as HTMLElement).offsetWidth);
 
 for (const theme of [undefined, "dark"] as const) {
-  test(`H1 : sceau de 64 px vermillon fixe à gauche du nom, surtitre, pas de bouton Bibliothèque (${theme ?? "clair"})`, async ({ page }) => {
+  test(`H1 : sceau de 64 px vermillon fixe à gauche du nom, surtitre, bouton Bibliothèque gardé (${theme ?? "clair"})`, async ({ page }) => {
     await create(page, 1200, theme);
     await page.getByRole("combobox", { name: "Clan" }).fill("Crabe");
     expect(await sealSize(page)).toBe(64);
@@ -63,7 +63,7 @@ for (const theme of [undefined, "dark"] as const) {
     const name = (await page.getByRole("heading", { level: 1 }).boundingBox())!;
     expect(seal.x + seal.width).toBeLessThan(name.x);
     await expect(page.locator("header.top .eyebrow")).toHaveText(/Carnet de Rokugan\s*Clan du Crabe/);
-    await expect(page.getByRole("button", { name: "Bibliothèque", exact: true })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Bibliothèque", exact: true })).toBeVisible();
     // Couleur de l'outil, pas celle du clan (G.3) ; teinte du thème.
     await expect(page.getByRole("button", { name: SEAL })).toHaveCSS("background-color", theme ? "rgb(181, 64, 47)" : "rgb(168, 56, 42)");
   });

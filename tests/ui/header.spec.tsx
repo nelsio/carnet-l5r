@@ -20,20 +20,20 @@ async function renderApp(character: Character | null = base(), mode: "edit" | "r
 const header = () => document.querySelector("header.top")!;
 
 describe("Sceau et surtitre (G.3)", () => {
-  it("H1 : fiche ouverte : sceau 帳 cliquable, surtitre « Carnet de Rokugan | Clan », plus de bouton Bibliothèque", async () => {
+  it("H1 : fiche ouverte : sceau 帳 cliquable, surtitre « Carnet de Rokugan | Clan », bouton Bibliothèque gardé", async () => {
     await renderApp();
     const seal = screen.getByRole("button", { name: SEAL });
     expect(seal).toHaveTextContent("帳");
     expect(seal).toHaveAttribute("title", "Carnet de Rokugan — Bibliothèque");
     expect(header().querySelector(".eyebrow")).toHaveTextContent(/^Carnet de RokuganClan de la Grue$/);
     expect(header().querySelector(".eyebrow .sep")).toHaveAttribute("aria-hidden", "true");
-    expect(screen.queryByRole("button", { name: "Bibliothèque" })).toBeNull();
-    expect(header().querySelectorAll(".theme-btn")).toHaveLength(2);
+    expect(screen.getByRole("button", { name: "Bibliothèque" })).toHaveClass("theme-btn");
+    expect(header().querySelectorAll(".theme-btn")).toHaveLength(3);
   });
 
-  it("H2 : le sceau ouvre la Bibliothèque", async () => {
+  it.each([SEAL, "Bibliothèque"])("H2 : « %s » ouvre la Bibliothèque", async (name) => {
     await renderApp();
-    fireEvent.click(screen.getByRole("button", { name: SEAL }));
+    fireEvent.click(screen.getByRole("button", { name }));
     expect(await screen.findByRole("heading", { name: "Bibliothèque" })).toBeInTheDocument();
   });
 

@@ -38,7 +38,7 @@ Les fiches enregistrées hors ligne restent **propres à ce fichier, sur cet app
 
 ## 3. Créer et remplir ta fiche
 
-- **Bibliothèque** → **Créer mon personnage** (ou **Nouvelle fiche**). La Bibliothèque liste toutes tes fiches ; on y revient par le **sceau 帳** rouge, à gauche du nom dans l'en-tête (v2.13). L'onglet du navigateur affiche le nom du personnage ouvert.
+- **Bibliothèque** → **Créer mon personnage** (ou **Nouvelle fiche**). La Bibliothèque liste toutes tes fiches ; on y revient par le bouton **Bibliothèque** de l'en-tête, ou par le **sceau 帳** rouge à gauche du nom. L'onglet du navigateur affiche le nom du personnage ouvert.
 - Chaque bloc de la fiche a son bouton **Edit** : il passe ce bloc en saisie, **Terminer** le repasse en lecture. Plusieurs blocs peuvent être ouverts ensemble. Les réserves (`5g3`, `6g2`…) se recalculent à chaque changement.
 - Une arme du livre saisie avec d'autres valeurs (VD, mots-clés) est signalée : **Mettre à jour** reprend celles du livre.
 - La **barre d'état**, en haut, reste visible partout :
