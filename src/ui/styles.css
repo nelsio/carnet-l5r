@@ -487,3 +487,10 @@ header.top + main{margin-top:18px}
 .kwpick button[aria-pressed=true]{border-color:var(--gold);background:var(--gold-soft)}
 .spellfoot{display:flex;justify-content:space-between;align-items:center}
 .affin{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:-2px 0 8px}
+/* ---------- v2.11.0 : lanceur de sort (annexe F.5) ---------- */
+.spellbox{display:grid;gap:8px;margin-bottom:12px;padding:10px;border-radius:8px;background:var(--bg);border-left:3px solid var(--gold)}
+.castrow{display:flex;flex-wrap:wrap;align-items:flex-end;gap:8px 16px}
+.castrow .field{max-width:220px}
+.spellraises{font-size:13.5px}
+.spellraises ul{margin:4px 0 0;padding-left:18px}
+.spelleffect{font-size:13.5px}

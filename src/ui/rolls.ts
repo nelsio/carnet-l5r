@@ -1,9 +1,9 @@
 /** Passerelle entre les actions de l'aide de jeu et le moteur de règles. */
 import {
-  applicableModifiers, armorModifierBonus, armorTN, assessmentTN, computePool, DEFAULT_MANEUVERS, findSkill, ignoresWoundPenalty,
+  applicableModifiers, armorModifierBonus, armorTN, assessmentTN, computePool, createSpell, DEFAULT_MANEUVERS, findSkill, ignoresWoundPenalty,
   maneuverFreeRaises, maneuverRaises, modifiersOf, modifierTN, schoolContext, targetNumber, targetTnModifier, woundState,
   type ActionDef, type ActiveEffect, type Character, type Maneuver, type Modifier, type Pool, type PoolAction, type SchoolContext,
-  rollStance, type CombatSub, type Situation, type Stance,
+  rollStance, type CombatSub, type Situation, type SpellRing, type Stance,
 } from "@carnet/core";
 import { CALLED_ZONES, KNOCKDOWN_QUADRUPED_COST, shownWoundMultiplier, TN_PER_RAISE, type CalledZone } from "../rules/l5r4e";
 
@@ -40,14 +40,30 @@ export interface RollOptions {
   freeToTn: boolean;
   /** Total adverse d'un jet en opposition, s'il est saisi (F7). */
   opponentTotal: number | null;
+  /** Sort : augmentations annoncées pour réduire le temps d'incantation (annexe F.2). */
+  castRaises: number;
+  /** Sort universel : élément choisi (null : celui à la plus grosse réserve). */
+  spellElement: SpellRing | null;
+  /** Agasha : autre Anneau pour 1 point de Vide (null : aucun). */
+  spellRing: SpellRing | null;
+  /** Cases de l'école cochées pour ce sort. */
+  spellOptions: Readonly<Record<string, boolean>>;
 }
+
+/** Options du lanceur qui décrivent le sort lancé. */
+export type SpellRollOptions = Pick<RollOptions, "spellElement" | "spellRing" | "spellOptions">;
+
+const SPELL_RESET = { castRaises: 0, spellElement: null, spellRing: null, spellOptions: {} } as const;
 
 export const DEFAULT_ROLL_OPTIONS: RollOptions = {
   tn: 15, targetTN: 20, opponentRank: 2, raises: 0, free: 0, extraRolled: 0, flat: 0,
   voidPoint: false, voidSkill: false, voidSpend: false, emphasis: false, emphasisName: "",
   calledZone: "limb", quadruped: false, disarm: false,
-  centerBonus: false, meleeTarget: false, freeToTn: false, opponentTotal: null,
+  centerBonus: false, meleeTarget: false, freeToTn: false, opponentTotal: null, ...SPELL_RESET,
 };
+
+/** Options d'un sort remises à zéro à chaque nouvelle action. */
+export const SPELL_ROLL_RESET: Pick<RollOptions, "castRaises" | keyof SpellRollOptions> = SPELL_RESET;
 
 /** Coût des manœuvres selon la variante choisie : zone du Coup ciblé, quadrupède renversé. */
 export function maneuverCosts(opts: Pick<RollOptions, "calledZone" | "quadruped">): Record<string, number> {
@@ -71,8 +87,18 @@ export interface SchoolInputs {
 /** Une action donne-t-elle lieu à un jet ? */
 export const isRollable = (a: ActionDef) => a.kind !== "info" && a.kind !== "move";
 
-export function toPoolAction(a: ActionDef): PoolAction {
+export function toPoolAction(a: ActionDef, spell: Partial<SpellRollOptions> = {}): PoolAction {
+  const options = Object.entries(spell.spellOptions ?? {}).filter(([, on]) => on).map(([id]) => id);
   switch (a.kind) {
+    case "spell":
+      return {
+        kind: "spell", spell: a.spell ?? createSpell(a.label),
+        ...(spell.spellElement ? { element: spell.spellElement } : {}),
+        ...(spell.spellRing ? { ring: spell.spellRing } : {}),
+        options,
+      };
+    case "spellDamage":
+      return { kind: "spellDamage", spell: a.spell ?? createSpell(a.label), options };
     case "damage":
       return { kind: "damage", weapon: a.weapon ?? { name: a.label, skill: "", dr: a.dr ?? "0g0" }, unarmed: a.unarmed };
     case "initiative":
@@ -147,12 +173,13 @@ export function poolFor(
   c: Character,
   a: ActionDef,
   opts: Pick<RollOptions, "extraRolled" | "voidPoint" | "voidSkill">
-    & { voidSpend?: boolean; emphasisName?: string; disarm?: boolean; centerBonus?: boolean; meleeTarget?: boolean },
+    & { voidSpend?: boolean; emphasisName?: string; disarm?: boolean; centerBonus?: boolean; meleeTarget?: boolean }
+    & Partial<SpellRollOptions>,
   stance: Stance,
   modifiers: readonly Modifier[] = activeModifiers(c, a, {}, stance),
   school: SchoolInputs = {},
 ): Pool {
-  return computePool(c, toPoolAction(a), {
+  return computePool(c, toPoolAction(a, opts), {
     stance,
     extraRolled: opts.extraRolled,
     voidPoint: opts.voidPoint,
@@ -183,7 +210,8 @@ export function baseTN(a: ActionDef, opts: RollOptions): number | null | "oppose
     case "opposed": return "opposed";
     case "target": return opts.targetTN;
     case "assessment": return assessmentTN(opts.opponentRank);
-    default: return opts.tn;
+    // ND d'un sort : fixé par sa maîtrise (F.2).
+    default: return a.kind === "spell" ? a.tn : opts.tn;
   }
 }
 
@@ -192,6 +220,7 @@ export function calledRaises(
   c: Character, a: ActionDef, opts: RollOptions, selection: Readonly<Record<string, number>>,
   effects: readonly ActiveEffect[] = [], selected?: ReadonlySet<string>,
 ): number {
+  if (a.kind === "spell") return opts.raises + opts.castRaises;
   if (!a.attack) return opts.raises;
   return opts.raises + maneuverRaises(selection, effectiveManeuvers(c), {
     character: c, free: maneuverFreeRaises(effects, selected), costs: maneuverCosts(opts),

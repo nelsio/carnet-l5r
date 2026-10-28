@@ -278,6 +278,7 @@ export function onMatches(on: readonly On[] | undefined, a: PoolAction, c?: Char
       case "social": return a.kind === "skill" && !a.attack && isSocialSkill(a.skill);
       case "lore": return a.kind === "skill" && isLoreSkill(a.skill);
       case "school": return a.kind === "skill" && !!c && isSchoolSkill(c, a.skill);
+      case "spell": return a.kind === "spell";
       default: return a.kind === "skill" && skillIs(a.skill, o.slice(6));
     }
   });

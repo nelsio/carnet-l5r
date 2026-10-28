@@ -62,6 +62,7 @@ L'onglet **Aide de jeu** (dans la barre du bas sur mobile) propose les jets de c
 | **Cour** | Jets sociaux : Courtisan, Étiquette, Sincérité, Intimidation, Tentation, Comédie, Commerce, et une action **« Se produire »** par compétence `Représentation : …`. |
 | **Déplacement** | Distances en combat (pieds et mètres), Athlétisme, Équitation, Discrétion, Chasse, marche forcée. |
 | **Combat** | **Escarmouche**, **Duel iaijutsu** et **Bataille**. |
+| **Magie** | Shugenja seulement (v2.11) : une carte **Lancer** par sort de ton Rouleaux & invocations, groupées par élément, avec la réserve `(Anneau + rang d'école ±1) g Anneau`, le ND (`5 + 5 × maîtrise`) et le temps d'incantation ; **Dégâts** du sort s'il a une VD (sans la Force ni point de Vide). Un sort que ton rang ne permet pas (maîtrise trop haute, élément de déficience au rang 1) est grisé avec sa raison, et **Lancer quand même** reste possible. |
 
 En **Escarmouche**, de haut en bas :
 
@@ -99,11 +100,14 @@ Par défaut, l'outil **ne lance pas les dés**. Pour lancer dans l'outil, appuie
 
 > Avec le lanceur de dés affiché, une attaque réussie avec **Augmentation des dégâts** pré-remplit les dés en plus sur le jet de dégâts.
 
+Pour un **sort**, le lanceur montre l'origine de la réserve (« Terre 3 + rang 1 + affinité 1 »), le ND fixé par la maîtrise et, sous les augmentations : l'élément à choisir pour un **sort universel**, les **cases de ton école** (cible non humaine, il fait jour…), ses **augmentations gratuites** appliquées d'office (mot-clé Jade, élément d'affinité d'Isawa), le champ **Augm. pour le temps d'incantation** (« Temps d'incantation : 1 action complexe »), les augmentations du sort, et les rappels (parchemin si le sort n'est pas mémorisé, jet de Volonté si tu es interrompu, effet). L'école **Agasha** peut lancer avec un autre Anneau : le point de Vide est dépensé au lancer. La maîtrise **Sortilèges 5** ajoute `+1g0` aux jets de sort.
+
 ## 6. Statistiques
 
 La page **Statistiques**, à côté de **Fiche** et **Aide de jeu** (dans la barre du bas sur mobile), donne pour **tous tes jets** la réserve, le minimum, la moyenne, le maximum et la **chance de réussite** contre un ND de `10` à `40`.
 
 - Trois cases : **Avec un point de Vide (+1g1)**, **Spécialisations appliquées**, **Pénalité de blessure actuelle**.
+- Un shugenja y trouve aussi une ligne par sort (`Sort · Frappe de jade (Terre)`), et ses dégâts.
 - Chaque augmentation ajoute `+5` au ND : décale-toi d'une colonne vers la droite.
 
 ## 7. Techniques d'école

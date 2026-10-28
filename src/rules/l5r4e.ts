@@ -3,7 +3,7 @@
  * Corriger une règle = modifier une donnée ici, pas le moteur.
  * Points à vérifier dans le livre : voir HANDOFF §12 (P2, P5).
  */
-import type { Maneuver, RollTrait, SpellElement, TraitKey } from "../core/schema";
+import type { Maneuver, RollTrait, Spell, SpellElement, TraitKey } from "../core/schema";
 import type { WeaponLike } from "../core/engine";
 import battleTable from "./table-bataille.json";
 
@@ -284,10 +284,10 @@ export const CLAN_ALIASES: Readonly<Record<string, string>> = {
 
 /* ---------- Catalogue d'actions ---------- */
 
-export type Situation = "investigation" | "court" | "movement" | "combat";
+export type Situation = "investigation" | "court" | "movement" | "combat" | "magic";
 export type CombatSub = "skirmish" | "duel" | "battle";
 export type ActionTN = number | "target" | "opposed" | "assessment" | null;
-export type ActionKind = "skill" | "trait" | "damage" | "initiative" | "move" | "info";
+export type ActionKind = "skill" | "trait" | "damage" | "initiative" | "move" | "info" | "spell" | "spellDamage";
 
 /** Forme d'une action de l'aide de jeu (HANDOFF §4.7). */
 export interface ActionDef {
@@ -309,6 +309,8 @@ export interface ActionDef {
   dr?: string;
   /** Arme utilisée, pour les attaques et dégâts générés depuis la fiche. */
   weapon?: WeaponLike;
+  /** Sort du Rouleaux & invocations, pour les actions `spell` et `spellDamage` (annexe F.5). */
+  spell?: Spell;
   /** Groupe de la situation, titré dans la liste d'actions (« Repos »). */
   group?: string;
   description: string;
@@ -319,6 +321,8 @@ export const SITUATIONS: readonly { id: Situation; label: string }[] = [
   { id: "court", label: "Cour" },
   { id: "movement", label: "Déplacement" },
   { id: "combat", label: "Combat" },
+  /** Shugenja seulement (annexe F.5). */
+  { id: "magic", label: "Magie" },
 ];
 
 export const COMBAT_SUBS: readonly { id: CombatSub; label: string }[] = [
@@ -377,6 +381,7 @@ export const SKILL_ALIASES: readonly (readonly string[])[] = [
   ["Discrétion", "Furtivité", "Stealth"],
   ["Représentation : Conte", "Représentation : Conteur", "Perform: Storytelling"],
   ["Représentation : Art oratoire", "Représentation : Éloquence", "Perform: Oratory"],
+  ["Sortilèges", "Spellcraft"],
 ];
 
 /**
@@ -505,3 +510,9 @@ export const UNIVERSAL_SPELLS = ["Sentir", "Communier", "Invoquer"] as const;
 
 /** ND d'un sort : 5 + 5 × maîtrise (p. 165). */
 export const SPELL_TN = { base: 5, perMastery: 5 } as const;
+
+/** Temps d'incantation : une action complexe par niveau de maîtrise, une de moins par augmentation, au moins 1 (p. 165). */
+export const SPELL_CAST_TIME_MIN = 1;
+
+/** Interruption pendant l'incantation : Volonté, ND 10, ou 5 + dégâts subis (p. 166). */
+export const SPELL_CONCENTRATION = { tn: 10, base: 5 } as const;
