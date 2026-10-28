@@ -39,12 +39,15 @@ describe("Rouleaux & invocations (F.5)", () => {
     expect(within(screen.getByTestId("spell-sentir")).getByText("Tous")).toBeInTheDocument();
   });
 
-  it("absente pour un bushi ; présente, vide, si l'école affichée est de shugenja", async () => {
+  it("absente pour un bushi ; présente, vide, avec une école de shugenja, et ses sorts de départ", async () => {
     await renderApp(structuredClone(kakita) as Character);
     expect(screen.queryByTestId("block-magic")).toBeNull();
     click("Edit : Identité & réputation");
     fireEvent.change(screen.getByRole("textbox", { name: "École (nom affiché)" }), { target: { value: "École de shugenja Isawa" } });
+    expect(screen.queryByTestId("block-magic")).toBeNull();
+    fireEvent.change(screen.getByRole("combobox", { name: "Techniques d'école" }), { target: { value: "kuni-shugenja" } });
     expect(magic().getByText(/Aucun sort noté/)).toBeInTheDocument();
+    expect(magic().getByTestId("starting-spells")).toHaveTextContent("Sorts de départ de l'école : universels, 3 Terre, 2 Feu, 1 Eau.");
   });
 
   it("édition : sorts universels en un clic, « + Sort », mots-clés à cocher et libres, mémorisé ; enregistré", async () => {
@@ -79,8 +82,37 @@ describe("Rouleaux & invocations (F.5)", () => {
     expect(magic().getByText("Feu sacré")).toBeInTheDocument();
   });
 
+  it("v2.10.0 : Techniques d'école d'un Kuni : « Affinité Terre · Déficience Air », page, rangs 2 à 5 grisés", async () => {
+    await renderApp(shugenja());
+    const block = within(screen.getByTestId("school-techniques"));
+    expect(block.getByText("École de shugenja Kuni")).toBeInTheDocument();
+    expect(block.getByTestId("affinity")).toHaveTextContent("Affinité Terre");
+    expect(block.getByTestId("affinity")).toHaveTextContent("Déficience Air");
+    expect(block.getByTestId("affinity")).toHaveTextContent("p. 109");
+    expect(block.getByTestId("school-rank-1")).not.toHaveClass("locked");
+    expect(block.getByTestId("school-rank-2")).toHaveClass("locked");
+    expect(block.getByTestId("school-rank-5")).toHaveTextContent("Rang 5 : nouveaux sorts.");
+  });
+
+  it("v2.10.0 : Isawa : liste « Affinité (shugenja) » dans Identité, Vide choisi ; absente pour un Kuni", async () => {
+    const storage = await renderApp(shugenja());
+    click("Edit : Identité & réputation");
+    expect(screen.queryByRole("combobox", { name: "Affinité (shugenja)" })).toBeNull();
+    fireEvent.change(screen.getByRole("combobox", { name: "Techniques d'école" }), { target: { value: "isawa-shugenja" } });
+    expect(screen.getByRole("textbox", { name: "École (nom affiché)" })).toHaveValue("École de shugenja Isawa");
+    expect(screen.getByTestId("affinity")).toHaveTextContent("Affinité à choisir (bloc Identité)");
+    expect(screen.getByTestId("affinity")).toHaveTextContent("Sans déficience");
+    const affinity = screen.getByRole("combobox", { name: "Affinité (shugenja)" });
+    expect([...affinity.querySelectorAll("option")].map((o) => o.textContent)).toEqual(["— à choisir", "Air", "Terre", "Feu", "Eau", "Vide"]);
+    fireEvent.change(affinity, { target: { value: "void" } });
+    expect(screen.getByTestId("affinity")).toHaveTextContent("Affinité Vide");
+    await vi.waitFor(async () => expect((await storage.library.get("perso"))?.character.affinity).toBe("void"));
+    fireEvent.change(affinity, { target: { value: "" } });
+    await vi.waitFor(async () => expect((await storage.library.get("perso"))?.character.affinity).toBeUndefined());
+  });
+
   it("suppression d'un sort ; la section reste ouverte pendant l'édition", async () => {
-    const storage = await renderApp(shugenja({ school: "", spells: shugenja().spells?.slice(0, 1) }));
+    const storage = await renderApp(shugenja({ schoolId: "", spells: shugenja().spells?.slice(0, 1) }));
     click("Edit : Rouleaux & invocations");
     click("Supprimer Sentir");
     expect(magic().getByRole("button", { name: "+ Sort" })).toBeInTheDocument();

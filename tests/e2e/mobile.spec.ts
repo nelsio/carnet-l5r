@@ -500,12 +500,12 @@ test.describe("M18 et M16 à 360 px de large", () => {
   });
 });
 
-test.describe("M19 (E36, v2.9.0) à 360 px de large", () => {
+test.describe("M19 (E36, v2.9.0 et v2.10.0) à 360 px de large", () => {
   test.use({ viewport: { width: 360, height: 740 } });
 
   test("Rouleaux & invocations en édition : sorts universels et un sort complet, aucun débordement", async ({ page }) => {
     await page.getByRole("button", { name: "Edit : Identité & réputation" }).click();
-    await page.getByRole("textbox", { name: "École (nom affiché)" }).fill("École de shugenja Kuni");
+    await page.getByRole("combobox", { name: "Techniques d'école" }).selectOption("kuni-shugenja");
     await page.getByRole("button", { name: "Terminer : Identité & réputation" }).click();
     await page.getByRole("button", { name: "Edit : Rouleaux & invocations" }).click();
     await page.getByRole("button", { name: "Ajouter les sorts universels" }).click();

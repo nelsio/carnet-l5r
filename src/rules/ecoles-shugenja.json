@@ -1,0 +1,160 @@
+{
+  "version": 1,
+  "note": "Catalogue des écoles de shugenja (lot 13, annexe F.4). Livre de base 4e, pages du PDF indiquées. Une technique par école (rang 1), résumée pour l'outil : aucun texte du livre ; les rangs 2 à 5 apportent des sorts. Maho exclu. Effets à vérifier dans le livre.",
+  "schools": [
+    {
+      "id": "kuni-shugenja", "clan": "Crabe", "name": "École de shugenja Kuni", "class": "Shugenja",
+      "ranks": [
+        {"rank": 1, "name": "Le Regard dans l'ombre", "summary": "+1g0 aux jets de sort contre une créature non humaine ; dégâts de sort +1g1 contre une cible souillée. Augmentation gratuite sur les sorts Jade.", "effects": []},
+        {"rank": 2, "name": "Nouveaux sorts", "summary": "Rang 2 : nouveaux sorts.", "effects": []},
+        {"rank": 3, "name": "Nouveaux sorts", "summary": "Rang 3 : nouveaux sorts.", "effects": []},
+        {"rank": 4, "name": "Nouveaux sorts", "summary": "Rang 4 : nouveaux sorts.", "effects": []},
+        {"rank": 5, "name": "Nouveaux sorts", "summary": "Rang 5 : nouveaux sorts.", "effects": []}
+      ],
+      "spellcasting": {"page": 109, "affinity": "earth", "deficiency": "air", "freeRaiseKeywords": ["Jade"], "options": [{"id": "nonhuman", "label": "Cible non humaine", "rolled": 1}, {"id": "tainted", "label": "Cible souillée (dégâts du sort)", "damageRolled": 1, "damageKept": 1}], "startingSpells": "universels, 3 Terre, 2 Feu, 1 Eau"}
+    },
+    {
+      "id": "asahina-shugenja", "clan": "Grue", "name": "École de shugenja Asahina", "class": "Shugenja",
+      "ranks": [
+        {"rank": 1, "name": "La Grâce de l'âme", "summary": "1 point de Vide : les dégâts adverses à 20 pieds perdent 0g1 pendant autant de rounds que ton rang d'école. Augmentation gratuite sur les sorts Défense.", "effects": []},
+        {"rank": 2, "name": "Nouveaux sorts", "summary": "Rang 2 : nouveaux sorts.", "effects": []},
+        {"rank": 3, "name": "Nouveaux sorts", "summary": "Rang 3 : nouveaux sorts.", "effects": []},
+        {"rank": 4, "name": "Nouveaux sorts", "summary": "Rang 4 : nouveaux sorts.", "effects": []},
+        {"rank": 5, "name": "Nouveaux sorts", "summary": "Rang 5 : nouveaux sorts.", "effects": []}
+      ],
+      "spellcasting": {"page": 112, "affinity": "air", "deficiency": "fire", "freeRaiseKeywords": ["Défense"], "reminders": ["1 point de Vide : dégâts adverses −0g1 à 20 pieds, rang d'école en rounds."], "startingSpells": "universels, 3 Air, 2 Eau, 1 Terre"}
+    },
+    {
+      "id": "tamori-shugenja", "clan": "Dragon", "name": "École de shugenja Tamori", "class": "Shugenja",
+      "ranks": [
+        {"rank": 1, "name": "La Chair des éléments", "summary": "Un emplacement pour enfermer dans une potion un sort qui vise une seule cible. Augmentation gratuite sur les sorts Artisanat.", "effects": []},
+        {"rank": 2, "name": "Nouveaux sorts", "summary": "Rang 2 : nouveaux sorts.", "effects": []},
+        {"rank": 3, "name": "Nouveaux sorts", "summary": "Rang 3 : nouveaux sorts.", "effects": []},
+        {"rank": 4, "name": "Nouveaux sorts", "summary": "Rang 4 : nouveaux sorts.", "effects": []},
+        {"rank": 5, "name": "Nouveaux sorts", "summary": "Rang 5 : nouveaux sorts.", "effects": []}
+      ],
+      "spellcasting": {"page": 115, "affinity": "earth", "deficiency": "air", "freeRaiseKeywords": ["Artisanat"], "reminders": ["Potion : un emplacement par jour d'attente, autant d'heures que la maîtrise pour la préparer."], "startingSpells": "universels, 3 Terre, 2 Feu, 1 Eau"}
+    },
+    {
+      "id": "kitsu-shugenja", "clan": "Lion", "name": "École de shugenja Kitsu", "class": "Shugenja",
+      "ranks": [
+        {"rank": 1, "name": "Les Yeux des ancêtres", "summary": "Jet de sort (Eau) contre Volonté × 5 de la cible : tu connais ses avantages et désavantages spirituels. Augmentation gratuite sur les sorts Bataille.", "effects": []},
+        {"rank": 2, "name": "Nouveaux sorts", "summary": "Rang 2 : nouveaux sorts.", "effects": []},
+        {"rank": 3, "name": "Nouveaux sorts", "summary": "Rang 3 : nouveaux sorts.", "effects": []},
+        {"rank": 4, "name": "Nouveaux sorts", "summary": "Rang 4 : nouveaux sorts.", "effects": []},
+        {"rank": 5, "name": "Nouveaux sorts", "summary": "Rang 5 : nouveaux sorts.", "effects": []}
+      ],
+      "spellcasting": {"page": 120, "affinity": "water", "deficiency": "fire", "freeRaiseKeywords": ["Bataille"], "reminders": ["Yeux des ancêtres : jet de sort (Eau) contre Volonté × 5 de la cible."], "startingSpells": "universels, 3 Eau, 2 Air, 1 Terre"}
+    },
+    {
+      "id": "moshi-shugenja", "clan": "Mante", "name": "École de shugenja Moshi", "class": "Shugenja",
+      "ranks": [
+        {"rank": 1, "name": "La Faveur du soleil", "summary": "Le jour, affinité pour le Feu en plus. Augmentation gratuite sur les sorts Tonnerre.", "effects": []},
+        {"rank": 2, "name": "Nouveaux sorts", "summary": "Rang 2 : nouveaux sorts.", "effects": []},
+        {"rank": 3, "name": "Nouveaux sorts", "summary": "Rang 3 : nouveaux sorts.", "effects": []},
+        {"rank": 4, "name": "Nouveaux sorts", "summary": "Rang 4 : nouveaux sorts.", "effects": []},
+        {"rank": 5, "name": "Nouveaux sorts", "summary": "Rang 5 : nouveaux sorts.", "effects": []}
+      ],
+      "spellcasting": {"page": 123, "affinity": "air", "deficiency": "earth", "freeRaiseKeywords": ["Tonnerre"], "options": [{"id": "day", "label": "Il fait jour (affinité Feu)", "extraAffinity": "fire"}], "startingSpells": "universels, 3 Air, 3 Feu"}
+    },
+    {
+      "id": "isawa-shugenja", "clan": "Phénix", "name": "École de shugenja Isawa", "class": "Shugenja",
+      "ranks": [
+        {"rank": 1, "name": "Le Don d'Isawa", "summary": "Affinité au choix (Vide compris), sans déficience. Augmentation gratuite sur tous les sorts de cet élément.", "effects": []},
+        {"rank": 2, "name": "Nouveaux sorts", "summary": "Rang 2 : nouveaux sorts.", "effects": []},
+        {"rank": 3, "name": "Nouveaux sorts", "summary": "Rang 3 : nouveaux sorts.", "effects": []},
+        {"rank": 4, "name": "Nouveaux sorts", "summary": "Rang 4 : nouveaux sorts.", "effects": []},
+        {"rank": 5, "name": "Nouveaux sorts", "summary": "Rang 5 : nouveaux sorts.", "effects": []}
+      ],
+      "spellcasting": {"page": 126, "affinity": "choice", "deficiency": null, "freeRaiseAffinity": true, "startingSpells": "universels, 3 d'un élément, 2 d'un autre, 1 d'un troisième, 1 d'un quatrième"}
+    },
+    {
+      "id": "agasha-shugenja", "clan": "Phénix", "name": "École de shugenja Agasha", "class": "Shugenja",
+      "ranks": [
+        {"rank": 1, "name": "Les Éléments de toute chose", "summary": "1 point de Vide : lancer un sort avec un autre Anneau, et l'emplacement de cet Anneau. Augmentation gratuite sur les sorts Artisanat.", "effects": []},
+        {"rank": 2, "name": "Nouveaux sorts", "summary": "Rang 2 : nouveaux sorts.", "effects": []},
+        {"rank": 3, "name": "Nouveaux sorts", "summary": "Rang 3 : nouveaux sorts.", "effects": []},
+        {"rank": 4, "name": "Nouveaux sorts", "summary": "Rang 4 : nouveaux sorts.", "effects": []},
+        {"rank": 5, "name": "Nouveaux sorts", "summary": "Rang 5 : nouveaux sorts.", "effects": []}
+      ],
+      "spellcasting": {"page": 127, "affinity": "fire", "deficiency": "water", "freeRaiseKeywords": ["Artisanat"], "ringSwap": true, "startingSpells": "universels, 3 Feu, 2 Terre, 1 Air"}
+    },
+    {
+      "id": "soshi-shugenja", "clan": "Scorpion", "name": "École de shugenja Soshi", "class": "Shugenja",
+      "ranks": [
+        {"rank": 1, "name": "Le Murmure des kami", "summary": "Un emplacement de plus du même élément : un sort non offensif ne laisse aucun signe visible. Augmentation gratuite sur les sorts Illusion.", "effects": []},
+        {"rank": 2, "name": "Nouveaux sorts", "summary": "Rang 2 : nouveaux sorts.", "effects": []},
+        {"rank": 3, "name": "Nouveaux sorts", "summary": "Rang 3 : nouveaux sorts.", "effects": []},
+        {"rank": 4, "name": "Nouveaux sorts", "summary": "Rang 4 : nouveaux sorts.", "effects": []},
+        {"rank": 5, "name": "Nouveaux sorts", "summary": "Rang 5 : nouveaux sorts.", "effects": []}
+      ],
+      "spellcasting": {"page": 129, "affinity": "air", "deficiency": "earth", "freeRaiseKeywords": ["Illusion"], "options": [{"id": "silent", "label": "Sans signe visible (1 emplacement de plus)", "extraSlot": 1}], "startingSpells": "universels, 3 Air, 2 Feu, 1 Eau"}
+    },
+    {
+      "id": "iuchi-shugenja", "clan": "Licorne", "name": "École de shugenja Iuchi", "class": "Shugenja",
+      "ranks": [
+        {"rank": 1, "name": "L'Esprit du vent", "summary": "Action complexe et un emplacement : une cible gagne une action de déplacement simple à son prochain tour. Augmentation gratuite sur les sorts Voyage.", "effects": []},
+        {"rank": 2, "name": "Nouveaux sorts", "summary": "Rang 2 : nouveaux sorts.", "effects": []},
+        {"rank": 3, "name": "Nouveaux sorts", "summary": "Rang 3 : nouveaux sorts.", "effects": []},
+        {"rank": 4, "name": "Nouveaux sorts", "summary": "Rang 4 : nouveaux sorts.", "effects": []},
+        {"rank": 5, "name": "Nouveaux sorts", "summary": "Rang 5 : nouveaux sorts.", "effects": []}
+      ],
+      "spellcasting": {"page": 133, "affinity": "water", "deficiency": "fire", "freeRaiseKeywords": ["Voyage"], "reminders": ["Esprit du vent : un emplacement (action complexe) → une action de déplacement simple pour une cible."], "startingSpells": "universels, 3 Eau, 2 Terre, 1 Air"}
+    },
+    {
+      "id": "komori-shugenja", "clan": "Clans mineurs", "name": "École de shugenja Komori (Chauve-souris)", "class": "Shugenja",
+      "ranks": [
+        {"rank": 1, "name": "Le Murmure des kami", "summary": "Un emplacement pour faire porter un message murmuré à une personne connue : 30 secondes et 100 miles par rang d'école.", "effects": []},
+        {"rank": 2, "name": "Nouveaux sorts", "summary": "Rang 2 : nouveaux sorts.", "effects": []},
+        {"rank": 3, "name": "Nouveaux sorts", "summary": "Rang 3 : nouveaux sorts.", "effects": []},
+        {"rank": 4, "name": "Nouveaux sorts", "summary": "Rang 4 : nouveaux sorts.", "effects": []},
+        {"rank": 5, "name": "Nouveaux sorts", "summary": "Rang 5 : nouveaux sorts.", "effects": []}
+      ],
+      "spellcasting": {"page": 219, "affinity": "air", "deficiency": "earth", "reminders": ["Message murmuré : un emplacement, 30 s et 100 miles par rang d'école."], "startingSpells": "universels, 3 Air, 2 Eau, 1 Feu"}
+    },
+    {
+      "id": "tonbo-shugenja", "clan": "Clans mineurs", "name": "École de shugenja Tonbo (Libellule)", "class": "Shugenja",
+      "ranks": [
+        {"rank": 1, "name": "Guidé par le destin", "summary": "Un emplacement par +1g0 à un jet social, au plus autant que ton rang d'école. Augmentation gratuite sur les sorts Divination.", "effects": []},
+        {"rank": 2, "name": "Nouveaux sorts", "summary": "Rang 2 : nouveaux sorts.", "effects": []},
+        {"rank": 3, "name": "Nouveaux sorts", "summary": "Rang 3 : nouveaux sorts.", "effects": []},
+        {"rank": 4, "name": "Nouveaux sorts", "summary": "Rang 4 : nouveaux sorts.", "effects": []},
+        {"rank": 5, "name": "Nouveaux sorts", "summary": "Rang 5 : nouveaux sorts.", "effects": []}
+      ],
+      "spellcasting": {"page": 220, "affinity": "water", "deficiency": "fire", "freeRaiseKeywords": ["Divination"], "reminders": ["Jet social : un emplacement par +1g0 (au plus le rang d'école)."], "startingSpells": "universels, 3 Eau, 2 Air, 1 Terre"}
+    },
+    {
+      "id": "kitsune-shugenja", "clan": "Clans mineurs", "name": "École de shugenja Kitsune (Renard)", "class": "Shugenja",
+      "ranks": [
+        {"rank": 1, "name": "L'Essence de Chikushudo", "summary": "Les sorts universels touchent aussi les esprits animaux. Augmentation gratuite sur un sort non offensif lancé sur un animal.", "effects": []},
+        {"rank": 2, "name": "Nouveaux sorts", "summary": "Rang 2 : nouveaux sorts.", "effects": []},
+        {"rank": 3, "name": "Nouveaux sorts", "summary": "Rang 3 : nouveaux sorts.", "effects": []},
+        {"rank": 4, "name": "Nouveaux sorts", "summary": "Rang 4 : nouveaux sorts.", "effects": []},
+        {"rank": 5, "name": "Nouveaux sorts", "summary": "Rang 5 : nouveaux sorts.", "effects": []}
+      ],
+      "spellcasting": {"page": 222, "affinity": "earth", "deficiency": "air", "options": [{"id": "animal", "label": "Sort non offensif sur un animal", "freeRaises": 1}], "startingSpells": "universels, 3 Terre, 2 Eau, 1 Feu"}
+    },
+    {
+      "id": "chuda-shugenja", "clan": "Clans mineurs", "name": "École de shugenja Chuda (originale)", "class": "Shugenja",
+      "ranks": [
+        {"rank": 1, "name": "Punir les impurs", "summary": "1 point de Vide : la Réduction d'un adversaire baisse de ton rang d'école. + rang d'école aux dégâts de tes sorts contre une cible souillée.", "effects": []},
+        {"rank": 2, "name": "Nouveaux sorts", "summary": "Rang 2 : nouveaux sorts.", "effects": []},
+        {"rank": 3, "name": "Nouveaux sorts", "summary": "Rang 3 : nouveaux sorts.", "effects": []},
+        {"rank": 4, "name": "Nouveaux sorts", "summary": "Rang 4 : nouveaux sorts.", "effects": []},
+        {"rank": 5, "name": "Nouveaux sorts", "summary": "Rang 5 : nouveaux sorts.", "effects": []}
+      ],
+      "spellcasting": {"page": 226, "affinity": "earth", "deficiency": "air", "options": [{"id": "tainted", "label": "Cible souillée (dégâts du sort)", "damageFlat": "schoolRank"}], "reminders": ["1 point de Vide : Réduction d'un adversaire −rang d'école."], "startingSpells": "universels, 3 Terre, 2 Feu, 1 Eau"}
+    },
+    {
+      "id": "seppun-shugenja", "clan": "Impérial", "name": "École de shugenja Seppun", "class": "Shugenja",
+      "ranks": [
+        {"rank": 1, "name": "Pour la défense du trône", "summary": "Augmentation gratuite sur un sort qui protège l'Empereur ou sa famille, et sur les sorts propres aux familles impériales.", "effects": []},
+        {"rank": 2, "name": "Nouveaux sorts", "summary": "Rang 2 : nouveaux sorts.", "effects": []},
+        {"rank": 3, "name": "Nouveaux sorts", "summary": "Rang 3 : nouveaux sorts.", "effects": []},
+        {"rank": 4, "name": "Nouveaux sorts", "summary": "Rang 4 : nouveaux sorts.", "effects": []},
+        {"rank": 5, "name": "Nouveaux sorts", "summary": "Rang 5 : nouveaux sorts.", "effects": []}
+      ],
+      "spellcasting": {"page": 231, "affinity": "fire", "deficiency": "water", "options": [{"id": "emperor", "label": "Protéger l'Empereur ou sa famille", "freeRaises": 1}, {"id": "imperial", "label": "Sort propre aux familles impériales", "freeRaises": 1}], "startingSpells": "universels, 3 Feu, 2 Terre, 1 Air"}
+    }
+  ]
+}

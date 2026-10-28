@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import {
-  activeEffects, armorSheet, attackTrait, catalogGap, catalogWeapon, createSpell, dailyHealing, isShugenja, reminderText, computePool, defaultModifiers, isRanged, parseDR, parseWeaponKeywords, rings, ROLL_TRAITS, schoolOf,
-  findSchool, schoolRankOf, schoolsByClan, sortSpells, SPELL_ELEMENTS, spellRaises, spellTn, suggestSchool, techniqueCategories, vocabularyChanges, weaponKeywords,
+  activeEffects, affinityOf, armorSheet, attackTrait, catalogGap, catalogWeapon, createSpell, dailyHealing, deficiencyOf, isShugenja, reminderText, computePool, defaultModifiers, isRanged, parseDR, parseWeaponKeywords, rings, ROLL_TRAITS, schoolOf,
+  findSchool, schoolRankOf, schoolsByClan, sortSpells, SPELL_ELEMENTS, SPELL_RINGS, spellcastingOf, spellRaises, spellTn, suggestSchool, techniqueCategories, vocabularyChanges, weaponKeywords,
   type ArmorPart, type Character, type PoolAction, type RollTrait, type TraitKey, type VocabularyChange,
 } from "@carnet/core";
 import { WEAPON_KEYWORD_LABELS } from "../../rules/ecoles";
@@ -161,6 +161,14 @@ function Identity() {
             ))}
           </select>
         </Field>
+        {spellcastingOf(c)?.affinity === "choice" && (
+          <Field label="Affinité (shugenja)">
+            <select className="in" value={c.affinity ?? ""} onChange={(e) => set(["affinity"], e.target.value || undefined)}>
+              <option value="">— à choisir</option>
+              {SPELL_RINGS.map((r) => <option key={r} value={r}>{ELEMENT_LABELS[r]}</option>)}
+            </select>
+          </Field>
+        )}
         <Field label="Rang d'école">
           <OptionalNumber
             min={1} value={c.schoolRank ?? undefined} placeholder={`= Insight (${c.insightRank})`} aria-label="Rang d'école"
@@ -479,6 +487,7 @@ function SchoolTechniques() {
   return (
     <div data-testid="school-techniques">
       <div className="schoolhead"><b>{school.name}</b> <span className="muted">· {school.clan} · Rang d'école {rank}</span></div>
+      {school.spellcasting && <SpellAffinity page={school.spellcasting.page} />}
       {school.ranks.map((r) => {
         const on = r.rank <= rank;
         return (
@@ -508,10 +517,13 @@ const isListedKeyword = (k: string) => (SPELL_KEYWORDS as readonly string[]).inc
 function Spells() {
   const { c, edit, set, dispatch } = useSheet("magic");
   const spells = c.spells ?? [];
+  const starting = spellcastingOf(c)?.startingSpells;
+  const head = starting && <p className="hint" style={{ marginTop: 0 }} data-testid="starting-spells">Sorts de départ de l'école : {starting}.</p>;
   if (edit) {
     const missing = UNIVERSAL_SPELLS.filter((n) => !spells.some((s) => s.name === n));
     return (
       <>
+        {head}
         {spells.map((s, i) => {
           const label = s.name || "ce sort";
           return (
@@ -576,32 +588,49 @@ function Spells() {
       </>
     );
   }
-  if (!spells.length) return <p className="muted">Aucun sort noté. Appuie sur « Edit » pour noter tes rouleaux et invocations.</p>;
+  if (!spells.length) return <>{head}<p className="muted">Aucun sort noté. Appuie sur « Edit » pour noter tes rouleaux et invocations.</p></>;
   return (
-    <div className="spells">
-      {sortSpells(spells).map((s) => {
-        const raises = spellRaises(s);
-        const line = [s.range && `Portée ${s.range}`, s.area && `Zone ${s.area}`, s.duration && `Durée ${s.duration}`].filter(Boolean).join(" · ");
-        return (
-          <div key={s.id} className={`spell el-${s.element}`} data-testid={`spell-${s.id}`}>
-            <div className="sp1">
-              <b>{s.name}</b>
-              <span className="tag el">{ELEMENT_LABELS[s.element]}</span>
-              <span className="mono muted">Maîtrise {s.mastery} · ND {spellTn(s.mastery)}</span>
-              <span className={`tag${s.memorized ? " memo" : ""}`}>{s.memorized ? "mémorisé" : "parchemin"}</span>
-            </div>
-            {line && <div className="sp2 muted">{line}</div>}
-            {(s.keywords.length > 0 || s.damage) && (
-              <div className="sp3">
-                {s.keywords.map((k) => <span key={k} className="tag">{k}</span>)}
-                {s.damage && <span className="tag">VD {s.damage}</span>}
+    <>
+      {head}
+      <div className="spells">
+        {sortSpells(spells).map((s) => {
+          const raises = spellRaises(s);
+          const line = [s.range && `Portée ${s.range}`, s.area && `Zone ${s.area}`, s.duration && `Durée ${s.duration}`].filter(Boolean).join(" · ");
+          return (
+            <div key={s.id} className={`spell el-${s.element}`} data-testid={`spell-${s.id}`}>
+              <div className="sp1">
+                <b>{s.name}</b>
+                <span className="tag el">{ELEMENT_LABELS[s.element]}</span>
+                <span className="mono muted">Maîtrise {s.mastery} · ND {spellTn(s.mastery)}</span>
+                <span className={`tag${s.memorized ? " memo" : ""}`}>{s.memorized ? "mémorisé" : "parchemin"}</span>
               </div>
-            )}
-            {raises.length > 0 && <div className="sp4"><span className="label">Augm.</span> {raises.join(" · ")}</div>}
-            {s.effect && <div className="prose sp5">{s.effect}</div>}
-          </div>
-        );
-      })}
+              {line && <div className="sp2 muted">{line}</div>}
+              {(s.keywords.length > 0 || s.damage) && (
+                <div className="sp3">
+                  {s.keywords.map((k) => <span key={k} className="tag">{k}</span>)}
+                  {s.damage && <span className="tag">VD {s.damage}</span>}
+                </div>
+              )}
+              {raises.length > 0 && <div className="sp4"><span className="label">Augm.</span> {raises.join(" · ")}</div>}
+              {s.effect && <div className="prose sp5">{s.effect}</div>}
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
+/** « Affinité Terre · Déficience Air » sous l'école de shugenja (annexe F.5), à la couleur de l'Anneau. */
+function SpellAffinity({ page }: { page: number }) {
+  const c = useCharacter();
+  const [affinity, deficiency] = [affinityOf(c), deficiencyOf(c)];
+  const ring = (r: string | undefined) => (r ? { ["--rc" as string]: `var(--${r})` } : undefined);
+  return (
+    <div className="affin" data-testid="affinity">
+      <span className="tag el" style={ring(affinity)}>Affinité {affinity ? ELEMENT_LABELS[affinity] : "à choisir (bloc Identité)"}</span>
+      <span className="tag el" style={ring(deficiency)}>{deficiency ? `Déficience ${ELEMENT_LABELS[deficiency]}` : "Sans déficience"}</span>
+      <span className="muted"> · p. {page}</span>
     </div>
   );
 }

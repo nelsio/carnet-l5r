@@ -67,9 +67,9 @@ export function schoolRankOf(c: Character): number {
   return c.schoolRank ?? c.insightRank;
 }
 
-/** Nom court d'une école (dernier mot) : « Kakita », « Daidoji ». */
+/** Nom court d'une école (dernier mot, sans précision entre parenthèses) : « Kakita », « Daidoji », « Komori ». */
 export function shortSchoolName(s: School): string {
-  return s.name.split(" ").pop() ?? s.name;
+  return s.name.replace(/\s*\(.*\)$/, "").split(" ").pop() ?? s.name;
 }
 
 /** Écoles groupées par clan, dans l'ordre du catalogue. */

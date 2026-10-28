@@ -81,12 +81,14 @@ describe("Lecture du Rouleaux & invocations (F.5)", () => {
     expect(spellRaises({ raises: "" })).toEqual([]);
   });
 
-  it("shugenja : au moins un sort, ou « shugenja » dans le nom affiché de l'école", () => {
+  it("shugenja : école de classe Shugenja, ou au moins un sort (F.4)", () => {
     const bushi = (structuredClone(kakita) as Character);
     expect(isShugenja(shugenja())).toBe(true);
+    expect(isShugenja({ ...shugenja(), spells: [] })).toBe(true);
     expect(isShugenja(bushi)).toBe(false);
-    expect(isShugenja({ ...bushi, school: "École de Shugenja Isawa" })).toBe(true);
-    expect(isShugenja({ ...shugenja(), spells: [], school: "" })).toBe(false);
+    // Le nom affiché ne suffit plus depuis le catalogue (v2.10.0).
+    expect(isShugenja({ ...bushi, school: "École de Shugenja Isawa" })).toBe(false);
+    expect(isShugenja({ ...shugenja(), spells: [], schoolId: "" })).toBe(false);
   });
 
   it("sort vierge : identifiants distincts, maîtrise 1, parchemin", () => {
