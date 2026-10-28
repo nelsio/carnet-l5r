@@ -47,6 +47,8 @@ export function Header() {
         </div>
       </div>
       <div className="top-right">
+        {/* Gardé à côté du sceau : plus visible, surtout sur mobile (annexe G.6, v2.13.1). */}
+        {c && <HeaderButton icon={ICONS.library} label="Bibliothèque" onClick={() => void library.showLibrary()} />}
         <HeaderButton
           icon={ICONS.dice} label={`Lanceur de dés : ${ui.showDiceRoller ? "affiché" : "masqué"}`} pressed={ui.showDiceRoller}
           onClick={() => dispatch({ type: "diceRoller", show: !ui.showDiceRoller })}
@@ -73,6 +75,7 @@ export function Header() {
 const APP_NAME = "Carnet de Rokugan";
 
 const ICONS = {
+  library: <path d="M4 4h4v16H4zM10 4h4v16h-4zM16.2 5.2l3.8-1 3 15.6-3.8 1z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />,
   dice: (
     <>
       <rect x="3.5" y="3.5" width="17" height="17" rx="3.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
