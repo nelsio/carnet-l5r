@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prototype en-tête</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+/* Prototype de référence pour handoff-title.md.
+   Dans l'appli, les règles « mobile » sont en @media (max-width:720px) ;
+   ici elles sont en @container pour simuler la largeur dans la page. */
+
+/* ---- Jetons de l'appli (styles.css) + jetons du sceau ---- */
+.app{
+  --acc-l:#7a6a3a; --acc-d:#cdb67a;
+  --bg:#ece6d8; --surface:#f7f3ea; --sunk:#e0d9c8; --ink:#2a261f; --muted:#6c6556; --line:#d2cab7;
+  --gold:var(--acc-l);
+  --seal:#a8382a; --seal-ink:#f7f3ea;
+  --f-display:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+  --f-body:"Zen Kaku Gothic New","Segoe UI",system-ui,sans-serif;
+  --tabbar:#d9d2c1;
+}
+.app[data-theme="dark"]{
+  --bg:#25272a; --surface:#2f3236; --sunk:#1c1e21; --ink:#e7e5e0; --muted:#a2a19c; --line:#44474c;
+  --gold:var(--acc-d);
+  --seal:#b5402f; --seal-ink:#f3ece0;
+  --tabbar:#1c1e21;
+}
+
+/* ---- Page du prototype (hors appli) ---- */
+:root{--p-bg:#f4f2ee;--p-ink:#222;--p-muted:#666;--p-line:#d6d2ca;--p-chip:#fff;--p-on:#222;--p-on-ink:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--p-bg:#161718;--p-ink:#e6e4df;--p-muted:#a09e99;--p-line:#3a3c40;--p-chip:#222427;--p-on:#e6e4df;--p-on-ink:#161718}}
+:root[data-theme="dark"]{--p-bg:#161718;--p-ink:#e6e4df;--p-muted:#a09e99;--p-line:#3a3c40;--p-chip:#222427;--p-on:#e6e4df;--p-on-ink:#161718}
+*{box-sizing:border-box}
+body{margin:0;background:var(--p-bg);color:var(--p-ink);font:14px/1.5 "Zen Kaku Gothic New",system-ui,sans-serif;padding:24px 16px 64px}
+.wrap{max-width:1120px;margin:0 auto}
+h1.p{font:800 22px/1.2 "Shippori Mincho B1",serif;margin:0 0 4px}
+.lede{color:var(--p-muted);margin:0 0 18px}
+.controls{display:flex;flex-wrap:wrap;gap:14px 22px;margin-bottom:18px}
+.ctl{display:grid;gap:6px}
+.ctl > span{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--p-muted)}
+.seg{display:flex;flex-wrap:wrap;gap:4px}
+.seg button{border:1px solid var(--p-line);background:var(--p-chip);color:var(--p-ink);border-radius:999px;padding:6px 12px;font:inherit;font-weight:500;cursor:pointer;min-height:36px}
+.seg button[aria-pressed="true"]{background:var(--p-on);color:var(--p-on-ink);border-color:var(--p-on)}
+.stage{overflow-x:auto;padding-bottom:4px}
+.frame{margin:0 auto;border:1px solid var(--p-line);border-radius:10px;overflow:hidden;transition:width .25s}
+.frame.desk{width:1080px}
+.frame.mob{width:390px}
+
+/* ---- Barre d'onglets simulée (titre d'onglet + favicon) ---- */
+.btabs{display:flex;align-items:flex-end;height:42px;padding:0 12px;background:var(--tabbar);gap:4px}
+.btab{display:flex;align-items:center;gap:8px;height:34px;padding:0 14px;background:var(--bg);border-radius:8px 8px 0 0;font:13px/1 var(--f-body);color:var(--ink);max-width:300px;min-width:0}
+.btab .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fav{flex:none;display:grid;place-items:center;width:16px;height:16px;border-radius:3px;background:var(--seal);color:var(--seal-ink);font:800 11px/1 var(--f-display)}
+
+/* ---- Appli ---- */
+.app{container-type:inline-size;background:var(--bg);color:var(--ink);font:15px/1.55 var(--f-body)}
+.app .body{padding:0 24px 24px}
+.app h1,.app h2{font-family:var(--f-display);margin:0;line-height:1.2;text-wrap:balance}
+.app button{font:inherit;color:inherit}
+.app :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;padding-block:22px 14px;border-bottom:3px solid var(--gold)}
+.who .sub{color:var(--muted);margin-top:2px}
+.who h1{font-size:clamp(26px,5vw,38px);font-weight:800}
+.mon{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
+.mon::before{content:"";width:12px;height:12px;border-radius:50%;background:var(--gold)}
+.top-right{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.theme-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 10px;font-weight:700;font-size:13px;color:var(--muted);cursor:pointer}
+.theme-btn .ico{width:16px;height:16px;flex:none}
+.tabs{display:flex;gap:2px;background:var(--sunk);padding:4px;border-radius:999px}
+.tabs button{border:0;background:transparent;padding:8px 12px;border-radius:999px;font-weight:700;color:var(--muted);cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.badge{font:700 11px/1 var(--f-body);letter-spacing:.06em;text-transform:uppercase;vertical-align:middle;border:1px solid var(--line);border-radius:999px;padding:3px 7px;color:var(--muted)}
+.placeholder{margin-top:18px;border:1px dashed var(--line);border-radius:8px;padding:22px;color:var(--muted);text-align:center}
+
+/* ==== NOUVEAU (handoff-title §5.2) ==== */
+.who{display:flex;align-items:center;gap:16px}
+.who-txt{min-width:0}
+.app .seal{flex:none;display:grid;place-items:center;width:64px;height:64px;padding:0;border:0;border-radius:8px;
+  background:var(--seal);color:var(--seal-ink);font:800 38px/1 var(--f-display);rotate:-3deg;
+  box-shadow:inset 0 0 0 3px var(--seal),inset 0 0 0 5px var(--seal-ink)}
+.app button.seal{cursor:pointer;color:var(--seal-ink)}
+.app button.seal:focus-visible{outline-offset:4px}
+.eyebrow{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin-bottom:4px}
+.eyebrow .mon{margin-bottom:0}
+.brand{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.eyebrow .sep{width:1px;height:12px;background:var(--line)}
+
+/* Mobile (dans l'appli : @media (max-width:720px)) */
+@container (max-width:720px){
+  .app .body{padding:0 16px 84px}
+  header.top{padding-block:14px 10px;flex-wrap:wrap;align-items:flex-end}  /* wrap : nécessaire, l'existant force nowrap */
+  .who h1{font-size:26px;overflow-wrap:anywhere}
+  .theme-btn{position:relative;width:40px;height:40px;padding:0;justify-content:center;border-radius:50%}
+  .theme-btn .txt{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .theme-btn .ico{width:20px;height:20px}
+  .tabs{position:absolute;left:0;right:0;bottom:0;border-radius:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;background:var(--surface);border-top:1px solid var(--line);padding:6px 12px}
+  .tabs button{padding:12px 4px;border-radius:8px;font-size:15px}
+  .tabs button[aria-pressed="true"]{background:color-mix(in srgb,var(--gold) 15%,var(--surface));box-shadow:none}
+  /* nouveau */
+  .who{gap:12px}
+  .app .seal{width:52px;height:52px;border-radius:7px;font-size:30px}
+  .eyebrow{gap:2px 8px;margin-bottom:2px}
+  .brand{font-size:10px;letter-spacing:.12em}
+  .eyebrow .mon{font-size:10px;letter-spacing:.08em}
+  .eyebrow .mon::before{width:9px;height:9px}
+  .eyebrow .sep{height:10px}
+  .top-right{width:100%;justify-content:flex-start}
+}
+.app{position:relative}
+
+.toast{position:absolute;right:16px;bottom:16px;background:var(--ink);color:var(--bg);padding:7px 12px;border-radius:7px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:5}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="p">Carnet de Rokugan : en-tête</h1>
+  <p class="lede">Prototype de référence pour <code>handoff-title.md</code>. Le sceau ouvre la bibliothèque quand une fiche est chargée.</p>
+
+  <div class="controls">
+    <div class="ctl"><span>Thème</span><div class="seg" data-ctl="theme">
+      <button type="button" data-v="light" aria-pressed="true">Clair</button>
+      <button type="button" data-v="dark" aria-pressed="false">Sombre</button>
+    </div></div>
+    <div class="ctl"><span>Largeur</span><div class="seg" data-ctl="width">
+      <button type="button" data-v="desk" aria-pressed="true">Bureau 1080</button>
+      <button type="button" data-v="mob" aria-pressed="false">Mobile 390</button>
+    </div></div>
+    <div class="ctl"><span>Personnage</span><div class="seg" data-ctl="char">
+      <button type="button" data-v="okado" aria-pressed="true">Okado Hiruma</button>
+      <button type="button" data-v="kakita" aria-pressed="false">Kakita Haruto</button>
+      <button type="button" data-v="long" aria-pressed="false">Nom long + Licorne</button>
+      <button type="button" data-v="noclan" aria-pressed="false">Clan inconnu</button>
+      <button type="button" data-v="none" aria-pressed="false">Aucun</button>
+    </div></div>
+    <div class="ctl"><span>Mode</span><div class="seg" data-ctl="mode">
+      <button type="button" data-v="edit" aria-pressed="true">Édition</button>
+      <button type="button" data-v="readonly" aria-pressed="false">Consultation</button>
+    </div></div>
+  </div>
+
+  <div class="stage">
+    <div class="frame desk" id="frame">
+      <div class="app" id="app" data-theme="light">
+        <div class="btabs" aria-hidden="true">
+          <div class="btab"><span class="fav">帳</span><span class="t" id="tabTitle">Carnet de Rokugan</span></div>
+        </div>
+        <div class="body">
+          <header class="top">
+            <div class="who" id="who"></div>
+            <div class="top-right" id="right"></div>
+          </header>
+          <div class="placeholder" id="ph">Contenu de la fiche</div>
+        </div>
+        <div class="toast" id="toast" role="status"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CHARS = {
+  okado:  { name:"Okado Hiruma", school:"École de bushi Hiruma", rank:1, clan:{label:"Clan du Crabe", light:"#3d5a73", dark:"#8fb0cc"} },
+  kakita: { name:"Kakita Haruto", school:"École de bushi Kakita", rank:2, clan:{label:"Clan de la Grue", light:"#2f7fb5", dark:"#8cc4ea"} },
+  long:   { name:"Shinjo Altansarnai no Yoshiko-hime", school:"École de bushi Shinjo", rank:3, clan:{label:"Clan de la Licorne", light:"#6b3fa0", dark:"#bb9ae6"} },
+  noclan: { name:"Ronin sans nom", school:"", rank:1, clan:null },
+  none:   null
+};
+const state = { theme:"light", width:"desk", char:"okado", mode:"edit" };
+const ICO = {
+  dice:'<rect x="3.5" y="3.5" width="17" height="17" rx="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="8.5" cy="8.5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.6" fill="currentColor"/>',
+  theme:'<circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/>'
+};
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const btn = (ico, label) => `<button type="button" class="theme-btn" title="${label}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true">${ICO[ico]}</svg><span class="txt">${label}</span></button>`;
+
+function render(){
+  const app = document.getElementById("app");
+  const c = CHARS[state.char];
+  app.dataset.theme = state.theme;
+  document.getElementById("frame").className = "frame " + state.width;
+  const acc = c && c.clan ? c.clan : { light:"#7a6a3a", dark:"#cdb67a" };
+  app.style.setProperty("--acc-l", acc.light);
+  app.style.setProperty("--acc-d", acc.dark);
+
+  // §4.4 : titre d'onglet
+  const title = c ? `${c.name} · Carnet de Rokugan` : "Carnet de Rokugan";
+  document.getElementById("tabTitle").textContent = title;
+
+  const who = document.getElementById("who");
+  if (c) {
+    const sub = [c.school, `Rang ${c.rank}`].filter(Boolean).join(" · ");
+    who.innerHTML =
+      `<button type="button" class="seal" data-act="library" title="Carnet de Rokugan — Bibliothèque" aria-label="Carnet de Rokugan — ouvrir la bibliothèque">帳</button>
+       <div class="who-txt">
+         <div class="eyebrow"><span class="brand">Carnet de Rokugan</span>${c.clan ? `<span class="sep" aria-hidden="true"></span><div class="mon">${esc(c.clan.label)}</div>` : ""}</div>
+         <h1>${esc(c.name)}${state.mode === "readonly" ? ' <span class="badge">Consultation</span>' : ""}</h1>
+         <div class="sub">${esc(sub)}</div>
+       </div>`;
+  } else {
+    who.innerHTML =
+      `<span class="seal" aria-hidden="true">帳</span>
+       <div class="who-txt"><h1>Carnet de Rokugan</h1><div class="sub">Compagnon de campagne · L5R 4e</div></div>`;
+  }
+  const themeLbl = state.theme === "dark" ? "Sombre" : "Clair";
+  document.getElementById("right").innerHTML =
+    btn("dice", "Lanceur de dés : masqué") + btn("theme", `Thème : ${themeLbl}`) +
+    (c ? `<div class="tabs" role="group" aria-label="Vue"><button type="button" aria-pressed="true">Fiche</button><button type="button" aria-pressed="false">Aide de jeu</button><button type="button" aria-pressed="false">Statistiques</button></div>` : "");
+  document.getElementById("ph").textContent = c ? "Contenu de la fiche" : "Bibliothèque : importer ou créer un personnage";
+}
+
+let tt;
+document.addEventListener("click", e => {
+  const b = e.target.closest(".seg button");
+  if (b) {
+    const k = b.parentElement.dataset.ctl;
+    state[k] = b.dataset.v;
+    b.parentElement.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b));
+    render();
+    return;
+  }
+  if (e.target.closest('[data-act="library"]')) {
+    const t = document.getElementById("toast");
+    t.textContent = "Bibliothèque ouverte";
+    t.classList.add("show");
+    clearTimeout(tt); tt = setTimeout(() => t.classList.remove("show"), 1400);
+  }
+});
+render();
+</script>
+</body>
+</html>

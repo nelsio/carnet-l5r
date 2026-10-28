@@ -40,7 +40,7 @@ test("E3 : export, puis import en « Nouvelle fiche » : fiche identique", async
     weapons: v1.weapons.map((w: object, i: number) => ({ ...w, keywords: keywords[i] })),
   });
 
-  await page.getByRole("button", { name: "Bibliothèque" }).click();
+  await page.getByRole("button", { name: "Carnet de Rokugan — ouvrir la bibliothèque" }).click();
   await expect(page.getByRole("listitem")).toHaveCount(2);
 });
 
@@ -61,7 +61,7 @@ test("E4 : import en « Consultation » : badge, lecture seule, jet possible san
   await expect(page.getByLabel("Dés", { exact: true })).toBeVisible();
   await expect(page.getByText("Points de Vide 2/2")).toBeVisible();
 
-  await page.getByRole("button", { name: "Bibliothèque" }).click();
+  await page.getByRole("button", { name: "Carnet de Rokugan — ouvrir la bibliothèque" }).click();
   await expect(page.getByRole("listitem").getByText("Consultation")).toBeVisible();
 });
 

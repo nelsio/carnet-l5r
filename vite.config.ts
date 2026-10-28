@@ -17,11 +17,28 @@ function renameHtml(fileName: string): Plugin {
   };
 }
 
+/** Favicon et apple-touch-icon en data URI : le livrable reste un seul fichier (annexe G.4). */
+function inlineIcons(): Plugin {
+  const TYPES: Record<string, string> = { svg: "image/svg+xml", png: "image/png" };
+  return {
+    name: "carnet:inline-icons",
+    apply: "build",
+    transformIndexHtml: {
+      order: "pre",
+      handler: (html) =>
+        html.replace(/(<link rel="(?:icon|apple-touch-icon)" href=")\/(src\/[^"]+\.(svg|png))"/g, (_m, start: string, path: string, ext: string) => {
+          const data = readFileSync(new URL(`./${path}`, import.meta.url)).toString("base64");
+          return `${start}data:${TYPES[ext]};base64,${data}"`;
+        }),
+    },
+  };
+}
+
 const { version } = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8")) as { version: string };
 
 export default defineConfig({
   define: { __APP_VERSION__: JSON.stringify(version) },
-  plugins: [react(), viteSingleFile(), renameHtml("carnet-l5r.html")],
+  plugins: [react(), inlineIcons(), viteSingleFile(), renameHtml("carnet-l5r.html")],
   resolve: {
     alias: {
       "@carnet/core": fileURLToPath(new URL("./src/core/index.ts", import.meta.url)),

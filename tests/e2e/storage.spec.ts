@@ -40,7 +40,7 @@ for (const t of targets) {
       await expect(page.getByText("Clan de la Grue")).toBeVisible();
       await openWounds(page);
       await expect(page.getByRole("spinbutton", { name: "Blessures subies" })).toHaveValue("1");
-      await page.getByRole("button", { name: "Bibliothèque" }).click();
+      await page.getByRole("button", { name: "Carnet de Rokugan — ouvrir la bibliothèque" }).click();
       await expect(page.getByRole("listitem")).toHaveCount(1);
       expect(external).toEqual([]);
     });

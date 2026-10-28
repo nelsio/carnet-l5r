@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
 import { clanAccent, schoolRankOf } from "@carnet/core";
 import { SHOW_WOUND_MULTIPLIER, WOUND_MULTIPLIERS } from "../../rules/l5r4e";
 import { useStore } from "../store";
@@ -12,24 +12,41 @@ export function Header() {
   // Sous le nom : école affichée et rang d'école, plus de famille (annexe E.19 S8).
   const sub = c ? [c.school.trim(), `Rang\u00a0${schoolRankOf(c)}`].filter(Boolean).join(" · ") : "";
 
+  // Titre d'onglet : nom du personnage, puis l'outil (annexe G.3).
+  const name = c?.name.trim();
+  useEffect(() => {
+    document.title = name ? `${name} · ${APP_NAME}` : APP_NAME;
+  }, [name]);
+
   return (
     <header className="top">
       <div className="who">
+        {/* Sceau 帳 : marque de l'outil ; avec une fiche ouverte, il ouvre la Bibliothèque (annexe G.3). */}
         {c ? (
-          <>
-            {clan && <div className="mon">{clan.label ?? `Clan ${c.clan}`}</div>}
-            <FitName name={c.name}>{readonly && <> <span className="badge">Consultation</span></>}</FitName>
-            <div className="sub">{sub}</div>
-          </>
+          <button type="button" className="seal" title={`${APP_NAME} — Bibliothèque`}
+            aria-label={`${APP_NAME} — ouvrir la bibliothèque`} onClick={() => void library.showLibrary()}>帳</button>
         ) : (
-          <>
-            <h1>Carnet de Rokugan</h1>
-            <div className="sub">Compagnon de campagne · L5R 4e</div>
-          </>
+          <span className="seal" aria-hidden="true">帳</span>
         )}
+        <div className="who-txt">
+          {c ? (
+            <>
+              <div className="eyebrow">
+                <span className="brand">{APP_NAME}</span>
+                {clan && <><span className="sep" aria-hidden="true" /><div className="mon">{clan.label ?? `Clan ${c.clan}`}</div></>}
+              </div>
+              <FitName name={c.name}>{readonly && <> <span className="badge">Consultation</span></>}</FitName>
+              <div className="sub">{sub}</div>
+            </>
+          ) : (
+            <>
+              <h1>{APP_NAME}</h1>
+              <div className="sub">Compagnon de campagne · L5R 4e</div>
+            </>
+          )}
+        </div>
       </div>
       <div className="top-right">
-        {c && <HeaderButton icon={ICONS.library} label="Bibliothèque" onClick={() => void library.showLibrary()} />}
         <HeaderButton
           icon={ICONS.dice} label={`Lanceur de dés : ${ui.showDiceRoller ? "affiché" : "masqué"}`} pressed={ui.showDiceRoller}
           onClick={() => dispatch({ type: "diceRoller", show: !ui.showDiceRoller })}
@@ -53,8 +70,9 @@ export function Header() {
   );
 }
 
+const APP_NAME = "Carnet de Rokugan";
+
 const ICONS = {
-  library: <path d="M4 4h4v16H4zM10 4h4v16h-4zM16.2 5.2l3.8-1 3 15.6-3.8 1z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />,
   dice: (
     <>
       <rect x="3.5" y="3.5" width="17" height="17" rx="3.5" fill="none" stroke="currentColor" strokeWidth="1.8" />

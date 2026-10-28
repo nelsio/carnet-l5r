@@ -6,9 +6,9 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document.
 
-**État au 25/10/2026 :** version publiée **v2.8.0**, lots 1 à 12 livrés (§11), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
+**État au 28/10/2026 :** version **v2.13.0**, lots 1 à 14 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
 
-**Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie).
+**Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie), F (lot 13 : shugenja et Magie), G (lot 14 : nom de l'outil dans l'en-tête).
 
 ---
 
@@ -285,11 +285,11 @@ interface LibraryStore {
 
 ### 6.2 Comportement à reproduire du prototype
 - **En-tête** :
-  - nom du clan en couleur au-dessus du nom ;
+  - **sceau 帳** de l'outil à gauche, qui ouvre la Bibliothèque, et surtitre « CARNET DE ROKUGAN | ● CLAN … » au-dessus du nom (annexe G) ;
   - famille, école et Rang dessous ;
   - bouton de thème (auto, clair, sombre) ;
-  - **boutons d'en-tête** Bibliothèque, Lanceur de dés et Thème : chacun = **icône + texte** sur bureau (livres, dé, demi-cercle), **icône seule** sur mobile (§7) ; le texte reste présent pour les lecteurs d'écran et en info-bulle, avec l'état courant (« Thème : sombre », « Lanceur de dés : masqué ») ;
-  - bouton **« Lanceur de dés : masqué / affiché »**, à côté du thème et de la Bibliothèque (même style ; fond d'accent pâle quand affiché). **Masqué par défaut**, choix mémorisé dans les préférences :
+  - **boutons d'en-tête** Lanceur de dés et Thème : chacun = **icône + texte** sur bureau (dé, demi-cercle), **icône seule** sur mobile (§7) ; le texte reste présent pour les lecteurs d'écran et en info-bulle, avec l'état courant (« Thème : sombre », « Lanceur de dés : masqué ») ;
+  - bouton **« Lanceur de dés : masqué / affiché »**, à côté du thème (même style ; fond d'accent pâle quand affiché). **Masqué par défaut**, choix mémorisé dans les préférences :
     - **masqué** : le panneau d'action reste un panneau d'aide (réserve, ligne « lancer à la main », Min · Moy. · Max, chance de réussite, ND final, options, manœuvres) mais **sans** bouton « Lancer », sans dés obtenus, sans verdict et sans historique. Les enchaînements qui dépendent d'un lancer (score d'initiative affiché, bonus de Défense totale, dés de dégâts pré-remplis) ne se déclenchent pas ; les dépenses de Vide se font par les pastilles et le panneau Vide ;
     - **affiché** : le bouton « Lancer » et les résultats apparaissent dans tous les lanceurs (Enquête, Cour, Déplacement, Combat) ;
     - le changement s'applique immédiatement, sans recharger ;
@@ -386,7 +386,7 @@ Point de rupture : **largeur ≤ 720 px**. Au-dessus, mise en page bureau inchan
 
 | Élément | Comportement mobile |
 |---|---|
-| En-tête | Bibliothèque, Lanceur de dés et Thème en **boutons ronds de 40 px, icône seule** ; nom du personnage et icônes tiennent **sur une seule ligne** (le nom passe à la ligne si besoin, jamais les icônes). Lanceur affiché = fond d'accent pâle. |
+| En-tête | Sceau de 52 px à gauche du nom ; Lanceur de dés et Thème en **boutons ronds de 40 px, icône seule**, **sous** le bloc sceau + nom, alignés à gauche (annexe G). Lanceur affiché = fond d'accent pâle. |
 | Navigation | Onglets Fiche / Aide de jeu / Statistiques dans une **barre fixe en bas**, trois boutons de même largeur. Marge basse = hauteur de la barre + `env(safe-area-inset-bottom)`. Onglet actif sur fond d'accent pâle. Les quatre onglets de situation de l'aide de jeu tiennent sur **une ligne, sans défilement** (360 px compris). |
 | Barre d'état | Les quatre tuiles Dépl. / ND armure / Réduction / Pénalité occupent **toute la largeur sur 4 colonnes égales**, texte centré. **Résumé sur une ligne** (niveau de blessure, pénalité, `blessures / seuil max`), cliquable, bordure rouge si le personnage est blessé. Un appui déplie la piste complète en **2 rangées de 4**. En dessous : compteur −/+ (boutons 40 px) et pastilles de Vide (26 px). |
 | Lanceur | **Panneau glissant depuis le bas**, ouvert au choix d'une action (pas à l'ouverture de l'écran). Hauteur max 88 vh, défilement interne, fond assombri derrière. Poignée et bouton × en haut ; fermeture par ×, appui sur le fond ou Échap. Bouton « Lancer » **collé en bas** du panneau. Après un lancer, le résultat est amené à l'écran et le panneau reste ouvert. Changer une option ne remet pas le défilement du panneau à zéro. Le défilement de la page est bloqué pendant l'ouverture. |
@@ -536,7 +536,7 @@ Ces cas complètent la spec fournie. L'agent les écrit dans `tests/core.modifie
 | M8 | Cibles tactiles (boutons −/+, pastilles, onglets) | Au moins 40 × 40 px |
 | M9 | Tuiles de la barre d'état à 360 px de large | Les 4 libellés et valeurs sont entièrement visibles, sans troncature ni retour à la ligne |
 | M10 | Boutons « i » | Zone de toucher ≥ 40 × 40 px ; les panneaux Posture et Vide tiennent sur moins d'un écran détails fermés |
-| M11 | En-tête à 360 px de large | Bibliothèque, Lanceur de dés et Thème en icônes de 40 px sur la même ligne que le nom ; libellé accessible avec l'état courant |
+| M11 | En-tête à 360 px de large | Sceau de 52 px ; Lanceur de dés et Thème en icônes de 40 px sous le nom, alignés à gauche ; libellé accessible avec l'état courant (annexe G, H7) |
 | M12 | Combat sur mobile, et à 360 px de large | Carte « Nouveau round » entre l'Initiative et la Posture ; sa description tient sur 2 lignes au plus |
 | M13 | Aide de jeu sur mobile, et à 360 px de large | Les 4 onglets de situation (Enquête, Cour, Déplacement, Combat) sur une ligne, sans défilement ni texte tronqué, zones de 40 px de haut ; Statistiques est dans la barre du bas |
 | M14 | Bonus de jet sur mobile, et à 360 px de large (E24) | Chaque bonus sur 3 lignes (nom et source, effet, cible et note), aucun texte tronqué |
@@ -564,7 +564,8 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
    - **v2.1.2** (patch) : Statistiques devient une vue à part (en-tête sur bureau, barre du bas sur mobile) ; les 4 onglets de situation tiennent sur une ligne à 360 px (§7, M13).
 12. **v2.2 à v2.8 — règles du livre, combat complet, ergonomie** : annexe E (validée le 24/10/2026). Sept versions : correctifs de règles et retouches d'interface (v2.2.0, **livrée**, tag `v2.2.0`, écarts en E.12), combat complet (v2.3.0, **livrée**, tag `v2.3.0`, écarts en E.13), maîtrises et armures (v2.4.0, **livrée**, tag `v2.4.0`, écarts en E.14), récupération (v2.5.0, **livrée**, tag `v2.5.0`, écarts en E.15), vocabulaire français (v2.6.0, **livrée**, tag `v2.6.0`, écarts en E.16), bataille de masse (v2.7.0, **livrée**, tag `v2.7.0`, écarts en E.17), bloc Armure et retouches d'interface (v2.8.0, **livrée**, E.18 et E.19, écarts en E.20) → cas L1 à L28, E24 à E34, M16 à M18.
 13. **v2.9 à v2.12 — shugenja et Magie** : annexe F (validée le 28/10/2026). Quatre versions : Rouleaux & invocations (v2.9.0, **livrée**, écarts en F.8), écoles de shugenja (v2.10.0, **livrée**, écarts en F.9), situation Magie et lanceur de sort (v2.11.0, **livrée**, écarts en F.10), emplacements et combat (v2.12.0, **livrée**, écarts en F.11) → cas G1 à G17, E36.
-14. **À définir** : kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts (fichier personnel importable, pas dans le dépôt), compteurs « N fois par séance » (D-g).
+14. **v2.13.0 — nom de l'outil dans l'en-tête** : annexe G (maquette validée). Sceau 帳 qui remplace le bouton Bibliothèque, surtitre, titre d'onglet dynamique, favicon (**livrée**, écarts en G.6) → cas H1 à H12.
+15. **À définir** : kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts (fichier personnel importable, pas dans le dépôt), compteurs « N fois par séance » (D-g).
 
 ---
 
@@ -1406,3 +1407,86 @@ Personnage : `reference/perso-test-shugenja.json` (Kuni rang 1, Terre 3, Air 2, 
 - **Tests** : `tests/core.slots.spec.ts` (emplacements, G7, G8, Agasha et Soshi, G14, format, escarmouche, G16, G17, Rester concentré) ; `tests/ui/slots.spec.tsx` (ligne Sorts, éditeur, consultation, ligne Emplacement, G8 aux vrais dés et au lanceur, G14, G16, G17, Rester concentré) ; M19 complète E36 (6 tuiles sur une ligne à 360 px).
 
 **Prototype** : `reference/prototype.html` = v2.8.0 en ligne + annexe F complète (les quatre versions), construit depuis une branche locale non poussée ; fiche de test `reference/perso-test-shugenja.json` (sorts de test : valeurs non vérifiées sur le livre, à ne pas reprendre comme catalogue).
+
+---
+
+## Annexe G — Lot 14 : nom de l'outil dans l'en-tête (v2.13.0)
+
+Statut : **maquette validée** (planches « avec personnage » et « sans personnage », clair, sombre et mobile). Une version, une PR. Ne touche que l'**identité de l'outil** : en-tête (`src/ui/components/Header.tsx`), titre d'onglet et favicon. Les données, les vues (Fiche / Aide de jeu / Statistiques) et le pied de page ne changent pas ; format de fiche inchangé.
+
+Prototype de référence : `reference/prototype-title.html`. Il est interactif (thème, largeur, personnage, mode) et reprend le CSS de G.3. Les règles mobiles y sont en `@container` pour simuler la largeur ; dans l'appli, elles restent en `@media (max-width:720px)`.
+
+### G.1 Problème
+« Carnet de Rokugan » n'apparaissait qu'en pied de page et dans `<title>`. Le `<h1>Carnet de Rokugan</h1>` de l'en-tête n'était rendu que sans personnage : dès qu'une fiche est ouverte, le nom du samouraï le remplace.
+
+### G.2 Décisions
+| # | Sujet | Décision |
+|---|---|---|
+| G-a | Sceau 帳 (« carnet ») | Tampon carré vermillon à gauche du bloc `.who`, sur tous les écrans. Avec personnage, il ouvre la Bibliothèque et **remplace le bouton « Bibliothèque »**. |
+| G-b | Surtitre | Avec personnage, la ligne du clan devient `CARNET DE ROKUGAN \| ● CLAN DU CRABE`. |
+| G-c | Titre d'onglet | `Okado Hiruma · Carnet de Rokugan` avec personnage, `Carnet de Rokugan` sans ; favicon reprenant le sceau. |
+| G-d | Couleur | Le sceau a une couleur **fixe**, indépendante du clan : c'est la marque de l'outil, pas celle du personnage. Le liseré sous l'en-tête suit toujours `--gold`. |
+
+### G.3 Rendu
+**Sceau**
+
+| Propriété | Bureau | Mobile (≤ 720 px) |
+|---|---|---|
+| Taille | 64 × 64 px | 52 × 52 px |
+| Coins | 8 px | 7 px |
+| Kanji | 帳, `--f-display` 800, 38 px | 30 px |
+| Double filet | `box-shadow: inset 0 0 0 3px var(--seal), inset 0 0 0 5px var(--seal-ink)` | idem |
+| Inclinaison | `rotate: -3deg` | idem |
+| Écart avec le nom | 16 px | 12 px |
+
+- Rien sous le sceau, ni texte ni légende.
+- **Avec personnage** : `<button>` qui appelle `library.showLibrary()`, `aria-label="Carnet de Rokugan — ouvrir la bibliothèque"`, `title="Carnet de Rokugan — Bibliothèque"`. Cliquable aussi en consultation.
+- **Sans personnage** : `<span aria-hidden="true">` décoratif ; le `<h1>` porte déjà le nom de l'outil.
+
+**Surtitre** (avec personnage seulement)
+- `.brand` : `--muted`, 12 px, 700, majuscules, `letter-spacing: .16em` ; séparateur : filet vertical 1 × 12 px en `--line` ; `.mon` inchangé.
+- Conteneur `.eyebrow` en `flex-wrap: wrap` : un nom de clan long passe à la ligne.
+- Mobile : 10 px, `letter-spacing: .08em` (`.12em` pour `.brand`), pastille de 9 px, filet de 10 px.
+- Sans clan reconnu : « CARNET DE ROKUGAN » seul, sans séparateur. Sans personnage : pas de surtitre, `<h1>Carnet de Rokugan</h1>` et « Compagnon de campagne · L5R 4e ».
+
+**Boutons de droite**
+- Bureau : Lanceur de dés, Thème, puis Fiche / Aide de jeu / Statistiques. Plus de bouton Bibliothèque.
+- Mobile : les boutons ronds de 40 px **passent sous le bloc sceau + nom, alignés à gauche** (`header.top` repasse en `wrap` / `flex-end`, `.top-right` sur toute la largeur). Les onglets restent dans la barre du bas. Remplace la règle « nom et icônes sur une seule ligne » du §7.
+
+**Jetons** (dans les trois blocs de thème ; couleurs seulement en variables, comme le reste de `styles.css`)
+```css
+/* clair */  --seal:#a8382a; --seal-ink:#f7f3ea;
+/* sombre */ --seal:#b5402f; --seal-ink:#f3ece0;
+```
+
+La règle globale `button{font:inherit}` (0,0,1) est plus faible que `.seal` (0,1,0) : la taille du kanji s'applique. Ne pas ajouter de règle plus spécifique sur les boutons de l'en-tête, sinon le kanji retombe à 15 px.
+
+`FitName` mesure la largeur de son `<h1>` : le sceau réduit la place disponible, ce qui est voulu ; un nom long tient toujours sur deux lignes (H4).
+
+### G.4 Police et favicon
+- **Kanji** : les polices embarquées sont des sous-ensembles latins ; 帳 s'afficherait en police de repli. Sous-ensemble kanji `src/ui/fonts/shippori-mincho-b1-800-kanji.woff2` (Shippori Mincho B1 800, avec les kanji des Anneaux 土水火風空 pour un usage ultérieur), déclaré avec `unicode-range: U+5E33, U+571F, U+6C34, U+706B, U+98A8, U+7A7A`. Commande dans `fonts/LICENSES.md`.
+- **Favicon** : `src/ui/favicon.svg`, carré vermillon à coins arrondis, filet intérieur et 帳 **vectorisé en tracé** (contour du glyphe extrait avec fontTools, pas de `<text>`) ; `src/ui/apple-touch-icon.png` 180 × 180 rendu depuis le SVG.
+- **Fichier unique** : le livrable est un seul HTML (§2) et Pages ne publie que lui (§9.1). Les deux icônes sont donc **inlinées en data URI** au build (plugin `carnet:inline-icons` de `vite.config.ts`) ; pas de dossier `public/`, pas de question de préfixe `base`.
+
+### G.5 Tests
+| ID | Cas | Attendu |
+|---|---|---|
+| H1 | Fiche ouverte, bureau, thèmes clair et sombre | Sceau 64 px à gauche du nom, couleur du thème et non du clan, surtitre `CARNET DE ROKUGAN \| ● CLAN DU …`, pas de bouton Bibliothèque |
+| H2 | Clic ou Entrée sur le sceau | La Bibliothèque s'ouvre ; focus visible sur le sceau |
+| H3 | Aucun personnage | Sceau non focalisable (`span`, `aria-hidden`), `<h1>Carnet de Rokugan</h1>` et sous-titre ; pas de surtitre ; liseré à l'accent par défaut |
+| H4 | Nom long, bureau et 390 px | `FitName` le tient sur 2 lignes au plus, sans chevaucher le sceau |
+| H5 | « Clan de la Licorne » et nom long, 390 px | Le surtitre passe à la ligne, aucun débordement horizontal |
+| H6 | Clan non reconnu ou vide | Surtitre réduit à « CARNET DE ROKUGAN », sans séparateur orphelin |
+| H7 | Mobile ≤ 720 px | Sceau 52 px ; boutons ronds **sous** le nom, alignés à gauche ; barre d'onglets du bas inchangée (M11) |
+| H8 | `document.title` | `Nom · Carnet de Rokugan` à l'ouverture d'une fiche, suit un renommage, `Carnet de Rokugan` après retour à la Bibliothèque |
+| H9 | Glyphe 帳 | Rendu en Shippori Mincho B1 embarquée, sans police de repli |
+| H10 | Couleurs | Aucune couleur littérale hors des jetons `--seal` / `--seal-ink` |
+| H11 | Consultation | Sceau cliquable vers la Bibliothèque, badge « Consultation » inchangé |
+| H12 | Favicon | Favicon et apple-touch-icon présentes dans le fichier unique (data URI) |
+
+### G.6 Écarts de mise en œuvre (v2.13.0)
+- **Corrections du handoff d'origine** : identifiants de tests T1 à T12 renommés **H1 à H12** (T1 à T42 existent déjà, §10) ; prototype dans `reference/` (pas `handoff/reference/`) ; les documents `HANDOFF-colors.md` et `handoff-ringstyle.md` cités n'existent pas dans le dépôt, la vérification « lint C8 » devient H10 (C8 est ici le catalogue d'armes, annexe E.2) ; favicon inlinée au lieu de `public/` (G.4).
+- **CSS mobile** : les règles du sceau et du surtitre sont intégrées au bloc mobile existant, qui remplaçait `header.top{flex-wrap:nowrap;align-items:center}` ; pas de second bloc qui le surcharge.
+- **Titre d'onglet** : `useEffect` dans `Header`, sur le nom sans espaces de bord ; un nom vide donne « Carnet de Rokugan ».
+- **Icône** : l'icône « livres » de la Bibliothèque est retirée (plus utilisée).
+- **Tests** : `tests/ui/header.spec.tsx` (H1, H2, H3, H6, H8, H11) ; Playwright `tests/e2e/header.spec.ts` (H1 clair et sombre, H2 au clavier, H3, H4 à 390 et 1200 px, H5, H9 par les polices réellement rendues, H12) ; M11 devient H7 (2 icônes sous le nom, à gauche, sceau 52 px). Les tests qui ouvraient la Bibliothèque par le bouton passent par le sceau. H10 : revue du diff (seules les lignes de jetons portent des couleurs).
