@@ -1,7 +1,7 @@
 import { Fragment, useEffect } from "react";
 import {
   armorEffects, armyStatus, battleOutcome, battleRollBonus, battleRollTotal, describeModifier, rollBattleDice, fullAttackAllowed, guardRule, initiativeScore, isSimpleAttack, stanceRestriction, modifiersOf, movement, movementBonus, movementWater, resolveValue,
-  reminderText, rings, schoolOf, schoolReminders, stackCount, stackEffects, stackMax, terrainWaiver, voidMultiplier,
+  isShugenja, reminderText, rings, schoolOf, schoolReminders, spellRestriction, stackCount, stackEffects, stackMax, terrainWaiver, voidMultiplier,
   type ActionDef, type ActiveEffect,
 } from "@carnet/core";
 import {
@@ -14,7 +14,9 @@ import { currentActions, useCharacter, useStore, type AidSituation, type BattleS
 import { Roller } from "./Roller";
 import { TakeDamage } from "./StatusBar";
 
-const AID_SITUATIONS: readonly { id: AidSituation; label: string }[] = SITUATIONS;
+/** Situations de l'aide de jeu : « Magie » pour un shugenja seulement (annexe F.5). */
+const aidSituations = (shugenja: boolean): readonly { id: AidSituation; label: string }[] =>
+  SITUATIONS.filter((s) => s.id !== "magic" || shugenja);
 
 export function Aid() {
   const { state, dispatch } = useStore();
@@ -35,9 +37,11 @@ export function Aid() {
     };
   }, [ui.sheetOpen, dispatch]);
 
+  const tabs = aidSituations(isShugenja(c));
   const situations = (
-    <div className="sit" role="group" aria-label="Situation">
-      {AID_SITUATIONS.map((s) => (
+    // Cinq onglets (Magie) : plus serrés sur mobile, pour tenir sur une ligne à 360 px.
+    <div className={`sit${tabs.length > 4 ? " many" : ""}`} role="group" aria-label="Situation">
+      {tabs.map((s) => (
         <button key={s.id} type="button" aria-pressed={ui.situation === s.id} onClick={() => dispatch({ type: "situation", situation: s.id })}>{s.label}</button>
       ))}
     </div>
@@ -530,12 +534,12 @@ function ActionCard({ action: a }: { action: ActionDef }) {
     ? poolFor(c, a, DEFAULT_ROLL_OPTIONS, stance, undefined, { mounted: ui.mounted, centerLastRound: ui.centerLastRound, assessmentWon: ui.assessmentWon })
     : null;
   const simple = a.attack && isSimpleAttack(c, toPoolAction(a), contextOf(ui));
-  const child = a.kind === "damage";
+  const child = a.kind === "damage" || a.kind === "spellDamage";
   const pending = child && ui.pendingDamage && ui.pendingDamage.parent === a.parent ? ui.pendingDamage.dice : 0;
-  // Posture qui empêche l'action (F2) : carte grisée avec la raison, jamais bloquée.
-  const blocked = ui.situation === "combat" && isRollable(a)
+  // Posture qui empêche l'action (F2), sort hors de portée du rang (F.5) : carte grisée avec la raison, jamais bloquée.
+  const blocked = (ui.situation === "combat" && isRollable(a)
     ? stanceRestriction(toPoolAction(a), { stance: ui.stance, mounted: ui.mounted, sub: ui.sub })
-    : null;
+    : null) ?? (a.kind === "spell" && a.spell ? spellRestriction(c, a.spell) : null);
   if (blocked) {
     return (
       <div className={["act", "blocked", child ? "child" : ""].filter(Boolean).join(" ")} data-testid={`blocked-${a.id}`}>

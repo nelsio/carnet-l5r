@@ -1,8 +1,8 @@
 import {
-  attackTrait, computePool, DEFAULT_SAMPLES, defaultModifiers, emphasisMatches, poolStats, schoolOf, woundState,
+  attackTrait, computePool, DEFAULT_SAMPLES, defaultModifiers, defaultSpellElement, emphasisMatches, poolStats, schoolOf, sortSpells, woundState,
   type Character, type Pool, type PoolAction,
 } from "@carnet/core";
-import { shownWoundMultiplier, TRAIT_LABELS } from "../../rules/l5r4e";
+import { ELEMENT_LABELS, shownWoundMultiplier, TRAIT_LABELS } from "../../rules/l5r4e";
 import { pct } from "../format";
 import { poolLabel } from "../rolls";
 import { useCharacter, useStore } from "../store";
@@ -21,7 +21,7 @@ interface Row {
 function buildRows(c: Character, voidPoint: boolean, emphasis: boolean): Row[] {
   const row = (label: string, action: PoolAction, child = false, emph = false): Row => ({
     label, child, pool: computePool(c, action, { voidPoint, modifiers: defaultModifiers(c, action) }),
-    emphasis: emphasis && emph, hasTN: action.kind === "skill" || action.kind === "trait",
+    emphasis: emphasis && emph, hasTN: action.kind === "skill" || action.kind === "trait" || action.kind === "spell",
   });
   return [
     row("Initiative", { kind: "initiative" }),
@@ -31,6 +31,11 @@ function buildRows(c: Character, voidPoint: boolean, emphasis: boolean): Row[] {
     ]),
     ...[...c.skills].sort((a, b) => a.name.localeCompare(b.name, "fr")).map((s) =>
       row(`${s.name} (${TRAIT_LABELS[s.trait]})`, { kind: "skill", skill: s.name, trait: s.trait }, false, s.emphases.length > 0)),
+    // Une ligne par sort du Rouleaux & invocations (annexe F.5), élément de lancement par défaut.
+    ...sortSpells(c.spells ?? []).flatMap((spell) => [
+      row(`Sort · ${spell.name} (${ELEMENT_LABELS[defaultSpellElement(c, spell)]})`, { kind: "spell", spell }),
+      ...(spell.damage?.trim() ? [row(`Dégâts · ${spell.name}`, { kind: "spellDamage", spell }, true)] : []),
+    ]),
   ];
 }
 

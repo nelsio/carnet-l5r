@@ -42,9 +42,9 @@ export interface When {
 
 /**
  * Jets concernés par un effet. `social` : compétences sociales ; `lore` : Connaissance ;
- * `school` : compétences de l'école ; `skill:X` : la compétence X (et ses variantes « X : … »).
+ * `school` : compétences de l'école ; `spell` : jets de sort ; `skill:X` : la compétence X (et ses variantes « X : … »).
  */
-export type On = "attack" | "damage" | "initiative" | "focus" | "skill" | "trait" | "bugei" | "social" | "lore" | "school" | `skill:${string}`;
+export type On = "attack" | "damage" | "initiative" | "focus" | "skill" | "trait" | "bugei" | "social" | "lore" | "school" | "spell" | `skill:${string}`;
 
 export type EffectMode = "auto" | "optional";
 export type ReminderContext = "combat" | "duel" | "damage" | "social";

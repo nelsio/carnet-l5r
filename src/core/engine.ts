@@ -4,7 +4,8 @@ import {
   type CatalogArmor, type RingKey, type Stance, type Terrain,
 } from "../rules/l5r4e";
 import { describeModifier, woundPenaltyReduction } from "./modifiers";
-import type { Character, Maneuver, Modifier, RollTrait, Skill, TraitKey, WeaponKeyword } from "./schema";
+import type { Character, Maneuver, Modifier, RollTrait, Skill, Spell, SpellRing, TraitKey, WeaponKeyword } from "./schema";
+import { spellCast, spellDamage } from "./spells";
 import {
   bowStrengthBonus, catalogWeapon, describeEffect, effectOn, guardRule, heavyArmorWaiver, maneuverCost, resolveValue, rollEffects, sameEmphasis, schoolArmorBonus, schoolContext, skillIs,
   terrainWaiver, voidMultiplier, voidPointBonus, voidSpendBonus, voidSpendOption, woundEffects, type ActiveEffect, type SchoolContext,
@@ -51,7 +52,14 @@ export type PoolAction =
   | { kind: "skill"; skill: string; trait: RollTrait; attack?: boolean; weapon?: WeaponLike; unarmed?: boolean; focus?: boolean }
   | { kind: "trait"; trait: RollTrait }
   | { kind: "damage"; weapon: WeaponLike; unarmed?: boolean }
-  | { kind: "initiative" };
+  | { kind: "initiative" }
+  /**
+   * Jet de sort (annexe F.2) : `element`, élément choisi d'un sort universel ; `ring`, autre Anneau (Agasha) ;
+   * `options`, cases de l'école cochées.
+   */
+  | { kind: "spell"; spell: Spell; element?: SpellRing; ring?: SpellRing; options?: readonly string[] }
+  /** Dégâts d'un sort : sa VD, sans la Force ni point de Vide. */
+  | { kind: "spellDamage"; spell: Spell; options?: readonly string[] };
 
 export interface PoolMods {
   stance?: Stance;
@@ -228,16 +236,31 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
       kept = c.traits.reflexes;
       canRaise = false;
       break;
+    case "spell": {
+      // (Anneau + rang de lancement) g Anneau ; à 0, le rang n'ajoute rien (F.2).
+      const cast = spellCast(c, action);
+      rolled = cast.ringValue + Math.max(0, cast.rank) + cast.rolled;
+      kept = cast.ringValue;
+      break;
+    }
+    case "spellDamage": {
+      const d = spellDamage(c, action);
+      rolled = d.rolled;
+      kept = d.kept;
+      canRaise = false;
+      break;
+    }
   }
 
   const disarmed = action.kind === "damage" && !!mods.disarm;
+  const damage = action.kind === "damage" || action.kind === "spellDamage";
   if (mods.extraRolled && !disarmed) {
     rolled = Math.max(0, rolled + mods.extraRolled);
     notes.push(`${mods.extraRolled > 0 ? "+" : ""}${mods.extraRolled} dé(s) lancé(s)`);
   }
-  let flat = 0;
-  let freeRaises = 0;
-  if (mods.centerBonus && action.kind !== "damage") {
+  let flat = action.kind === "spellDamage" ? spellDamage(c, action).flat : 0;
+  let freeRaises = action.kind === "spell" ? spellCast(c, action).freeRaises.length : 0;
+  if (mods.centerBonus && !damage) {
     rolled += CENTER_BONUS.rolled;
     kept += CENTER_BONUS.kept;
     flat += c.voidRing;
@@ -292,7 +315,7 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
   const vm = voidMultiplier(c);
   // Dégâts : pas de point de Vide, sauf au katana, et un seul (C2).
   const katana = action.kind === "damage" && !disarmed && isKatanaVoid(action.weapon);
-  const voidBlocked = action.kind === "damage" && !katana;
+  const voidBlocked = (action.kind === "damage" && !katana) || action.kind === "spellDamage";
   if (mods.voidPoint && !voidBlocked) {
     // Un point vaut 1g1, ou plus avec une technique (Asako R1, Shosuro Acteur R1).
     const per = voidPointBonus(c, action, ctx);
@@ -300,7 +323,7 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
     kept += per.kept * POOL_BONUS.voidPoint.kept * vm;
     notes.push(`${katana ? "Vide (katana)" : "Point de Vide"} : +${per.rolled * vm}g${per.kept * vm}`);
   }
-  const spend = mods.voidSpend && action.kind !== "damage" ? voidSpendOption(c, action) : undefined;
+  const spend = mods.voidSpend && !damage ? voidSpendOption(c, action) : undefined;
   if (spend) {
     const b = voidSpendBonus(c, spend, action, ctx);
     rolled += b.rolled * vm;

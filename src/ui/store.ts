@@ -10,7 +10,7 @@ import {
 } from "@carnet/core";
 import { FEINT_MANEUVER_ID, WOUND_MULTIPLIERS, WOUND_NEXT_MULTIPLIER, type Terrain } from "../rules/l5r4e";
 import type { LibraryEntry } from "../storage";
-import { DEFAULT_ROLL_OPTIONS, effectiveManeuvers, isRollable, isUnskilled, toPoolAction, type RollOptions } from "./rolls";
+import { DEFAULT_ROLL_OPTIONS, effectiveManeuvers, isRollable, isUnskilled, SPELL_ROLL_RESET, toPoolAction, type RollOptions } from "./rolls";
 
 export type Theme = "auto" | "light" | "dark";
 export type View = "sheet" | "aid" | "stats";
@@ -285,7 +285,7 @@ function select(c: Character, ui: UiState, a: ActionDef, open: boolean): UiState
   const opts: RollOptions = {
     ...ui.opts,
     raises: 0, free: 0, flat: 0, extraRolled: 0, calledZone: "limb", quadruped: false, disarm: false,
-    centerBonus: false, meleeTarget: false, freeToTn: false, opponentTotal: null,
+    centerBonus: false, meleeTarget: false, freeToTn: false, opponentTotal: null, ...SPELL_ROLL_RESET,
     tn: typeof a.tn === "number" ? a.tn : ui.opts.tn,
     emphasis: a.kind === "skill" && emphasisMatches(c, a.skill ?? "", a.emphasisHint),
     emphasisName: (a.kind === "skill" && matchingEmphasis(c, a.skill ?? "", a.emphasisHint)) || "",
@@ -489,6 +489,8 @@ function rolled(state: AppState, c: Character, action: Extract<AppAction, { type
   // Techniques payées en Vide : option Shiba R1, et effets cochés avec un coût en Vide.
   const spend = opts.voidSpend ? voidSpendOption(c, toPoolAction(a)) : undefined;
   if (spend && c.voidPoints >= spend.points) for (let i = 0; i < spend.points; i++) next = spendVoid(next);
+  // Agasha : lancer avec un autre Anneau coûte 1 point de Vide (annexe F.4, G12).
+  if (a.kind === "spell" && opts.spellRing) next = spendVoid(next);
   for (const e of activeEffects(c)) {
     if (!state.ui.techToggles[e.key] || !("void" in e) || !e.void) continue;
     for (let i = 0; i < e.void; i++) next = spendVoid(next);
@@ -519,7 +521,7 @@ function rolled(state: AppState, c: Character, action: Extract<AppAction, { type
     ...next,
     ui: {
       ...ui,
-      opts: { ...ui.opts, voidPoint: false, voidSkill: false, voidSpend: false, centerBonus: false },
+      opts: { ...ui.opts, voidPoint: false, voidSkill: false, voidSpend: false, centerBonus: false, spellRing: null },
       initiative: a.kind === "initiative" ? total : ui.initiative,
       // Une nouvelle Initiative ouvre une nouvelle escarmouche : le Vide d'Initiative retombe.
       voidInitiative: a.kind === "initiative" ? 0 : ui.voidInitiative,

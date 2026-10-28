@@ -2,10 +2,12 @@ import { useEffect, useRef } from "react";
 import {
   applicableModifiers, armorRollTn, bowStrength, DAMAGE_MANEUVER_ID, describeEffect, focusOutcome, opposedMargin, opposedVerdict, stanceRestriction, woundEffectNote, describeModifier, effectOn, findSkill, fullDefenseBonus, maneuverCost, maneuverFreeRaises, modifierTN,
   formatDice, isRanged, isSocialSkill, meditationVoidPoints, poolStats, reminderText, rollDice, schoolContext, schoolReminders, verdict, voidMultiplier,
-  voidPointBonus, voidSpendBonus, voidSpendOption, woundState,
+  castTime, castTimeLabel, schoolRankOf, spellCast, spellcastingOf, spellOptions, spellRaises, spellRestriction, SPELL_RINGS,
+  voidPointBonus, voidSpendBonus, voidSpendOption, woundState, type Spell, type SpellAction, type SpellRing,
   type ActionDef, type ActiveEffect, type Character, type Pool,
 } from "@carnet/core";
-import { CALLED_ZONES, CENTER_BONUS, COMBAT_SUBS, MEDITATE_ACTION_ID, MELEE_TARGET_PENALTY, SITUATIONS, TN_PER_RAISE, TN_SCALE, TRAIT_LABELS, type CalledZone } from "../../rules/l5r4e";
+import type { SpellOption } from "../../rules/ecoles";
+import { CALLED_ZONES, CENTER_BONUS, COMBAT_SUBS, ELEMENT_LABELS, MEDITATE_ACTION_ID, MELEE_TARGET_PENALTY, SITUATIONS, SPELL_CONCENTRATION, TN_PER_RAISE, TN_SCALE, TRAIT_LABELS, type CalledZone } from "../../rules/l5r4e";
 import { pct } from "../format";
 import {
   activeModifiers, calledRaises, contextOf, effectiveManeuvers, finalTN, isActive, isUnskilled, maneuverCosts, poolFor, rollWoundPenalty,
@@ -36,7 +38,7 @@ export function Roller() {
 
   const { opts } = ui;
   const ctx = schoolContext({ ...contextOf(ui), emphasis: opts.emphasisName });
-  const pa = toPoolAction(a);
+  const pa = toPoolAction(a, opts);
   const selected = selectedKeys(ui.techToggles);
   const stance = uiRollStance(ui);
   const duel = ui.situation === "combat" && ui.sub === "duel";
@@ -159,6 +161,9 @@ export function Roller() {
           <NumberField className="in mono" value={opts.flat} onChange={(n) => set({ flat: n })} />
         </label>
       </div>
+
+      {/* Sort : après le ND et les augmentations (annexe F.5). */}
+      {(a.kind === "spell" || a.kind === "spellDamage") && a.spell && <SpellPanel action={a} spell={a.spell} />}
 
       <div className="grid" style={{ gap: 6, marginBottom: 12 }}>
         {!pool.voidBlocked && (
@@ -389,8 +394,124 @@ function poolOrigin(c: Character, a: ActionDef, opts: RollOptions): string {
       const bow = a.weapon && isRanged(a.weapon) ? `Arc ${bowStrength(c, a.weapon)}` : null;
       return `${bow ?? `Force ${c.traits.strength}`} + VD ${a.dr ?? ""}${extra}`;
     }
+    case "spell": {
+      // « Feu 3 + rang 1 + affinité 1 » (annexe F.5).
+      const cast = spellCast(c, toPoolAction(a, opts) as SpellAction);
+      const parts = [`${ELEMENT_LABELS[cast.ring]} ${cast.ringValue}`, `rang ${schoolRankOf(c)}`];
+      if (cast.affinity) parts.push("affinité 1");
+      const minus = cast.deficiency ? " − déficience 1" : "";
+      return `${parts.join(" + ")}${minus}${cast.rolled ? ` + ${cast.rolled} (école)` : ""}${extra}`;
+    }
+    case "spellDamage": return `VD ${a.spell?.damage ?? ""}${extra}`;
     default: return `Rang ${c.insightRank} + Réflexes ${c.traits.reflexes}${extra}`;
   }
+}
+
+/** Cases de l'école utiles à ce jet : jet de sort (dés, augmentations, affinité) ou dégâts du sort. */
+const forSpellRoll = (o: SpellOption) => o.rolled !== undefined || o.freeRaises !== undefined || o.extraAffinity !== undefined;
+const forSpellDamage = (o: SpellOption) => o.damageRolled !== undefined || o.damageKept !== undefined || o.damageFlat !== undefined;
+
+function optionEffect(o: SpellOption, c: Character): string {
+  if (o.extraAffinity) return `affinité ${ELEMENT_LABELS[o.extraAffinity]}`;
+  if (o.freeRaises) return `${o.freeRaises} augmentation gratuite`;
+  if (o.rolled) return `+${o.rolled}g0`;
+  if (o.damageFlat === "schoolRank") return `+${schoolRankOf(c)} aux dégâts`;
+  return `+${o.damageRolled ?? 0}g${o.damageKept ?? 0} aux dégâts`;
+}
+
+/** Lanceur d'un sort (annexe F.5) : élément, autre Anneau, cases de l'école, temps d'incantation, rappels. */
+function SpellPanel({ action: a, spell }: { action: ActionDef; spell: Spell }) {
+  const { state, dispatch } = useStore();
+  const c = useCharacter();
+  const { opts } = state.ui;
+  const sc = spellcastingOf(c);
+  const set = (patch: Partial<RollOptions>) => dispatch({ type: "option", patch });
+  const damage = a.kind === "spellDamage";
+  const options = spellOptions(c).filter(damage ? forSpellDamage : forSpellRoll);
+  const checkboxes = options.length > 0 && (
+    <div className="grid" style={{ gap: 6 }} role="group" aria-label="Cases de l'école">
+      {options.map((o) => (
+        <label key={o.id} className="chk">
+          <input type="checkbox" checked={!!opts.spellOptions[o.id]} onChange={(e) => set({ spellOptions: { ...opts.spellOptions, [o.id]: e.target.checked } })} />
+          {" "}{o.label} <span className="muted">· {optionEffect(o, c)}</span>
+        </label>
+      ))}
+    </div>
+  );
+  if (damage) return <div className="spellbox" data-testid="spell-panel">{checkboxes}</div>;
+
+  const pa = toPoolAction(a, opts) as SpellAction;
+  const cast = spellCast(c, pa);
+  const restriction = spellRestriction(c, spell, cast.element, pa.options);
+  const raises = spellRaises(spell);
+  const time = castTime(spell.mastery, opts.castRaises);
+  const otherRings = SPELL_RINGS.filter((r) => r !== cast.element);
+  return (
+    <div className="spellbox" data-testid="spell-panel">
+      {restriction && (
+        <div className="hint" data-testid="spell-restriction" style={{ color: "var(--bad)", marginTop: 0 }}>
+          {restriction} Tu peux lancer quand même si le MJ l'accepte.
+        </div>
+      )}
+      {spell.element === "all" && (
+        <label className="field" style={{ maxWidth: 260 }}>
+          <span className="label">Élément (sort universel)</span>
+          <select className="in" value={cast.element} onChange={(e) => set({ spellElement: e.target.value as SpellRing, spellRing: null })}>
+            {SPELL_RINGS.map((r) => <option key={r} value={r}>{ELEMENT_LABELS[r]}</option>)}
+          </select>
+        </label>
+      )}
+      {sc?.ringSwap && (
+        <div className="grid" style={{ gap: 6 }}>
+          <label className="chk">
+            <input
+              type="checkbox" checked={!!opts.spellRing} disabled={c.voidPoints < 1 && !opts.spellRing}
+              onChange={(e) => set({ spellRing: e.target.checked ? (otherRings[0] ?? null) : null })}
+            />
+            {" "}1 point de Vide : lancer avec un autre Anneau <span className="muted">· reste {c.voidPoints}</span>
+          </label>
+          {opts.spellRing && (
+            <label className="field" style={{ maxWidth: 260, marginLeft: 24 }}>
+              <span className="label">Anneau du jet</span>
+              <select className="in" value={opts.spellRing} onChange={(e) => set({ spellRing: e.target.value as SpellRing })}>
+                {otherRings.map((r) => <option key={r} value={r}>{ELEMENT_LABELS[r]}</option>)}
+              </select>
+            </label>
+          )}
+        </div>
+      )}
+      {checkboxes}
+      {cast.freeRaises.length > 0 && (
+        <div className="hint" data-testid="spell-free-raises" style={{ color: "var(--gold)" }}>
+          {cast.freeRaises.length} augmentation{cast.freeRaises.length > 1 ? "s" : ""} gratuite{cast.freeRaises.length > 1 ? "s" : ""} de l'école : {cast.freeRaises.join(", ")}.
+        </div>
+      )}
+      <div className="castrow">
+        <label className="field">
+          <span className="label">Augm. pour le temps d'incantation</span>
+          <NumberField className="in mono" min={0} max={10} value={opts.castRaises} onChange={(n) => set({ castRaises: n })} />
+        </label>
+        <div className="tnline" style={{ margin: 0 }}>
+          <span>Temps d'incantation</span>
+          <b data-testid="cast-time">{castTimeLabel(time)}</b>
+        </div>
+      </div>
+      {raises.length > 0 && (
+        <div className="spellraises" data-testid="spell-raises">
+          <span className="label">Augmentations du sort</span>
+          <ul>{raises.map((r) => <li key={r}>{r}</li>)}</ul>
+        </div>
+      )}
+      {!spell.memorized && (
+        <div className="hint" data-testid="spell-scroll">Sort non mémorisé : lance-le parchemin en main (le mémoriser coûte {spell.mastery} XP).</div>
+      )}
+      <div className="hint">
+        Interrompu pendant l'incantation : jet de Volonté ND {SPELL_CONCENTRATION.tn} (ou {SPELL_CONCENTRATION.base} + dégâts subis) pour ne pas perdre le sort.
+      </div>
+      {sc?.reminders?.map((r) => <div key={r} className="hint" style={{ color: "var(--gold)" }}>{r}</div>)}
+      {spell.effect && <div className="spelleffect prose" data-testid="spell-effect">{spell.effect}</div>}
+    </div>
+  );
 }
 
 function TnField({ action: a, opts, set }: { action: ActionDef; opts: RollOptions; set: (p: Partial<RollOptions>) => void }) {
@@ -413,6 +534,15 @@ function TnField({ action: a, opts, set }: { action: ActionDef; opts: RollOption
         <div className="field"><span className="label">ND</span><span className="muted" style={{ fontSize: 13, paddingTop: 6 }}>Opposition : compare au jet adverse</span></div>
       );
     default:
+      // Sort : ND fixé par la maîtrise (F.2).
+      if (a.kind === "spell") {
+        return (
+          <div className="field">
+            <span className="label">ND de base</span>
+            <span className="mono" data-testid="spell-tn" style={{ paddingTop: 6 }}>{a.tn} <span className="muted">· maîtrise {a.spell?.mastery}</span></span>
+          </div>
+        );
+      }
       return (
         <label className="field"><span className="label">ND de base</span>
           <select className="in mono" value={opts.tn} onChange={(e) => set({ tn: Number(e.target.value) })}>

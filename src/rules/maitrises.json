@@ -75,6 +75,9 @@
     { "skill": "Méditation", "rank": 3, "summary": "La méditation rend 2 points de Vide.",
       "effects": [ { "kind": "voidRecovery", "points": 2 } ] },
     { "skill": "Méditation", "rank": 7, "summary": "La méditation rend 3 points de Vide.",
-      "effects": [ { "kind": "voidRecovery", "points": 3 } ] }
+      "effects": [ { "kind": "voidRecovery", "points": 3 } ] },
+
+    { "skill": "Sortilèges", "rank": 5, "summary": "+1g0 aux jets de sort (p. 140, annexe F.2).",
+      "effects": [ { "kind": "roll", "on": ["spell"], "rolled": 1, "mode": "auto" } ] }
   ]
 }

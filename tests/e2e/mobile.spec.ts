@@ -297,10 +297,10 @@ test.describe("M12 à 360 px de large", () => {
 });
 
 /** Les onglets de situation tiennent sur une ligne, sans défilement ni texte tronqué, en zones de 40 px. */
-async function situationsFit(page: Page) {
+async function situationsFit(page: Page, labels = ["Enquête", "Cour", "Déplacement", "Combat"]) {
   await tab(page, "Aide de jeu").click();
   const group = page.getByRole("group", { name: "Situation" });
-  await expect(group.getByRole("button")).toHaveText(["Enquête", "Cour", "Déplacement", "Combat"]);
+  await expect(group.getByRole("button")).toHaveText(labels);
   const report = await group.evaluate((g) => {
     const vw = document.documentElement.clientWidth;
     const buttons = [...g.querySelectorAll("button")].map((b) => {
@@ -500,7 +500,7 @@ test.describe("M18 et M16 à 360 px de large", () => {
   });
 });
 
-test.describe("M19 (E36, v2.9.0 et v2.10.0) à 360 px de large", () => {
+test.describe("M19 (E36, v2.9.0 à v2.11.0) à 360 px de large", () => {
   test.use({ viewport: { width: 360, height: 740 } });
 
   test("Rouleaux & invocations en édition : sorts universels et un sort complet, aucun débordement", async ({ page }) => {
@@ -524,5 +524,11 @@ test.describe("M19 (E36, v2.9.0 et v2.10.0) à 360 px de large", () => {
     await page.getByRole("button", { name: "Terminer : Rouleaux & invocations" }).click();
     await expect(page.getByTestId("block-magic").locator(".spell")).toHaveCount(4);
     await noHorizontalScroll(page, "Rouleaux & invocations en lecture");
+    // v2.11.0 : les 5 situations sur une ligne, puis le lanceur d'un sort sans débordement.
+    await situationsFit(page, ["Enquête", "Cour", "Déplacement", "Combat", "Magie"]);
+    await page.getByRole("group", { name: "Situation" }).getByRole("button", { name: "Magie" }).click();
+    await page.locator("button.act").filter({ hasText: "Lancer · Frappe de jade" }).click();
+    await expect(page.getByTestId("spell-panel")).toBeVisible();
+    await noHorizontalScroll(page, "lanceur de sort");
   });
 });
