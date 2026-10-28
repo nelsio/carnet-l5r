@@ -3,7 +3,7 @@
  * Corriger une règle = modifier une donnée ici, pas le moteur.
  * Points à vérifier dans le livre : voir HANDOFF §12 (P2, P5).
  */
-import type { Maneuver, RollTrait, TraitKey } from "../core/schema";
+import type { Maneuver, RollTrait, SpellElement, TraitKey } from "../core/schema";
 import type { WeaponLike } from "../core/engine";
 import battleTable from "./table-bataille.json";
 
@@ -491,3 +491,17 @@ export const NAMED_MODIFIERS: readonly ModifierTemplate[] = [
     note: "Désavantage physique : +5 à la pénalité de chaque niveau de blessure (livre p. 162).",
   },
 ];
+
+/** Magie (annexe F) : libellés des éléments d'un sort, « Tous » pour un sort universel. */
+export const ELEMENT_LABELS: Record<SpellElement, string> = {
+  air: "Air", earth: "Terre", fire: "Feu", water: "Eau", void: "Vide", all: "Tous",
+};
+
+/** Mots-clés de sort proposés à cocher (P20) ; le joueur peut en saisir d'autres. */
+export const SPELL_KEYWORDS = ["Bataille", "Artisanat", "Défense", "Divination", "Illusion", "Jade", "Tonnerre", "Voyage", "Protection"] as const;
+
+/** Sorts connus de tout shugenja (p. 166) : Sense, Commune, Summon ; noms français à confirmer (P20). */
+export const UNIVERSAL_SPELLS = ["Sentir", "Communier", "Invoquer"] as const;
+
+/** ND d'un sort : 5 + 5 × maîtrise (p. 165). */
+export const SPELL_TN = { base: 5, perMastery: 5 } as const;

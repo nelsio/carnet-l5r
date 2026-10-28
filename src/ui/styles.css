@@ -466,3 +466,23 @@ header.top + main{margin-top:18px}
   .armform{grid-template-columns:repeat(2,minmax(0,1fr))}
   .armform .armcat{grid-column:1/-1}
 }
+/* ---------- v2.9.0 : Rouleaux & invocations (annexe F.5) ---------- */
+.spells{display:grid;gap:8px}
+.spell{display:grid;gap:3px;min-width:0;padding:8px 10px;border-radius:8px;background:var(--bg);border-left:3px solid var(--rc,var(--gold))}
+.spell.el-air{--rc:var(--air)}.spell.el-earth{--rc:var(--earth)}.spell.el-fire{--rc:var(--fire)}.spell.el-water{--rc:var(--water)}.spell.el-void{--rc:var(--void)}
+.spell .sp1{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px}
+.spell .sp1 b{font-family:var(--f-display);font-size:16px}
+.spell .sp1 .mono{font-size:12.5px}
+.spell .sp2,.spell .sp4{font-size:13px}
+.spell .sp5{font-size:13.5px}
+.tag.el{background:color-mix(in srgb,var(--rc,var(--gold)) 18%,var(--surface));color:var(--ink)}
+.tag.memo{background:var(--gold-soft);color:var(--ink)}
+.spelledit{display:grid;gap:8px;margin-bottom:10px;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.spelledit .form-grid{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+.spelledit .form-grid.wide{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.spelledit textarea.in{min-height:64px}
+.kwpick{display:flex;flex-wrap:wrap;align-items:center;gap:5px}
+.kwpick .label{margin-right:4px}
+.kwpick button{padding:3px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:12.5px;font-weight:600}
+.kwpick button[aria-pressed=true]{border-color:var(--gold);background:var(--gold-soft)}
+.spellfoot{display:flex;justify-content:space-between;align-items:center}

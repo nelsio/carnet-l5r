@@ -90,7 +90,28 @@ export const ManeuverSchema = z.object({
   stackable: z.boolean("doit être vrai ou faux"),
 }, "doit être un objet");
 
-export const MODIFIER_SOURCES = ["technique", "advantage", "disadvantage", "other"] as const;
+/** Élément d'un sort (annexe F.3) ; « all » : sort universel, élément choisi au lancement. */
+export const SPELL_ELEMENTS = ["air", "earth", "fire", "water", "void", "all"] as const;
+
+/** Sort du Rouleaux & invocations (annexe F.3) : champs libres, recopiés par le joueur. */
+export const SpellSchema = z.object({
+  id: text(40).min(1, "ne doit pas être vide"),
+  name: text(120).min(1, "ne doit pas être vide"),
+  element: z.enum(SPELL_ELEMENTS, "doit être air, earth, fire, water, void ou all"),
+  mastery: int(1, 6),
+  keywords: z.array(text(40), "doit être une liste de textes").default([]),
+  range: text(80).default(""),
+  area: text(120).default(""),
+  duration: text(80).default(""),
+  /** Augmentations propres au sort, une par ligne. */
+  raises: text(2000).default(""),
+  /** VD facultative (« 2k2 ») : action « Dégâts » du sort (v2.11.0). */
+  damage: z.string("doit être un texte").regex(/^\s*(\d+\s*[kg]\s*\d+)?\s*$/i, "doit être au format 2k2").optional(),
+  memorized: z.boolean("doit être vrai ou faux").default(false),
+  effect: text().default(""),
+}, "doit être un objet");
+
+export const MODIFIER_SOURCES =["technique", "advantage", "disadvantage", "other"] as const;
 export const MODIFIER_TARGETS = ["all", "skill", "trait", "social", "attack", "damage", "initiative", "armor", "wounds"] as const;
 export const STANCE_IDS = ["attack", "fullAttack", "defense", "fullDefense", "center"] as const;
 
@@ -153,6 +174,8 @@ export const characterShape = {
   maneuvers: z.array(ManeuverSchema, "doit être une liste").default([]),
   /** Facultatif : ajout compatible au format v1 (HANDOFF annexe B). */
   modifiers: z.array(ModifierSchema, "doit être une liste").optional(),
+  /** Facultatif : Rouleaux & invocations (annexe F.3), format v2 inchangé. */
+  spells: z.array(SpellSchema, "doit être une liste").optional(),
   advantages: text().default(""),
   disadvantages: text().default(""),
   notes: text().default(""),
@@ -172,7 +195,9 @@ export type WeaponKeyword = z.infer<typeof WeaponKeywordSchema>;
 export type Technique = z.infer<typeof TechniqueSchema>;
 export type Maneuver = z.infer<typeof ManeuverSchema>;
 export type Modifier = z.infer<typeof ModifierSchema>;
-export type ModifierTarget = (typeof MODIFIER_TARGETS)[number];
+export type Spell = z.infer<typeof SpellSchema>;
+export type SpellElement = (typeof SPELL_ELEMENTS)[number];
+export type ModifierTarget =(typeof MODIFIER_TARGETS)[number];
 export type Character = z.infer<typeof CharacterSchema>;
 
 export interface FieldError { path: string; message: string }

@@ -17,3 +17,4 @@ export * from "./battle";
 export * from "./armor";
 export { DAMAGE_MANEUVER_ID, DEFAULT_MANEUVERS, DISARM_MANEUVER_ID } from "../rules/l5r4e";
 export type { ActionDef, ArmyStatus, CombatSub, Engagement, Situation, Stance } from "../rules/l5r4e";
+export * from "./spells";
