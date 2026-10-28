@@ -1,13 +1,14 @@
 /**
  * Catalogue des techniques d'école (HANDOFF annexes C.3 et D).
  * Les données vivent dans `ecoles-bushi.json` (copie de `reference/ecoles-bushi.json`) et
- * `ecoles-courtisans.json` (courtisans et Shosuro, lot 11) : effets chiffrés et résumés écrits pour l'outil,
- * aucun texte du livre.
+ * `ecoles-courtisans.json` (courtisans et Shosuro, lot 11) et `ecoles-shugenja.json` (shugenja, lot 13) :
+ * effets chiffrés et résumés écrits pour l'outil, aucun texte du livre.
  * Écart avec la référence : la manœuvre « knock » du prototype s'appelle ici « knockdown » (Yoritomo R4).
  */
 import type { TraitKey, WeaponKeyword } from "../core/schema";
 import bushi from "./ecoles-bushi.json";
 import courtiers from "./ecoles-courtisans.json";
+import shugenja from "./ecoles-shugenja.json";
 import masteries from "./maitrises.json";
 import type { RingKey, Stance, Terrain } from "./l5r4e";
 
@@ -101,6 +102,37 @@ export interface School {
   skills?: string[];
   /** Mots qui désignent l'école dans le champ libre « École », en plus du nom de famille (suggestion, annexe D-h). */
   classWords?: string[];
+  /** École de shugenja (annexe F.4) : affinité, déficience, augmentations gratuites, options du lanceur de sort. */
+  spellcasting?: Spellcasting;
+}
+
+/**
+ * Case d'école du lanceur de sort (v2.11.0) : `rolled` dés lancés en plus, `freeRaises`, `extraAffinity` (Moshi le jour),
+ * `extraSlot` (Soshi), bonus aux dégâts du sort (`damageRolled`/`damageKept`, ou `damageFlat` = rang d'école).
+ */
+export interface SpellOption {
+  id: string; label: string;
+  rolled?: number; freeRaises?: number; extraAffinity?: RingKey; extraSlot?: number;
+  damageRolled?: number; damageKept?: number; damageFlat?: "schoolRank";
+}
+
+export interface Spellcasting {
+  /** Page du livre (PDF). */
+  page: number;
+  /** « choice » : affinité au choix du joueur (Isawa, champ `affinity` de la fiche). */
+  affinity: RingKey | "choice";
+  deficiency: RingKey | null;
+  /** Mots-clés de sort qui donnent une augmentation gratuite. */
+  freeRaiseKeywords?: string[];
+  /** Augmentation gratuite sur tous les sorts de l'élément d'affinité (Isawa). */
+  freeRaiseAffinity?: boolean;
+  options?: SpellOption[];
+  /** Rappels sans effet chiffré. */
+  reminders?: string[];
+  /** 1 point de Vide : lancer avec un autre Anneau (Agasha). */
+  ringSwap?: boolean;
+  /** Rappel des sorts de départ (« universels, 3 Terre, 2 Feu, 1 Eau »). */
+  startingSpells: string;
 }
 /**
  * Arme du livre (p. 201-206, annexe E.2 C8). `special: "katanaVoid"` : un point de Vide possible aux dégâts ;
@@ -122,8 +154,8 @@ type MasteryRoll = Omit<Extract<Effect, { kind: "roll" }>, "on"> & { on: (On | "
 /** Maîtrises de compétence, par compétence puis par rang. */
 export const MASTERIES = masteries.masteries as unknown as readonly Mastery[];
 
-/** Écoles bushi (lot 10), puis courtisans et Shosuro (lot 11). */
-export const SCHOOLS = [...bushi.schools, ...courtiers.schools] as unknown as readonly School[];
+/** Écoles bushi (lot 10), courtisans et Shosuro (lot 11), puis shugenja (lot 13). */
+export const SCHOOLS = [...bushi.schools, ...courtiers.schools, ...shugenja.schools] as unknown as readonly School[];
 /** Catalogue d'armes : mots-clés, compétence et VD du livre (vérifiés, HANDOFF P10 et annexe E.2 C8). */
 export const WEAPON_CATALOG = bushi.weaponCatalog as unknown as readonly CatalogWeapon[];
 /** Compétences Bugei (Akodo R5, Utaku R5). */

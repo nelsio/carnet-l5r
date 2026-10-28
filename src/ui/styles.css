@@ -486,3 +486,4 @@ header.top + main{margin-top:18px}
 .kwpick button{padding:3px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:12.5px;font-weight:600}
 .kwpick button[aria-pressed=true]{border-color:var(--gold);background:var(--gold-soft)}
 .spellfoot{display:flex;justify-content:space-between;align-items:center}
+.affin{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:-2px 0 8px}
