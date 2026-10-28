@@ -118,9 +118,9 @@ describe("Situation « Magie » (F.5)", () => {
   it("un lancer par sort, groupé par élément, ND et temps d'incantation ; dégâts rattachés si VD", () => {
     const actions = buildActions(kuni(), "magic");
     expect(actions.map((a) => a.id)).toEqual([
-      "spell-sentir", "spell-air-1", "spell-jade-strike", "spelldmg-jade-strike", "spell-earth-2", "spell-fire-1", "spelldmg-fire-1",
+      "spell-sentir", "spell-air-1", "spell-jade-strike", "spelldmg-jade-strike", "spell-earth-2", "spell-fire-1", "spelldmg-fire-1", "concentrate",
     ]);
-    expect(actions.map((a) => a.group)).toEqual(["Tous", "Air", "Terre", "Terre", "Terre", "Feu", "Feu"]);
+    expect(actions.map((a) => a.group)).toEqual(["Tous", "Air", "Terre", "Terre", "Terre", "Feu", "Feu", "Interruption"]);
     const earth2 = actions.find((a) => a.id === "spell-earth-2");
     expect(earth2).toMatchObject({ kind: "spell", tn: 15, label: "Lancer · Mur de terre", description: "ND 15 · 2 actions complexes · Défense · parchemin" });
     expect(actions.find((a) => a.id === "spelldmg-fire-1")).toMatchObject({
@@ -128,7 +128,7 @@ describe("Situation « Magie » (F.5)", () => {
     });
   });
 
-  it("une fiche sans sort : aucune action", () => {
-    expect(buildActions(kuni({ spells: [] }), "magic")).toEqual([]);
+  it("une fiche sans sort : seulement « Rester concentré » (v2.12.0)", () => {
+    expect(buildActions(kuni({ spells: [] }), "magic").map((a) => a.id)).toEqual(["concentrate"]);
   });
 });

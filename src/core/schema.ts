@@ -94,6 +94,8 @@ export const ManeuverSchema = z.object({
 export const SPELL_ELEMENTS = ["air", "earth", "fire", "water", "void", "all"] as const;
 /** Anneaux d'un shugenja (affinité, déficience), Vide compris. */
 export const SPELL_RINGS = ["air", "earth", "fire", "water", "void"] as const;
+/** Emplacements de sorts : un compteur par Anneau, plus les emplacements libres (F.2). */
+export const SPELL_SLOT_KEYS = [...SPELL_RINGS, "free"] as const;
 
 /** Sort du Rouleaux & invocations (annexe F.3) : champs libres, recopiés par le joueur. */
 export const SpellSchema = z.object({
@@ -180,6 +182,10 @@ export const characterShape = {
   spells: z.array(SpellSchema, "doit être une liste").optional(),
   /** Facultatif : affinité choisie, pour une école à affinité au choix (Isawa, annexe F.3). */
   affinity: z.enum(SPELL_RINGS, "doit être un Anneau").optional(),
+  /** Facultatif : emplacements de sorts dépensés aujourd'hui, par Anneau et « free » (annexe F.3, F-d). */
+  spellSlotsUsed: z.partialRecord(
+    z.enum(SPELL_SLOT_KEYS, "doit être air, earth, fire, water, void ou free"), positiveInt(), "doit être un objet",
+  ).optional(),
   advantages: text().default(""),
   disadvantages: text().default(""),
   notes: text().default(""),
@@ -202,6 +208,7 @@ export type Modifier = z.infer<typeof ModifierSchema>;
 export type Spell = z.infer<typeof SpellSchema>;
 export type SpellElement = (typeof SPELL_ELEMENTS)[number];
 export type SpellRing = (typeof SPELL_RINGS)[number];
+export type SpellSlotKey = (typeof SPELL_SLOT_KEYS)[number];
 export type ModifierTarget =(typeof MODIFIER_TARGETS)[number];
 export type Character = z.infer<typeof CharacterSchema>;
 

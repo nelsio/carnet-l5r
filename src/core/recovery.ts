@@ -8,9 +8,12 @@ export function dailyHealing(c: Character): number {
   return DAILY_HEALING.perStamina * c.traits.stamina + DAILY_HEALING.perInsight * c.insightRank;
 }
 
-/** « Nouvelle journée » : Vide plein (p. 80), blessures soignées, plancher 0. */
+/** « Nouvelle journée » : Vide plein (p. 80), blessures soignées, plancher 0, emplacements de sorts rechargés (F-d). */
 export function newDay(c: Character): Character {
-  return { ...c, voidPoints: c.voidRing, wounds: Math.max(0, c.wounds - dailyHealing(c)) };
+  return {
+    ...c, voidPoints: c.voidRing, wounds: Math.max(0, c.wounds - dailyHealing(c)),
+    ...(c.spellSlotsUsed ? { spellSlotsUsed: {} } : {}),
+  };
 }
 
 /** Méditation réussie (p. 139) : 1 point de Vide, plus avec la maîtrise de Méditation, plafonné à l'Anneau de Vide. */

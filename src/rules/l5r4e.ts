@@ -516,3 +516,4 @@ export const SPELL_CAST_TIME_MIN = 1;
 
 /** Interruption pendant l'incantation : Volonté, ND 10, ou 5 + dégâts subis (p. 166). */
 export const SPELL_CONCENTRATION = { tn: 10, base: 5 } as const;
+export const CONCENTRATE_ACTION_ID = "concentrate";

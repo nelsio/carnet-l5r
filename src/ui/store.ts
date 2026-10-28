@@ -5,7 +5,8 @@
 import { createContext, useContext, type Dispatch } from "react";
 import {
   activeEffects, buildActions, DAMAGE_MANEUVER_ID, DISARM_MANEUVER_ID, emphasisMatches, matchingEmphasis, meditate, newDay, voidSpendOption,
-  feintBonus, focusOutcome, fullAttackAllowed, fullDefenseBonus, updateVocabulary, woundsFromDamage, type ActionDef, type ArmyStatus, type Character, type CombatSub,
+  feintBonus, focusOutcome, fullAttackAllowed, fullDefenseBonus, refundSpellSlots, spellSlotNeed, spendSpellSlots, updateVocabulary, woundsFromDamage,
+  type ActionDef, type ArmyStatus, type Character, type CombatSub, type SpellAction, type SpellSlotKey,
   type Engagement, type RollResult, type Situation, type Stance,
 } from "@carnet/core";
 import { FEINT_MANEUVER_ID, WOUND_MULTIPLIERS, WOUND_NEXT_MULTIPLIER, type Terrain } from "../rules/l5r4e";
@@ -88,6 +89,8 @@ export interface UiState {
   /** Dégâts liés à l'attaque réussie : dés d'augmentation, ou Désarmement (2g1 sans la Force). */
   pendingDamage: { parent: string; dice: number; disarm?: boolean; flat?: number } | null;
   lastRoll: RollRecord | null;
+  /** Dernier sort lancé (v2.12.0) : emplacements pris, pour « Annuler (interrompu) » ; `success` null : jet sans ND. */
+  spellCast: { actionId: string; slots: SpellSlotKey[]; success: boolean | null } | null;
   history: { label: string; total: number; tn: number | null | "opposed" }[];
   sheetOpen: boolean;
   woundsExpanded: boolean;
@@ -181,6 +184,7 @@ export const initialUi: UiState = {
   maneuvers: {},
   pendingDamage: null,
   lastRoll: null,
+  spellCast: null,
   history: [],
   sheetOpen: false,
   woundsExpanded: false,
@@ -218,6 +222,10 @@ export type AppAction =
   | { type: "newDay" }
   /** Méditation réussie : points de Vide rendus. */
   | { type: "meditate" }
+  /** Sort lancé aux vrais dés (v2.12.0) : Réussi ou Raté, l'emplacement est dépensé. */
+  | { type: "castSpell"; success: boolean }
+  /** Sort réussi puis interrompu : emplacements rendus. */
+  | { type: "cancelCast" }
   | { type: "toggleInfo"; panel: InfoPanel }
   | { type: "toggleArmorEdit" }
   | { type: "view"; view: View }
@@ -303,7 +311,7 @@ function select(c: Character, ui: UiState, a: ActionDef, open: boolean): UiState
   if (a.id === "strike" && ui.focusGap !== null) opts.free = focusOutcome(c, ui.focusGap).freeRaises;
   return {
     ...ui, selectedId: a.id, opts: { ...opts, voidSpend: false }, maneuvers: {}, modifierToggles: {}, techToggles: {}, techInputs: {},
-    pendingDamage, sheetOpen: open || ui.sheetOpen,
+    pendingDamage, sheetOpen: open || ui.sheetOpen, spellCast: null,
   };
 }
 
@@ -379,7 +387,7 @@ const kept = (ui: UiState): Pick<UiState, "theme" | "showDiceRoller" | "woundMul
   ({ theme: ui.theme, showDiceRoller: ui.showDiceRoller, woundMultiplier: ui.woundMultiplier, info: ui.info });
 
 /** Actions qui modifient la fiche : refusées en consultation. */
-const EDITING = new Set<AppAction["type"]>(["set", "add", "remove", "wounds", "pip", "toggleBlockEdit", "replaceCharacter", "newDay", "meditate", "vocabulary"]);
+const EDITING = new Set<AppAction["type"]>(["set", "add", "remove", "wounds", "pip", "toggleBlockEdit", "replaceCharacter", "newDay", "meditate", "vocabulary", "castSpell", "cancelCast"]);
 
 export function reducer(state: AppState, action: AppAction): AppState {
   const { character: c, ui } = state;
@@ -433,6 +441,16 @@ export function reducer(state: AppState, action: AppAction): AppState {
     }
     case "meditate":
       return { ...state, character: meditate(c) };
+    case "castSpell": {
+      const a = selectedAction(c, ui);
+      if (!a || a.kind !== "spell") return state;
+      const next = castSpell(spendRollCosts(state, c, a), c, a, action.success);
+      return { ...next, ui: { ...next.ui, ...afterRoll(next.ui) } };
+    }
+    case "cancelCast":
+      return ui.spellCast
+        ? { ...state, character: refundSpellSlots(c, ui.spellCast.slots), ui: { ...ui, spellCast: null } }
+        : state;
     case "toggleBlockEdit": {
       const editing = new Set(ui.editing);
       if (!editing.delete(action.block)) editing.add(action.block);
@@ -477,10 +495,8 @@ export function reducer(state: AppState, action: AppAction): AppState {
   }
 }
 
-/** Bilan d'un jet : dépense de Vide, initiative, Défense totale, dégâts en attente, historique. */
-function rolled(state: AppState, c: Character, action: Extract<AppAction, { type: "rolled" }>): AppState {
-  const a = selectedAction(c, state.ui);
-  if (!a) return state;
+/** Dépenses d'un jet : points de Vide (jet, compétence, techniques, Anneau d'Agasha). */
+function spendRollCosts(state: AppState, c: Character, a: ActionDef): AppState {
   let next = state;
   const { opts } = state.ui;
   if (opts.voidPoint) next = spendVoid(next);
@@ -495,9 +511,33 @@ function rolled(state: AppState, c: Character, action: Extract<AppAction, { type
     if (!state.ui.techToggles[e.key] || !("void" in e) || !e.void) continue;
     for (let i = 0; i < e.void; i++) next = spendVoid(next);
   }
-  const ui = next.ui;
+  return next;
+}
+
+/** Sort lancé (F.2) : ses emplacements sont dépensés, réussi ou raté ; rien en consultation. */
+function castSpell(state: AppState, c: Character, a: ActionDef, success: boolean | null): AppState {
+  if (state.mode === "readonly" || !state.character) return state;
+  const need = spellSlotNeed(c, toPoolAction(a, state.ui.opts) as SpellAction);
+  const { character, taken } = spendSpellSlots(state.character, need.ring, need.count);
+  return { ...state, character, ui: { ...state.ui, spellCast: { actionId: a.id, slots: taken, success } } };
+}
+
+/** Options remises à zéro après un jet : dépenses faites, bonus de Centre utilisé. */
+const afterRoll = (ui: UiState): Partial<UiState> => ({
+  opts: { ...ui.opts, voidPoint: false, voidSkill: false, voidSpend: false, centerBonus: false, spellRing: null },
+  centerBonusUsed: ui.centerBonusUsed || ui.opts.centerBonus,
+});
+
+/** Bilan d'un jet : dépense de Vide, emplacements de sort, initiative, Défense totale, dégâts en attente, historique. */
+function rolled(state: AppState, c: Character, action: Extract<AppAction, { type: "rolled" }>): AppState {
+  const a = selectedAction(c, state.ui);
+  if (!a) return state;
+  const { opts } = state.ui;
   const { total } = action.result;
   const success = typeof action.tn === "number" && total >= action.tn;
+  let next = spendRollCosts(state, c, a);
+  if (a.kind === "spell") next = castSpell(next, c, a, typeof action.tn === "number" ? success : null);
+  const ui = next.ui;
   const damageDice = a.attack && success ? (ui.maneuvers[DAMAGE_MANEUVER_ID] ?? 0) : 0;
   const disarm = a.attack && success && (ui.maneuvers[DISARM_MANEUVER_ID] ?? 0) > 0;
   const feint = a.attack && success && typeof action.tn === "number" && (ui.maneuvers[FEINT_MANEUVER_ID] ?? 0) > 0
@@ -521,11 +561,10 @@ function rolled(state: AppState, c: Character, action: Extract<AppAction, { type
     ...next,
     ui: {
       ...ui,
-      opts: { ...ui.opts, voidPoint: false, voidSkill: false, voidSpend: false, centerBonus: false, spellRing: null },
+      ...afterRoll(ui),
       initiative: a.kind === "initiative" ? total : ui.initiative,
       // Une nouvelle Initiative ouvre une nouvelle escarmouche : le Vide d'Initiative retombe.
       voidInitiative: a.kind === "initiative" ? 0 : ui.voidInitiative,
-      centerBonusUsed: ui.centerBonusUsed || opts.centerBonus,
       ...(a.fullDefense ? { stance: "fullDefense" as const, fullDefenseBonus: fullDefenseBonus(total) } : {}),
       pendingDamage: a.attack
         ? (disarm ? { parent: a.id, dice: 0, disarm }
