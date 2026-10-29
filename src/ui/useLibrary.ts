@@ -70,7 +70,8 @@ export function useLibrary(
       const prefs = await storage.prefs.get();
       const list = (await storage.library.list()).sort(byDate);
       if (cancelled) return;
-      if (prefs.theme) dispatch({ type: "theme", theme: prefs.theme });
+      // IndexedDB fait foi face au cache de localStorage (annexe I.1.8).
+      dispatch({ type: "theme", theme: prefs.theme ?? "auto" });
       if (prefs.showDiceRoller) dispatch({ type: "diceRoller", show: true });
       if (prefs.woundMultiplier) dispatch({ type: "woundMultiplier", value: prefs.woundMultiplier });
       setEntries(list);

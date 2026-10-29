@@ -356,7 +356,7 @@ interface LibraryStore {
 - Aucun appel réseau : polices embarquées, aucune bibliothèque chargée depuis un CDN.
 
 ### 6.4 Thème et couleurs
-> **Remplacé au lot 17 (v2.14.0) par l'annexe I.1** (jetons, accents lisibles, couleurs sémantiques, Android). Jusqu'à sa livraison, cette section décrit l'état v2.13 ; ensuite, l'annexe I.1 fait foi.
+> **Remplacé au lot 17 (v2.14.0) par l'annexe I.1** (jetons, accents lisibles, couleurs sémantiques, Android), livré : l'annexe I.1 fait foi, cette section décrit l'état v2.13.
 
 - Couleurs uniquement en variables CSS.
 - Clair écru : fond `#ece6d8`, surface `#f7f3ea`, encre `#2a261f`.
@@ -571,7 +571,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 14. **v2.13.0 — nom de l'outil dans l'en-tête** : annexe G (maquette validée). Sceau 帳 qui ouvre la Bibliothèque, surtitre, titre d'onglet dynamique, favicon (**livrée**, écarts en G.6) → cas H1 à H12. **v2.13.1** (patch) : le bouton Bibliothèque est gardé à côté du sceau (G.6).
 15. **v2.13.2 — fichiers du dépôt GitHub** : annexe H.1 à H.4 (**livrée**, écarts en H.11). Licence MIT, contribution, code de conduite, sécurité, `CHANGELOG.md`, modèles d'issue et de PR, Dependabot, `.editorconfig` → cas R1 à R4. Code applicatif inchangé (sauf `package.json`).
 16. **v2.13.3 — correctifs** : annexe H.5 à H.8 (**livrée**, écarts en H.12). Notation `XgY` partout à l'affichage (`formatDR`, données en `g`), boutons en trop et incohérences (relevé X1 à X6, captures avant / après) → cas K1 à K8.
-17. **v2.14.0 — couleurs** : annexe I.1, **remplace le §6.4**. Jetons `--surface-2`, `--accent-ink`, `--on-accent`, couleurs sémantiques `--danger` / `--ok` / `--warn`, jetons `--ring-*`, `theme-color` et thème sans flash → cas N1 à N12.
+17. **v2.14.0 — couleurs** : annexe I.1, **remplace le §6.4**. Jetons `--surface-2`, `--accent-ink`, `--on-accent`, couleurs sémantiques `--danger` / `--ok` / `--warn`, jetons `--ring-*`, `theme-color` et thème sans flash (**livrée**, écarts en I.6) → cas N1 à N12.
 18. **v2.15.0 — bloc Anneaux « Ensō »** : annexe I.2, CSS seul (`reference/anneaux-enso.css`) → cas A1 à A8.
 19. **v2.16.0 — sélecteurs** : annexe I.3. Sélecteurs `appearance: base-select` (`reference/selecteurs.css`), panneau Posture en menu déroulant sans « i » → cas D1 à D10 ; E12 et M10 adaptés.
 20. **v2.17.0 — localisation** : annexe J. Français (référence) et anglais, sélecteur `FR · EN` dans le pied de page, dictionnaires typés sans dépendance → cas I1 à I13.
@@ -1648,7 +1648,7 @@ Les points P-H2, P-H3, P-H5 et P-H6 du handoff d'origine portent sur les langues
 ### H.11 Écarts de mise en œuvre (v2.13.2)
 - **Code de conduite** : texte officiel `content/version/2/1/code_of_conduct.fr.md` du dépôt `EthicalSource/contributor_covenant`, en-tête TOML retiré ; seul le contact `[INSÉRER UNE ADRESSE EMAIL]` est remplacé par la fonction « Report content » de GitHub (« Report to repository admins »).
 - **Étiquettes** : `bug.yml` → `bug`, `idee.yml` → `enhancement` (étiquettes existantes) ; `regle.yml` → `règle`, **étiquette à créer par Nelson** (sans elle, GitHub n'en pose aucune).
-- **CHANGELOG** : v2.9.0 à v2.13.1 sont sur `main` et en ligne mais **sans tag ni release** (dernier tag : `v2.8.0`) ; leurs entrées sont datées du merge, sans lien. Les liens se limitent aux versions taguées.
+- **CHANGELOG** : à la livraison, v2.9.0 à v2.13.1 étaient sur `main` sans tag ni release ; leurs entrées sont datées du merge. Tags et releases créés le 29/10/2026 ; liens ajoutés au lot 17.
 - **CONTRIBUTING** : point 10 = renvoi au code de conduite ; les traductions (lot 20) prendront le point 11. Le README gagne aussi, à l'étape 1 de « Publier une version », la mise à jour de `CHANGELOG.md`.
 - **R3** vérifié en local : `dist/carnet-l5r.html` ne diffère de la v2.13.1 que par le numéro de version (1 octet).
 
@@ -1665,7 +1665,7 @@ Les points P-H2, P-H3, P-H5 et P-H6 du handoff d'origine portent sur les langues
 
 ## Annexe I — Lots 17 à 19 : couleurs, Anneaux, sélecteurs (v2.14.0 à v2.16.0)
 
-Statut : **à livrer**, maquettes validées (artifacts « Anneaux de la fiche », proposition B, et « Sélecteurs du Carnet », hors dépôt). Sources : `HANDOFF-colors.md`, `handoff-ringstyle.md`, `handoff-selectors.md`. Trois lots, une PR chacun, dans l'ordre : les Anneaux et les sélecteurs utilisent les jetons du lot 17. Ne touche pas aux données de fiche : pas de migration de schéma. La typographie et la mise en page ne changent pas, sauf le bloc Anneaux (I.2) et le panneau Posture (I.3).
+Statut : lot 17 **livré** (écarts en I.6), lots 18 et 19 **à livrer**, maquettes validées (artifacts « Anneaux de la fiche », proposition B, et « Sélecteurs du Carnet », hors dépôt). Sources : `HANDOFF-colors.md`, `handoff-ringstyle.md`, `handoff-selectors.md`. Trois lots, une PR chacun, dans l'ordre : les Anneaux et les sélecteurs utilisent les jetons du lot 17. Ne touche pas aux données de fiche : pas de migration de schéma. La typographie et la mise en page ne changent pas, sauf le bloc Anneaux (I.2) et le panneau Posture (I.3).
 
 | Lot | Version | Contenu |
 |---|---|---|
@@ -2026,6 +2026,15 @@ S1 à S10 du handoff d'origine renommés **D1 à D10** (S1 à S5 existent deux f
 - **Masque `--enso`** recopié deux fois dans les handoffs : une seule déclaration (I.2.3).
 - **Identifiants** : C1 à C11 → N1 à N11 (+ N12, P-I1) ; R1 à R8 → A1 à A8 ; S1 à S10 → D1 à D10 ; « lint C8 » → N8.
 - **Maquettes** : les artifacts cités ne sont pas dans le dépôt ; le CSS validé est dans `reference/anneaux-enso.css` et `reference/selecteurs.css`.
+
+### I.6 Écarts de mise en œuvre (v2.14.0)
+- **`--accent-fill`** (nouveau, P-I1 au défaut) : fond plein qui porte du texte (`.btn.accent`, sous-onglet de situation actif, « i » ouvert) ; `--accent-ink` en clair, `--accent` en sombre, texte `--on-accent`. N12 le vérifie pour les onze accents. La classe `.btn.gold` devient `.btn.accent`.
+- **Élévation** : `--surface-2` + `--shadow` pour le lanceur mobile (et son en-tête collant), la fenêtre d'import et les éditeurs de la barre d'état (ND d'armure, blessures, emplacements). Le lanceur reste intégré (`--surface`) au bureau. Ombre de l'onglet actif : `0 1px 2px var(--line)` (plus de `rgba` littéral).
+- **`--warn`** : augmentations au-delà du Vide (lanceur) et bandeau de conflit du fichier lié (texte `--ink`, bordure et fond `--warn`). Les autres alertes restent en `--danger`.
+- **Thème au chargement** : l'état initial reprend le cache `localStorage` ; à la lecture des préférences, IndexedDB fait foi (sans thème enregistré : auto, cache effacé). `applyTheme` gère les balises `theme-color`.
+- **Jetons gardés** : `--sunk` sombre (`#1c1e21`) inchangé comme prévu ; `color-mix` des badges d'Anneau (`.b-cocher`, `.b-rappel`, `.tag.el`) gardés en `srgb`.
+- **N7** testé en Playwright (bordures calculées de la barre d'état, bureau et 390 px, clair et sombre) ; **N8** dans Vitest (`tests/colors.spec.ts`) sur tous les `.css` de `src/ui` ; **N9** relève le fond à la première image. Les colonnes « Accent-ink » sont aussi vérifiées contre la formule de mélange (±2 par canal).
+- **Tests existants modifiés** : U3 (`ui/app`, variables `--clan-*`), couleur de clan (`core.engine`, champs `inkLight` / `inkDark`), E8 (`e2e/storage`, `--bg` sombre `#26252a`).
 
 ---
 

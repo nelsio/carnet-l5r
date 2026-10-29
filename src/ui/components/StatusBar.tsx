@@ -191,7 +191,7 @@ export function TakeDamage({ onDone, initial = 0, label = "Dégâts reçus", cou
         Réduction {totalReduction(c)} → <b className="mono" style={{ color: "var(--ink)" }}>+{added}</b> blessure(s)
       </span>
       <button
-        type="button" className="btn sm gold" disabled={damage <= 0}
+        type="button" className="btn sm accent" disabled={damage <= 0}
         onClick={() => { dispatch({ type: "takeDamage", damage, voidSpent }); onDone(); }}
       >Encaisser</button>
     </div>

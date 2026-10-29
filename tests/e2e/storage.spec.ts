@@ -9,7 +9,7 @@ const targets = [
   { id: "E2", label: "servi en HTTP comme sur Pages", url: "http://localhost:4173/carnet-l5r.html", offline: false },
 ];
 
-const BG = { light: "rgb(236, 230, 216)", dark: "rgb(37, 39, 42)" };
+const BG = { light: "rgb(236, 230, 216)", dark: "rgb(38, 37, 42)" }; // --bg sombre réchauffé (annexe I.1.3)
 const background = (page: Page) => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
 
 for (const t of targets) {

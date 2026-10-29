@@ -102,11 +102,11 @@ export function Roller() {
       <div className="label">{context}</div>
       <h2 style={{ margin: "2px 0 8px" }}>{a.label}</h2>
       {restriction && (
-        <div className="hint" data-testid="stance-restriction" style={{ color: "var(--bad)", marginTop: 0 }}>
+        <div className="hint" data-testid="stance-restriction" style={{ color: "var(--danger)", marginTop: 0 }}>
           {restriction} Tu peux lancer quand même si le MJ l'accepte.
         </div>
       )}
-      {woundNote && <div className="hint" data-testid="wound-note" style={{ color: "var(--bad)", marginTop: 0 }}>{woundNote}</div>}
+      {woundNote && <div className="hint" data-testid="wound-note" style={{ color: "var(--danger)", marginTop: 0 }}>{woundNote}</div>}
       <div style={{ display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
         <span className="poolbig" data-testid="pool">{formatDice(pool.rolled, pool.kept)}</span>
         <span className="muted" style={{ fontSize: 13 }}>{poolOrigin(c, a, opts)}{pool.bonus ? ` · ${pool.bonus > 0 ? "+" : ""}${pool.bonus} au total` : ""}</span>
@@ -129,13 +129,13 @@ export function Roller() {
           {typeof tn === "number" && <span className="ch">Réussite <b data-testid="chance">{pct(stats.chance(tn))}</b></span>}
         </div>
       )}
-      {mastery && <div className="hint" data-testid="mastery" style={{ color: "var(--gold)" }}>{mastery}.</div>}
+      {mastery && <div className="hint" data-testid="mastery" style={{ color: "var(--accent-ink)" }}>{mastery}.</div>}
       {pool.notes.filter((n) => n.startsWith("Force ") || n.includes("force de l'arc") || n.startsWith("Désarmement")).map((n) => (
-        <div key={n} className="hint" data-testid="weapon-note" style={{ color: "var(--gold)" }}>{n}.</div>
+        <div key={n} className="hint" data-testid="weapon-note" style={{ color: "var(--accent-ink)" }}>{n}.</div>
       ))}
       {armorRollTn(c, pa, ui.mounted).notes.map((n) => <div key={n} className="hint" data-testid="armor-note">{n}.</div>)}
-      {pool.warnings?.map((w) => <div key={w} className="hint" data-testid="weapon-warning" style={{ color: "var(--bad)" }}>{w}</div>)}
-      {!pool.canRaise && a.kind === "skill" && <div className="hint" style={{ color: "var(--bad)" }}>Sans compétence : pas d'explosion, pas d'augmentation.</div>}
+      {pool.warnings?.map((w) => <div key={w} className="hint" data-testid="weapon-warning" style={{ color: "var(--danger)" }}>{w}</div>)}
+      {!pool.canRaise && a.kind === "skill" && <div className="hint" style={{ color: "var(--danger)" }}>Sans compétence : pas d'explosion, pas d'augmentation.</div>}
 
       <div className="opts">
         <TnField action={a} opts={opts} set={set} />
@@ -257,14 +257,14 @@ export function Roller() {
       {reminders.length > 0 && (
         <div data-testid="school-reminders">
           {reminders.map((e) => (
-            <div key={e.key} className="hint" style={{ color: "var(--gold)" }}>{e.technique} ({e.source}) : {reminderText(e, c)}</div>
+            <div key={e.key} className="hint" style={{ color: "var(--accent-ink)" }}>{e.technique} ({e.source}) : {reminderText(e, c)}</div>
           ))}
         </div>
       )}
 
-      {unlimited && <div className="hint" style={{ color: "var(--gold)" }}>Augmentations non limitées par ton Vide.</div>}
+      {unlimited && <div className="hint" style={{ color: "var(--accent-ink)" }}>Augmentations non limitées par ton Vide.</div>}
       {raises > 0 && (
-        <div className="tnline" style={{ marginTop: 10, color: !unlimited && raises > c.voidRing ? "var(--bad)" : undefined }}>
+        <div className="tnline" style={{ marginTop: 10, color: !unlimited && raises > c.voidRing ? "var(--warn)" : undefined }}>
           <span>Augmentations annoncées</span>
           <span className="mono"><b>{raises}</b>{unlimited ? "" : ` / max ${c.voidRing}`}{!unlimited && raises > c.voidRing ? " · dépasse ton Vide" : ""}</span>
         </div>
@@ -292,7 +292,7 @@ export function Roller() {
         </div>
       )}
       {freeToTn > 0 && typeof tn === "number" && <div className="hint">{freeToTn} augmentation(s) gratuite(s) déduites du ND (−{TN_PER_RAISE * freeToTn}).</div>}
-      {ws.penalty === null && <div className="hint" style={{ color: "var(--bad)" }}>Ton personnage est hors de combat.</div>}
+      {ws.penalty === null && <div className="hint" style={{ color: "var(--danger)" }}>Ton personnage est hors de combat.</div>}
       {a.id === MEDITATE_ACTION_ID && <MeditationSuccess />}
       {a.kind === "spell" && !ui.showDiceRoller && <SpellCastLine action={a} manual />}
 
@@ -332,7 +332,7 @@ function MeditationSuccess() {
     <div className="tnline" style={{ marginTop: 10 }}>
       <span className="muted">{full ? `Vide plein (${c.voidPoints}/${c.voidRing}).` : `Vide ${c.voidPoints}/${c.voidRing}.`}</span>
       {state.mode !== "readonly" && (
-        <button type="button" className="btn sm gold" disabled={full} onClick={() => dispatch({ type: "meditate" })}>
+        <button type="button" className="btn sm accent" disabled={full} onClick={() => dispatch({ type: "meditate" })}>
           Réussi : +{points} point{points > 1 ? "s" : ""} de Vide
         </button>
       )}
@@ -356,7 +356,7 @@ function FocusGap() {
         />
       </label>
       {outcome && (
-        <div className="hint" data-testid="focus-outcome" style={{ color: outcome.first ? "var(--gold)" : undefined }}>
+        <div className="hint" data-testid="focus-outcome" style={{ color: outcome.first ? "var(--accent-ink)" : undefined }}>
           {outcome.first
             ? `Tu frappes en premier, ${outcome.freeRaises} augmentation(s) gratuite(s) pré-remplie(s) sur la Frappe.`
             : `Frappe simultanée (il faut ${outcome.threshold} d'écart pour frapper en premier).`}
@@ -421,7 +421,7 @@ function SlotLine({ action: a }: { action: ActionDef }) {
   const key = slotFor(c, need.ring);
   const slot = key && spellSlots(c)[key];
   return (
-    <div className="tnline" data-testid="spell-slot" style={{ margin: 0, color: slot ? undefined : "var(--bad)" }}>
+    <div className="tnline" data-testid="spell-slot" style={{ margin: 0, color: slot ? undefined : "var(--danger)" }}>
       <span>Emplacement</span>
       <span>
         {slot && key
@@ -449,7 +449,7 @@ function SpellCastLine({ action: a, manual = false }: { action: ActionDef; manua
       {manual && <span className="muted">Jet aux vrais dés :</span>}
       {manual && !readonly && (
         <>
-          <button type="button" className="btn sm gold" onClick={() => dispatch({ type: "castSpell", success: true })}>Réussi</button>
+          <button type="button" className="btn sm accent" onClick={() => dispatch({ type: "castSpell", success: true })}>Réussi</button>
           <button type="button" className="btn sm" onClick={() => dispatch({ type: "castSpell", success: false })}>Raté</button>
         </>
       )}
@@ -505,7 +505,7 @@ function SpellPanel({ action: a, spell }: { action: ActionDef; spell: Spell }) {
   return (
     <div className="spellbox" data-testid="spell-panel">
       {restriction && (
-        <div className="hint" data-testid="spell-restriction" style={{ color: "var(--bad)", marginTop: 0 }}>
+        <div className="hint" data-testid="spell-restriction" style={{ color: "var(--danger)", marginTop: 0 }}>
           {restriction} Tu peux lancer quand même si le MJ l'accepte.
         </div>
       )}
@@ -538,7 +538,7 @@ function SpellPanel({ action: a, spell }: { action: ActionDef; spell: Spell }) {
       )}
       {checkboxes}
       {cast.freeRaises.length > 0 && (
-        <div className="hint" data-testid="spell-free-raises" style={{ color: "var(--gold)" }}>
+        <div className="hint" data-testid="spell-free-raises" style={{ color: "var(--accent-ink)" }}>
           {cast.freeRaises.length} augmentation{cast.freeRaises.length > 1 ? "s" : ""} gratuite{cast.freeRaises.length > 1 ? "s" : ""} de l'école : {cast.freeRaises.join(", ")}.
         </div>
       )}
@@ -566,7 +566,7 @@ function SpellPanel({ action: a, spell }: { action: ActionDef; spell: Spell }) {
         Interrompu pendant l'incantation : « Rester concentré », Volonté ND {SPELL_CONCENTRATION.tn} (ou {SPELL_CONCENTRATION.base} + dégâts subis) ;
         {" "}un sort réussi puis interrompu ne consomme pas l'emplacement.
       </div>
-      {sc?.reminders?.map((r) => <div key={r} className="hint" style={{ color: "var(--gold)" }}>{r}</div>)}
+      {sc?.reminders?.map((r) => <div key={r} className="hint" style={{ color: "var(--accent-ink)" }}>{r}</div>)}
       {spell.effect && <div className="spelleffect prose" data-testid="spell-effect">{spell.effect}</div>}
     </div>
   );
@@ -694,7 +694,7 @@ function ManeuverPicker({ effects }: { effects: readonly ActiveEffect[] }) {
         </label>
       )}
       {reserved.map((e) => (
-        <div key={e.key} className="hint" style={{ marginTop: 4, color: "var(--gold)" }}>
+        <div key={e.key} className="hint" style={{ marginTop: 4, color: "var(--accent-ink)" }}>
           {describeEffect(e, c)} · {e.source} : déduites du coût de la manœuvre.
         </div>
       ))}
@@ -732,7 +732,7 @@ function RollOutcome({ roll: r }: { roll: RollRecord }) {
             {ok ? "Réussite" : "Échec"} <span className="mono" style={{ fontSize: 16 }}>{total} / {r.tn} ({margin >= 0 ? "+" : ""}{margin})</span>
           </div>
           {r.baseSuccess && (
-            <div className="hint" data-testid="base-success" style={{ color: "var(--gold)" }}>
+            <div className="hint" data-testid="base-success" style={{ color: "var(--accent-ink)" }}>
               Réussite sans les augmentations : le ND de base {r.baseTn} est atteint (Akodo R5), les augmentations n'ont pas d'effet.
             </div>
           )}

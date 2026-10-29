@@ -87,7 +87,7 @@ function Block({ id, title, label, children }: { id: BlockId; title: ReactNode; 
         <h2>{title}</h2>
         {state.mode === "edit" && (
           <button
-            type="button" className={`btn sm${edit ? " gold" : ""}`} aria-pressed={edit}
+            type="button" className={`btn sm${edit ? " accent" : ""}`} aria-pressed={edit}
             aria-label={`${edit ? "Terminer" : "Edit"} : ${name}`}
             onClick={() => dispatch({ type: "toggleBlockEdit", block: id })}
           >{edit ? "Terminer" : "Edit"}</button>
@@ -109,7 +109,7 @@ function Rings() {
   return (
     <div className="rings">
       {RING_ORDER.map((key) => (
-        <div key={key} className={`ring ${key}`} style={{ ["--rc" as string]: `var(--${key})` }}>
+        <div key={key} className={`ring ${key}`} style={{ ["--rc" as string]: `var(--ring-${key})` }}>
           <div className="rn">{RINGS[key].label}</div>
           <div className="rv">{r[key]}</div>
           {key === "void" ? (
@@ -502,7 +502,7 @@ function SchoolTechniques() {
             </div>
             <div className="muted">{r.summary}</div>
             {valued.filter((e) => e.rank === r.rank).map((e) => (
-              <div key={e.key} className="hint" style={{ color: "var(--gold)" }}>→ {reminderText(e, c)}</div>
+              <div key={e.key} className="hint" style={{ color: "var(--accent-ink)" }}>→ {reminderText(e, c)}</div>
             ))}
           </div>
         );
@@ -625,7 +625,7 @@ function Spells() {
 function SpellAffinity({ page }: { page: number }) {
   const c = useCharacter();
   const [affinity, deficiency] = [affinityOf(c), deficiencyOf(c)];
-  const ring = (r: string | undefined) => (r ? { ["--rc" as string]: `var(--${r})` } : undefined);
+  const ring = (r: string | undefined) => (r ? { ["--rc" as string]: `var(--ring-${r})` } : undefined);
   return (
     <div className="affin" data-testid="affinity">
       <span className="tag el" style={ring(affinity)}>Affinité {affinity ? ELEMENT_LABELS[affinity] : "à choisir (bloc Identité)"}</span>
@@ -659,7 +659,7 @@ function NewDay() {
           </p>
           <span style={{ display: "flex", gap: 8 }}>
             <button type="button" className="btn" onClick={() => setConfirm(false)}>Annuler</button>
-            <button type="button" className="btn gold" onClick={() => { dispatch({ type: "newDay" }); setConfirm(false); }}>Confirmer la nouvelle journée</button>
+            <button type="button" className="btn accent" onClick={() => { dispatch({ type: "newDay" }); setConfirm(false); }}>Confirmer la nouvelle journée</button>
           </span>
         </>
       ) : (
@@ -714,7 +714,7 @@ function VocabularyBanner() {
           </div>
           <span style={{ display: "flex", gap: 8 }}>
             <button type="button" className="btn" onClick={() => setPreview(false)}>Annuler</button>
-            <button type="button" className="btn gold" onClick={() => { setPreview(false); dispatch({ type: "vocabulary", op: "update" }); }}>Renommer</button>
+            <button type="button" className="btn accent" onClick={() => { setPreview(false); dispatch({ type: "vocabulary", op: "update" }); }}>Renommer</button>
           </span>
         </>
       ) : (

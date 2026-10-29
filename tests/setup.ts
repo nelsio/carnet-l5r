@@ -4,4 +4,8 @@ import "fake-indexeddb/auto";
 import { cleanup } from "@testing-library/react";
 import { afterEach } from "vitest";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  // Cache du thème (annexe I.1.8) : ne passe pas d'un test à l'autre.
+  localStorage.clear();
+});

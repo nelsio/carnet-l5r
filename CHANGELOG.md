@@ -6,6 +6,18 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.14.0] - 2026-10-30
+
+### Modifié
+- Couleurs en jetons : fond sombre réchauffé (anthracite chaud), surfaces surélevées (`--surface-2`) pour le lanceur mobile, l'import et les éditeurs de la barre d'état.
+- Accent de clan lisible : tout texte en couleur de clan utilise une teinte assombrie (clair) ou éclaircie (sombre), au moins 4,5:1 pour les onze accents.
+- Couleurs d'état indépendantes du clan : danger (blessure, erreur), réussite et avertissement (augmentations au-delà du Vide, conflit de fichier lié). Un personnage Scorpion indemne n'a plus l'air blessé.
+- Les boutons pleins à la couleur du clan portent un texte lisible dans les deux thèmes.
+
+### Ajouté
+- Android : barre de Chrome à la couleur du thème, contrôles natifs assortis, aucun flash du mauvais thème au chargement.
+- Tests de contraste et lint des couleurs littérales (N1 à N12).
+
 ## [2.13.3] - 2026-10-30
 
 ### Corrigé
@@ -140,9 +152,16 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.13.3...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.14.0...HEAD
+[2.14.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.14.0
 [2.13.3]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.13.3
 [2.13.2]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.13.2
+[2.13.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.13.1
+[2.13.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.13.0
+[2.12.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.12.0
+[2.11.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.11.0
+[2.10.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.10.0
+[2.9.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.9.0
 [2.8.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.8.0
 [2.7.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.7.0
 [2.6.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.6.0

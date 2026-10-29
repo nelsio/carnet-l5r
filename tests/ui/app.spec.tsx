@@ -79,13 +79,15 @@ describe("Fiche", () => {
     click("Edit : Identité & réputation");
     const clan = screen.getByRole("combobox", { name: "Clan" });
     fireEvent.change(clan, { target: { value: "Scorpion" } });
-    expect(root.style.getPropertyValue("--acc-l")).toBe("#a82828");
-    expect(root.style.getPropertyValue("--acc-d")).toBe("#f07a7a");
+    expect(root.style.getPropertyValue("--clan-l")).toBe("#a82828");
+    expect(root.style.getPropertyValue("--clan-ink-l")).toBe("#7b2d26");
+    expect(root.style.getPropertyValue("--clan-d")).toBe("#f07a7a");
+    expect(root.style.getPropertyValue("--clan-ink-d")).toBe("#f1918e");
     fireEvent.change(clan, { target: { value: "crane" } });
-    expect(root.style.getPropertyValue("--acc-l")).toBe("#2f7fb5");
+    expect(root.style.getPropertyValue("--clan-l")).toBe("#2f7fb5");
     expect(screen.getByText("Clan de la Grue")).toBeInTheDocument();
     fireEvent.change(clan, { target: { value: "Ronin" } });
-    expect(root.style.getPropertyValue("--acc-l")).toBe("");
+    for (const v of ["--clan-l", "--clan-ink-l", "--clan-d", "--clan-ink-d"]) expect(root.style.getPropertyValue(v)).toBe("");
   });
 
   it("U4 : un texte saisi n'est jamais interprété comme du HTML", async () => {

@@ -8,7 +8,7 @@ import { Sheet } from "./components/Sheet";
 import { Stats } from "./components/Stats";
 import { StatusBar } from "./components/StatusBar";
 import { initialState, reducer, StoreContext, type PendingImport, type Store } from "./store";
-import { useThemeAndClan } from "./theme";
+import { cachedTheme, useThemeAndClan } from "./theme";
 import { useLibrary, type LibraryOptions } from "./useLibrary";
 
 const d10 = () => 1 + Math.floor(Math.random() * 10);
@@ -20,7 +20,7 @@ export interface AppProps extends LibraryOptions {
 }
 
 export function App({ storage, rng = d10, ...libraryOptions }: AppProps) {
-  const [state, dispatch] = useReducer(reducer, undefined, initialState);
+  const [state, dispatch] = useReducer(reducer, cachedTheme(), initialState);
   const [pending, setPending] = useState<PendingImport | null>(null);
   const { ready, api } = useLibrary(storage, state, dispatch, setPending, libraryOptions);
   const startImport = useCallback((file: File) => {

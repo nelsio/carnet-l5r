@@ -3,6 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!-- Barre de Chrome et contrôles natifs selon le thème, sans flash au chargement (annexe I.1.8) -->
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#ece6d8" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#26252a" media="(prefers-color-scheme: dark)" />
+    <script>
+      try {
+        var t = localStorage.getItem('carnet-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
     <title>Carnet de Rokugan</title>
     <link rel="icon" href="/src/ui/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/src/ui/apple-touch-icon.png" />
