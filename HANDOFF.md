@@ -569,7 +569,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 12. **v2.2 à v2.8 — règles du livre, combat complet, ergonomie** : annexe E (validée le 24/10/2026). Sept versions : correctifs de règles et retouches d'interface (v2.2.0, **livrée**, tag `v2.2.0`, écarts en E.12), combat complet (v2.3.0, **livrée**, tag `v2.3.0`, écarts en E.13), maîtrises et armures (v2.4.0, **livrée**, tag `v2.4.0`, écarts en E.14), récupération (v2.5.0, **livrée**, tag `v2.5.0`, écarts en E.15), vocabulaire français (v2.6.0, **livrée**, tag `v2.6.0`, écarts en E.16), bataille de masse (v2.7.0, **livrée**, tag `v2.7.0`, écarts en E.17), bloc Armure et retouches d'interface (v2.8.0, **livrée**, E.18 et E.19, écarts en E.20) → cas L1 à L28, E24 à E34, M16 à M18.
 13. **v2.9 à v2.12 — shugenja et Magie** : annexe F (validée le 28/10/2026). Quatre versions : Rouleaux & invocations (v2.9.0, **livrée**, écarts en F.8), écoles de shugenja (v2.10.0, **livrée**, écarts en F.9), situation Magie et lanceur de sort (v2.11.0, **livrée**, écarts en F.10), emplacements et combat (v2.12.0, **livrée**, écarts en F.11) → cas G1 à G17, E36.
 14. **v2.13.0 — nom de l'outil dans l'en-tête** : annexe G (maquette validée). Sceau 帳 qui ouvre la Bibliothèque, surtitre, titre d'onglet dynamique, favicon (**livrée**, écarts en G.6) → cas H1 à H12. **v2.13.1** (patch) : le bouton Bibliothèque est gardé à côté du sceau (G.6).
-15. **v2.13.2 — fichiers du dépôt GitHub** : annexe H.1 à H.4. Licence MIT, contribution, code de conduite, sécurité, `CHANGELOG.md`, modèles d'issue et de PR, Dependabot, `.editorconfig` → cas R1 à R4. Code applicatif inchangé (sauf `package.json`).
+15. **v2.13.2 — fichiers du dépôt GitHub** : annexe H.1 à H.4 (**livrée**, écarts en H.11). Licence MIT, contribution, code de conduite, sécurité, `CHANGELOG.md`, modèles d'issue et de PR, Dependabot, `.editorconfig` → cas R1 à R4. Code applicatif inchangé (sauf `package.json`).
 16. **v2.13.3 — correctifs** : annexe H.5 à H.8. Notation `XgY` partout à l'affichage (`formatDR`, données en `g`), boutons en trop et incohérences (relevé X1 à X6, captures avant / après) → cas K1 à K8.
 17. **v2.14.0 — couleurs** : annexe I.1, **remplace le §6.4**. Jetons `--surface-2`, `--accent-ink`, `--on-accent`, couleurs sémantiques `--danger` / `--ok` / `--warn`, jetons `--ring-*`, `theme-color` et thème sans flash → cas N1 à N12.
 18. **v2.15.0 — bloc Anneaux « Ensō »** : annexe I.2, CSS seul (`reference/anneaux-enso.css`) → cas A1 à A8.
@@ -1505,7 +1505,7 @@ La règle globale `button{font:inherit}` (0,0,1) est plus faible que `.seal` (0,
 
 ## Annexe H — Lots 15 et 16 : dépôt GitHub et correctifs (v2.13.2, v2.13.3)
 
-Statut : **à livrer**. Source : `handoff-lots-15-17.md` (29/10/2026), audit fait sur `main` au commit `dfaac10` (v2.13.1) ; les numéros de ligne cités peuvent avoir bougé, se fier aux extraits. Ordre des lots tranché le 29/10/2026 : **15 → 16 → 17 → 18 → 19 → 20** (langues en dernier, annexe J ; visuel avant, annexe I). Une PR par lot, CI verte, tag posé après merge (procédure du README).
+Statut : lot 15 **livré** (écarts en H.11), lot 16 **à livrer**. Source : `handoff-lots-15-17.md` (29/10/2026), audit fait sur `main` au commit `dfaac10` (v2.13.1) ; les numéros de ligne cités peuvent avoir bougé, se fier aux extraits. Ordre des lots tranché le 29/10/2026 : **15 → 16 → 17 → 18 → 19 → 20** (langues en dernier, annexe J ; visuel avant, annexe I). Une PR par lot, CI verte, tag posé après merge (procédure du README).
 
 | Lot | Version | Contenu | Code applicatif touché |
 |---|---|---|---|
@@ -1643,6 +1643,13 @@ Les points P-H2, P-H3, P-H5 et P-H6 du handoff d'origine portent sur les langues
 - **Identifiants** : relevé B1 à B6 renommé **X1 à X6** (B1 à B11 existent déjà, §10.1 bis) ; tests de langue L1 à L13 renommés **I1 à I13** (L1 à L28 existent, E.10). R1 à R4 et K1 à K8 sont gardés.
 - **« lint C8 »** dans `CONTRIBUTING.md` : C8 est ici le catalogue d'armes (E.2) ; le lint des couleurs s'appelle **N8** (annexe I.1) et n'existe qu'à partir du lot 17.
 - `DISARM_DAMAGE` vaut aujourd'hui `"2k1"` (le handoff donnait directement la valeur cible). `formatDR` reçoit dès le lot 16 son paramètre `letter`.
+
+### H.11 Écarts de mise en œuvre (v2.13.2)
+- **Code de conduite** : texte officiel `content/version/2/1/code_of_conduct.fr.md` du dépôt `EthicalSource/contributor_covenant`, en-tête TOML retiré ; seul le contact `[INSÉRER UNE ADRESSE EMAIL]` est remplacé par la fonction « Report content » de GitHub (« Report to repository admins »).
+- **Étiquettes** : `bug.yml` → `bug`, `idee.yml` → `enhancement` (étiquettes existantes) ; `regle.yml` → `règle`, **étiquette à créer par Nelson** (sans elle, GitHub n'en pose aucune).
+- **CHANGELOG** : v2.9.0 à v2.13.1 sont sur `main` et en ligne mais **sans tag ni release** (dernier tag : `v2.8.0`) ; leurs entrées sont datées du merge, sans lien. Les liens se limitent aux versions taguées.
+- **CONTRIBUTING** : point 10 = renvoi au code de conduite ; les traductions (lot 20) prendront le point 11. Le README gagne aussi, à l'étape 1 de « Publier une version », la mise à jour de `CHANGELOG.md`.
+- **R3** vérifié en local : `dist/carnet-l5r.html` ne diffère de la v2.13.1 que par le numéro de version (1 octet).
 
 ---
 

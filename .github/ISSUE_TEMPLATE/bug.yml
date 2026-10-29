@@ -1,0 +1,59 @@
+name: Bug
+description: Quelque chose ne marche pas comme prévu.
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Affichée dans le pied de page de l'outil.
+      placeholder: v2.13.2
+    validations:
+      required: true
+  - type: input
+    id: navigateur
+    attributes:
+      label: Navigateur et appareil
+      placeholder: Firefox 140 sur Windows 11, Safari sur iPhone 13…
+    validations:
+      required: true
+  - type: dropdown
+    id: format
+    attributes:
+      label: Bureau ou mobile
+      options:
+        - Bureau
+        - Mobile
+        - Les deux
+    validations:
+      required: true
+  - type: textarea
+    id: etapes
+    attributes:
+      label: Étapes pour reproduire
+      placeholder: |
+        1. Ouvrir la fiche…
+        2. Choisir la situation Escarmouche…
+        3. …
+    validations:
+      required: true
+  - type: textarea
+    id: attendu
+    attributes:
+      label: Résultat attendu
+    validations:
+      required: true
+  - type: textarea
+    id: obtenu
+    attributes:
+      label: Résultat obtenu
+      description: Une capture d'écran aide beaucoup.
+    validations:
+      required: true
+  - type: textarea
+    id: fiche
+    attributes:
+      label: Fiche JSON (facultatif)
+      description: >-
+        Exportée depuis la Bibliothèque. Retire avant de la joindre ce que tu ne veux pas partager
+        (nom, historique, notes…) : une issue est publique.
