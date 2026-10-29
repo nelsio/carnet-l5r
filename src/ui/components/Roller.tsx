@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import {
   applicableModifiers, armorRollTn, bowStrength, DAMAGE_MANEUVER_ID, describeEffect, focusOutcome, opposedMargin, opposedVerdict, stanceRestriction, woundEffectNote, describeModifier, effectOn, findSkill, fullDefenseBonus, maneuverCost, maneuverFreeRaises, modifierTN,
-  formatDice, isRanged, isSocialSkill, meditationVoidPoints, poolStats, reminderText, rollDice, schoolContext, schoolReminders, verdict, voidMultiplier,
+  formatDice, formatDR, isRanged, isSocialSkill, meditationVoidPoints, poolStats, reminderText, rollDice, schoolContext, schoolReminders, verdict, voidMultiplier,
   castTime, castTimeLabel, concentrationTn, schoolRankOf, slotFor, spellCast, spellcastingOf, spellOptions, spellRaises, spellRestriction, SPELL_RINGS, spellSlotNeed, spellSlots,
   voidPointBonus, voidSpendBonus, voidSpendOption, woundState, type Spell, type SpellAction, type SpellRing, type SpellSlotKey,
   type ActionDef, type ActiveEffect, type Character, type Pool,
@@ -331,9 +331,11 @@ function MeditationSuccess() {
   return (
     <div className="tnline" style={{ marginTop: 10 }}>
       <span className="muted">{full ? `Vide plein (${c.voidPoints}/${c.voidRing}).` : `Vide ${c.voidPoints}/${c.voidRing}.`}</span>
-      <button type="button" className="btn sm gold" disabled={full || state.mode === "readonly"} onClick={() => dispatch({ type: "meditate" })}>
-        Réussi : +{points} point{points > 1 ? "s" : ""} de Vide
-      </button>
+      {state.mode !== "readonly" && (
+        <button type="button" className="btn sm gold" disabled={full} onClick={() => dispatch({ type: "meditate" })}>
+          Réussi : +{points} point{points > 1 ? "s" : ""} de Vide
+        </button>
+      )}
     </div>
   );
 }
@@ -394,7 +396,7 @@ function poolOrigin(c: Character, a: ActionDef, opts: RollOptions): string {
     case "damage": {
       // Force effective de l'arc : plafonnée par la Force, +1 avec Kyujutsu 7 (annexe E.2 C11).
       const bow = a.weapon && isRanged(a.weapon) ? `Arc ${bowStrength(c, a.weapon)}` : null;
-      return `${bow ?? `Force ${c.traits.strength}`} + VD ${a.dr ?? ""}${extra}`;
+      return `${bow ?? `Force ${c.traits.strength}`} + VD ${formatDR(a.dr ?? "")}${extra}`;
     }
     case "spell": {
       // « Feu 3 + rang 1 + affinité 1 » (annexe F.5).
@@ -404,7 +406,7 @@ function poolOrigin(c: Character, a: ActionDef, opts: RollOptions): string {
       const minus = cast.deficiency ? " − déficience 1" : "";
       return `${parts.join(" + ")}${minus}${cast.rolled ? ` + ${cast.rolled} (école)` : ""}${extra}`;
     }
-    case "spellDamage": return `VD ${a.spell?.damage ?? ""}${extra}`;
+    case "spellDamage": return `VD ${formatDR(a.spell?.damage ?? "")}${extra}`;
     default: return `Rang ${c.insightRank} + Réflexes ${c.traits.reflexes}${extra}`;
   }
 }
@@ -441,13 +443,14 @@ function SpellCastLine({ action: a, manual = false }: { action: ActionDef; manua
   const spent = cast && cast.slots.length > 0
     ? <>{manual ? (cast.success ? "Lancé" : "Raté") + " : emplacement" : "Emplacement dépensé :"} {cast.slots.map(slotName).join(", ")}{manual ? " dépensé." : cast.success === false ? " (raté)" : ""}</>
     : cast ? "Aucun emplacement dépensé." : null;
+  if (manual && readonly && !spent) return null;
   return (
     <div className="spellmanual" data-testid="spell-cast">
-      {manual && (
+      {manual && <span className="muted">Jet aux vrais dés :</span>}
+      {manual && !readonly && (
         <>
-          <span className="muted">Jet aux vrais dés :</span>
-          <button type="button" className="btn sm gold" disabled={readonly} onClick={() => dispatch({ type: "castSpell", success: true })}>Réussi</button>
-          <button type="button" className="btn sm" disabled={readonly} onClick={() => dispatch({ type: "castSpell", success: false })}>Raté</button>
+          <button type="button" className="btn sm gold" onClick={() => dispatch({ type: "castSpell", success: true })}>Réussi</button>
+          <button type="button" className="btn sm" onClick={() => dispatch({ type: "castSpell", success: false })}>Raté</button>
         </>
       )}
       {spent && <span className="spelldone" data-testid="spell-spent">{spent}</span>}

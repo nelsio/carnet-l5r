@@ -329,6 +329,8 @@ div.man button{border:0;background:var(--surface);width:24px;height:24px;border-
 .entry-main b{font-family:var(--f-display);font-size:17px;margin-right:8px}
 .entry-main .muted{font-size:13px}
 .entry-actions{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:flex-end}
+/* Confirmation de suppression dans le bloc Identité (annexe H.7 X1) */
+.confirm-line{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .dot{width:14px;height:14px;border-radius:50%;background:var(--dot-l)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .dot{background:var(--dot-d)}}
 :root[data-theme="dark"] .dot{background:var(--dot-d)}

@@ -570,7 +570,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 13. **v2.9 à v2.12 — shugenja et Magie** : annexe F (validée le 28/10/2026). Quatre versions : Rouleaux & invocations (v2.9.0, **livrée**, écarts en F.8), écoles de shugenja (v2.10.0, **livrée**, écarts en F.9), situation Magie et lanceur de sort (v2.11.0, **livrée**, écarts en F.10), emplacements et combat (v2.12.0, **livrée**, écarts en F.11) → cas G1 à G17, E36.
 14. **v2.13.0 — nom de l'outil dans l'en-tête** : annexe G (maquette validée). Sceau 帳 qui ouvre la Bibliothèque, surtitre, titre d'onglet dynamique, favicon (**livrée**, écarts en G.6) → cas H1 à H12. **v2.13.1** (patch) : le bouton Bibliothèque est gardé à côté du sceau (G.6).
 15. **v2.13.2 — fichiers du dépôt GitHub** : annexe H.1 à H.4 (**livrée**, écarts en H.11). Licence MIT, contribution, code de conduite, sécurité, `CHANGELOG.md`, modèles d'issue et de PR, Dependabot, `.editorconfig` → cas R1 à R4. Code applicatif inchangé (sauf `package.json`).
-16. **v2.13.3 — correctifs** : annexe H.5 à H.8. Notation `XgY` partout à l'affichage (`formatDR`, données en `g`), boutons en trop et incohérences (relevé X1 à X6, captures avant / après) → cas K1 à K8.
+16. **v2.13.3 — correctifs** : annexe H.5 à H.8 (**livrée**, écarts en H.12). Notation `XgY` partout à l'affichage (`formatDR`, données en `g`), boutons en trop et incohérences (relevé X1 à X6, captures avant / après) → cas K1 à K8.
 17. **v2.14.0 — couleurs** : annexe I.1, **remplace le §6.4**. Jetons `--surface-2`, `--accent-ink`, `--on-accent`, couleurs sémantiques `--danger` / `--ok` / `--warn`, jetons `--ring-*`, `theme-color` et thème sans flash → cas N1 à N12.
 18. **v2.15.0 — bloc Anneaux « Ensō »** : annexe I.2, CSS seul (`reference/anneaux-enso.css`) → cas A1 à A8.
 19. **v2.16.0 — sélecteurs** : annexe I.3. Sélecteurs `appearance: base-select` (`reference/selecteurs.css`), panneau Posture en menu déroulant sans « i » → cas D1 à D10 ; E12 et M10 adaptés.
@@ -1505,7 +1505,7 @@ La règle globale `button{font:inherit}` (0,0,1) est plus faible que `.seal` (0,
 
 ## Annexe H — Lots 15 et 16 : dépôt GitHub et correctifs (v2.13.2, v2.13.3)
 
-Statut : lot 15 **livré** (écarts en H.11), lot 16 **à livrer**. Source : `handoff-lots-15-17.md` (29/10/2026), audit fait sur `main` au commit `dfaac10` (v2.13.1) ; les numéros de ligne cités peuvent avoir bougé, se fier aux extraits. Ordre des lots tranché le 29/10/2026 : **15 → 16 → 17 → 18 → 19 → 20** (langues en dernier, annexe J ; visuel avant, annexe I). Une PR par lot, CI verte, tag posé après merge (procédure du README).
+Statut : lot 15 **livré** (écarts en H.11), lot 16 **livré** (écarts en H.12). Source : `handoff-lots-15-17.md` (29/10/2026), audit fait sur `main` au commit `dfaac10` (v2.13.1) ; les numéros de ligne cités peuvent avoir bougé, se fier aux extraits. Ordre des lots tranché le 29/10/2026 : **15 → 16 → 17 → 18 → 19 → 20** (langues en dernier, annexe J ; visuel avant, annexe I). Une PR par lot, CI verte, tag posé après merge (procédure du README).
 
 | Lot | Version | Contenu | Code applicatif touché |
 |---|---|---|---|
@@ -1614,7 +1614,8 @@ Ne sont **pas** en trop (décisions de Nelson, à garder) :
 | X3 | `FileActions.tsx` | `<ImportButton label="Importer un JSON…" />` répète la valeur par défaut. | Retirer la prop (nettoyage). |
 | X4 | `Library.tsx` et `Stats.tsx` | `"fr-FR"` en dur (`Intl.DateTimeFormat`, `toLocaleString`). | Sans effet visible au lot 16. Passe par la langue courante au lot 20 (J.4). Le noter ici, ne rien changer. |
 | X5 | `Sheet.tsx`, Identité | Libellé « Rang (Insight) » et indication « = Insight (n) » : terme anglais isolé dans l'interface française. | Point P-H4 : défaut « Rang d'Insight » partout (déjà utilisé dans `l5r4e.ts`). |
-| X6… | *À compléter par l'agent (captures) et par Nelson* | | |
+| X6 | `Roller.tsx`, `MeditationSuccess` en consultation | « Réussi : +n point de Vide » affiché mais `disabled` : sans effet en consultation (même cas que X2). | En consultation, ne pas l'afficher ; le rappel « Vide n/max. » reste. |
+| X7… | *À compléter par Nelson* | | |
 
 > **Nelson** : ajoute ici les boutons en trop que tu as repérés en jeu (écran, bureau ou mobile, libellé du bouton). L'agent les traite en priorité.
 
@@ -1650,6 +1651,15 @@ Les points P-H2, P-H3, P-H5 et P-H6 du handoff d'origine portent sur les langues
 - **CHANGELOG** : v2.9.0 à v2.13.1 sont sur `main` et en ligne mais **sans tag ni release** (dernier tag : `v2.8.0`) ; leurs entrées sont datées du merge, sans lien. Les liens se limitent aux versions taguées.
 - **CONTRIBUTING** : point 10 = renvoi au code de conduite ; les traductions (lot 20) prendront le point 11. Le README gagne aussi, à l'étape 1 de « Publier une version », la mise à jour de `CHANGELOG.md`.
 - **R3** vérifié en local : `dist/carnet-l5r.html` ne diffère de la v2.13.1 que par le numéro de version (1 octet).
+
+### H.12 Écarts de mise en œuvre (v2.13.3)
+- **Captures** (H.6) : 56 vues « avant » et « après » (14 vues × bureau 1280 px et 390 px × clair et sombre), hors dépôt, jointes à la PR pour les vues touchées. Seul ajout au relevé : **X6** (bouton de méditation en consultation). Les points de Vide et la tuile « Sorts » de la barre d'état, désactivés en consultation, restent affichés : ils montrent l'état de la fiche.
+- **X1** : la question reprend le nom du personnage (« Supprimer « Kuni Taeko » ? ») ; mise en page par une classe `.confirm-line` (alignée à gauche, contrairement à `.entry-actions`).
+- **X2** : en consultation, la ligne « Jet aux vrais dés » disparaît entièrement tant qu'aucun résultat n'est montré.
+- **X5** : « Rang d'Insight » pour le libellé **et** l'indication du Rang d'école, chiffre en tête pour rester lisible dans un champ étroit (« n (Rang d'Insight) »). Libellés de test touchés : `tests/ui/schools.spec.tsx`, `tests/e2e/schools.spec.ts`.
+- **K4** : il n'y a pas de bouton « Associer » pour les armes (c'est celui de l'école, E19) ; l'arme du catalogue passe par « Mettre à jour » (écart avec le livre, E.2 C8). Testé sur le Cimeterre `3k2` → `2g3`.
+- **K5** : testé au niveau du cœur (`mergeCharacter` sur l'export d'une fiche `3k2`) ; l'affichage en `g` est couvert par K2.
+- **Tests existants modifiés** (valeurs attendues, pas de règle) : libellés `VD 2k2` / `3k2` / `2k3` → `g` (`core.lot12`, `core.magic`, `ui/lot12`, `ui/magic`, `ui/spells`, `e2e/import-export`) ; « Confirmer la suppression » → « Supprimer définitivement » (`ui/library`) ; boutons désactivés → absents en consultation (`ui/slots`, `ui/recovery`). `core.rules.spec.ts` inchangé.
 
 ---
 

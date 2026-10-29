@@ -2,7 +2,7 @@ import {
   DUEL_ASSESSMENT, DUEL_WEAPON_PATTERN, FIXED_ACTIONS, TN_PER_RAISE, TRAIT_LABELS,
   type ActionDef, type CombatSub, type Situation,
 } from "../rules/l5r4e";
-import { attackTrait, isRanged, type WeaponLike } from "./engine";
+import { attackTrait, formatDR, isRanged, type WeaponLike } from "./engine";
 import type { Character } from "./schema";
 import { skillIs } from "./schools";
 import { CONCENTRATE_ACTION, skirmishSpellActions, spellActions } from "./spells";
@@ -26,8 +26,8 @@ export function weaponActions(w: WeaponLike, sub: CombatSub): ActionDef[] {
       id: `dmg-${sub}-${w.name}`, situation: "combat", sub, parent: attackId, kind: "damage", dr: w.dr, weapon: w, tn: null,
       label: `Dégâts · ${w.name}`,
       description: ranged
-        ? `Force de l'arc ${w.bowStrength ?? 0} + VD de la flèche ${w.dr}.`
-        : `Force + VD ${w.dr}. Les augmentations de dégâts s'ajoutent en dés lancés.`,
+        ? `Force de l'arc ${w.bowStrength ?? 0} + VD de la flèche ${formatDR(w.dr)}.`
+        : `Force + VD ${formatDR(w.dr)}. Les augmentations de dégâts s'ajoutent en dés lancés.`,
     },
   ];
 }

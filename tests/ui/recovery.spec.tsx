@@ -103,10 +103,11 @@ describe("Méditation (Enquête, groupe Repos)", () => {
     expect(screen.getByText("Points de Vide 2/2")).toBeInTheDocument();
   });
 
-  it("en consultation : bouton désactivé", async () => {
+  it("en consultation : bouton masqué (annexe H.7 X6)", async () => {
     await renderApp(base({ voidPoints: 0 }), "readonly");
     click("Aide de jeu");
     click(/^Méditer/);
-    expect(roller().getByRole("button", { name: "Réussi : +1 point de Vide" })).toBeDisabled();
+    expect(roller().getByText("Vide 0/2.")).toBeInTheDocument();
+    expect(roller().queryByRole("button", { name: /^Réussi/ })).toBeNull();
   });
 });

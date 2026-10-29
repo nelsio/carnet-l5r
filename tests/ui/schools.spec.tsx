@@ -32,8 +32,8 @@ describe("Techniques d'école : parcours E16 à E19", () => {
     const select = screen.getByRole("combobox", { name: "Techniques d'école" });
     expect(within(select).getByRole("group", { name: "Crabe" })).toBeInTheDocument();
     fireEvent.change(select, { target: { value: "hiruma-bushi" } });
-    fireEvent.change(screen.getByRole("spinbutton", { name: "Rang (Insight)" }), { target: { value: "2" } });
-    expect(screen.getByRole("spinbutton", { name: "Rang d'école" })).toHaveAttribute("placeholder", "= Insight (2)");
+    fireEvent.change(screen.getByRole("spinbutton", { name: "Rang d'Insight" }), { target: { value: "2" } });
+    expect(screen.getByRole("spinbutton", { name: "Rang d'école" })).toHaveAttribute("placeholder", "2 (Rang d'Insight)");
     click("Terminer : Identité & réputation");
 
     const block = screen.getByTestId("school-techniques");

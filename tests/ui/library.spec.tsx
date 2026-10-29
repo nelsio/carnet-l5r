@@ -162,7 +162,7 @@ describe("Écran Bibliothèque", () => {
     await mount(s);
     click("Edit : Identité & réputation");
     click("Supprimer ce personnage…");
-    click("Confirmer la suppression");
+    click("Supprimer définitivement");
     expect(await screen.findByRole("heading", { name: "Aucun personnage dans ce carnet" })).toBeInTheDocument();
     expect(await s.library.list()).toEqual([]);
   });

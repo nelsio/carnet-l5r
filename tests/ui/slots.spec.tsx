@@ -108,12 +108,13 @@ describe("Emplacements au lancer (F.5)", () => {
     expect(slot("earth")).toHaveTextContent("2/3");
   });
 
-  it("consultation : Réussi et Raté désactivés, rien n'est dépensé", async () => {
+  it("K7 : consultation : ni « Réussi » ni « Raté » dans le DOM (annexe H.7 X2)", async () => {
     await renderApp(kuni(), "readonly");
     toMagic();
     fireEvent.click(card("Lancer · Frappe de jade"));
-    expect(roller().getByRole("button", { name: "Réussi" })).toBeDisabled();
-    expect(roller().getByRole("button", { name: "Raté" })).toBeDisabled();
+    expect(roller().queryByRole("button", { name: "Réussi" })).toBeNull();
+    expect(roller().queryByRole("button", { name: "Raté" })).toBeNull();
+    expect(roller().queryByTestId("spell-cast")).toBeNull();
   });
 
   it("G14 : Nouvelle journée : aperçu « emplacements de sorts rechargés », emplacements pleins", async () => {

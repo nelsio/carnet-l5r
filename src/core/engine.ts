@@ -150,6 +150,12 @@ export function parseDR(s: string): DiceCode {
   return m ? { rolled: Number(m[1]), kept: Number(m[2]) } : { rolled: 0, kept: 0 };
 }
 
+/** VD pour l'affichage : « 3k3 », « 3 K 3 », « 3g3 » → « 3g3 » ; texte invalide rendu tel quel, rogné (annexe H.5). */
+export function formatDR(s: string, letter = "g"): string {
+  const m = /^\s*(\d+)\s*[kg]\s*(\d+)\s*$/i.exec(s);
+  return m ? `${Number(m[1])}${letter}${Number(m[2])}` : s.trim();
+}
+
 export function formatDice(rolled: number, kept: number): string {
   return `${rolled}g${kept}`;
 }

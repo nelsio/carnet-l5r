@@ -33,7 +33,7 @@ export function FileActions() {
       <h2>Fichier</h2>
       <div className="file-actions">
         <button type="button" className="btn" onClick={() => downloadText(exportFileName(c), serializeCharacter(c))}>Exporter la fiche</button>
-        {!readonly && <ImportButton label="Importer un JSON…" />}
+        {!readonly && <ImportButton />}
         {!readonly && file.supported && file.state === "none" && (
           <button type="button" className="btn" onClick={() => void library.linkFile()}>Lier à un fichier…</button>
         )}

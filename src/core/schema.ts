@@ -109,8 +109,8 @@ export const SpellSchema = z.object({
   duration: text(80).default(""),
   /** Augmentations propres au sort, une par ligne. */
   raises: text(2000).default(""),
-  /** VD facultative (« 2k2 ») : action « Dégâts » du sort (v2.11.0). */
-  damage: z.string("doit être un texte").regex(/^\s*(\d+\s*[kg]\s*\d+)?\s*$/i, "doit être au format 2k2").optional(),
+  /** VD facultative (« 2g2 ») : action « Dégâts » du sort (v2.11.0). */
+  damage: z.string("doit être un texte").regex(/^\s*(\d+\s*[kg]\s*\d+)?\s*$/i, "doit être au format 2g2").optional(),
   memorized: z.boolean("doit être vrai ou faux").default(false),
   effect: text().default(""),
 }, "doit être un objet");

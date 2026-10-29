@@ -18,7 +18,7 @@ async function importKakita(page: Page) {
 async function chooseSchool(page: Page, school: string, insight: string) {
   await page.getByRole("button", { name: "Edit : Identité & réputation" }).click();
   await page.getByRole("combobox", { name: "Techniques d'école" }).selectOption({ label: school });
-  await page.getByRole("spinbutton", { name: "Rang (Insight)" }).fill(insight);
+  await page.getByRole("spinbutton", { name: "Rang d'Insight" }).fill(insight);
   await page.getByRole("button", { name: "Terminer : Identité & réputation" }).click();
 }
 
