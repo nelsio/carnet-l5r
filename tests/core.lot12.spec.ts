@@ -156,8 +156,8 @@ describe("Lot 12, v2.2.0 : correctifs de règles (annexe E.2)", () => {
     expect(catalogGap({ name: "Wakizashi", skill: "Kenjutsu", dr: "2k2", keywords: ["samourai", "moyenne"] })).toBeUndefined();
     expect(catalogGap({ name: "Wakizashi", skill: "Kenjutsu", dr: "2g2", keywords: ["moyenne", "samourai"] })).toBeUndefined();
     expect(catalogGap({ name: "Wakizashi", skill: "Kenjutsu", dr: "2k2", keywords: ["samourai", "petite"] }))
-      .toEqual({ dr: "2k2", keywords: ["samourai", "moyenne"] });
-    expect(catalogGap({ name: "Cimeterre", skill: "Kenjutsu", dr: "3k2", keywords: ["cimeterre", "moyenne"] })?.dr).toBe("2k3");
+      .toEqual({ dr: "2g2", keywords: ["samourai", "moyenne"] });
+    expect(catalogGap({ name: "Cimeterre", skill: "Kenjutsu", dr: "3k2", keywords: ["cimeterre", "moyenne"] })?.dr).toBe("2g3");
     expect(catalogGap({ name: "Lame de mon père", skill: "Kenjutsu", dr: "3k2" })).toBeUndefined();
     // Une fiche v1 migrée reçoit les mots-clés du livre : l'arc n'est plus Samouraï.
     const v1 = migrate({ ...structuredClone(perso), schemaVersion: 1, weapons: [{ name: "Yumi", skill: "Kyujutsu", dr: "2k2", bowStrength: 3 }] });

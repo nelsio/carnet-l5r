@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
 import {
-  activeEffects, affinityOf, armorSheet, attackTrait, catalogGap, catalogWeapon, createSpell, dailyHealing, deficiencyOf, isShugenja, reminderText, computePool, defaultModifiers, isRanged, parseDR, parseWeaponKeywords, rings, ROLL_TRAITS, schoolOf,
+  activeEffects, affinityOf, armorSheet, attackTrait, catalogGap, catalogWeapon, createSpell, dailyHealing, deficiencyOf, isShugenja, reminderText, computePool, defaultModifiers, isRanged, formatDR, parseDR, parseWeaponKeywords, rings, ROLL_TRAITS, schoolOf,
   findSchool, schoolRankOf, schoolsByClan, sortSpells, SPELL_ELEMENTS, SPELL_RINGS, spellcastingOf, spellRaises, spellTn, suggestSchool, techniqueCategories, vocabularyChanges, weaponKeywords,
   type ArmorPart, type Character, type PoolAction, type RollTrait, type TraitKey, type VocabularyChange,
 } from "@carnet/core";
@@ -171,11 +171,11 @@ function Identity() {
         )}
         <Field label="Rang d'école">
           <OptionalNumber
-            min={1} value={c.schoolRank ?? undefined} placeholder={`= Insight (${c.insightRank})`} aria-label="Rang d'école"
+            min={1} value={c.schoolRank ?? undefined} placeholder={`${c.insightRank} (Rang d'Insight)`} aria-label="Rang d'école"
             onChange={(n) => set(["schoolRank"], n ?? null)}
           />
         </Field>
-        <Field label="Rang (Insight)">{num(["insightRank"], c.insightRank, 1, 10)}</Field>
+        <Field label="Rang d'Insight">{num(["insightRank"], c.insightRank, 1, 10)}</Field>
         <Field label="Honneur">{num(["honor"], c.honor, 0, 10, 0.1)}</Field>
         <Field label="Gloire">{num(["glory"], c.glory, 0, 10, 0.1)}</Field>
         <Field label="Statut">{num(["status"], c.status, 0, 10, 0.1)}</Field>
@@ -333,7 +333,7 @@ function CatalogGap({ index }: { index: number }) {
   const [own, book] = [parseDR(w.dr), parseDR(gap.dr)];
   const sameKeywords = [...(w.keywords ?? [])].sort().join() === [...gap.keywords].sort().join();
   const parts = [
-    own.rolled !== book.rolled || own.kept !== book.kept ? gap.dr : "",
+    own.rolled !== book.rolled || own.kept !== book.kept ? formatDR(gap.dr) : "",
     sameKeywords ? "" : gap.keywords.map((k) => WEAPON_KEYWORD_LABELS[k]).join(", "),
   ].filter(Boolean);
   return (
@@ -395,7 +395,7 @@ function Weapons() {
               <tr key={i}>
                 <td>
                   <b>{w.name}</b>
-                  <div className="muted" style={{ fontSize: 12.5 }}>{w.skill} · VD {w.dr}{isRanged(w) ? ` · arc ${w.bowStrength ?? 0}` : ""}</div>
+                  <div className="muted" style={{ fontSize: 12.5 }}>{w.skill} · VD {formatDR(w.dr)}{isRanged(w) ? ` · arc ${w.bowStrength ?? 0}` : ""}</div>
                   {keywords.length > 0 && <div>{keywords.map((k) => <span key={k} className="tag">{WEAPON_KEYWORD_LABELS[k]}</span>)}</div>}
                   {state.mode === "edit" && <CatalogGap index={i} />}
                 </td>
@@ -608,7 +608,7 @@ function Spells() {
               {(s.keywords.length > 0 || s.damage) && (
                 <div className="sp3">
                   {s.keywords.map((k) => <span key={k} className="tag">{k}</span>)}
-                  {s.damage && <span className="tag">VD {s.damage}</span>}
+                  {s.damage && <span className="tag">VD {formatDR(s.damage)}</span>}
                 </div>
               )}
               {raises.length > 0 && <div className="sp4"><span className="label">Augm.</span> {raises.join(" · ")}</div>}
@@ -732,17 +732,19 @@ function VocabularyBanner() {
   );
 }
 
+/** Même motif que la Bibliothèque : question, « Supprimer définitivement » et « Annuler » (annexe H.7 X1). */
 function DeleteCharacter() {
   const { state, library } = useStore();
+  const c = useCharacter();
   const [confirm, setConfirm] = useState(false);
+  if (!confirm) {
+    return <p><button type="button" className="btn" onClick={() => setConfirm(true)}>Supprimer ce personnage…</button></p>;
+  }
   return (
-    <p>
-      <button type="button" className="btn" onClick={() => setConfirm(true)}>Supprimer ce personnage…</button>{" "}
-      {confirm && (
-        <button type="button" className="btn" style={{ color: "var(--bad)" }} onClick={() => state.entryId && void library.remove(state.entryId)}>
-          Confirmer la suppression
-        </button>
-      )}
+    <p className="confirm-line">
+      <span className="muted">Supprimer « {c.name || "Sans nom"} » ?</span>
+      <button type="button" className="btn sm danger" onClick={() => state.entryId && void library.remove(state.entryId)}>Supprimer définitivement</button>
+      <button type="button" className="btn sm" onClick={() => setConfirm(false)}>Annuler</button>
     </p>
   );
 }

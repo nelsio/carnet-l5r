@@ -124,7 +124,7 @@ describe("Situation « Magie » (F.5)", () => {
     toMagic();
     fireEvent.click(card("Dégâts · Feux intérieurs"));
     expect(roller().getByTestId("pool")).toHaveTextContent("3g2");
-    expect(roller().getByText("VD 3k2")).toBeInTheDocument();
+    expect(roller().getByText("VD 3g2")).toBeInTheDocument();
     expect(roller().queryByRole("checkbox", { name: /point de Vide/ })).toBeNull();
     fireEvent.click(roller().getByRole("checkbox", { name: /Cible souillée/ }));
     expect(roller().getByTestId("pool")).toHaveTextContent("4g3");

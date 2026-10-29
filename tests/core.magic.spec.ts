@@ -124,7 +124,7 @@ describe("Situation « Magie » (F.5)", () => {
     const earth2 = actions.find((a) => a.id === "spell-earth-2");
     expect(earth2).toMatchObject({ kind: "spell", tn: 15, label: "Lancer · Mur de terre", description: "ND 15 · 2 actions complexes · Défense · parchemin" });
     expect(actions.find((a) => a.id === "spelldmg-fire-1")).toMatchObject({
-      kind: "spellDamage", parent: "spell-fire-1", tn: null, label: "Dégâts · Feux intérieurs", description: "VD 3k2, sans la Force ni point de Vide.",
+      kind: "spellDamage", parent: "spell-fire-1", tn: null, label: "Dégâts · Feux intérieurs", description: "VD 3g2, sans la Force ni point de Vide.",
     });
   });
 

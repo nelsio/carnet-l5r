@@ -65,7 +65,7 @@ describe("Fiche : armes du livre et bonus de jet (annexe E.2 C8, E.9 S1)", () =>
     await renderApp(c);
     const gap = screen.getByRole("group", { name: "Écart avec le livre : Wakizashi" });
     expect(gap).toHaveTextContent("Le livre indique Samouraï, Moyenne : mettre à jour ?");
-    expect(screen.getByRole("group", { name: "Écart avec le livre : Cimeterre" })).toHaveTextContent("Le livre indique 2k3 : mettre à jour ?");
+    expect(screen.getByRole("group", { name: "Écart avec le livre : Cimeterre" })).toHaveTextContent("Le livre indique 2g3 : mettre à jour ?");
     fireEvent.click(within(gap).getByRole("button", { name: "Mettre à jour" }));
     expect(screen.queryByRole("group", { name: "Écart avec le livre : Wakizashi" })).toBeNull();
     expect(screen.getAllByRole("row").find((r) => r.textContent?.startsWith("Wakizashi"))).toHaveTextContent("Moyenne");

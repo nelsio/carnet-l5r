@@ -32,7 +32,7 @@ describe("Rouleaux & invocations (F.5)", () => {
     expect(jade.getByText("mémorisé")).toBeInTheDocument();
     expect(jade.getByText("Portée 100 pieds · Zone Une cible · Durée Instantanée")).toBeInTheDocument();
     expect(jade.getByText("Jade")).toBeInTheDocument();
-    expect(jade.getByText("VD 2k2")).toBeInTheDocument();
+    expect(jade.getByText("VD 2g2")).toBeInTheDocument();
     expect(jade.getByText(/Portée \(\+10 pieds\) · Cibles \(\+1\)/)).toBeInTheDocument();
     expect(within(screen.getByTestId("spell-earth-2")).getByText("Maîtrise 2 · ND 15")).toBeInTheDocument();
     expect(within(screen.getByTestId("spell-earth-2")).getByText("parchemin")).toBeInTheDocument();

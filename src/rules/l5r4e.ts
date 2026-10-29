@@ -161,7 +161,7 @@ export const CALLED_ZONES: readonly { id: CalledZone; label: string; cost: numbe
 /** Renversement d'un quadrupède (p. 89). */
 export const KNOCKDOWN_QUADRUPED_COST = 4;
 /** Dégâts après un Désarmement réussi (p. 88) : sans la Force ni augmentation de dégâts. */
-export const DISARM_DAMAGE = "2k1";
+export const DISARM_DAMAGE = "2g1";
 /** Malus au ND des arcs selon la monture (p. 202). */
 export const BOW_TN_PENALTY = 10;
 

@@ -4,7 +4,7 @@
  */
 import type { SpellOption, Spellcasting } from "../rules/ecoles";
 import { CONCENTRATE_ACTION_ID, ELEMENT_LABELS, SPELL_CAST_TIME_MIN, SPELL_CONCENTRATION, SPELL_TN, type ActionDef } from "../rules/l5r4e";
-import { normalize, parseDR, rings, type PoolAction } from "./engine";
+import { formatDR, normalize, parseDR, rings, type PoolAction } from "./engine";
 import {
   SPELL_ELEMENTS, SPELL_RINGS, SPELL_SLOT_KEYS, type Character, type Spell, type SpellElement, type SpellRing, type SpellSlotKey,
 } from "./schema";
@@ -157,7 +157,7 @@ export function spellActions(c: Character): ActionDef[] {
     if (!spell.damage?.trim()) return [cast];
     return [cast, {
       id: `spelldmg-${spell.id}`, situation: "magic", parent: id, kind: "spellDamage", spell, tn: null, group,
-      label: `Dégâts · ${spell.name}`, description: `VD ${spell.damage}, sans la Force ni point de Vide.`,
+      label: `Dégâts · ${spell.name}`, description: `VD ${formatDR(spell.damage)}, sans la Force ni point de Vide.`,
     }];
   });
 }

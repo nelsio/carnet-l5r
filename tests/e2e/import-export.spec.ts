@@ -92,6 +92,6 @@ test("E5 : fusion ajoutant Kyujutsu et un arc : aperçu, puis tir sur Réflexes 
   await page.locator("button.act").filter({ hasText: "Tir · Yumi" }).click();
   await expect(page.getByText("Kyujutsu 1 + Réflexes 3")).toBeVisible();
   await page.locator("button.act").filter({ hasText: "Dégâts · Yumi" }).click();
-  await expect(page.getByText("Arc 2 + VD 2k2")).toBeVisible();
+  await expect(page.getByText("Arc 2 + VD 2g2")).toBeVisible();
   await expect(page.getByText("Force 2 : l'arc de force 3 tire à 2.")).toBeVisible();
 });

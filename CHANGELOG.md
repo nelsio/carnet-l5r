@@ -6,6 +6,14 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.13.3] - 2026-10-30
+
+### Corrigé
+- Valeurs de dégâts toujours affichées en `XgY` (fiche, aide de jeu, lanceur), même saisies ou stockées en `XkY` ; catalogue d'armes livré en `g`.
+- Suppression depuis le bloc Identité : même confirmation que dans la Bibliothèque (« Supprimer définitivement », « Annuler »).
+- En consultation, les boutons sans effet (« Réussi » / « Raté » d'un sort, « Réussi » de la méditation) ne sont plus affichés.
+- « Rang d'Insight » remplace « Rang (Insight) » dans le bloc Identité.
+
 ## [2.13.2] - 2026-10-29
 
 ### Ajouté
@@ -132,7 +140,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.13.2...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.13.3...HEAD
+[2.13.3]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.13.3
 [2.13.2]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.13.2
 [2.8.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.8.0
 [2.7.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.7.0
