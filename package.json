@@ -1,8 +1,14 @@
 {
   "name": "carnet-l5r",
-  "version": "2.13.1",
+  "version": "2.13.2",
   "private": true,
   "description": "Carnet de Rokugan : compagnon de campagne pour L5R 4e édition",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nelsio/carnet-l5r"
+  },
+  "homepage": "https://nelsio.github.io/carnet-l5r/",
   "type": "module",
   "scripts": {
     "dev": "vite",

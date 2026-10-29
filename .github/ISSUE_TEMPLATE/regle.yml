@@ -1,0 +1,38 @@
+name: Règle à vérifier
+description: L'outil applique une règle différemment du livre de base 4e.
+labels: [règle]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        **Ne recopie pas le texte du livre** (techniques, sorts, descriptions) : résume la règle
+        avec tes mots et donne la page. Le livre fait foi.
+  - type: input
+    id: regle
+    attributes:
+      label: Règle concernée
+      placeholder: Feinte, règle des dix dés, technique Akodo rang 2…
+    validations:
+      required: true
+  - type: input
+    id: page
+    attributes:
+      label: Page du livre de base 4e
+      description: Précise l'édition (française ou anglaise).
+      placeholder: p. 87, édition française
+    validations:
+      required: true
+  - type: textarea
+    id: outil
+    attributes:
+      label: Ce que fait l'outil
+      description: Version, fiche ou réglages utiles, réserve affichée (ex. 6g3).
+    validations:
+      required: true
+  - type: textarea
+    id: livre
+    attributes:
+      label: Ce que dit le livre
+      description: En résumé, sans recopie.
+    validations:
+      required: true

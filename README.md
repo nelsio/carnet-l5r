@@ -1,5 +1,9 @@
 # Carnet de Rokugan
 
+[![CI](https://github.com/nelsio/carnet-l5r/actions/workflows/ci.yml/badge.svg)](https://github.com/nelsio/carnet-l5r/actions/workflows/ci.yml)
+[![Dernière release](https://img.shields.io/github/v/release/nelsio/carnet-l5r)](https://github.com/nelsio/carnet-l5r/releases/latest)
+[![Licence MIT](https://img.shields.io/github/license/nelsio/carnet-l5r)](LICENSE)
+
 Compagnon de campagne pour les joueurs de **La Légende des Cinq Anneaux, 4e édition** : ta **fiche de personnage**, et une **aide aux jets Roll & Keep** selon la situation (enquête, cour, déplacement, escarmouche, duel, bataille).
 
 L'outil tient dans **un seul fichier HTML** (`carnet-l5r.html`). Il n'a **ni serveur, ni compte**, et **n'envoie rien sur internet** : tes fiches restent dans ton navigateur.
@@ -179,6 +183,7 @@ Pour mettre à jour la fiche d'un joueur, **importe son nouveau fichier**.
 ## 12. Licences et mentions
 
 - **La Légende des Cinq Anneaux (Legend of the Five Rings, L5R)** est une marque de son éditeur. Ce carnet est un **outil de fan non officiel**, sans lien avec l'éditeur ; il ne reproduit pas les textes des livres. Garde ton livre de base sous la main : **il fait foi**.
+- Code sous licence **MIT** (voir [`LICENSE`](LICENSE)).
 - Polices embarquées, sous licence **SIL Open Font License 1.1** :
   - **Shippori Mincho B1** : © The Shippori Mincho Project Authors (aussi le kanji 帳 du sceau et de l'icône) ;
   - **Zen Kaku Gothic New** : © The Zen Kaku Gothic Project Authors ;
@@ -205,8 +210,14 @@ npm run test:e2e       # Playwright, sur le build
 
 ### Publier une version
 
-1. Mettre à jour `version` dans `package.json` (**SemVer**) et merger sur `main`.
+1. Mettre à jour `version` dans `package.json` (**SemVer**), ajouter l'entrée de la version dans `CHANGELOG.md` et merger sur `main`.
 2. Poser le tag correspondant sur le commit de merge : `git tag v1.2.3 && git push origin v1.2.3`.
 3. Le workflow `release.yml` **vérifie que le tag correspond à `package.json`**, relance lint, types et tests, construit le fichier et crée la release avec `carnet-l5r.html` en pièce jointe et des notes générées.
 
 Chaque merge sur `main` met aussi à jour la version en ligne (`pages.yml`).
+
+## Contribuer
+
+Bugs, règles à vérifier et idées passent par les issues : voir [`CONTRIBUTING.md`](CONTRIBUTING.md).
+Les échanges suivent le [code de conduite](CODE_OF_CONDUCT.md).
+Une faille de sécurité se signale en privé : voir [`SECURITY.md`](SECURITY.md).

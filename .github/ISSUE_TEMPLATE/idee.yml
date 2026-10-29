@@ -1,0 +1,32 @@
+name: Idée d'évolution
+description: Un besoin en jeu que l'outil ne couvre pas encore.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: besoin
+    attributes:
+      label: Besoin en jeu
+      description: Ce qui te manque ou te ralentit autour de la table.
+    validations:
+      required: true
+  - type: dropdown
+    id: situation
+    attributes:
+      label: Situation
+      options:
+        - Enquête
+        - Cour
+        - Déplacement
+        - Escarmouche
+        - Duel
+        - Bataille
+        - Magie
+        - Fiche ou Bibliothèque
+        - Autre
+    validations:
+      required: true
+  - type: textarea
+    id: proposition
+    attributes:
+      label: Proposition
+      description: Ce que tu imagines (facultatif si le besoin suffit).
