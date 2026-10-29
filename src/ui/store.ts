@@ -201,8 +201,9 @@ export const initialUi: UiState = {
   battle: initialBattle,
 };
 
-export function initialState(): AppState {
-  return { screen: "library", entryId: null, mode: "edit", character: null, ui: initialUi };
+/** `theme` : thème mis en cache, appliqué dès le premier rendu en attendant les préférences (annexe I.1.8). */
+export function initialState(theme: Theme = "auto"): AppState {
+  return { screen: "library", entryId: null, mode: "edit", character: null, ui: { ...initialUi, theme } };
 }
 
 export type AppAction =

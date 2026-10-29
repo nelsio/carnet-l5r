@@ -423,7 +423,7 @@ function VoidPanel() {
         <span className="panel-title"><span className="label">Dépenser du Vide</span><InfoButton panel="void" label="Dépenser du Vide" /></span>
       </div>
       {ui.voidSpentThisRound && (
-        <p className="hint" style={{ color: "var(--bad)", margin: "0 0 8px" }}>Déjà un point de Vide dépensé ce round (limite normale : 1 par round).</p>
+        <p className="hint" style={{ color: "var(--danger)", margin: "0 0 8px" }}>Déjà un point de Vide dépensé ce round (limite normale : 1 par round).</p>
       )}
       <div className="stance">
         <button type="button" aria-pressed={ui.opts.voidPoint} disabled={none && !ui.opts.voidPoint} onClick={() => dispatch({ type: "option", patch: { voidPoint: !ui.opts.voidPoint } })}>
@@ -495,8 +495,8 @@ function MovePanel() {
           </div>
         ))}
       </div>
-      {bonus > 0 && <p className="hint" style={{ margin: "6px 0 0", color: "var(--gold)" }}>+{bonus} pieds par tour (technique d'école), sans dépasser le maximum.</p>}
-      {waiver && <p className="hint" data-testid="terrain-waiver" style={{ margin: "6px 0 0", color: "var(--gold)" }}>Maîtrise {waiver.source} : terrain {TERRAINS.find((t) => t.id === terrain)?.label.toLowerCase()} sans pénalité.</p>}
+      {bonus > 0 && <p className="hint" style={{ margin: "6px 0 0", color: "var(--accent-ink)" }}>+{bonus} pieds par tour (technique d'école), sans dépasser le maximum.</p>}
+      {waiver && <p className="hint" data-testid="terrain-waiver" style={{ margin: "6px 0 0", color: "var(--accent-ink)" }}>Maîtrise {waiver.source} : terrain {TERRAINS.find((t) => t.id === terrain)?.label.toLowerCase()} sans pénalité.</p>}
       {details && (
         <p className="hint" style={{ marginBottom: 0 }}>
           Terrain modéré (broussailles, foule) : Anneau d'Eau −1 ; difficile (eau, escaliers, marais) : −2, avec 1 au minimum (livre p. 87).
