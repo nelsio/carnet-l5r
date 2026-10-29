@@ -8,7 +8,9 @@ Fait foi :
 
 **État au 28/10/2026 :** version **v2.13.1**, lots 1 à 14 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
 
-**Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie), F (lot 13 : shugenja et Magie), G (lot 14 : nom de l'outil dans l'en-tête).
+**Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie), F (lot 13 : shugenja et Magie), G (lot 14 : nom de l'outil dans l'en-tête), H (lots 15 et 16 : dépôt GitHub et correctifs), I (lots 17 à 19 : couleurs, Anneaux, sélecteurs), J (lot 20 : localisation).
+
+**Prochains lots (29/10/2026) :** 15 → 20, dans l'ordre, annexes H, I et J (à livrer).
 
 ---
 
@@ -337,7 +339,7 @@ interface LibraryStore {
   - Cellules teintées en vert proportionnellement à la chance de réussite.
   - Trois cases à cocher : « Avec un point de Vide », « Spécialisations appliquées » (cochée par défaut), « Pénalité de blessure actuelle » (cochée par défaut).
   - Mention : chaque augmentation ajoute +5 au ND, il suffit de lire une colonne plus à droite. Sur mobile, le tableau défile horizontalement dans son cadre.
-- **Détails repliables (« i »)** :
+- **Détails repliables (« i »)** (au lot 19, Posture devient un menu déroulant sans « i », annexe I.3.4) :
   - les boutons des panneaux **Posture** et **Dépenser du Vide** n'affichent que leur titre ;
   - **un seul** petit bouton rond « i » par panneau, placé dans l'en-tête à côté du titre (« Posture i », « Dépenser du Vide i » ; pas de compteur « reste » dans cet en-tête, les points de Vide restants sont dans la barre d'état ; en-tête sur une seule ligne, y compris sur mobile) ; il déplie ou replie **toutes** les descriptions du panneau à la fois, sans rien sélectionner ;
   - le « i » est rempli en couleur d'accent quand les détails sont ouverts ; les deux panneaux sont indépendants ;
@@ -354,6 +356,8 @@ interface LibraryStore {
 - Aucun appel réseau : polices embarquées, aucune bibliothèque chargée depuis un CDN.
 
 ### 6.4 Thème et couleurs
+> **Remplacé au lot 17 (v2.14.0) par l'annexe I.1** (jetons, accents lisibles, couleurs sémantiques, Android). Jusqu'à sa livraison, cette section décrit l'état v2.13 ; ensuite, l'annexe I.1 fait foi.
+
 - Couleurs uniquement en variables CSS.
 - Clair écru : fond `#ece6d8`, surface `#f7f3ea`, encre `#2a261f`.
 - Sombre anthracite : fond `#25272a`, surface `#2f3236`, encre `#e7e5e0`.
@@ -391,7 +395,7 @@ Point de rupture : **largeur ≤ 720 px**. Au-dessus, mise en page bureau inchan
 | Barre d'état | Les quatre tuiles Dépl. / ND armure / Réduction / Pénalité occupent **toute la largeur sur 4 colonnes égales**, texte centré. **Résumé sur une ligne** (niveau de blessure, pénalité, `blessures / seuil max`), cliquable, bordure rouge si le personnage est blessé. Un appui déplie la piste complète en **2 rangées de 4**. En dessous : compteur −/+ (boutons 40 px) et pastilles de Vide (26 px). |
 | Lanceur | **Panneau glissant depuis le bas**, ouvert au choix d'une action (pas à l'ouverture de l'écran). Hauteur max 88 vh, défilement interne, fond assombri derrière. Poignée et bouton × en haut ; fermeture par ×, appui sur le fond ou Échap. Bouton « Lancer » **collé en bas** du panneau. Après un lancer, le résultat est amené à l'écran et le panneau reste ouvert. Changer une option ne remet pas le défilement du panneau à zéro. Le défilement de la page est bloqué pendant l'ouverture. |
 | Situations | Rangées Enquête / Déplacement / Combat et sous-types en **défilement horizontal**, sans retour à la ligne. |
-| Postures et Vide | Grille de 2 colonnes, titres seuls ; un « i » de 26 px dans l'en-tête de chaque panneau, zone de toucher ≥ 40 px. |
+| Postures et Vide | (Posture : menu déroulant au lot 19, annexe I.3.4.) Grille de 2 colonnes, titres seuls ; un « i » de 26 px dans l'en-tête de chaque panneau, zone de toucher ≥ 40 px. |
 | Saisie | Champs en **16 px** (pas de zoom automatique sur iOS). Cibles tactiles d'au moins 40 px. |
 | Anneaux | 2 colonnes, le Vide sur toute la largeur. |
 | Encoches | Gouttières latérales `max(16px, env(safe-area-inset-left/right))`. Barre du bas et panneau respectent les zones sûres. |
@@ -518,7 +522,7 @@ Ces cas complètent la spec fournie. L'agent les écrit dans `tests/core.modifie
 | E9 | Statistiques | Une ligne par compétence, attaque, dégâts et initiative ; cocher « point de Vide » augmente les réserves de +1g1 et les pourcentages |
 | E10 | Lanceur : ajouter une augmentation | Le ND final monte de 5 et la chance de réussite baisse |
 | E11 | Kenjutsu passé à 7 (dés forcés : 9, 4…) | Les dégâts du katana affichent la note de maîtrise ; le 9 est relancé et le dé affiche « 13 » avec « 9+4 » ; la compétence de l'arme est trouvée même écrite « kenjutsu » ou avec des espaces |
-| E12 | Boutons « i » de Posture, Vide et Déplacement | Descriptions masquées par défaut ; un clic sur le « i » d'un panneau déplie toutes ses descriptions, un second les replie ; aucun effet sur la posture, le Vide ni l'autre panneau |
+| E12 | Boutons « i » de Posture, Vide et Déplacement (Posture retirée au lot 19, remplacée par D3, I.3.7) | Descriptions masquées par défaut ; un clic sur le « i » d'un panneau déplie toutes ses descriptions, un second les replie ; aucun effet sur la posture, le Vide ni l'autre panneau |
 | E13 | Lanceur sur Dégâts · Katana | « Dés lancés ± » et « Bonus fixe » sur une seule ligne ; ligne « Les 10 explosent… » sans phrase « Lance… » ; avec Kenjutsu 7, « Les 9 et 10 explosent… » |
 | E14 | Appui sur la tuile ND armure | L'éditeur d'armure s'ouvre ; bonus 5 avec Réflexes 2 → tuile ND 20 ; réduction 3 → tuile Réduction 3 ; valeurs conservées au rechargement |
 | E15 | Option « Lanceur de dés » | Par défaut « masqué » : aucun bouton « Lancer » ni historique dans les lanceurs  ; « affiché » : le bouton apparaît partout ; le choix survit au rechargement |
@@ -535,7 +539,7 @@ Ces cas complètent la spec fournie. L'agent les écrit dans `tests/core.modifie
 | M7 | Champs en mode modification | Taille de police calculée ≥ 16 px |
 | M8 | Cibles tactiles (boutons −/+, pastilles, onglets) | Au moins 40 × 40 px |
 | M9 | Tuiles de la barre d'état à 360 px de large | Les 4 libellés et valeurs sont entièrement visibles, sans troncature ni retour à la ligne |
-| M10 | Boutons « i » | Zone de toucher ≥ 40 × 40 px ; les panneaux Posture et Vide tiennent sur moins d'un écran détails fermés |
+| M10 | Boutons « i » (reformulé au lot 19, I.3.7) | Zone de toucher ≥ 40 × 40 px ; les panneaux Posture et Vide tiennent sur moins d'un écran détails fermés |
 | M11 | En-tête à 360 px de large | Sceau de 52 px ; Bibliothèque, Lanceur de dés et Thème en icônes de 40 px sous le nom, alignés à gauche ; libellé accessible avec l'état courant (annexe G, H7) |
 | M12 | Combat sur mobile, et à 360 px de large | Carte « Nouveau round » entre l'Initiative et la Posture ; sa description tient sur 2 lignes au plus |
 | M13 | Aide de jeu sur mobile, et à 360 px de large | Les 4 onglets de situation (Enquête, Cour, Déplacement, Combat) sur une ligne, sans défilement ni texte tronqué, zones de 40 px de haut ; Statistiques est dans la barre du bas |
@@ -565,7 +569,13 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 12. **v2.2 à v2.8 — règles du livre, combat complet, ergonomie** : annexe E (validée le 24/10/2026). Sept versions : correctifs de règles et retouches d'interface (v2.2.0, **livrée**, tag `v2.2.0`, écarts en E.12), combat complet (v2.3.0, **livrée**, tag `v2.3.0`, écarts en E.13), maîtrises et armures (v2.4.0, **livrée**, tag `v2.4.0`, écarts en E.14), récupération (v2.5.0, **livrée**, tag `v2.5.0`, écarts en E.15), vocabulaire français (v2.6.0, **livrée**, tag `v2.6.0`, écarts en E.16), bataille de masse (v2.7.0, **livrée**, tag `v2.7.0`, écarts en E.17), bloc Armure et retouches d'interface (v2.8.0, **livrée**, E.18 et E.19, écarts en E.20) → cas L1 à L28, E24 à E34, M16 à M18.
 13. **v2.9 à v2.12 — shugenja et Magie** : annexe F (validée le 28/10/2026). Quatre versions : Rouleaux & invocations (v2.9.0, **livrée**, écarts en F.8), écoles de shugenja (v2.10.0, **livrée**, écarts en F.9), situation Magie et lanceur de sort (v2.11.0, **livrée**, écarts en F.10), emplacements et combat (v2.12.0, **livrée**, écarts en F.11) → cas G1 à G17, E36.
 14. **v2.13.0 — nom de l'outil dans l'en-tête** : annexe G (maquette validée). Sceau 帳 qui ouvre la Bibliothèque, surtitre, titre d'onglet dynamique, favicon (**livrée**, écarts en G.6) → cas H1 à H12. **v2.13.1** (patch) : le bouton Bibliothèque est gardé à côté du sceau (G.6).
-15. **À définir** : kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts (fichier personnel importable, pas dans le dépôt), compteurs « N fois par séance » (D-g).
+15. **v2.13.2 — fichiers du dépôt GitHub** : annexe H.1 à H.4. Licence MIT, contribution, code de conduite, sécurité, `CHANGELOG.md`, modèles d'issue et de PR, Dependabot, `.editorconfig` → cas R1 à R4. Code applicatif inchangé (sauf `package.json`).
+16. **v2.13.3 — correctifs** : annexe H.5 à H.8. Notation `XgY` partout à l'affichage (`formatDR`, données en `g`), boutons en trop et incohérences (relevé X1 à X6, captures avant / après) → cas K1 à K8.
+17. **v2.14.0 — couleurs** : annexe I.1, **remplace le §6.4**. Jetons `--surface-2`, `--accent-ink`, `--on-accent`, couleurs sémantiques `--danger` / `--ok` / `--warn`, jetons `--ring-*`, `theme-color` et thème sans flash → cas N1 à N12.
+18. **v2.15.0 — bloc Anneaux « Ensō »** : annexe I.2, CSS seul (`reference/anneaux-enso.css`) → cas A1 à A8.
+19. **v2.16.0 — sélecteurs** : annexe I.3. Sélecteurs `appearance: base-select` (`reference/selecteurs.css`), panneau Posture en menu déroulant sans « i » → cas D1 à D10 ; E12 et M10 adaptés.
+20. **v2.17.0 — localisation** : annexe J. Français (référence) et anglais, sélecteur `FR · EN` dans le pied de page, dictionnaires typés sans dépendance → cas I1 à I13.
+21. **À définir** : kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts (fichier personnel importable, pas dans le dépôt), compteurs « N fois par séance » (D-g).
 
 ---
 
@@ -1490,3 +1500,628 @@ La règle globale `button{font:inherit}` (0,0,1) est plus faible que `.seal` (0,
 - **Titre d'onglet** : `useEffect` dans `Header`, sur le nom sans espaces de bord ; un nom vide donne « Carnet de Rokugan ».
 - **Bouton Bibliothèque gardé (v2.13.1)** : décision de Nelson après la v2.13.0. Sur mobile, le sceau seul ne se devinait pas comme bouton ; le bouton « Bibliothèque » (icône livres, rond de 40 px sur mobile) revient en tête des boutons de droite, partout, et le sceau reste un accès en plus. H1, H2, H7 et M11 adaptés.
 - **Tests** : `tests/ui/header.spec.tsx` (H1, H2, H3, H6, H8, H11) ; Playwright `tests/e2e/header.spec.ts` (H1 clair et sombre, H2 au clavier, H3, H4 à 390 et 1200 px, H5, H9 par les polices réellement rendues, H12) ; M11 devient H7 (3 icônes sous le nom, à gauche, sceau 52 px). Les tests qui ouvraient la Bibliothèque par le bouton passent par le sceau. H10 : revue du diff (seules les lignes de jetons portent des couleurs).
+
+---
+
+## Annexe H — Lots 15 et 16 : dépôt GitHub et correctifs (v2.13.2, v2.13.3)
+
+Statut : **à livrer**. Source : `handoff-lots-15-17.md` (29/10/2026), audit fait sur `main` au commit `dfaac10` (v2.13.1) ; les numéros de ligne cités peuvent avoir bougé, se fier aux extraits. Ordre des lots tranché le 29/10/2026 : **15 → 16 → 17 → 18 → 19 → 20** (langues en dernier, annexe J ; visuel avant, annexe I). Une PR par lot, CI verte, tag posé après merge (procédure du README).
+
+| Lot | Version | Contenu | Code applicatif touché |
+|---|---|---|---|
+| **15** | v2.13.2 | Fichiers classiques d'un dépôt GitHub (licence, contribution, modèles…) | Non (sauf `package.json`) |
+| **16** | v2.13.3 | Correctifs : notation `XkY` → `XgY`, boutons en trop, incohérences | Oui |
+
+### H.1 Lot 15 — fichiers à créer
+| Fichier | Contenu |
+|---|---|
+| `LICENSE` | Licence **MIT** (P-H1), titulaire « Nelson » (ou le pseudo GitHub `nelsio`), année 2026. Texte MIT standard, en anglais (c'est le texte qui fait foi). |
+| `CONTRIBUTING.md` | En français. Plan en H.2. |
+| `CODE_OF_CONDUCT.md` | **Contributor Covenant 2.1**, traduction française officielle (récupérée sur contributor-covenant.org, pas réécrite). Contact : signalement privé via GitHub (pas d'adresse e-mail publiée). |
+| `SECURITY.md` | Court : l'outil n'a ni serveur ni compte ; une faille possible = injection de contenu via un JSON importé, ou fuite de données. Signalement par **« Report a vulnerability »** (signalement privé GitHub, à activer dans Settings → Security). Seule la dernière version est corrigée. |
+| `CHANGELOG.md` | Format *Keep a Changelog*. Une entrée par version publiée, reconstruite depuis le §11 et les releases GitHub (v1.0.0 → v2.13.2). Résumé en 1 à 4 puces par version, pas de copie des annexes. Section `[Non publié]` en tête. |
+| `.github/ISSUE_TEMPLATE/bug.yml` | Formulaire : version (pied de page), navigateur et appareil, bureau ou mobile, étapes, attendu, obtenu, fiche JSON jointe facultative (avec rappel : retirer ce qu'on ne veut pas partager). |
+| `.github/ISSUE_TEMPLATE/regle.yml` | « Règle à vérifier » : règle concernée, page du livre 4e (édition française ou anglaise), ce que fait l'outil, ce que dit le livre. **Pas de recopie de texte du livre** (rappel dans le formulaire). |
+| `.github/ISSUE_TEMPLATE/idee.yml` | Idée d'évolution : besoin en jeu, situation (enquête, escarmouche…), proposition. |
+| `.github/ISSUE_TEMPLATE/config.yml` | `blank_issues_enabled: false`. |
+| `.github/PULL_REQUEST_TEMPLATE.md` | Lot / version, résumé, cases à cocher : lint, typecheck, Vitest, Playwright, captures bureau + 390 px (si interface), `CHANGELOG.md` à jour, `HANDOFF.md` à jour (écarts de mise en œuvre). |
+| `.github/dependabot.yml` | `npm` et `github-actions`, **mensuel**, regroupement des mises à jour mineures et correctives (`groups`), 5 PR ouvertes au plus. |
+| `.editorconfig` | UTF-8, LF, indentation 2 espaces, retour à la ligne final ; `*.md` sans suppression des espaces de fin. |
+
+### H.2 `CONTRIBUTING.md` (plan)
+1. **Esprit du projet** : outil de fan, un seul fichier HTML, aucune requête réseau, rien n'est envoyé. Toute contribution respecte ces contraintes.
+2. **Signaler un bug ou une règle** : passer par les modèles d'issue.
+3. **Proposer une évolution** : ouvrir une issue avant de coder. Les évolutions importantes passent par une annexe de `HANDOFF.md` (spécification avant code).
+4. **Développer** : renvoi à la section Développement du README (Node 24, commandes). Ne pas dupliquer les commandes.
+5. **Règles du code** : TypeScript strict ; logique de jeu dans `src/core` (pur, sans DOM, couvert à 100 %) ; règles en données dans `src/rules` ; couleurs uniquement en jetons CSS (vérifié par le lint N8 à partir du lot 17, annexe I.1) ; aucun `dangerouslySetInnerHTML` ; aucune dépendance chargée depuis un CDN.
+6. **Tests attendus** : la spécification `tests/core.rules.spec.ts` ne se modifie pas pour faire passer du code ; un désaccord avec le livre se signale en issue « Règle à vérifier ».
+7. **Branches et commits** : une branche par lot ou correctif (`lot-16-correctifs`, `fix-…`) ; messages en français, à l'impératif ; PR vers `main`.
+8. **Versions** : SemVer, procédure de publication du README. Un changement du format de fiche incrémente `schemaVersion` et ajoute une migration testée.
+9. **Textes du livre** : ne jamais recopier les textes des livres L5R (techniques, sorts, descriptions). Résumés courts et références de page seulement.
+10. **Traductions** (ajouté au lot 20) : renvoi à J.8.
+
+### H.3 Lot 15 — fichiers modifiés
+- `package.json` : `"license": "MIT"`, `"repository": { "type": "git", "url": "https://github.com/nelsio/carnet-l5r" }`, `"homepage": "https://nelsio.github.io/carnet-l5r/"`. Garder `"private": true` (empêche une publication npm par erreur).
+- `README.md` :
+  - sous le titre, trois badges : CI, dernière release, licence ;
+  - §12 Licences et mentions : ajouter « Code sous licence MIT (voir `LICENSE`) » avant les polices ;
+  - nouvelle section **Contribuer** après Développement : 3 lignes, liens vers `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`.
+- Réglages GitHub (**à faire par Nelson**, pas par l'agent) : activer le signalement privé de vulnérabilités ; renseigner la description et l'URL du dépôt ; sujets `l5r`, `legend-of-the-five-rings`, `rpg`, `character-sheet`.
+
+### H.4 Tests du lot 15
+| ID | Vérification | Attendu |
+|---|---|---|
+| R1 | Onglet « Insights → Community standards » du dépôt | Toutes les cases cochées (description, README, code de conduite, contribution, licence, sécurité, modèles d'issue et de PR) |
+| R2 | « New issue » | Les 3 formulaires proposés, pas d'issue vierge |
+| R3 | CI | Verte ; aucun changement dans `dist/carnet-l5r.html` hors numéro de version |
+| R4 | `dependabot.yml` | Validé par GitHub (pas d'erreur dans l'onglet Dependabot) |
+
+### H.5 Lot 16 — notation des dés : `XkY` affiché à la place de `XgY`
+**Problème.** La règle (§4) est : `XgY` à l'affichage, `XkY` accepté en saisie. Plusieurs endroits affichent la VD **brute**, telle que stockée. Or le catalogue d'armes est écrit en `k` : une arme ajoutée depuis le catalogue (bouton « Associer ») ou une ancienne fiche s'affiche « VD 3k3 ».
+
+**Correctif en deux parties.**
+1. **Un seul formateur**, dans `src/core` (pur, testé), à côté de `parseDR` (`src/core/engine.ts`) :
+   ```ts
+   /** VD pour l'affichage : « 3k3 », « 3 K 3 », « 3g3 » → « 3g3 » ; texte invalide rendu tel quel, rogné. */
+   export function formatDR(s: string, letter = "g"): string {
+     const m = /^\s*(\d+)\s*[kg]\s*(\d+)\s*$/i.exec(s);
+     return m ? `${Number(m[1])}${letter}${Number(m[2])}` : s.trim();
+   }
+   ```
+   Le second paramètre sert au lot 20 (`g` en français, `k` en anglais, annexe J).
+2. **Appliquer `formatDR` à chaque affichage** d'une VD. Relevé de l'audit :
+
+   | Fichier | Endroit |
+   |---|---|
+   | `src/ui/components/Sheet.tsx` | Ligne d'arme en lecture : `VD {w.dr}` |
+   | `src/ui/components/Sheet.tsx` | Suggestion du catalogue (écart avec le livre) : `gap.dr` affiché |
+   | `src/ui/components/Sheet.tsx` | Étiquette de sort : `VD {s.damage}` |
+   | `src/ui/components/Roller.tsx` | Détail de la réserve de dégâts : `+ VD ${a.dr}` et `VD ${a.spell?.damage}` |
+   | `src/core/actions.ts` | Descriptions des actions de dégâts (`VD de la flèche ${w.dr}`, `Force + VD ${w.dr}`) |
+   | `src/core/spells.ts` | Description « Dégâts · sort » (`VD ${spell.damage}`) |
+
+   Puis chercher les autres occurrences : `grep -rnE 'VD \$\{|\.dr\}|damage\}' src`.
+
+**Données.** Normaliser en `g` les sources livrées avec l'outil :
+- `src/rules/ecoles-bushi.json` : les 16 `"dr"` du catalogue d'armes (`"3k2"` → `"3g2"`, etc.) ;
+- `src/rules/l5r4e.ts` : `DISARM_DAMAGE = "2k1"` → `"2g1"` ;
+- `src/core/schema.ts` : message « doit être au format 2g2 » et commentaire ;
+- `reference/` : ne pas toucher.
+
+**Ce qu'on ne fait pas.** On ne réécrit pas les VD déjà enregistrées dans les fiches : `parseDR` accepte les deux lettres et l'affichage passe par `formatDR`. Dans les champs de saisie (mode Edit), on laisse la valeur tapée par le joueur. Pas de changement de `schemaVersion`. `src/core/schools.ts` compare les VD en ramenant `g` à `k` : comportement correct, ne pas modifier.
+
+### H.6 Lot 16 — boutons en trop et incohérences
+L'audit a été fait sur le code, sans capture d'écran. **Avant de coder**, l'agent :
+1. génère les captures Playwright de chaque vue (Bibliothèque vide et pleine, Fiche en lecture, Fiche avec tous les blocs en Edit, Aide de jeu × chaque situation, Statistiques, Consultation), en bureau et en 390 px, thèmes clair et sombre ;
+2. complète le relevé H.7 avec ce qu'il voit, en appliquant la définition ci-dessous ;
+3. joint les captures « avant » et « après » à la PR.
+
+**Définition d'un bouton en trop :**
+- deux contrôles **visibles en même temps sur le même écran** qui font la même chose, sans raison de contexte ;
+- un bouton **désactivé en permanence** dans l'état courant (exemple : consultation) : on le masque ;
+- un bouton **qui reste affiché** alors que l'action est déjà engagée (confirmation sans « Annuler », bouton d'origine toujours visible).
+
+Ne sont **pas** en trop (décisions de Nelson, à garder) :
+- le bouton Bibliothèque **et** le sceau 帳 (G.6, v2.13.1) ;
+- les boutons « Edit » / « Terminer » par bloc (E.9 S2) ;
+- « Importer un JSON… » dans la Bibliothèque **et** dans le panneau Fichier de la fiche : contextes différents (nouvelle fiche ou fusion).
+
+### H.7 Relevé
+| # | Endroit | Constat | Correctif |
+|---|---|---|---|
+| X1 | `Sheet.tsx`, `DeleteCharacter` (bloc Identité en Edit) | « Supprimer ce personnage… » reste affiché à côté de « Confirmer la suppression » ; pas de bouton Annuler ; couleur en style inline (`style={{ color: "var(--bad)" }}`). Diffère du motif de la Bibliothèque. | Même motif que la Bibliothèque : au clic, remplacer le bouton par « Supprimer « Nom » ? » + **« Supprimer définitivement »** (`btn sm danger`) + **« Annuler »**. Plus de style inline. |
+| X2 | `Roller.tsx`, `SpellCastLine` en consultation | « Réussi » et « Raté » affichés mais `disabled` : sans effet en consultation. | En consultation, ne pas les afficher. Garder le libellé « Jet aux vrais dés » seulement si un résultat est montré. |
+| X3 | `FileActions.tsx` | `<ImportButton label="Importer un JSON…" />` répète la valeur par défaut. | Retirer la prop (nettoyage). |
+| X4 | `Library.tsx` et `Stats.tsx` | `"fr-FR"` en dur (`Intl.DateTimeFormat`, `toLocaleString`). | Sans effet visible au lot 16. Passe par la langue courante au lot 20 (J.4). Le noter ici, ne rien changer. |
+| X5 | `Sheet.tsx`, Identité | Libellé « Rang (Insight) » et indication « = Insight (n) » : terme anglais isolé dans l'interface française. | Point P-H4 : défaut « Rang d'Insight » partout (déjà utilisé dans `l5r4e.ts`). |
+| X6… | *À compléter par l'agent (captures) et par Nelson* | | |
+
+> **Nelson** : ajoute ici les boutons en trop que tu as repérés en jeu (écran, bureau ou mobile, libellé du bouton). L'agent les traite en priorité.
+
+### H.8 Tests du lot 16
+| ID | Cas | Attendu |
+|---|---|---|
+| K1 | `formatDR` : `"3k3"`, `"3K3"`, `" 3 k 3 "`, `"3g3"`, `"0k4"`, `"abc"`, `""` | `3g3`, `3g3`, `3g3`, `3g3`, `0g4`, `abc`, `""` |
+| K2 | Fiche avec une arme en `"3k3"` et un sort `damage: "2k2"`, vues Fiche, Aide de jeu (Escarmouche, Duel), Statistiques, lanceur ouvert sur les dégâts | `document.body.textContent` ne contient aucune correspondance de `/\b\d+k\d+\b/` ; « 3g3 » et « 2g2 » présents |
+| K3 | Données livrées | Aucun `"dr"` de `src/rules/*.json` ni constante de `l5r4e.ts` ne contient `k` (test sur les données) |
+| K4 | « Associer » une arme du catalogue | La VD enregistrée et affichée est en `g` |
+| K5 | Export puis import d'une fiche ancienne (`"3k2"`) | Fusion sans changement signalé sur la VD ; affichage en `3g2` |
+| K6 | X1 : suppression depuis le bloc Identité | Un clic : confirmation + Annuler, bouton d'origine masqué ; Annuler revient à l'état initial ; confirmer supprime et ramène à la Bibliothèque |
+| K7 | X2 : sort en consultation | Aucun bouton « Réussi » / « Raté » dans le DOM |
+| K8 | Non-régression | `core.rules.spec.ts` et toutes les suites existantes vertes sans modifier les valeurs attendues (sauf libellés touchés par X5, à lister dans la PR) |
+
+### H.9 Points ouverts (à trancher par Nelson)
+| # | Point | Défaut si non tranché |
+|---|---|---|
+| P-H1 | Licence du code | **MIT**. Alternative : GPL-3.0 si tu veux que les forks restent libres. |
+| P-H4 | « Insight » dans l'interface française | « Rang d'Insight » partout (X5). Alternative : un terme français de ton choix. |
+
+Les points P-H2, P-H3, P-H5 et P-H6 du handoff d'origine portent sur les langues : ils deviennent P-J1 à P-J4 (annexe J.9).
+
+### H.10 Corrections du handoff d'origine
+- **Numéros de lot** : le handoff prévoyait les langues au lot 17 (v2.14.0). Le visuel (couleurs, Anneaux, sélecteurs, annexe I) passe avant : les langues deviennent le **lot 20 (v2.17.0)**, annexe J.
+- **Identifiants** : relevé B1 à B6 renommé **X1 à X6** (B1 à B11 existent déjà, §10.1 bis) ; tests de langue L1 à L13 renommés **I1 à I13** (L1 à L28 existent, E.10). R1 à R4 et K1 à K8 sont gardés.
+- **« lint C8 »** dans `CONTRIBUTING.md` : C8 est ici le catalogue d'armes (E.2) ; le lint des couleurs s'appelle **N8** (annexe I.1) et n'existe qu'à partir du lot 17.
+- `DISARM_DAMAGE` vaut aujourd'hui `"2k1"` (le handoff donnait directement la valeur cible). `formatDR` reçoit dès le lot 16 son paramètre `letter`.
+
+---
+
+## Annexe I — Lots 17 à 19 : couleurs, Anneaux, sélecteurs (v2.14.0 à v2.16.0)
+
+Statut : **à livrer**, maquettes validées (artifacts « Anneaux de la fiche », proposition B, et « Sélecteurs du Carnet », hors dépôt). Sources : `HANDOFF-colors.md`, `handoff-ringstyle.md`, `handoff-selectors.md`. Trois lots, une PR chacun, dans l'ordre : les Anneaux et les sélecteurs utilisent les jetons du lot 17. Ne touche pas aux données de fiche : pas de migration de schéma. La typographie et la mise en page ne changent pas, sauf le bloc Anneaux (I.2) et le panneau Posture (I.3).
+
+| Lot | Version | Contenu |
+|---|---|---|
+| **17** | v2.14.0 | Jetons de couleur, accents de clan lisibles, couleurs sémantiques, Android (I.1) — **remplace le §6.4** |
+| **18** | v2.15.0 | Bloc Anneaux « Ensō » : liseré au pinceau, valeur dans un ensō, kanji en filigrane (I.2), CSS seul |
+| **19** | v2.16.0 | Sélecteurs stylés (`appearance: base-select`) ; panneau Posture en menu déroulant (I.3) |
+
+Références : `reference/anneaux-enso.css` (CSS du lot 18), `reference/selecteurs.css` (CSS du lot 19), `reference/enso-mask.py` (régénère le masque `--enso`, vérifié : il redonne exactement le tracé des deux fichiers CSS).
+
+### I.1 Lot 17 — Couleurs (v2.14.0)
+Toutes les valeurs ont été vérifiées (contraste WCAG 2.1, luminance relative ; recontrôlées le 29/10/2026 par script, mélanges en oklab : voir I.1.9).
+
+**I.1.1 Objectifs**
+1. **Lisibilité** : tout texte atteint au moins 4,5:1 sur son fond, dans les deux thèmes et pour les onze accents de clan.
+2. **Identité commune** : le thème sombre garde la chaleur « papier et encre » du thème clair.
+3. **Sens indépendant du clan** : un personnage Scorpion ne doit pas avoir l'air « blessé » en permanence.
+4. **Android** : la barre de Chrome et les contrôles natifs suivent le thème, sans flash du mauvais thème au chargement.
+
+**I.1.2 Principes**
+- Couleurs **uniquement en variables CSS**. Aucune couleur littérale dans un composant.
+- Mode auto selon `prefers-color-scheme` ; choix forcé via `data-theme="light" | "dark"` sur `<html>`, mémorisé.
+- Chaque jeton est défini d'abord sur `:root` (valeurs claires), puis redéfini dans les deux blocs sombres (media query et `[data-theme="dark"]`).
+- **Les couleurs de clan sont des données** (`CLANS` et `UNKNOWN_CLAN` de `src/rules/l5r4e.ts`). Les quatre valeurs par clan (I.1.4) y sont stockées en hexadécimal, sans calcul à l'exécution, pour que les tests puissent les vérifier.
+- Seuls les fonds et filets décoratifs (`--muted`, `--line`, `--accent-pale`, `--*-pale`) sont calculés avec `color-mix()`.
+
+**I.1.3 Jetons de base**
+| Jeton | Rôle | Clair (écru) | Sombre (anthracite chaud) |
+|---|---|---|---|
+| `--bg` | Fond de page | `#ece6d8` | `#26252a` *(avant `#25272a`)* |
+| `--surface` | Cartes, panneaux, tuiles | `#f7f3ea` | `#302f33` *(avant `#2f3236`)* |
+| `--surface-2` | **Nouveau.** Menus déroulants, panneau du lanceur, éditeurs pleine largeur, popovers | `#fdfbf6` | `#3a393e` |
+| `--ink` | Texte principal | `#2a261f` | `#e7e5e0` |
+| `--muted` | Texte secondaire, libellés, notes | `color-mix(in oklab, var(--ink) 70%, var(--surface))` ≈ `#615d55` *(avant `#6c6556`)* | idem ≈ `#abaaa8` *(avant `#a2a19c`)* |
+| `--line` | Bordures, séparateurs | `color-mix(in oklab, var(--ink) 18%, transparent)` *(avant `#d2cab7`)* | idem *(avant `#44474c`)* |
+| `--shadow` | Ombre des éléments surélevés | `0 10px 28px rgb(60 45 20 / .18)` | `0 10px 28px rgb(0 0 0 / .45)` |
+
+Le sombre est légèrement réchauffé : la teinte bleutée de `#25272a` disparaît et l'anthracite rejoint la famille de l'écru. Contrastes de l'encre : 13,6:1 sur la surface claire, 10,6:1 sur la surface sombre, 9,1:1 sur `--surface-2` sombre. `--muted` : au moins 4,9:1 sur `--bg`, `--surface` et `--surface-2`, dans les deux thèmes.
+
+Jetons existants **gardés** (absents du handoff d'origine) : `--sunk` (fond des étiquettes `.tag`, valeurs inchangées), `--seal` / `--seal-ink` (annexe G), polices `--f-*`.
+
+**I.1.4 Accents de clan**
+
+| Jeton | Rôle |
+|---|---|
+| `--accent` | Bordures, pastilles, icônes, remplissage du « i » ouvert, connecteurs. **Jamais pour du texte.** Remplace `--gold`. |
+| `--accent-ink` | **Nouveau.** Tout texte en couleur d'accent : option choisie, onglet actif (libellé), « +Ng0 en attente », réserves (`.pool`), surtitre `.mon`, liens. |
+| `--accent-pale` | Fond d'accent pâle (onglet actif, lanceur affiché, option choisie). `color-mix(in oklab, var(--accent) 16%, var(--surface))`. Remplace `--gold-soft`. |
+| `--on-accent` | Texte posé sur un fond `--accent` plein : `#ffffff` en clair, `--bg` en sombre. Voir P-I1. |
+
+Raison : en clair, Lion, Phénix, Grue et Mante descendent sous 4,5:1 quand on les utilise comme texte (Lion à 3,1:1 sur le fond). `--accent-ink` est la même teinte assombrie avec l'encre ; en sombre, elle est éclaircie pour rester lisible sur `--surface-2` et sur le fond pâle.
+
+| Clan | Accent clair | Accent-ink clair | Accent sombre | Accent-ink sombre |
+|---|---|---|---|---|
+| Crabe | `#3d5a73` | `#374754` | `#8fb0cc` | `#a1bbd0` |
+| Grue | `#2f7fb5` | `#345f7d` | `#8cc4ea` | `#9fcbe8` |
+| Dragon | `#2f7a45` | `#335b37` | `#7fcb93` | `#96d1a2` |
+| Licorne | `#6b3fa0` | `#533971` | `#bb9ae6` | `#c4a9e6` |
+| Lion | `#a87b0c` | `#795c20` | `#e6bf55` | `#e6c776` |
+| Mante | `#1f8073` | `#2e5f54` | `#6fd0c1` | `#8bd5c7` |
+| Phénix | `#c25a14` | `#8a4921` | `#f0a066` | `#f0ae80` |
+| Scorpion | `#a82828` | `#7b2d26` | `#f07a7a` | `#f1918e` |
+| Araignée | `#4a4a4a` | `#3e3d3a` | `#b5b5b5` | `#bfbebd` |
+| Familles impériales | `#8a6d12` | `#66531f` | `#dcc06a` | `#dec884` |
+| Clan non reconnu (`UNKNOWN_CLAN`) | `#7a6a3a` | `#5c5131` | `#cdb67a` | `#d2bf8f` |
+
+Les colonnes « Accent » sont inchangées. Les colonnes « Accent-ink » se calculent ainsi (pour un futur clan) : clair `color-mix(in oklab, accent 65%, #2a261f)` ; sombre `color-mix(in oklab, accent 80%, #e7e5e0)`. Contraste minimal obtenu, tous clans confondus : **4,73:1** en clair (sur `--bg` et sur `--accent-pale`), **4,58:1** en sombre (sur `--surface-2` et sur `--accent-pale`). La reconnaissance du clan ne change pas : sans accents ni casse, noms anglais acceptés.
+
+**Application.** `applyClan` (`src/ui/theme.ts`) pose quatre variables sur `<html>` : `--clan-l`, `--clan-ink-l`, `--clan-d`, `--clan-ink-d` (remplacent `--acc-l` / `--acc-d`) ; un clan non reconnu les retire et la feuille de style garde les valeurs d'`UNKNOWN_CLAN`. Les blocs de thème choisissent la paire :
+```css
+:root { --accent: var(--clan-l); --accent-ink: var(--clan-ink-l); }
+/* blocs sombres */ { --accent: var(--clan-d); --accent-ink: var(--clan-ink-d); }
+```
+
+**I.1.5 Couleurs sémantiques**
+**Indépendantes du clan.** Elles remplacent tout usage de l'accent ou d'un rouge littéral pour signifier un état.
+
+| Jeton | Usage | Clair | Sombre |
+|---|---|---|---|
+| `--danger` | Bordure « blessé », Hors de combat, Mort, erreurs d'import, bouton `.btn.danger`. Remplace `--bad`. | `#b3261e` | `#f2867e` |
+| `--ok` | Teinte des pourcentages de réussite, import valide, fichier lié synchronisé, verdict réussi | `#276b2b` *(avant `#2e7a4b`)* | `#7fcb93` *(avant `#6cc58f`)* |
+| `--warn` | **Nouveau.** Augmentations au-delà du Vide (`raiseCapExceeded`), conflit de fichier lié, avertissements de fusion | `#8a5800` | `#e6bf55` |
+| `--danger-pale`, `--ok-pale`, `--warn-pale` | Fonds d'alerte | `color-mix(in oklab, var(--x) 14%, var(--surface))` | idem |
+
+Contrastes : au moins 4,6:1 en texte sur `--bg` et `--surface` dans les deux thèmes. Sur leur propre fond pâle, `--warn` clair descend à 4,3:1 : dans un bandeau d'alerte, mettre le texte en `--ink` et réserver `--warn` à l'icône et à la bordure.
+
+Règle : la bordure rouge de la barre d'état utilise `--danger`, jamais `--accent`. Un personnage Scorpion indemne n'a aucune bordure rouge.
+
+**I.1.6 Anneaux**
+Les couleurs des Anneaux restent indépendantes du clan et passent en jetons nommés `--ring-earth`, `--ring-water`, `--ring-fire`, `--ring-air`, `--ring-void` (remplacent `--earth` … `--void`, P-I3), plus `--on-ring` pour un kanji ou un chiffre posé sur une pastille d'Anneau pleine.
+
+Contrairement au §6.4 d'origine (« fixes »), l'appli a **deux jeux** depuis le prototype : clair `#5e6d2c` `#245f8c` `#a8382a` `#6a7f99` `#5d4290`, sombre `#9fb25a` `#6fb0e0` `#e8735f` `#a9bbd2` `#a98be0` (Terre, Eau, Feu, Air, Vide). Ces deux jeux sont **gardés** (ils sont la variante sombre que prévoyait le handoff). Contrôle du 29/10/2026 :
+- face à `--surface` : clair 3,7 à 7,2:1, sombre 4,5 à 6,8:1 — tous ≥ 3:1 ;
+- face au blanc : clair 4,1 à 7,9:1, mais **sombre 2,0 à 3,0:1** (échec). D'où P-I2 : `--on-ring: #ffffff` en clair, `var(--bg)` en sombre (5,1 à 7,8:1).
+
+**I.1.7 Élévation**
+| Niveau | Fond | Bordure | Ombre |
+|---|---|---|---|
+| Page | `--bg` | — | — |
+| Carte, tuile, panneau intégré | `--surface` | `--line` | aucune |
+| Surélevé : menu déroulant, panneau du lanceur (mobile), éditeur pleine largeur, popover | `--surface-2` | `--line` | `--shadow` |
+| Voile derrière le panneau mobile | `rgb(0 0 0 / .35)` en clair, `rgb(0 0 0 / .55)` en sombre (jeton `--scrim`) | — | — |
+
+En sombre, l'ombre se voit peu : c'est l'écart `--surface` → `--surface-2` qui marque l'élévation. Il ne faut pas le supprimer.
+
+**I.1.8 Android et chargement**
+Dans le `<head>` de `index.html`, avant toute feuille de style :
+```html
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#ece6d8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#26252a" media="(prefers-color-scheme: dark)">
+<script>
+  try {
+    var t = localStorage.getItem('carnet-theme');
+    if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+  } catch (e) {}
+</script>
+```
+- La préférence de thème reste stockée dans IndexedDB (préférences du store, champ `theme`, §3.2). IndexedDB est asynchrone et ne peut pas être lu avant le premier rendu : la valeur est **recopiée** dans `localStorage` (`carnet-theme`) à chaque changement. `localStorage` ne sert que de cache contre le flash ; en cas d'écart, IndexedDB fait foi.
+- Le script fonctionne en `file://` et ne fait aucun appel réseau.
+- `color-scheme: light` sur `:root`, `color-scheme: dark` dans les deux blocs sombres : champs natifs, barres de défilement et sélecteurs suivent le thème.
+- **Thème forcé** : les deux balises `theme-color` sont remplacées par une seule, à la valeur de `--bg` du thème choisi. En mode auto, on remet les deux balises avec `media`.
+
+**I.1.9 Bloc CSS de référence**
+```css
+:root {
+  color-scheme: light;
+  --bg: #ece6d8; --surface: #f7f3ea; --surface-2: #fdfbf6; --ink: #2a261f;
+  --muted: color-mix(in oklab, var(--ink) 70%, var(--surface));
+  --line:  color-mix(in oklab, var(--ink) 18%, transparent);
+  --shadow: 0 10px 28px rgb(60 45 20 / .18);
+  --scrim: rgb(0 0 0 / .35);
+
+  --clan-l: #7a6a3a; --clan-ink-l: #5c5131; --clan-d: #cdb67a; --clan-ink-d: #d2bf8f; /* UNKNOWN_CLAN */
+  --accent: var(--clan-l); --accent-ink: var(--clan-ink-l);
+  --accent-pale: color-mix(in oklab, var(--accent) 16%, var(--surface));
+  --on-accent: #ffffff;
+
+  --danger: #b3261e; --ok: #276b2b; --warn: #8a5800;
+  --danger-pale: color-mix(in oklab, var(--danger) 14%, var(--surface));
+  --ok-pale:     color-mix(in oklab, var(--ok) 14%, var(--surface));
+  --warn-pale:   color-mix(in oklab, var(--warn) 14%, var(--surface));
+
+  --ring-earth: #5e6d2c; --ring-water: #245f8c; --ring-fire: #a8382a; --ring-air: #6a7f99; --ring-void: #5d4290;
+  --on-ring: #ffffff;
+  /* + --sunk, --seal, --seal-ink, --f-* : inchangés */
+}
+
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  color-scheme: dark;
+  --bg: #26252a; --surface: #302f33; --surface-2: #3a393e; --ink: #e7e5e0;
+  --shadow: 0 10px 28px rgb(0 0 0 / .45);
+  --scrim: rgb(0 0 0 / .55);
+  --accent: var(--clan-d); --accent-ink: var(--clan-ink-d);
+  --on-accent: var(--bg);
+  --danger: #f2867e; --ok: #7fcb93; --warn: #e6bf55;
+  --ring-earth: #9fb25a; --ring-water: #6fb0e0; --ring-fire: #e8735f; --ring-air: #a9bbd2; --ring-void: #a98be0;
+  --on-ring: var(--bg);
+  /* + --sunk, --seal, --seal-ink sombres : inchangés */
+}}
+
+:root[data-theme="dark"] { /* mêmes déclarations que le bloc précédent */ }
+```
+Les jetons calculés (`--muted`, `--line`, `--accent-pale`, `--*-pale`) n'ont pas besoin d'être redéclarés en sombre : ils se recalculent à partir des jetons redéfinis.
+
+**I.1.10 Migration**
+1. Fusionner le bloc I.1.9 dans le bloc de thème de `src/ui/styles.css` (ne pas le remplacer en entier : `--sunk`, `--seal*`, `--f-*` restent).
+2. Ajouter `inkLight` et `inkDark` à `ClanInfo` (`CLANS`) et à `UNKNOWN_CLAN` dans `src/rules/l5r4e.ts` ; `clanAccent` les renvoie ; `applyClan` pose les quatre variables `--clan-*`.
+3. Renommer `--gold` → `--accent`, `--gold-soft` → `--accent-pale`, `--bad` → `--danger`, `--earth` … `--void` → `--ring-*` (`.ring`, `.spell.el-*`, `.slot` / `.s-*`, `Sheet.tsx`). Le liseré sous l'en-tête (G-d) suit `--accent`.
+4. Rechercher tout texte coloré avec l'accent (`color: var(--gold)` : `.mon`, `.pool`, etc.) et le passer en `--accent-ink`.
+5. Rechercher tout rouge, vert ou orange littéral, et tout usage de l'accent pour un état : remplacer par `--danger`, `--ok`, `--warn`.
+6. Menus, panneau du lanceur, éditeurs pleine largeur : fond `--surface-2` et ombre `--shadow`.
+7. Ajouter I.1.8 en tête de `index.html` et la recopie dans `localStorage` au changement de thème (`applyTheme`).
+8. Aucune donnée de fiche n'est touchée : pas de migration de schéma.
+
+**I.1.11 Tests**
+C1 à C11 du handoff d'origine renommés **N1 à N11** (C1 à C12 existent déjà, E.2).
+
+| ID | Cas | Attendu |
+|---|---|---|
+| N1 | Pour chaque clan (11), thème clair : `accent-ink` sur `--bg`, `--surface` et `--accent-pale` | Contraste ≥ 4,5:1 |
+| N2 | Pour chaque clan (11), thème sombre : `accent-ink` sur `--surface`, `--surface-2` et `--accent-pale` | Contraste ≥ 4,5:1 |
+| N3 | Pour chaque clan, `accent` sur `--surface` dans les deux thèmes | Contraste ≥ 3:1 (bordures, icônes) |
+| N4 | `--ink` et `--muted` sur `--bg`, `--surface`, `--surface-2`, deux thèmes | ≥ 4,5:1 |
+| N5 | `--danger`, `--ok`, `--warn` sur `--bg` et `--surface`, deux thèmes | ≥ 4,5:1 |
+| N6 | Couleurs d'Anneau face à `--on-ring` et face à `--surface`, deux thèmes | ≥ 3:1 |
+| N7 | Personnage Scorpion indemne | Aucune bordure `--danger` sur la barre d'état ; blessé : bordure `--danger` |
+| N8 | Aucune couleur littérale hors des blocs de thème | Test de lint sur les fichiers CSS de `src/ui` (hex, `rgb()`, `hsl()` interdits hors `:root` et blocs sombres ; exceptions : `--shadow`, `--scrim`). Remplace la revue manuelle de H10. |
+| N9 | Thème forcé sombre, système clair, rechargement à froid | Aucune image rendue en thème clair avant le thème sombre (Playwright : capture au premier rendu) |
+| N10 | Changement de thème | `theme-color` vaut `--bg` du thème actif ; `localStorage.carnet-theme` à jour |
+| N11 | Mode auto | Deux balises `theme-color` avec `media` présentes |
+| N12 | Texte sur fond `--accent` plein (P-I1) | ≥ 4,5:1 pour chaque clan, deux thèmes |
+
+N1 à N6 et N12 se testent dans Vitest sur les valeurs hexadécimales des données (I.1.4) et des jetons, avec une petite fonction de contraste WCAG et un mélange oklab pour les jetons calculés ; pas besoin de navigateur. U3 (§10.3) et E8 (§10.4) restent valables.
+
+### I.2 Lot 18 — Bloc Anneaux « Ensō » (v2.15.0)
+Ne traite que l'apparence du **bloc Anneaux de la fiche** (classes `.rings` / `.ring`). Les données, les règles de calcul, le mode édition et les couleurs des Anneaux ne changent pas.
+
+**I.2.1 Objectif.** Remplacer les cartes rectangulaires à liseré coloré par un rendu « encre et pinceau » :
+1. **Liseré en coup de pinceau** en haut de chaque carte : attaque fine à gauche, trait plein légèrement incliné, fin effilochée en poils secs, petite trace de pinceau sec dans le trait.
+2. **Valeur de l'Anneau dans un ensō** : cercle **parfaitement rond**, dont seule l'épaisseur varie (attaque appuyée en haut à droite, trait qui ondule et s'allège, fin effilée en trois poils secs). Ouverture en haut à droite.
+3. **Kanji de l'Anneau en filigrane**, centré, sur presque toute la hauteur de la carte, **jamais coupé** : 土 Terre, 水 Eau, 火 Feu, 風 Air, 空 Vide.
+
+**I.2.2 Périmètre**
+- **CSS seul.** Aucun changement de JSX : le style s'appuie sur ce que produit le bloc Anneaux de `Sheet.tsx` (`Cg()` dans le prototype minifié) :
+  - `<div className={`ring ${key}`} style={{ "--rc": `var(--${key})` }}>` avec `key` ∈ `earth | water | fire | air | void` (après le lot 17 : `var(--ring-${key})`) ;
+  - enfants `.rn` (nom), `.rv` (valeur), `.tr` (lignes de Traits).
+- Le CSS de `reference/anneaux-enso.css` s'ajoute **après** les règles `.ring` existantes (il en surcharge une partie : `border-top`, alignement, taille de `.rv`, qui passe de 28 à 26 px).
+- La grille `.rings` (5 colonnes, 2 colonnes sous 720 px, Vide en pleine largeur) est inchangée.
+- Couleurs : tout passe par `--rc`. Jetons utilisés : `--rc`, `--f-display`. Aucune couleur littérale (les masques SVG sont des formes, pas des couleurs : la teinte vient de `background: var(--rc)`).
+- Kanji : le sous-ensemble `shippori-mincho-b1-800-kanji.woff2` contient déjà 土水火風空 (G.4) ; rien à ajouter.
+
+**I.2.3 Détails de rendu**
+| Élément | Implémentation | Notes |
+|---|---|---|
+| Liseré pinceau | `.ring::after`, fond `--rc`, masque SVG `--brush` étiré (`100% 100%`) | 10 px de haut, inset 6 px, rotation −0,8° ; `padding-top` de la carte porté à 18 px |
+| Ensō | `.rv::before`, fond `--rc`, masque SVG `--enso` (`contain`) | `.rv` fait 64 px, rond ; le masque déborde de 3 px pour que le trait ne colle pas au chiffre |
+| Kanji | `.ring::before`, `content` selon la classe de l'Anneau | Taille `min(9.6rem, 90cqi)` : pleine hauteur, mais réduit sur carte étroite pour ne jamais être coupé ; opacité 0,11 |
+| Empilement | `.ring` en `isolation: isolate`, enfants en `z-index: 1`, kanji en `z-index: 0` | Le texte et les champs d'édition restent au-dessus du kanji et cliquables (`pointer-events: none` sur le kanji) |
+| Taille relative | `container-type: inline-size` sur `.ring` | Nécessaire pour l'unité `cqi` du kanji |
+
+Pseudo-éléments utilisés : `.ring::before` (kanji), `.ring::after` (liseré), `.rv::before` (ensō). Ne pas les réutiliser ailleurs sur ces éléments. Le masque `--enso` sert aussi au sélecteur Anneau (I.3) : le déclarer **une seule fois** (sur `:root`) plutôt que de recopier la data URI. Pour modifier le trait : `reference/enso-mask.py` (changer `thick()`, garder `R` constant pour que le cercle reste rond).
+
+**I.2.4 Tests**
+R1 à R8 du handoff d'origine renommés **A1 à A8** (R1 à R4 = lot 15).
+
+| ID | Cas | Attendu |
+|---|---|---|
+| A1 | Fiche en lecture, thème clair puis sombre | 5 cartes avec liseré pinceau, ensō rond et kanji en filigrane, à la couleur de chaque Anneau |
+| A2 | Largeur ≤ 720 px | 2 colonnes, Vide en pleine largeur ; kanji entier, non coupé, sur chaque carte |
+| A3 | Bureau étroit (5 colonnes serrées, cartes ≈ 110 px) | Kanji réduit, toujours entier ; ensō et chiffre intacts |
+| A4 | Mode édition du bloc Anneaux | Champs de Traits et d'Anneau de Vide visibles au-dessus du kanji, cliquables, focus visible |
+| A5 | Valeur à 2 chiffres (10) | Le chiffre tient dans l'ensō sans toucher le trait |
+| A6 | Correspondance kanji | Terre 土, Eau 水, Feu 火, Air 風, Vide 空 (test DOM : `getComputedStyle(ring, '::before').content`) |
+| A7 | Aucune couleur littérale ajoutée | Le lint N8 passe (les data URI de masque ne contiennent pas de couleur) |
+| A8 | Navigateur sans `mask` | Repli acceptable : `-webkit-mask` est fourni ; Chrome Android, Edge, Firefox et Safari récents le gèrent |
+
+A1 à A5 : captures Playwright (deux thèmes × deux largeurs) à joindre à la PR.
+
+### I.3 Lot 19 — Sélecteurs et panneau Posture (v2.16.0)
+Remplace les listes déroulantes natives de l'app par des sélecteurs stylés (`appearance: base-select`), et **remplace les boutons du panneau Posture par un menu déroulant**. Variantes retenues : **Champ, En ligne, Anneau (ensō), Catalogue groupé, Avec effets**. CSS complet : `reference/selecteurs.css`.
+
+**I.3.1 Principes**
+- Une base commune `.cs` + une classe de variante : `class="cs cs-champ"`, `class="cs cs-ligne"`, etc.
+- Tout le style est sous `@supports (appearance: base-select)` : un navigateur qui ne le gère pas (Firefox, Safari à ce jour) garde la **liste native**, qui doit rester utilisable (I.3.6).
+- Jetons de l'annexe I.1 uniquement : `--surface`, `--surface-2`, `--ink`, `--muted`, `--line`, `--shadow`, `--accent`, `--accent-ink`, `--accent-pale`, polices `--f-display`, `--f-body`, `--f-mono`. Menu déroulant = élément surélevé : fond `--surface-2`, ombre `--shadow` (I.1.7). Texte en couleur d'accent = `--accent-ink`.
+- Les variantes riches ont un `<button><selectedcontent></selectedcontent></button>` en **premier enfant** du `<select>`, et un `value` explicite sur chaque `<option>`.
+- Mobile : champs en 16 px sous 720 px (pas de zoom Android), options d'au moins 40 px de haut.
+- **React 18** (version du dépôt) : `<button>`, `<selectedcontent>` et des `<span>` dans `<option>` sont créés par le DOM de React, pas par le parseur HTML : ils sont conservés. React peut émettre un avertissement `validateDOMNesting` en développement, sans effet en production. Garder le `<select>` contrôlé (`value` + `onChange`) et des `value` sur toutes les options. Encapsuler dans un composant `RichSelect` pour ne pas répéter la structure.
+
+**I.3.2 Où chaque variante s'applique**
+Les `<select>` actuels sont dans `Sheet.tsx`, `Roller.tsx`, `Modifiers.tsx` et `ArmorCatalog.tsx` (16 au 29/10/2026). On ne transforme en sélecteur que ce qui est déjà un `<select>`, plus le panneau Posture.
+
+| Variante | Classe | Usages |
+|---|---|---|
+| Champ | `cs-champ` | Formulaires d'édition : bloc Identité (Clan, Famille), Trait d'une compétence, Compétence d'une arme, et tout `<select>` de modification |
+| En ligne | `cs-ligne` | Barre d'état, en-têtes de panneau, options du lanceur (ex. armure dans l'éditeur, choix « Vide : lancer avec l'Anneau ») |
+| Anneau | `cs-anneau` | Affinité / déficience Isawa, élément d'un sort (« Élément du sort universel »), Anneau d'un jet de Vide |
+| Catalogue groupé | `cs-catalogue` | « Techniques d'école » (groupées par clan, option « Aucune »), sorts, manœuvres |
+| Avec effets | `cs-effet` | **Panneau Posture** (I.3.4) ; état de bataille de masse |
+
+**I.3.3 Structure des variantes riches**
+**Anneau** (pastille ensō + kanji, Traits en dessous dans la liste) :
+```html
+<select class="cs cs-anneau" value={affinity} onChange={…} aria-label="Affinité">
+  <button><selectedcontent></selectedcontent></button>
+  <option value="earth" style="--rc: var(--ring-earth)"><span class="k">土</span><span class="n">Terre</span><span class="d">Constitution · Volonté</span></option>
+  <option value="water" style="--rc: var(--ring-water)"><span class="k">水</span><span class="n">Eau</span><span class="d">Force · Perception</span></option>
+  <option value="fire"  style="--rc: var(--ring-fire)"><span class="k">火</span><span class="n">Feu</span><span class="d">Agilité · Intelligence</span></option>
+  <option value="air"   style="--rc: var(--ring-air)"><span class="k">風</span><span class="n">Air</span><span class="d">Réflexes · Vigilance</span></option>
+  <option value="void"  style="--rc: var(--ring-void)"><span class="k">空</span><span class="n">Vide</span><span class="d">Points de Vide</span></option>
+</select>
+```
+Noms d'Anneaux et de Traits tirés de `RINGS` / `TRAIT_LABELS` de `l5r4e.ts`, pas recopiés. Le kanji est à la couleur de l'Anneau, dans l'ensō au pinceau ; une fois l'option choisie, seuls la pastille et le nom restent.
+
+**Catalogue groupé** : `<optgroup><legend>Clan</legend>…</optgroup>` ; option = `.n` nom, `.m` référence (« p. 109 »), `.d` résumé sur une ligne.
+
+**Avec effets** : option = `.n` nom, `.fx` étiquettes d'effet (`.up` pour un bonus, neutre pour un malus ou une contrainte), `.d` description.
+
+**I.3.4 Panneau Posture : menu déroulant à la place des boutons**
+Les **boutons de posture** du panneau Combat (Attaque, Assaut, Défense, Défense totale, Centre) sont **remplacés par un seul sélecteur `cs-effet`**. Conséquences :
+- La **description de la posture choisie est toujours affichée**, sous le sélecteur (`.posture-desc`), précédée de ses étiquettes d'effet.
+- Le bouton **« i » du panneau Posture est supprimé**, ainsi que l'état ouvert / fermé associé. L'en-tête devient simplement « Posture ».
+- Les « i » des panneaux **Dépenser du Vide**, **Rappels d'école** et de l'encart **Se déplacer en combat** **ne changent pas**.
+- La section « Techniques d'école » du panneau (case Monté, compteurs, cases de ND d'armure, étiquette « Bonus de Centre ») reste en dessous, inchangée.
+
+```html
+<div class="panel-head"><h2>Posture</h2></div>
+<select class="cs cs-effet" value={stance} onChange={…} aria-label="Posture" aria-describedby="posture-desc">
+  <button><selectedcontent></selectedcontent></button>
+  <option value="attack">
+    <span class="n">Attaque</span>
+    <span class="fx"><span>aucun modificateur</span></span>
+    <span class="d">{description de la posture}</span>
+  </option>
+  <option value="fullAttack">
+    <span class="n">Assaut</span>
+    <span class="fx"><span class="up">+2g1 attaque</span><span>ND armure −10</span></span>
+    <span class="d">…</span>
+  </option>
+  <!-- defense, fullDefense, center sur le même modèle -->
+</select>
+<div class="posture-desc" id="posture-desc">
+  <div class="fx">…étiquettes de la posture choisie…</div>
+  {description de la posture choisie}
+</div>
+```
+- Noms et descriptions viennent de `STANCES` (`l5r4e.ts`). Les **étiquettes d'effet n'existent pas encore** dans les données : les ajouter à `STANCES` (champ `tags: { label, up? }[]`), pas dans le composant. Étiquettes de la maquette, à confirmer contre les règles : Attaque « aucun modificateur » ; Assaut « +2g1 attaque » (bonus), « ND armure −10 » ; Défense « ND armure +Défense +Air » (bonus) ; Défense totale « ND armure +jet » (bonus), « pas d'attaque » ; Centre « bonus au round suivant » (bonus), « aucune action ». Les effets ajoutés par une technique d'école (ex. Hiruma) s'affichent aussi en étiquettes.
+- Dans la liste, chaque option montre nom, étiquettes **et** description : on lit l'effet avant de choisir. Le champ fermé n'affiche que le nom.
+
+**Comportements conservés**
+- Changer de posture met à jour le ND d'armure, les réserves et la barre d'état, comme le bouton aujourd'hui.
+- Enchaînement : une **Défense totale lancée** met le sélecteur sur « Défense totale ».
+- « Nouveau round » : mémorise si la posture était Centre (inchangé).
+- Fiche en consultation : même règle qu'aujourd'hui pour les boutons de posture.
+
+**I.3.5 CSS**
+`reference/selecteurs.css`, sections 5.1 (base commune, une fois) à 5.6 (Avec effets et `.posture-desc`). À la mise en œuvre : `--rc` des options d'Anneau pointe vers `--ring-*` ; la data URI `--enso` n'est pas recopiée (I.2.3).
+
+**I.3.6 Repli sans `base-select`**
+- La liste native n'affiche que le texte des options, mis bout à bout. Ordre des `<span>` imposé (nom d'abord) pour que le début de ligne reste le nom.
+- **Posture** : la description permanente `.posture-desc` est hors du `<select>`, donc visible partout ; le repli reste complet.
+- **Anneau** : en repli, le kanji précède le nom (« 風Air… ») ; acceptable.
+- Aucun message « navigateur non compatible » dans l'app.
+
+**I.3.7 Tests**
+S1 à S10 du handoff d'origine renommés **D1 à D10** (S1 à S5 existent deux fois, §10.2 et E.9).
+
+| ID | Cas | Attendu |
+|---|---|---|
+| D1 | Chrome / Edge récents, chaque variante | Menu stylé sur `--surface-2` avec ombre ; option choisie sur `--accent-pale` ; focus visible |
+| D2 | Firefox | Listes natives, toutes utilisables ; panneau Posture : description visible sous le select |
+| D3 | Panneau Posture | Aucun bouton de posture ni bouton « i » ; un `<select>` « Posture » ; description et étiquettes de la posture choisie affichées en permanence |
+| D4 | Choisir « Assaut » | ND d'armure −10 dans la barre d'état ; réserve d'attaque +2g1 ; description mise à jour |
+| D5 | Lancer une Défense totale | Le sélecteur passe sur « Défense totale » |
+| D6 | Hiruma R3 (`reference/perso-test-ecoles.json`) | Techniques d'école toujours affichées sous le sélecteur ; effets ajoutés visibles en étiquettes |
+| D7 | Sélecteur Anneau | 5 options avec ensō et kanji à la couleur de l'Anneau ; champ fermé : pastille + nom |
+| D8 | Techniques d'école | Groupes par clan, option « Aucune », référence de page à droite ; liste à la largeur du champ |
+| D9 | Mobile 360 px (« Pixel 7 », « iPhone 13 ») | Pas de zoom à l'ouverture (16 px), options ≥ 40 px, menu dans l'écran, pas de défilement horizontal |
+| D10 | Lint couleurs (N8) | Aucune couleur littérale dans ces règles |
+
+**Tests existants mis à jour au lot 19** : E12 (§10.4) ne porte plus que sur les « i » de Vide, Déplacement et Rappels d'école, le cas Posture est remplacé par D3 ; M10 (§10.5) devient « Boutons "i" : zone de toucher ≥ 40 × 40 px ; le panneau Vide tient sur moins d'un écran détails fermés ; le panneau Posture tient sur moins d'un écran avec sa description » ; §6.2 « Détails repliables » et §7 « Postures et Vide » : retirer Posture.
+
+### I.4 Points ouverts (à trancher par Nelson)
+| # | Point | Défaut si non tranché |
+|---|---|---|
+| P-I1 | `--on-accent` blanc sur l'accent clair plein : **Lion 3,8:1, Phénix 4,4:1, Grue 4,35:1** (sous 4,5:1, contrôle du 29/10/2026). Le handoff ne liste aucun texte sur accent plein, mais le « i » ouvert est rempli d'accent et porte une lettre. | Un fond plein qui porte du texte utilise `--accent-ink` en clair (blanc dessus : 6,2:1 au moins) ; `--accent` reste pour les bordures et pastilles sans texte. Test N12. |
+| P-I2 | `--on-ring` en sombre : le blanc échoue (2,0 à 3,0:1) sur les Anneaux sombres. | `--on-ring: var(--bg)` en sombre (5,1:1 au moins). |
+| P-I3 | Nom des jetons d'Anneau | Renommer `--earth` … `--void` en `--ring-*` au lot 17 (tous les usages mis à jour dans la même PR). |
+| P-I4 | Étiquettes d'effet des postures (I.3.4) | Textes de la maquette, ajoutés à `STANCES`. |
+
+### I.5 Corrections des handoffs d'origine
+- **Noms de jetons** : les handoffs supposent `--accent`, `--bad`, `--earth`, `--acc-l` ; le code utilise `--gold` / `--gold-soft` (accent), `--bad`, `--earth` … `--void`, `--acc-l` / `--acc-d`, et a aussi `--sunk`. Correspondance et renommages en I.1.10 ; `--sunk` et `--seal*` gardés.
+- **« Remplacer le bloc de thème »** devient « fusionner » (I.1.10, étape 1) pour ne pas perdre `--sunk`, `--seal*` et les polices.
+- **Couleurs d'Anneau** : elles ne sont pas « fixes » mais en deux jeux clair / sombre (I.1.6) ; le jeu sombre tient lieu de la variante `--ring-*-d` envisagée.
+- **Vocabulaire** (édition française, E.7) : posture « Attaque totale » → **« Assaut »** ; Trait de l'Air « Intuition » → **« Vigilance »**.
+- **Posture** : « aucun texte nouveau » n'est pas tenable pour les étiquettes d'effet, absentes de `STANCES` ; elles s'y ajoutent (P-I4).
+- **Composant `Cg()`** : nom du prototype minifié ; dans l'appli, bloc Anneaux de `Sheet.tsx`.
+- **Masque `--enso`** recopié deux fois dans les handoffs : une seule déclaration (I.2.3).
+- **Identifiants** : C1 à C11 → N1 à N11 (+ N12, P-I1) ; R1 à R8 → A1 à A8 ; S1 à S10 → D1 à D10 ; « lint C8 » → N8.
+- **Maquettes** : les artifacts cités ne sont pas dans le dépôt ; le CSS validé est dans `reference/anneaux-enso.css` et `reference/selecteurs.css`.
+
+---
+
+## Annexe J — Lot 20 : localisation (v2.17.0)
+
+Statut : **à livrer** après l'annexe I. Source : `handoff-lots-15-17.md` (lot 17 d'origine). Français (référence) + anglais, sélecteur de langue. Réutilise `formatDR` (H.5) ; traduit aussi les textes ajoutés aux lots 17 à 19 (étiquettes de posture, sélecteurs).
+
+### J.1 Décisions
+| Sujet | Décision |
+|---|---|
+| Langues | **Français** (langue de référence, complète) et **anglais**. Le portugais ou d'autres langues s'ajoutent ensuite par un simple fichier de traduction (P-J1). |
+| Langue par défaut | « Auto » : français si `navigator.language` commence par `fr`, anglais sinon. Choix forcé mémorisé dans les préférences (comme le thème). |
+| Sélecteur | Dans le **pied de page**, à côté de la version : `FR · EN`, la langue active en gras. L'en-tête ne change pas (déjà chargé sur mobile). Libellé accessible : « Langue » / « Language ». |
+| Bibliothèque | Aucune. Dictionnaires TypeScript typés, maison, sans dépendance (fichier unique, aucune requête réseau). |
+| Données de fiche | **Inchangées.** Les noms saisis par le joueur (personnage, arme, compétence, notes) ne sont jamais traduits. Pas de changement de `schemaVersion`. Un JSON exporté en anglais se réimporte à l'identique en français. |
+| Notation des dés | `XgY` en français, `XkY` en anglais (`formatDR(s, t.diceLetter)`). En saisie, les deux lettres restent acceptées dans les deux langues. |
+| Terminologie anglaise | Celle du livre de base 4e anglais (Rings, Traits, Insight Rank, Raises, Void Points, TN, Armor TN, Wound ranks…). Glossaire J.6. |
+| Textes de règles | Les résumés de techniques, sorts et maîtrises sont **traduits en résumé**, jamais copiés du livre anglais. Un texte non traduit s'affiche en français (repli), sans erreur. |
+
+### J.2 Architecture
+```
+src/i18n/
+├─ index.ts        # Locale, setLocale(), getLocale(), t(), plural(), formatDate(), formatNumber()
+├─ fr.ts           # dictionnaire de référence : export const fr = { … } as const
+├─ en.ts           # export const en: Messages = { … }  (Messages = type dérivé de fr)
+└─ rules.en.ts     # traductions des catalogues de règles (J.5), par id
+```
+- **`src/core` reste pur et sans DOM.** Il importe `t()` depuis `src/i18n` (module pur lui aussi). La langue courante est une variable de module réglée par `setLocale()` ; défaut `"fr"`. Ainsi **toutes les suites de tests existantes restent vertes sans modification** : elles tournent en français.
+- **Typage strict** : `type Messages = DeepStringify<typeof fr>` ; `en.ts` doit satisfaire `Messages`. Une clé manquante en anglais = **erreur de compilation** (`tsc --noEmit` en CI).
+- Clés **par zone** : `header.*`, `library.*`, `sheet.*`, `aid.*`, `roller.*`, `stats.*`, `status.*`, `import.*`, `link.*`, `rules.*` (postures, niveaux de blessure, manœuvres, ND…), `common.*`.
+- Paramètres : `t("library.deleteConfirm", { name })` avec gabarit `"Supprimer « {name} » ?"`. Pas de HTML dans les messages ; la mise en forme reste en JSX.
+- Pluriels : `plural(n, { one, other })` via `Intl.PluralRules(locale)`.
+- Dates et nombres : `formatDate()` / `formatNumber()` remplacent les `"fr-FR"` en dur (X4). Les décimales gardent la virgule en français, le point en anglais (`decimal()`, `toMeters()` de `src/ui/format.ts`).
+- **React** : un hook `useLocale()` (contexte ou état du store) provoque le re-rendu au changement de langue. Changer de langue ne recharge pas la page et ne perd ni l'état de jeu ni l'historique des jets.
+- **`<html lang>`** suit la langue ; `document.title` aussi (« Carnet de Rokugan » / « Rokugan Notebook », P-J2).
+
+### J.3 Ce qui est traduit
+| Zone | Exemples |
+|---|---|
+| Interface | Tous les libellés, boutons, titres, info-bulles, `aria-label`, messages d'erreur, bandeaux (fichier lié, mode dégradé, vocabulaire) |
+| Moteur (`src/core`) | Libellés et descriptions d'actions générées, notes de réserve, verdicts, avertissements de fusion (`traits.agility : doit être…`), messages Zod |
+| Données de règles | Postures (noms, descriptions, étiquettes d'effet du lot 19), manœuvres par défaut, échelle des ND, niveaux de blessure, situations et sous-types, terrains et états de bataille, noms d'Anneaux et de Traits, noms de clans |
+| Catalogues | Noms d'écoles, rangs et résumés de techniques, sorts, maîtrises, armes et armures du catalogue (J.5) |
+| README | Section courte « English » en tête renvoyant vers `README.en.md` (guide joueur traduit, P-J3) |
+
+**Non traduit :** contenu saisi par le joueur ; `HANDOFF.md` ; messages de commit ; `CHANGELOG.md`.
+
+### J.4 Points délicats
+1. **Noms de compétences.** Les fiches stockent des noms (en français dans les fiches existantes) et le moteur les retrouve par `findSkill` + alias (annexe D-d). On ne change **pas** le nom stocké : à l'affichage, un nom de compétence **connu du catalogue** est montré dans la langue courante ; un nom libre reste tel quel. Les alias anglais (`Kenjutsu`, `Investigation`, `Etiquette`…) s'ajoutent à `SKILL_ALIASES` pour qu'une fiche créée en anglais fonctionne avec les mêmes calculs.
+2. **Reconnaissance des clans** : déjà bilingue (§6.4). Le libellé affiché (« Clan du Crabe » / « Crab Clan ») suit la langue.
+3. **Bandeau « Mettre à jour le vocabulaire »** (E.7) : propre à l'édition française. **Masqué en anglais.**
+4. **Export** : nom de fichier inchangé (`<nom>-l5r.json`).
+5. **Sceau 帳** : identique dans les deux langues.
+6. **Largeurs** : les libellés anglais sont souvent plus courts, mais vérifier les boutons ronds mobiles, la barre d'état et la barre d'onglets du bas (« Game aid », « Statistics »).
+
+### J.5 Catalogues de règles
+- Les JSON de `src/rules/` restent en français (source). `rules.en.ts` fournit, **par identifiant**, les champs à afficher : `name`, `effect`, `description`, `techniques[rank].name/summary`.
+- Un identifiant sans traduction affiche le français : jamais de clé brute à l'écran.
+- Test de complétude (I6) : liste les entrées sans traduction anglaise et échoue au-delà de **0 pour l'interface et les règles de base**, **avertit seulement** pour les catalogues d'écoles et de sorts (une traduction partielle est acceptable en v2.17.0 ; le compte figure dans la PR).
+
+### J.6 Glossaire de départ (fr → en)
+| Français | Anglais |
+|---|---|
+| Anneaux : Terre, Eau, Feu, Air, Vide | Rings: Earth, Water, Fire, Air, Void |
+| Constitution, Volonté, Force, Perception, Agilité, Intelligence, Réflexes, Vigilance | Stamina, Willpower, Strength, Perception, Agility, Intelligence, Reflexes, Awareness |
+| Rang d'Insight | Insight Rank |
+| Augmentation (annoncée, libre) | Raise (called, free) |
+| ND / ND d'armure | TN / Armor TN |
+| Points de Vide | Void Points |
+| Spécialisation | Emphasis |
+| Postures : Attaque, Assaut, Défense, Défense totale, Centre | Attack, Full Attack, Defense, Full Defense, Center |
+| Indemne, Égratigné, Éraflé, Blessé, Gravement blessé, Estropié, À terre, Hors de combat, Mort | Healthy, Nicked, Grazed, Hurt, Injured, Crippled, Down, Out, Dead |
+| Réduction | Reduction |
+| Escarmouche, Duel iaijutsu, Bataille | Skirmish, Iaijutsu duel, Mass battle |
+| Fiche, Aide de jeu, Statistiques, Bibliothèque | Sheet, Game aid, Statistics, Library |
+| Consultation | Read-only |
+| Nouvelle journée, Nouveau round | New day, New round |
+
+À compléter par l'agent avec la terminologie du livre anglais. Un terme douteux se liste dans la PR, il ne s'invente pas.
+
+### J.7 Tests
+L1 à L13 du handoff d'origine renommés **I1 à I13** (L1 à L28 existent, E.10).
+
+| ID | Cas | Attendu |
+|---|---|---|
+| I1 | `tsc --noEmit` avec une clé retirée de `en.ts` | Échec de compilation (test de type ou vérification manuelle documentée dans la PR) |
+| I2 | Suites existantes | Toutes vertes **sans modification**, langue par défaut `fr` |
+| I3 | `navigator.language = "en-US"`, première ouverture | Interface en anglais ; `<html lang="en">` |
+| I4 | `navigator.language = "fr-FR"` | Interface en français |
+| I5 | Choix forcé EN, rechargement | Anglais conservé ; « Auto » revient au navigateur |
+| I6 | Complétude | Aucune chaîne française visible en anglais (hors données du joueur et catalogues partiellement traduits) : parcours Playwright de toutes les vues, comparaison avec une liste de mots français témoins (`Fiche`, `Blessures`, `Posture`, `Lancer`…) |
+| I7 | Notation | En anglais, aucune correspondance de `/\b\d+g\d+\b/` ; en français, aucune de `/\b\d+k\d+\b/` (reprise de K2) |
+| I8 | Fiche créée en anglais (compétence « Kenjutsu », trait « Awareness »), export, import en français | Mêmes réserves calculées ; aucun champ modifié par l'import |
+| I9 | Changement de langue en plein jeu (lanceur ouvert, historique de 3 jets, initiative posée) | Rien n'est perdu ; libellés mis à jour sans rechargement |
+| I10 | Dates et nombres | Bibliothèque : date au format local ; Statistiques : « 10 000 » en français, « 10,000 » en anglais |
+| I11 | Mobile 390 px, anglais | M1 à M8 toujours verts ; aucun libellé tronqué dans la barre du bas |
+| I12 | Bandeau vocabulaire | Absent en anglais |
+| I13 | `document.title` | Suit la langue et le nom du personnage |
+
+### J.8 Ajouter une langue (à copier dans `CONTRIBUTING.md`)
+1. Copier `src/i18n/en.ts` en `src/i18n/<code>.ts` (code BCP 47 : `pt`, `es`…) et traduire. Le compilateur signale toute clé manquante.
+2. Ajouter la langue à la liste `LOCALES` de `src/i18n/index.ts` (code, nom natif, lettre des dés).
+3. Facultatif : `rules.<code>.ts` pour les catalogues ; sinon repli sur le français.
+4. Lancer `npm test` et `npm run test:e2e` ; joindre une capture bureau et 390 px à la PR.
+
+### J.9 Points ouverts (à trancher par Nelson)
+| # | Point | Défaut si non tranché |
+|---|---|---|
+| P-J1 | Langues du lot 20 (ex P-H2) | Français + anglais. Portugais possible ensuite (fichier `pt.ts`, J.8). |
+| P-J2 | Nom de l'outil en anglais (ex P-H3) | « Rokugan Notebook » ; le sceau 帳 ne change pas. Alternative : garder « Carnet de Rokugan » partout. |
+| P-J3 | README anglais (ex P-H5) | `README.en.md` complet. Alternative : une section courte en anglais dans le README. |
+| P-J4 | Bouton « Edit » en français (ex P-H6) | Gardé (E.9 S2). En anglais : « Edit » / « Done ». |
+
+### J.10 Corrections du handoff d'origine
+- Lot 17 / v2.14.0 → **lot 20 / v2.17.0** (H.10) ; L1 à L13 → I1 à I13 ; P-H2, P-H3, P-H5, P-H6 → P-J1 à P-J4 ; renvois B4 → X4, §17.x → J.x.
+- Glossaire : la posture *Full Attack* s'appelle **« Assaut »** dans l'appli (vocabulaire de l'édition française, E.7), pas « Attaque totale ».
