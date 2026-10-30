@@ -8,7 +8,7 @@ const pageUrl = pathToFileURL(resolve("dist/carnet-l5r.html")).href;
 /** Fiche avec Kenjutsu 7 et un katana : les dégâts explosent sur 9 (étiquette « 9+ »). */
 async function kenjutsu7(page: Page) {
   await page.goto(pageUrl);
-  await page.getByRole("button", { name: "Créer mon personnage" }).click();
+  await page.getByRole("button", { name: "Nouvelle fiche vierge" }).click();
   await page.getByRole("button", { name: "Terminer : Identité & réputation" }).click();
   await page.getByRole("button", { name: "Edit : Compétences" }).click();
   await page.getByRole("button", { name: "+ Compétence" }).click();
@@ -49,7 +49,7 @@ test("Q19 : Min, Moy., Max et Réussite de même hauteur, texte centré (± 1 px
 
 test("Q4 : bloc Identité, valeurs en mono, Initiative en .pool, placeholder du Rang d'école en police du corps", async ({ page }) => {
   await page.goto(pageUrl);
-  await page.getByRole("button", { name: "Créer mon personnage" }).click();
+  await page.getByRole("button", { name: "Nouvelle fiche vierge" }).click();
   const placeholderFont = await page.getByRole("spinbutton", { name: "Rang d'école" })
     .evaluate((el) => getComputedStyle(el, "::placeholder").fontFamily);
   expect(placeholderFont).toContain("Zen Kaku Gothic New");

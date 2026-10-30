@@ -11,13 +11,16 @@ import doji from "../../reference/exemple-courtisan.json";
 
 export interface Example {
   id: "bushi" | "shugenja" | "courtisan";
-  label: string;
+  /** Type affiché sur la carte du modèle (annexe L.3). */
+  type: string;
+  /** Kanji de la pastille de la carte. */
+  kanji: string;
   fileName: string;
   build(): Character;
 }
 
 export const EXAMPLES: readonly Example[] = [
-  { id: "bushi", label: "Exemple bushi", fileName: "exemple-bushi-l5r.json", build: () => migrate(kakita) },
-  { id: "shugenja", label: "Exemple shugenja", fileName: "exemple-shugenja-l5r.json", build: () => migrate(tamori) },
-  { id: "courtisan", label: "Exemple courtisan", fileName: "exemple-courtisan-l5r.json", build: () => migrate(doji) },
+  { id: "bushi", type: "Bushi", kanji: "刀", fileName: "exemple-bushi-l5r.json", build: () => migrate(kakita) },
+  { id: "shugenja", type: "Shugenja", kanji: "火", fileName: "exemple-shugenja-l5r.json", build: () => migrate(tamori) },
+  { id: "courtisan", type: "Courtisan", kanji: "扇", fileName: "exemple-courtisan-l5r.json", build: () => migrate(doji) },
 ];

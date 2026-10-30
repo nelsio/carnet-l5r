@@ -52,7 +52,7 @@ const storedNames = (page: Page) =>
 test("lier, écrire à chaque modification, survivre au rechargement, conflit, délier", async ({ page }) => {
   const file = "shiba-tetsu-l5r.json";
   await page.goto(url);
-  await page.getByRole("button", { name: "Créer mon personnage" }).click();
+  await page.getByRole("button", { name: "Nouvelle fiche vierge" }).click();
   await page.getByRole("textbox", { name: "Nom", exact: true }).fill("Shiba Tetsu");
   await page.getByRole("button", { name: "Terminer" }).click();
 
@@ -93,7 +93,7 @@ test("lier, écrire à chaque modification, survivre au rechargement, conflit, d
 test("conflit résolu en chargeant la version du fichier", async ({ page }) => {
   const file = "nouveau-samourai-l5r.json";
   await page.goto(url);
-  await page.getByRole("button", { name: "Créer mon personnage" }).click();
+  await page.getByRole("button", { name: "Nouvelle fiche vierge" }).click();
   await page.getByRole("button", { name: "Terminer" }).click();
   await page.getByRole("button", { name: "Lier à un fichier…" }).click();
   await expect(page.getByText(`Lié à ${file}`)).toBeVisible();

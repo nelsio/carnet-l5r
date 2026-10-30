@@ -10,7 +10,7 @@ async function create(page: Page, width: number, theme: "light" | "dark" = "ligh
   await page.emulateMedia({ colorScheme: theme });
   await page.setViewportSize({ width, height: 900 });
   await page.goto(pageUrl);
-  await page.getByRole("button", { name: "Créer mon personnage" }).click();
+  await page.getByRole("button", { name: "Nouvelle fiche vierge" }).click();
   await page.getByRole("button", { name: "Terminer : Identité & réputation" }).click();
 }
 

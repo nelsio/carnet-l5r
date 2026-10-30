@@ -4,12 +4,12 @@ import { downloadText } from "../download";
 import { useCharacter, useStore } from "../store";
 
 /** Bouton « Importer un JSON » : choix d'un fichier, puis fenêtre d'import. */
-export function ImportButton({ label = "Importer un JSON…" }: { label?: string }) {
+export function ImportButton({ label = "Importer un JSON…", className = "btn" }: { label?: string; className?: string }) {
   const { startImport } = useStore();
   const input = useRef<HTMLInputElement>(null);
   return (
     <>
-      <button type="button" className="btn" onClick={() => input.current?.click()}>{label}</button>
+      <button type="button" className={className} onClick={() => input.current?.click()}>{label}</button>
       <input
         ref={input} type="file" accept=".json,application/json" hidden aria-label="Fichier JSON à importer"
         onChange={(e) => {

@@ -677,3 +677,76 @@ header.top + main{margin-top:18px}
 @media (max-width:720px){
   .cs-champ,.cs-anneau,.cs-catalogue,.cs-effet{width:100%;font-size:16px}
 }
+
+/* ---------- Portail de la campagne (annexe L, v2.19.0) : liens externes, menu Ressources, Bibliothèque ---------- */
+a{color:var(--accent-ink);text-decoration:none;text-underline-offset:3px}
+a:hover{text-decoration:underline}
+.ext{width:13px;height:13px;flex:none;vertical-align:-1px;margin-left:5px}
+a.btn{display:inline-flex;align-items:center;text-decoration:none;color:var(--ink)}
+a.btn.accent{color:var(--on-accent)}
+a.btn .ext{margin-left:8px}
+/* Menu Ressources : bouton d'en-tête ouvert, menu déroulant sous le bouton (bureau) */
+.res{position:relative;display:flex}
+.res .theme-btn[aria-expanded="true"]{background:var(--accent-pale);color:var(--accent-ink);border-color:var(--accent)}
+.res-scrim{display:none}
+.res-menu{position:absolute;right:0;top:calc(100% + 8px);z-index:25;width:340px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:8px}
+.res-menu .grip{display:none}
+.res-group{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:10px 10px 6px}
+.res-menu a{display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:10px;padding:8px 10px;border-radius:7px;color:var(--ink);min-height:44px;text-decoration:none}
+.res-menu a:hover,.res-menu a:focus-visible{background:var(--accent-pale)}
+.res-menu .kj{display:grid;place-items:center;width:28px;height:28px;border-radius:6px;background:var(--surface);border:1px solid var(--line);font:800 15px/1 var(--f-display);color:var(--accent-ink)}
+.res-menu .t{font-weight:700;font-size:14px;line-height:1.25}
+.res-menu .d{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+.res-menu .ext{color:var(--muted);margin:0}
+.res-foot{border-top:1px solid var(--line);margin:6px 0 0;padding:8px 10px 4px;font-size:12px;color:var(--muted)}
+/* Bibliothèque vide : deux façons de commencer, puis les modèles (L.3) */
+.lib-empty{display:grid;gap:22px}
+.start h2{font-size:21px;margin-bottom:6px}
+.start > p{margin:0}
+.start-opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px}
+.start-opt{display:grid;grid-template-rows:auto 1fr auto;border:1px solid var(--line);border-radius:10px;padding:16px;background:var(--bg)}
+.start-opt-h{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:start}
+.start-opt-h h3{font-size:18px}
+.start-opt-h p{margin:2px 0 0;font-size:14px}
+.start-opt-act{justify-self:start}
+.opt-k{display:grid;place-items:center;width:40px;height:40px;border-radius:8px;background:var(--accent-pale);color:var(--accent-ink);font:800 20px/1 var(--f-display)}
+.steps{list-style:none;margin:14px 0 16px;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.steps li{display:grid;gap:4px;align-content:start;padding:12px;border-radius:8px;background:var(--surface);border:1px solid var(--line)}
+.steps .step-n{font:800 18px/1 var(--f-display);color:var(--accent-ink)}
+.steps .step-s{font-weight:700;font-size:14px}
+.steps .step-x{font-size:12px;color:var(--muted)}
+.templates h2{font-size:20px}
+.templates > p{margin:2px 0 12px}
+.tpl-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.tplc{display:grid;grid-template-columns:40px 1fr;gap:10px 12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px}
+.tplc .file-actions{grid-column:1/-1}
+.tplt .ty{font-size:11px;font-weight:700;line-height:1.2;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-ink)}
+.tplt .n{font-weight:700;font-size:15px}
+.tplt .m{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.dot.sm{width:9px;height:9px;flex:none}
+.discover{margin:0;font-size:12px;color:var(--muted)}
+.discover a{font-weight:700;text-decoration:underline}
+/* Bibliothèque avec fiches : « Un nouveau personnage ? » sous la liste (L.4) */
+.newchar{margin-top:16px}
+.start-opt.compact{grid-template-rows:auto auto;padding:14px}
+.start-opt.compact h3{font-size:16px}
+.start-opt.compact p{font-size:13px}
+.start-opt.compact .start-opt-act{margin:8px 0 0 52px}
+.newchar-foot{margin:12px 0 0;font-size:13px;color:var(--muted)}
+.newchar-foot .linkbtn{font-weight:700}
+@media (max-width:720px){
+  /* Ressources : panneau glissant depuis le bas, comme le lanceur (§7) */
+  .res{position:static}
+  .res-scrim{display:block;position:fixed;inset:0;z-index:30;background:var(--scrim)}
+  .res-menu{position:fixed;left:0;right:0;top:auto;bottom:0;z-index:31;width:auto;max-height:88vh;overflow-y:auto;overscroll-behavior:contain;
+    border-radius:16px 16px 0 0;border:0;border-top:1px solid var(--line);
+    padding:0 max(8px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px));
+    animation:sheetIn .2s ease-out}
+  .res-menu .grip{display:block;width:44px;height:5px;border-radius:3px;background:var(--line);margin:8px auto 2px}
+  body.menu-open,html:has(body.menu-open){overflow:hidden}
+  .start-opts,.tpl-list{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr}
+  .steps li{grid-template-columns:24px 1fr;column-gap:10px}
+  .steps .step-n{grid-row:span 2}
+  .tplc .btn,.start-opt .btn{min-height:44px}
+}

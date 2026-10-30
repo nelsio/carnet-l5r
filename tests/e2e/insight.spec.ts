@@ -20,7 +20,7 @@ async function fits(el: Locator) {
 
 test("K1 : ligne Insight et badge d'écart lisibles, sans débordement", async ({ page }) => {
   await page.goto(pageUrl);
-  await page.getByRole("button", { name: "Créer mon personnage" }).click();
+  await page.getByRole("button", { name: "Nouvelle fiche vierge" }).click();
   await page.getByRole("button", { name: "Terminer : Identité & réputation" }).click();
   await page.getByRole("button", { name: "Edit : Identité & réputation" }).click();
   await page.getByRole("spinbutton", { name: "Rang d'Insight" }).fill("3");

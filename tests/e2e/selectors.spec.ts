@@ -13,7 +13,7 @@ async function create(page: Page, theme: "light" | "dark") {
   await page.emulateMedia({ colorScheme: theme });
   await page.setViewportSize({ width: 1200, height: 900 });
   await page.goto(pageUrl);
-  await page.getByRole("button", { name: "Créer mon personnage" }).click();
+  await page.getByRole("button", { name: "Nouvelle fiche vierge" }).click();
 }
 
 /** Valeur calculée d'un jeton de couleur, via un élément témoin. */

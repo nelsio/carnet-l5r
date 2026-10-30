@@ -43,7 +43,7 @@ Les fiches enregistrées hors ligne restent **propres à ce fichier, sur cet app
 
 ## 3. Créer et remplir ta fiche
 
-- **Bibliothèque** → **Créer mon personnage** (ou **Nouvelle fiche**). La Bibliothèque liste toutes tes fiches ; on y revient par le bouton **Bibliothèque** de l'en-tête, ou par le **sceau 帳** rouge à gauche du nom. L'onglet du navigateur affiche le nom du personnage ouvert.
+- **Bibliothèque** → **Nouvelle fiche vierge** (ou **Nouvelle fiche**, sous la liste), pour recopier une fiche papier. Tu peux aussi créer ton personnage sur la **Forge** du portail de la campagne, puis importer le JSON qu'elle exporte (voir [Portail de la campagne](#portail-de-la-campagne)), ou partir d'un **modèle** (Bushi, Shugenja, Courtisan). La Bibliothèque liste toutes tes fiches ; on y revient par le bouton **Bibliothèque** de l'en-tête, ou par le **sceau 帳** rouge à gauche du nom. L'onglet du navigateur affiche le nom du personnage ouvert.
 - Chaque bloc de la fiche a son bouton **Edit** : il passe ce bloc en saisie, **Terminer** le repasse en lecture. Plusieurs blocs peuvent être ouverts ensemble. Les réserves (`5g3`, `6g2`…) se recalculent à chaque changement.
 - Une arme du livre saisie avec d'autres valeurs (VD, mots-clés) est signalée : **Mettre à jour** reprend celles du livre.
 - Le bloc **Identité** (v2.18) calcule tes **points d'Insight** : somme des Anneaux × 10, plus les rangs de toutes tes compétences (les spécialisations ne comptent pas), affichés `125 · Rang 1`. Rang 1 sous 150 points, puis un rang tous les 25 points (Rang 2 à 150, Rang 3 à 175…), au plus 10. Le champ **Bonus d'Insight (MJ)** ajoute les points accordés hors calcul (avantage, technique, décision du MJ). Le **Rang d'Insight que tu saisis fait foi** pour tous les calculs (initiative, soins, rang d'école…) : s'il diffère du calcul, une étiquette le signale (« Rang saisi 3 · calculé 1 »), sans rien bloquer ni corriger.
@@ -58,6 +58,12 @@ Les fiches enregistrées hors ligne restent **propres à ce fichier, sur cet app
 - **Nouvelle journée…** (en tête de fiche) : après une nuit de repos, un aperçu puis **Confirmer** remet tes points de Vide au maximum, soigne `2 × Constitution + Rang` blessures, recharge les emplacements de sorts, et remet l'initiative et les compteurs d'escarmouche à zéro.
 - Les libellés suivent l'**édition française** : trait **Vigilance**, compétences **Courtisan**, **Discrétion**, **Représentation : Conte** et **Représentation : Art oratoire**, spécialisation **Courtoisie** d'Étiquette. Une fiche qui emploie encore les anciens noms (Courtoisie, Furtivité, Conteur, Éloquence, Politesse) marche telle quelle ; un bandeau propose **Mettre à jour…** : aperçu des renommages, puis **Renommer** (annulable tout de suite par **Annuler le renommage**) ou **Plus tard**.
 - Les niveaux de blessure suivent le livre : Indemne jusqu'à `Terre × 5`, puis `Terre × 2` par niveau. (Le réglage `× 3` à `× 5` de la v2.5 est masqué pour le moment.)
+
+### Portail de la campagne
+
+Le bouton **Ressources** (icône de torii, en haut, sur tous les écrans) ouvre les liens vers le **site de la campagne** du MJ : le portail, la page de ton clan (si une fiche est ouverte), la **Forge de personnage**, le **Grimoire**, le **Mémento de combat**, **Bushido & honneur** et **Étiquette & coutumes**. Chaque lien s'ouvre dans un **nouvel onglet** ; le Carnet ne contacte jamais ce site de lui-même et marche toujours hors ligne.
+
+La **Forge** est une création guidée : elle calcule l'XP, les traits et les bonus d'école, puis exporte un **JSON compatible** avec le Carnet. Importe-le ici avec **Importer un JSON**.
 
 ## 4. Jouer avec l'aide de jeu
 
@@ -165,7 +171,7 @@ Un bonus **« d'office »** compte dans toutes les réserves ; un bonus **« au 
   - Après un rechargement, le navigateur redemande la permission : clique sur **Reprendre l'enregistrement**.
   - Si le fichier a été modifié ailleurs, l'outil te laisse choisir : **Charger la version du fichier**, **Écraser avec ma version**, ou **Fusionner** après un aperçu.
   - **Délier** retire le lien sans toucher au fichier.
-- **Exemple** : dans la Bibliothèque, **Modèles de fiche (JSON)** propose trois fiches complètes, déjà remplies, à adapter puis importer : **Exemple bushi** (Kakita), **Exemple shugenja** (Tamori, avec deux sorts) et **Exemple courtisan** (Doji, avec deux bonus de jet).
+- **Exemple** : dans la Bibliothèque vide, **Modèles de personnage** propose trois fiches complètes, déjà remplies : **Bushi** (Kakita), **Shugenja** (Tamori, avec deux sorts) et **Courtisan** (Doji, avec deux bonus de jet). **Utiliser** en crée une fiche dans ce navigateur et l'ouvre ; **JSON** télécharge le fichier, à adapter puis importer. Avec des fiches, les modèles sont sous la liste (« Ou partir d'un modèle »).
 
 ## 10. Changer d'appareil
 

@@ -75,7 +75,7 @@ describe("Suppression depuis le bloc Identité (H.7 X1)", () => {
     expect(screen.queryByRole("button", { name: "Supprimer définitivement" })).toBeNull();
     click("Supprimer ce personnage…");
     click("Supprimer définitivement");
-    expect(await screen.findByRole("heading", { name: "Aucun personnage dans ce carnet" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Pas encore de personnage ?" })).toBeInTheDocument();
     expect(await storage.library.list()).toEqual([]);
   });
 });

@@ -30,7 +30,7 @@ beforeEach(() => {
 describe("Démarrage", () => {
   it("sans fiche : la Bibliothèque vide invite à créer un personnage", async () => {
     await mount(memoryStorage());
-    expect(screen.getByRole("heading", { name: "Aucun personnage dans ce carnet" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Pas encore de personnage ?" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /bibliothèque/i })).toBeNull();
   });
 
@@ -163,7 +163,7 @@ describe("Écran Bibliothèque", () => {
     click("Edit : Identité & réputation");
     click("Supprimer ce personnage…");
     click("Supprimer définitivement");
-    expect(await screen.findByRole("heading", { name: "Aucun personnage dans ce carnet" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Pas encore de personnage ?" })).toBeInTheDocument();
     expect(await s.library.list()).toEqual([]);
   });
 });

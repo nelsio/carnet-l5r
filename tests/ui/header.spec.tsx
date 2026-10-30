@@ -14,7 +14,7 @@ async function renderApp(character: Character | null = base(), mode: "edit" | "r
   if (character) await storage.library.put({ id: "kakita", character, mode, updatedAt: "2026-10-28T10:00:00.000Z" });
   const view = render(<App storage={storage} rng={() => 5} />);
   if (character) await screen.findByRole("heading", { level: 1, name: new RegExp(character.name.slice(0, 5)) });
-  else await screen.findByRole("heading", { name: "Aucun personnage dans ce carnet" });
+  else await screen.findByRole("heading", { name: "Pas encore de personnage ?" });
   return view;
 }
 const header = () => document.querySelector("header.top")!;
@@ -28,7 +28,8 @@ describe("Sceau et surtitre (G.3)", () => {
     expect(header().querySelector(".eyebrow")).toHaveTextContent(/^Carnet de RokuganClan de la Grue$/);
     expect(header().querySelector(".eyebrow .sep")).toHaveAttribute("aria-hidden", "true");
     expect(screen.getByRole("button", { name: "Bibliothèque" })).toHaveClass("theme-btn");
-    expect(header().querySelectorAll(".theme-btn")).toHaveLength(3);
+    // Bibliothèque, Lanceur, Thème et Ressources (annexe L.2)
+    expect(header().querySelectorAll(".theme-btn")).toHaveLength(4);
   });
 
   it.each([SEAL, "Bibliothèque"])("H2 : « %s » ouvre la Bibliothèque", async (name) => {

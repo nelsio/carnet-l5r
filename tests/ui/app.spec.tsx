@@ -19,7 +19,7 @@ async function renderApp(character: Character | null = base(), rng = always(5), 
   }
   const view = render(<App storage={storage} rng={rng} />);
   await screen.findByText(/^Carnet de Rokugan v/);
-  await (character ? screen.findByRole("heading", { level: 1, name: new RegExp(character.name.slice(0, 5)) }) : screen.findByRole("button", { name: "Créer mon personnage" }));
+  await (character ? screen.findByRole("heading", { level: 1, name: new RegExp(character.name.slice(0, 5)) }) : screen.findByRole("button", { name: "Nouvelle fiche vierge" }));
   return { ...view, storage };
 }
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
@@ -40,7 +40,7 @@ describe("Socle", () => {
   });
   it("sans fiche : crée un personnage et passe en modification", async () => {
     await renderApp(null);
-    click("Créer mon personnage");
+    click("Nouvelle fiche vierge");
     expect(await screen.findByRole("heading", { level: 1, name: "Nouveau samouraï" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Terminer : Identité & réputation" })).toBeInTheDocument();
   });

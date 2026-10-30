@@ -10,7 +10,7 @@ test("le build unique s'ouvre en file:// sans aucune requête réseau, polices c
     if (!req.url().startsWith("file://") && !req.url().startsWith("data:")) external.push(req.url());
   });
   await page.goto(pageUrl);
-  await page.getByRole("button", { name: "Créer mon personnage" }).click();
+  await page.getByRole("button", { name: "Nouvelle fiche vierge" }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Nouveau samouraï" })).toBeVisible();
   await page.getByRole("button", { name: "Terminer" }).click();
   await page.getByRole("button", { name: "Aide de jeu" }).click();
