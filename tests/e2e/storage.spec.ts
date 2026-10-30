@@ -24,7 +24,7 @@ for (const t of targets) {
       await page.goto(t.url);
       if (t.offline) await context.setOffline(true);
 
-      await page.getByRole("button", { name: "Créer mon personnage" }).click();
+      await page.getByRole("button", { name: "Nouvelle fiche vierge" }).click();
       await page.getByRole("textbox", { name: "Nom", exact: true }).fill("Doji Ayame");
       await page.getByRole("combobox", { name: "Clan" }).fill("Grue");
       await page.getByRole("button", { name: "Edit : Anneaux & Traits" }).click();
@@ -76,7 +76,7 @@ test.describe("Préférences et armure après rechargement (file://)", () => {
 
   test("E14 : l'éditeur d'armure s'ouvre depuis la tuile ; bonus et réduction conservés", async ({ page }) => {
     await page.goto(url);
-    await page.getByRole("button", { name: "Créer mon personnage" }).click();
+    await page.getByRole("button", { name: "Nouvelle fiche vierge" }).click();
     await page.getByRole("button", { name: "Terminer" }).click();
     const armorTile = page.locator(".cstats .ct").filter({ hasText: "ND armure" });
     await expect(armorTile).toContainText("15");
@@ -94,7 +94,7 @@ test.describe("Préférences et armure après rechargement (file://)", () => {
 
   test("E15 : lanceur de dés affiché par défaut, partout ; masqué, le choix survit au rechargement (J.7)", async ({ page }) => {
     await page.goto(url);
-    await page.getByRole("button", { name: "Créer mon personnage" }).click();
+    await page.getByRole("button", { name: "Nouvelle fiche vierge" }).click();
     await page.getByRole("button", { name: "Terminer" }).click();
     await page.getByRole("button", { name: "Aide de jeu" }).click();
     for (const s of ["Enquête", "Déplacement", "Combat"]) {

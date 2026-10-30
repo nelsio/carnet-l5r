@@ -6,6 +6,18 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.19.0] - 2026-10-30
+
+### Ajouté
+- Bouton **Ressources** dans l'en-tête, sur tous les écrans : liens vers le portail de la campagne (portail, page du clan de la fiche, Forge de personnage, Grimoire, Mémento de combat, Bushido & honneur, Étiquette & coutumes). Menu déroulant sur bureau, panneau glissant depuis le bas sur mobile. Simples liens ouverts dans un nouvel onglet : aucune requête réseau.
+- Bibliothèque vide : deux façons de commencer, **Forger sur le portail** ou **Fiche vierge**, chacune en trois étapes ; lien « Découvrir la campagne ».
+- Cartes **Modèles de personnage** (type, nom, clan et Rang lus dans la fiche) : **Utiliser** crée et ouvre une fiche, **JSON** télécharge le fichier.
+- Bibliothèque avec fiches : carte « Un nouveau personnage ? » sous la liste (Forge, fiche vierge, modèles).
+
+### Modifié
+- Le bouton « Nouvelle fiche » quitte l'en-tête de la liste pour la carte « Un nouveau personnage ? ».
+- « Créer mon personnage » devient « Nouvelle fiche vierge » ; la ligne « Modèles de fiche (JSON) » est remplacée par les cartes de modèles.
+
 ## [2.18.0] - 2026-10-30
 
 ### Ajouté
@@ -193,7 +205,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.18.0...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.19.0...HEAD
+[2.19.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.19.0
 [2.18.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.18.0
 [2.17.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.17.0
 [2.16.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.16.0

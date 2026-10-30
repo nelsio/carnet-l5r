@@ -25,7 +25,7 @@ for (const width of [360, 1200]) {
   test(`E32 : nom long à ${width} px : 2 lignes au plus, nom complet sans « … »`, async ({ page }) => {
     await page.setViewportSize({ width, height: 800 });
     await page.goto(pageUrl);
-    await page.getByRole("button", { name: "Créer mon personnage" }).click();
+    await page.getByRole("button", { name: "Nouvelle fiche vierge" }).click();
     await page.getByRole("textbox", { name: "Nom", exact: true }).fill(LONG_NAME);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(LONG_NAME);
     const fit = await nameLines(page);
@@ -48,7 +48,7 @@ async function create(page: Page, width: number, theme?: "dark") {
   await page.setViewportSize({ width, height: 800 });
   if (theme) await page.emulateMedia({ colorScheme: theme });
   await page.goto(pageUrl);
-  await page.getByRole("button", { name: "Créer mon personnage" }).click();
+  await page.getByRole("button", { name: "Nouvelle fiche vierge" }).click();
 }
 
 /** Boîte du sceau sans la rotation de 3° : largeur CSS. */

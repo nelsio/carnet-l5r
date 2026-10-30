@@ -199,7 +199,7 @@ describe("Couleur de clan", () => {
     expect(clanAccent("Ronin")).toEqual({ id: null, label: null, light: "#7a6a3a", inkLight: "#5c5131", dark: "#cdb67a", inkDark: "#d2bf8f" });
   });
   it("renvoie aussi la teinte du texte (annexe I.1.4)", () => {
-    expect(clanAccent("Lion")).toEqual({ id: "lion", label: "Clan du Lion", light: "#a87b0c", inkLight: "#795c20", dark: "#e6bf55", inkDark: "#e6c776" });
+    expect(clanAccent("Lion")).toEqual({ id: "lion", label: "Clan du Lion", light: "#a87b0c", inkLight: "#795c20", dark: "#e6bf55", inkDark: "#e6c776", portalSlug: "lion" });
   });
 });
 

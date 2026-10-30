@@ -11,7 +11,7 @@ const BG_DARK = "rgb(38, 37, 42)";
 async function create(page: Page, width = 1200) {
   await page.setViewportSize({ width, height: 800 });
   await page.goto(pageUrl);
-  await page.getByRole("button", { name: "Créer mon personnage" }).click();
+  await page.getByRole("button", { name: "Nouvelle fiche vierge" }).click();
 }
 
 /** Couleurs de bordure visibles dans la barre d'état. */

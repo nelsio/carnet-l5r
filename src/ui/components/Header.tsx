@@ -3,6 +3,7 @@ import { clanAccent, schoolRankOf } from "@carnet/core";
 import { SHOW_WOUND_MULTIPLIER, WOUND_MULTIPLIERS } from "../../rules/l5r4e";
 import { useStore } from "../store";
 import { NEXT_THEME, THEME_LABELS } from "../theme";
+import { ResourcesMenu } from "./ResourcesMenu";
 
 export function Header() {
   const { state, dispatch, library } = useStore();
@@ -54,6 +55,7 @@ export function Header() {
           onClick={() => dispatch({ type: "diceRoller", show: !ui.showDiceRoller })}
         />
         <HeaderButton icon={ICONS.theme} label={`Thème : ${THEME_LABELS[ui.theme]}`} onClick={() => dispatch({ type: "theme", theme: NEXT_THEME[ui.theme] })} />
+        <ResourcesMenu />
         {SHOW_WOUND_MULTIPLIER && (
           <HeaderButton
             icon={ICONS.wounds} label={`Blessures : Terre × ${ui.woundMultiplier}`}

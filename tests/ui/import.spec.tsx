@@ -179,16 +179,16 @@ describe("Modèles de fiche (annexe J.5)", () => {
     return { name: names[0], text, json: JSON.parse(text) as Character };
   }
 
-  it("Q9 : trois boutons sous « Modèles de fiche (JSON) »", async () => {
+  it("Q9 : un bouton « JSON » par carte de modèle (annexe L.3)", async () => {
     await mount([]);
-    const group = within(screen.getByRole("group", { name: "Modèles de fiche (JSON)" }));
-    expect(group.getAllByRole("button").map((b) => b.textContent)).toEqual(["Exemple bushi", "Exemple shugenja", "Exemple courtisan"]);
+    const section = within(screen.getByRole("region", { name: "Modèles de personnage" }));
+    expect(section.getAllByRole("button", { name: /^JSON/ }).map((b) => b.getAttribute("aria-label"))).toEqual(["JSON du modèle Bushi", "JSON du modèle Shugenja", "JSON du modèle Courtisan"]);
     expect(screen.queryByRole("button", { name: "Télécharger un exemple de fiche (JSON)" })).toBeNull();
   });
 
   it("Q9 : l'exemple bushi est valide et se réimporte en « Nouvelle fiche »", async () => {
     const { storage } = await mount([]);
-    const { name, text, json } = await download("Exemple bushi");
+    const { name, text, json } = await download("JSON du modèle Bushi");
     expect(name).toBe("exemple-bushi-l5r.json");
     expect(json).toMatchObject({ schemaVersion: 2, name: "Kakita Haruto" });
     expect(json.modifiers?.map((m) => m.name)).toEqual(["Voix"]);
@@ -203,7 +203,7 @@ describe("Modèles de fiche (annexe J.5)", () => {
 
   it("Q9 : le shugenja a l'école Tamori et 2 sorts, et se réimporte", async () => {
     await mount([]);
-    const { name, text, json } = await download("Exemple shugenja");
+    const { name, text, json } = await download("JSON du modèle Shugenja");
     expect(name).toBe("exemple-shugenja-l5r.json");
     expect(json).toMatchObject({ name: "Tamori Ayane", schoolId: "tamori-shugenja" });
     expect(json.spells?.map((x) => x.name)).toEqual(["Sentir", "Frappe de jade"]);
@@ -216,7 +216,7 @@ describe("Modèles de fiche (annexe J.5)", () => {
 
   it("Q9 : la courtisane a l'école Doji et 2 bonus, et se réimporte", async () => {
     await mount([]);
-    const { name, text, json } = await download("Exemple courtisan");
+    const { name, text, json } = await download("JSON du modèle Courtisan");
     expect(name).toBe("exemple-courtisan-l5r.json");
     expect(json).toMatchObject({ name: "Doji Sayuri", schoolId: "doji-courtisan" });
     expect(json.modifiers).toHaveLength(2);
@@ -230,6 +230,6 @@ describe("Modèles de fiche (annexe J.5)", () => {
   it("aussi depuis une Bibliothèque déjà remplie", async () => {
     await mount();
     click("Carnet de Rokugan — ouvrir la bibliothèque");
-    expect(await screen.findByRole("button", { name: "Exemple shugenja" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "Partir du modèle Shugenja" })).toBeInTheDocument();
   });
 });

@@ -6,11 +6,11 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document.
 
-**État au 30/10/2026 :** version **v2.18.0**, lots 1 à 21 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
+**État au 30/10/2026 :** version **v2.19.0**, lots 1 à 22 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
 
-**Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie), F (lot 13 : shugenja et Magie), G (lot 14 : nom de l'outil dans l'en-tête), H (lots 15 et 16 : dépôt GitHub et correctifs), I (lots 17 à 19 : couleurs, Anneaux, sélecteurs), J (lot 20 : correctifs et retouches), K (lot 21 : points d'Insight).
+**Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie), F (lot 13 : shugenja et Magie), G (lot 14 : nom de l'outil dans l'en-tête), H (lots 15 et 16 : dépôt GitHub et correctifs), I (lots 17 à 19 : couleurs, Anneaux, sélecteurs), J (lot 20 : correctifs et retouches), K (lot 21 : points d'Insight), L (lots 22 et 23 : liens vers le portail de campagne).
 
-**Prochain lot (30/10/2026) :** à définir (§11, point 22). Le lot 21 (annexe K, points d'Insight) est livré ; la localisation est reportée.
+**Prochain lot (30/10/2026) :** lot 23 (annexe L.7 à L.9, v2.20.0) : liens vers le portail dans la Fiche et l'Aide de jeu. Le lot 22 (menu Ressources, Bibliothèque) est livré ; la localisation est reportée.
 
 ---
 
@@ -27,6 +27,7 @@ Fait foi :
 | Import | **Fusion** d'un JSON dans une fiche, avec aperçu des changements avant application. Export JSON complet. |
 | Thèmes | Clair **écru**, sombre **anthracite**, mode auto. Accent de couleur selon le **clan**. |
 | Mobile | Mise en page validée sur téléphone (§7). |
+| Portail de campagne | Liens vers le portail de campagne du MJ (simples liens ouverts dans un nouvel onglet, **aucune requête**) : menu Ressources, Forge de personnage, pages de clan, grimoire (annexe L). |
 
 ### Hors périmètre
 Serveur, comptes, synchronisation automatique entre appareils, édition par le MJ, jets partagés en temps réel, sorts de shugenja (le catalogue d'actions les permettra plus tard).
@@ -274,7 +275,7 @@ interface LibraryStore {
 ### 6.1 Écrans
 | Écran | Contenu |
 |---|---|
-| **Bibliothèque** (écran d'accueil s'il n'y a aucune fiche, sinon accessible par l'en-tête) | Liste des fiches locales : nom, clan (pastille de couleur), école, date, badge « Consultation » pour les fiches en lecture seule. Actions : Ouvrir, Nouvelle fiche, Importer un JSON, Supprimer (avec confirmation intégrée à la page). |
+| **Bibliothèque** (écran d'accueil s'il n'y a aucune fiche, sinon accessible par l'en-tête) | Liste des fiches locales : nom, clan (pastille de couleur), école, date, badge « Consultation » pour les fiches en lecture seule. Actions : Ouvrir, Importer un JSON, Supprimer (avec confirmation intégrée à la page). **Vide** (v2.19.0, annexe L.3) : « Pas encore de personnage ? » avec deux options (Forger sur le portail, Fiche vierge), cartes **Modèles de personnage** (Utiliser, JSON) et lien « Découvrir la campagne ». **Avec fiches** (L.4) : carte « Un nouveau personnage ? » sous la liste (Forge, Nouvelle fiche, modèles). |
 | **Fiche** | Comme le prototype (§6.2). |
 | **Aide de jeu** | Comme le prototype (§6.2), avec la situation **Cour** en plus (annexe D.8). |
 | **Statistiques** | Tableau des chances de réussite de tous les jets (§6.2). Troisième vue, à côté de Fiche et Aide de jeu (v2.1.2). |
@@ -290,7 +291,7 @@ interface LibraryStore {
   - **sceau 帳** de l'outil à gauche, qui ouvre aussi la Bibliothèque, et surtitre « CARNET DE ROKUGAN | ● CLAN … » au-dessus du nom (annexe G) ;
   - famille, école et Rang dessous ;
   - bouton de thème (auto, clair, sombre) ;
-  - **boutons d'en-tête** Bibliothèque, Lanceur de dés et Thème : chacun = **icône + texte** sur bureau (livres, dé, demi-cercle), **icône seule** sur mobile (§7) ; le texte reste présent pour les lecteurs d'écran et en info-bulle, avec l'état courant (« Thème : sombre », « Lanceur de dés : masqué ») ;
+  - **boutons d'en-tête** Bibliothèque, Lanceur de dés, Thème et **Ressources** (v2.19.0, annexe L.2 : menu de liens vers le portail de campagne, sur tous les écrans) : chacun = **icône + texte** sur bureau (livres, dé, demi-cercle, torii), **icône seule** sur mobile (§7) ; le texte reste présent pour les lecteurs d'écran et en info-bulle, avec l'état courant (« Thème : sombre », « Lanceur de dés : masqué ») ;
   - bouton **« Lanceur de dés : masqué / affiché »**, à côté du thème et de la Bibliothèque (même style ; fond d'accent pâle quand affiché). **Affiché par défaut** (v2.17.0, annexe J.7), choix mémorisé dans les préférences :
     - **masqué** : le panneau d'action reste un panneau d'aide (réserve, ligne « lancer à la main », Min · Moy. · Max, chance de réussite, ND final, options, manœuvres) mais **sans** bouton « Lancer », sans dés obtenus, sans verdict et sans historique. Les enchaînements qui dépendent d'un lancer (score d'initiative affiché, bonus de Défense totale, dés de dégâts pré-remplis) ne se déclenchent pas ; les dépenses de Vide se font par les pastilles et le panneau Vide ;
     - **affiché** : le bouton « Lancer » et les résultats apparaissent dans tous les lanceurs (Enquête, Cour, Déplacement, Combat) ;
@@ -390,7 +391,7 @@ Point de rupture : **largeur ≤ 720 px**. Au-dessus, mise en page bureau inchan
 
 | Élément | Comportement mobile |
 |---|---|
-| En-tête | Sceau de 52 px à gauche du nom ; Bibliothèque, Lanceur de dés et Thème en **boutons ronds de 40 px, icône seule**, **sous** le bloc sceau + nom, alignés à gauche (annexe G). Lanceur affiché = fond d'accent pâle. |
+| En-tête | Sceau de 52 px à gauche du nom ; Bibliothèque, Lanceur de dés, Thème et Ressources en **boutons ronds de 40 px, icône seule**, **sous** le bloc sceau + nom, alignés à gauche (annexe G). Lanceur affiché = fond d'accent pâle. Ressources ouvre un **panneau glissant depuis le bas**, comme le lanceur : poignée, voile, hauteur max 88 vh (annexe L.2). |
 | Navigation | Onglets Fiche / Aide de jeu / Statistiques dans une **barre fixe en bas**, trois boutons de même largeur. Marge basse = hauteur de la barre + `env(safe-area-inset-bottom)`. Onglet actif sur fond d'accent pâle. Les quatre onglets de situation de l'aide de jeu tiennent sur **une ligne, sans défilement** (360 px compris). |
 | Barre d'état | Les quatre tuiles Dépl. / ND armure / Réduction / Pénalité occupent **toute la largeur sur 4 colonnes égales**, texte centré. **Résumé sur une ligne** (niveau de blessure, pénalité, `blessures / seuil max`), cliquable, bordure rouge si le personnage est blessé. Un appui déplie la piste complète en **2 rangées de 4**. En dessous : compteur −/+ (boutons 40 px) et pastilles de Vide (26 px). |
 | Lanceur | **Panneau glissant depuis le bas**, ouvert au choix d'une action (pas à l'ouverture de l'écran). Hauteur max 88 vh, défilement interne, fond assombri derrière. Poignée et bouton × en haut ; fermeture par ×, appui sur le fond ou Échap. Bouton « Lancer » **collé en bas** du panneau. Après un lancer, le résultat est amené à l'écran et le panneau reste ouvert. Changer une option ne remet pas le défilement du panneau à zéro. Le défilement de la page est bloqué pendant l'ouverture. |
@@ -576,7 +577,9 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 19. **v2.16.0 — sélecteurs** : annexe I.3. Sélecteurs `appearance: base-select` (`reference/selecteurs.css`), panneau Posture en menu déroulant sans « i » (**livrée**, écarts en I.8) → cas D1 à D10 ; E12 et M10 adaptés.
 20. **v2.17.0 — correctifs et retouches** (**livrée**, écarts en J.14) : annexe J (retours de jeu du 30/10/2026). Bloc Armes en Edit lisible sur mobile, police du bloc Identité, bouton de technique sans « sort », bonus de jet sans catalogue (modèles par source), modèles de fiche shugenja et courtisan, panneau Vide en menu déroulant, lanceur de dés affiché par défaut, sorts avant les attaques en escarmouche, champ « Dés lancés ± » retiré, Min · Moy. · Max centrés dans le lanceur → cas Q1 à Q19.
 21. **v2.18.0 — points d'Insight** (**livrée**, écarts en K.5) : annexe K. Points d'Insight calculés et Rang suggéré dans le bloc Identité, champ facultatif `insightBonus`, étiquette d'écart avec le rang saisi (qui fait foi) → cas I1 à I9, K1.
-22. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts (fichier personnel importable, pas dans le dépôt), compteurs « N fois par séance » (D-g).
+22. **v2.19.0 — portail de campagne : menu et Bibliothèque** (**livrée**, écarts en L.6) : annexe L.1 à L.5. Adresses dans `src/rules/portal.ts`, bouton et menu **Ressources** (panneau bas sur mobile), Bibliothèque vide (Forge ou fiche vierge, cartes de modèles) et avec fiches (« Un nouveau personnage ? ») → cas O1 à O11.
+23. **v2.20.0 — portail de campagne : Fiche et Aide de jeu** : annexe L.7 à L.9. Clan de l'en-tête en lien, liens de sort vers le grimoire, encadré de liens de l'Aide de jeu (Combat, Cour) → cas O12 à O17.
+24. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts (fichier personnel importable, pas dans le dépôt), compteurs « N fois par séance » (D-g).
 
 ---
 
@@ -2333,3 +2336,168 @@ Les identifiants I1 à I9 sont repris du handoff source (les I1 à I13 de la loc
 ### K.6 Hors périmètre
 - Aucun lien avec l'XP : le coût des achats n'est ni calculé ni vérifié (lot à part, journal d'achats).
 - Pas de mise à jour automatique de `insightRank`.
+
+---
+
+## Annexe L — Lots 22 et 23 : liens vers le portail de campagne (v2.19.0, v2.20.0)
+
+Statut : **validé par Nelson le 30/10/2026**. Lot 22 **livré** (v2.19.0, écarts en L.6) ; lot 23 à livrer (v2.20.0). Source : `handoff-outlinks.md` (30/10/2026), intitulé « lots 21 et 22 » en v2.18.0 et v2.19.0 : renuméroté **lots 22 et 23**, **v2.19.0 et v2.20.0** (le lot 21 est le calcul d'Insight, v2.18.0, annexe K). Prototype de référence : `reference/prototype-outlinks.html` (sélecteurs Écran, Personnage, Thème, Largeur). En cas d'écart, le prototype fait foi pour le rendu, cette annexe pour le comportement.
+
+Une PR et une version mineure par lot. Pas de changement de format de fiche (`schemaVersion` reste 2). Captures « avant » et « après » des vues touchées (bureau 1280 px et 390 px, clair et sombre) à chaque PR.
+
+### L.0 Objet
+
+Le Carnet renvoie vers le **portail de la campagne** du MJ (site statique sur GitHub Pages) :
+
+| Page | Adresse |
+|---|---|
+| Portail | `https://vincenzorpg.github.io/L5R/index.html` |
+| Forge de personnage | `…/createcharacter.html` (exporte un JSON compatible avec le Carnet) |
+| Grimoire | `…/grimoire.html` |
+| Page de clan | `…/clans/<slug>.html` (8 Grands Clans) |
+| Mémento de combat | `…/aides/combat-memento.html` |
+| Bushido & honneur | `…/aides/bushido-honneur.html` |
+| Étiquette & coutumes | `…/aides/etiquette-coutumes.html` |
+
+**Règles communes à tous les liens :**
+- Ce sont de simples liens `<a href>` : **aucune requête réseau** n'est ajoutée (§1 inchangé). Le Carnet marche toujours hors ligne et en `file://` ; seul le clic demande une connexion.
+- `target="_blank" rel="noopener noreferrer"`, icône « lien externe » (flèche sortant d'un carré, 13 px, `currentColor`) après le libellé.
+- Nom accessible complété par « (nouvel onglet) » quand le texte visible ne le dit pas (icône seule, nom de clan).
+- Couleur du texte de lien : `--accent-ink` (annexe I.1). Soulignement au survol.
+- Les liens restent visibles en **consultation** (ils ne modifient rien).
+- Aucun texte du livre n'est ajouté : descriptions d'une ligne, écrites pour le Carnet.
+
+| Lot | Version | Contenu |
+|---|---|---|
+| **22** | v2.19.0 | Configuration des liens (L.1), bouton et menu **Ressources** (L.2), **Bibliothèque** vide et avec fiches (L.3, L.4) |
+| **23** | v2.20.0 | Liens dans la **Fiche** : clan et sorts (L.7), encadré de liens dans l'**Aide de jeu** (L.8) |
+
+### L.1 Configuration : `src/rules/portal.ts` (lot 22)
+
+Un seul module porte toutes les adresses, pour qu'un changement d'URL du portail ne touche qu'un fichier : `PORTAL_BASE`, `PORTAL` (`home`, `forge`, `grimoire`, `combat`, `bushido`, `etiquette`), `clanUrl(clanId)` et `spellUrl(name)`.
+
+- `clanUrl` lit le champ **`portalSlug`** de la table des clans (`CLANS`, `src/rules/l5r4e.ts`) : `crabe`, `grue`, `dragon`, `lion`, `mante`, `phenix`, `scorpion`, `licorne`. Araignée, Familles impériales et clan non reconnu n'en ont pas → `null`.
+- `spellUrl` : `PORTAL.grimoire + "?q=" + encodeURIComponent(name.trim())`. Un nom vide renvoie `PORTAL.grimoire`.
+- Composant commun `ExternalLink` (`src/ui/components/ExternalLink.tsx`) : rend le `<a>` avec les attributs ci-dessus, l'icône (`ExtIcon`) et un nom accessible (`label`) si demandé.
+
+### L.2 En-tête : bouton et menu « Ressources » (lot 22)
+
+- **Quatrième bouton d'en-tête**, après Thème : icône **torii** (deux traverses, deux piliers, trait 1,8 px), libellé « Ressources ». Même style et mêmes règles que Bibliothèque, Lanceur et Thème (§6.2, §7) : icône + texte sur bureau, rond de 40 px icône seule sur mobile.
+- `aria-haspopup="menu"`, `aria-expanded` ; ouvert = fond `--accent-pale`, texte `--accent-ink`, bordure `--accent`.
+- Présent sur **tous les écrans**, Bibliothèque comprise.
+
+**Contenu du menu**, en trois groupes avec intitulé en petites capitales (`--muted`) :
+
+| Groupe | Entrée | Description (1 ligne) | Kanji |
+|---|---|---|---|
+| Campagne | Portail de la campagne | Clans, règles, aides de jeu | 帝 |
+| Campagne | *Nom du clan de la fiche* (si `clanUrl` ≠ null et une fiche est ouverte) | Histoire, familles et serments | kanji de l'Anneau du clan affiché sur le portail (Crabe 土, Grue 風, Dragon 龍, Lion 武, Mante 雷, Phénix 鳳, Scorpion 忍, Licorne 馬) |
+| Créer | Forge de personnage | Exporte un JSON compatible avec le Carnet | 鍛 |
+| Références | Grimoire | Sorts, Kihō, recherche par effet | 巻 |
+| Références | Mémento de combat | Postures, duel Iaijutsu | 刀 |
+| Références | Bushido & honneur | Vertus et barème d'honneur | 義 |
+| Références | Étiquette & coutumes | Castes, cadeaux, thé | 茶 |
+
+- Chaque entrée : pastille kanji 28 px (fond `--surface`, bordure `--line`, kanji `--accent-ink`), titre en gras, description `--muted` 12 px, icône externe à droite. Hauteur ≥ 44 px, survol `--accent-pale`.
+- Pied : « Site de la campagne. S'ouvre dans un nouvel onglet. » (`--muted`, 12 px).
+- **Bureau** : menu déroulant sous le bouton, aligné à droite, 340 px, fond `--surface-2`, ombre `--shadow` (élévation, annexe I.1).
+- **Mobile** : **panneau glissant depuis le bas**, comme le lanceur (§7) : poignée, voile `--scrim`, hauteur max 88 %, défilement interne.
+- Fermeture : Échap (focus rendu au bouton), clic hors du menu, appui sur le voile, choix d'un lien. À l'ouverture, focus sur la première entrée ; flèches haut/bas entre les entrées.
+
+### L.3 Bibliothèque vide (écran d'accueil sans fiche, lot 22)
+
+Remplace le contenu de l'accueil vide. Deux blocs, puis une ligne.
+
+**Bloc « Pas encore de personnage ? »** (carte `--surface`) :
+- Titre, puis : « Deux façons de commencer. Tu as déjà un fichier ? **Importer un JSON** » (lien-bouton qui lance l'import existant).
+- **Deux options côte à côte, de même poids** (une colonne sur mobile), chacune sur fond `--bg` avec bordure `--line` :
+
+| | Forger sur le portail | Fiche vierge |
+|---|---|---|
+| Pastille kanji (40 px, fond `--accent-pale`) | 鍛 | 筆 |
+| Description | Création guidée : le portail calcule l'XP, les traits et les bonus d'école. | Saisie directe dans le Carnet, pour recopier une fiche papier existante. |
+| Étapes (一 二 三) | **Forger** : clan, école, anneaux, compétences · **Exporter** : bouton « JSON » de la Forge · **Importer** : ici, avec « Importer un JSON » | **Créer** : nom, clan, école et Rang · **Remplir** : anneaux, compétences, techniques · **Jouer** : enregistrée dans ce navigateur |
+| Bouton principal (`btn` plein accent) | « Ouvrir la Forge » + icône externe → `PORTAL.forge` | « Nouvelle fiche vierge » → action « Nouvelle fiche » existante |
+
+- Les étapes : trois cases en ligne sur bureau, empilées sur mobile (numéro kanji à gauche).
+
+**Bloc « Modèles de personnage »** (remplace la ligne « Modèles de fiche (JSON) » de J.5) :
+- Sous-titre : « Une fiche d'exemple complète, à ouvrir ou à copier pour partir d'une base. »
+- Une carte par entrée de `EXAMPLES` (J.5), trois colonnes sur bureau, une sur mobile. Chaque carte affiche le **type** (Bushi, Shugenja, Courtisan) en petites capitales `--accent-ink`, le **nom** du personnage, le **clan** (pastille de couleur du clan) et le **Rang** : « Clan de la Grue · Rang 1 ». Nom, clan et Rang sont **lus dans la fiche** (`build()`), pas écrits en dur.
+- Deux boutons `btn sm` : **« Utiliser »** crée une nouvelle fiche locale à partir du modèle et l'ouvre ; **« JSON »** télécharge le fichier (`exemple-*-l5r.json`, comportement J.5).
+- `EXAMPLES` gagne les champs `type` (libellé affiché) et `kanji` (pastille de la carte : 刀, 火, 扇, repris du prototype).
+
+**Ligne finale** : « Nouveau à Rokugan ? **Découvrir la campagne** » → `PORTAL.home` (`--muted`, 12 px).
+
+### L.4 Bibliothèque avec fiches (lot 22)
+
+- En-tête de liste : ne garde que **« Importer un JSON »**. Le bouton « Nouvelle fiche » **en sort**.
+- Sous la liste, nouvelle carte **« Un nouveau personnage ? »** :
+  - **deux options côte à côte** (une colonne sur mobile), même structure compacte : pastille kanji 40 px, titre, description d'une ligne, bouton principal ;
+    - **Forger sur le portail** (鍛) : « Création guidée, puis export JSON à importer ici. » → « Ouvrir la Forge » + icône externe ;
+    - **Fiche vierge** (筆) : « Saisie directe dans le Carnet, depuis une fiche papier. » → « Nouvelle fiche » ;
+  - ligne de pied : « Ou partir d'un modèle : **Bushi** · **Shugenja** · **Courtisan** » (liens-boutons, même action que « Utiliser » de L.3).
+
+### L.5 Tests du lot 22
+
+| ID | Cas | Attendu |
+|---|---|---|
+| O1 | `clanUrl` pour les 11 clans | 8 adresses `clans/<slug>.html` ; `null` pour Araignée, Impériales, non reconnu |
+| O2 | `spellUrl("Frappe de jade")`, `spellUrl("  ")` | `…grimoire.html?q=Frappe%20de%20jade` ; `…grimoire.html` |
+| O3 | Tout lien externe rendu (menu, Bibliothèque) | `target="_blank"`, `rel` contient `noopener` et `noreferrer`, icône externe présente |
+| O4 | Menu Ressources, fiche Crabe ouverte | 7 entrées dont « Clan du Crabe » → `clans/crabe.html` ; fiche Araignée : 6 entrées |
+| O5 | Menu Ressources au clavier | Entrée/Espace ouvre, focus sur la 1re entrée, flèches, Échap ferme et rend le focus |
+| O6 | Menu Ressources à 390 px | Panneau bas avec voile ; appui sur le voile ferme ; bouton rond 40 px sous le nom |
+| O7 | Bibliothèque vide | Deux options de même largeur sur bureau, empilées à 390 px ; « Nouvelle fiche vierge » crée une fiche |
+| O8 | Modèles | 3 cartes avec type, nom, clan, Rang lus dans `build()` ; « Utiliser » crée et ouvre une fiche ; « JSON » télécharge le bon fichier |
+| O9 | Bibliothèque avec fiches | Plus de « Nouvelle fiche » en tête de liste ; carte « Un nouveau personnage ? » avec ses deux boutons et les 3 modèles |
+| O10 | Réseau | Aucune requête vers `vincenzorpg.github.io` au chargement ni à l'ouverture du menu (Playwright, écoute réseau) |
+| O11 | Contrastes | Liens `--accent-ink` sur `--surface`, `--surface-2`, `--bg` : déjà couverts par C1/C2 ; lint N8 vert |
+
+### L.6 Écarts de mise en œuvre (lot 22)
+
+- **Numérotation** : lots 22 et 23, v2.19.0 et v2.20.0, au lieu de 21 et 22, v2.18.0 et v2.19.0 (voir le statut). Préfixe de tests **O** libre, gardé.
+- **`clanUrl(clanId: string | null)`** : accepte directement `clanAccent(c.clan).id`, `null` pour un clan non reconnu. `clanAccent` renvoie aussi `portalSlug` (test du moteur adapté).
+- **Kanji des clans** : table `PORTAL_CLAN_KANJI` dans `portal.ts`, plutôt qu'un second champ de `CLANS`.
+- **Menu** : composant `ResourcesMenu` (`src/ui/components/ResourcesMenu.tsx`). Entrées `role="menuitem"` dans trois `role="group"` nommés ; Début et Fin vont à la première et à la dernière entrée ; Tab ferme le menu. Le défilement de la page est bloqué sous le panneau mobile (classe `menu-open`, comme `sheet-open` du lanceur).
+- **Noms accessibles** : entrées du menu « Titre : description (nouvel onglet) » ; bouton de Forge « Ouvrir la Forge (nouvel onglet) » ; boutons des modèles « Utiliser le modèle Bushi », « JSON du modèle Bushi », « Partir du modèle Bushi » (le texte visible reste « Utiliser », « JSON », « Bushi »).
+- **Rang des modèles** : rang d'école (`schoolRankOf`), comme le sous-titre de l'en-tête.
+- **Modèles** : le champ `label` de `EXAMPLES` (« Exemple bushi ») est retiré, remplacé par `type` et `kanji`. La ligne d'aide sur le dépôt de fichier reste sous l'en-tête de la liste ; elle disparaît de l'accueil vide.
+- **Classes CSS** préfixées (`start-opt`, `step-n`, `res-menu`…) : `.opts` et `.x` existent déjà (options du lanceur, bouton de suppression).
+- **Tests existants adaptés** : « Créer mon personnage » → « Nouvelle fiche vierge » et « Aucun personnage dans ce carnet » → « Pas encore de personnage ? » (Vitest et Playwright) ; Q9 sur les cartes de modèles ; H1 et H7 : 4 boutons d'en-tête.
+- **Tests** : `tests/core.portal.spec.ts` (O1, O2), `tests/ui/portal.spec.tsx` (O3, O4, O5 aux flèches et Échap, O7 à O9), `tests/e2e/portal.spec.ts` (O4 sur bureau, O5 à Entrée et Espace, O6, O7 en largeur, O10). O11 : aucune couleur nouvelle, jetons existants seulement ; lint N8 vert.
+
+### L.7 Fiche (lot 23, v2.20.0)
+
+**Clan dans l'en-tête** : si `clanUrl(clan)` ≠ null, le surtitre du clan (pastille + nom, annexe G) devient un `ExternalLink` vers la page du clan, avec l'icône externe après le nom et `aria-label` « Clan du Crabe : page du clan sur le portail (nouvel onglet) ». Sinon, il reste du texte.
+
+**Bloc Sorts** (shugenja, annexe F) :
+- Dans le titre du bloc, à droite : lien « Grimoire » + icône externe → `PORTAL.grimoire`.
+- Sur chaque ligne de sort, bouton-lien icône seule (zone 44 × 44 px, icône externe 18 px, `--accent-ink`, survol `--accent-pale`) → `spellUrl(nom du sort)`, `aria-label` « <nom> dans le grimoire (nouvel onglet) ».
+- Note sous la liste (`--muted`, 12 px) : « Chaque lien ouvre le grimoire avec le nom du sort en recherche. »
+- En édition, les liens restent ; ils ne remplacent aucun contrôle existant.
+
+### L.8 Aide de jeu (lot 23, v2.20.0)
+
+- Pour les situations qui ont des liens, un **encadré compact** s'affiche **à droite des actions** sur bureau (grille 1,4fr / 1fr) et **dessous** sur mobile.
+- **Pas de titre** dans l'encadré. Carte `--surface`, bordure `--line`, padding vertical réduit (2 px, les lignes portent leur propre espacement). Une ligne par lien : titre `--accent-ink` en gras, description `--muted` 12 px, icône externe à droite ; séparateur `--line` entre les lignes ; hauteur ≥ 44 px. `aria-label` de l'encadré : « Liens vers le portail ».
+- Correspondance (à relier aux identifiants réels des situations dans le code) :
+
+| Situation | Liens |
+|---|---|
+| Combat (et duel ou escarmouche s'ils existent) | Mémento de combat : « Round d'escarmouche, postures, duel Iaijutsu » |
+| Cour | Étiquette & coutumes : « Castes, cadeaux, cérémonie du thé » ; Bushido & honneur : « Vertus, gains et pertes d'honneur » |
+| Autres situations | Pas d'encadré, la mise en page reste celle d'aujourd'hui |
+
+- La table vit dans `src/rules/portal.ts` (`SITUATION_LINKS: Record<SituationId, { url, title, desc }[]>`).
+
+### L.9 Tests du lot 23
+
+| ID | Cas | Attendu |
+|---|---|---|
+| O12 | En-tête, fiche Crabe | Le nom du clan est un lien vers `clans/crabe.html` avec icône ; fiche Araignée : texte simple |
+| O13 | Fiche shugenja (`exemple-shugenja.json`) | Lien « Grimoire » dans le titre du bloc ; un lien par sort vers `?q=Sentir`, `?q=Frappe%20de%20jade` |
+| O14 | Fiche bushi | Aucun lien de sort (pas de bloc Sorts) |
+| O15 | Aide de jeu, Combat puis Cour | 1 lien puis 2 liens, sans titre d'encadré ; autre situation : pas d'encadré |
+| O16 | Aide de jeu à 390 px | Encadré sous les actions ; les onglets de situation tiennent toujours sur une ligne (§7) |
+| O17 | Consultation | Tous les liens présents et actifs |

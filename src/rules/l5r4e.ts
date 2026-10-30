@@ -273,17 +273,18 @@ export const DUEL_WEAPON_PATTERN = /katana|wakizashi|ken|sabre/i;
 /** Évaluation en duel : 10 + 5 × Rang adverse. */
 export const DUEL_ASSESSMENT = { base: 10, perRank: 5 } as const;
 
-/** Clans : clés normalisées (sans accents ni casse) et couleurs d'accent ; `ink*` : même teinte pour le texte (annexe I.1.4). */
-export interface ClanInfo { id: string; label: string; light: string; inkLight: string; dark: string; inkDark: string }
+/** Clans : clés normalisées (sans accents ni casse) et couleurs d'accent ; `ink*` : même teinte pour le texte (annexe I.1.4) ;
+ * `portalSlug` : page du clan sur le portail de la campagne (annexe L.1), absent si le portail n'en a pas. */
+export interface ClanInfo { id: string; label: string; light: string; inkLight: string; dark: string; inkDark: string; portalSlug?: string }
 export const CLANS: readonly ClanInfo[] = [
-  { id: "crabe", label: "Clan du Crabe", light: "#3d5a73", inkLight: "#374754", dark: "#8fb0cc", inkDark: "#a1bbd0" },
-  { id: "grue", label: "Clan de la Grue", light: "#2f7fb5", inkLight: "#345f7d", dark: "#8cc4ea", inkDark: "#9fcbe8" },
-  { id: "dragon", label: "Clan du Dragon", light: "#2f7a45", inkLight: "#335b37", dark: "#7fcb93", inkDark: "#96d1a2" },
-  { id: "licorne", label: "Clan de la Licorne", light: "#6b3fa0", inkLight: "#533971", dark: "#bb9ae6", inkDark: "#c4a9e6" },
-  { id: "lion", label: "Clan du Lion", light: "#a87b0c", inkLight: "#795c20", dark: "#e6bf55", inkDark: "#e6c776" },
-  { id: "mante", label: "Clan de la Mante", light: "#1f8073", inkLight: "#2e5f54", dark: "#6fd0c1", inkDark: "#8bd5c7" },
-  { id: "phenix", label: "Clan du Phénix", light: "#c25a14", inkLight: "#8a4921", dark: "#f0a066", inkDark: "#f0ae80" },
-  { id: "scorpion", label: "Clan du Scorpion", light: "#a82828", inkLight: "#7b2d26", dark: "#f07a7a", inkDark: "#f1918e" },
+  { id: "crabe", label: "Clan du Crabe", light: "#3d5a73", inkLight: "#374754", dark: "#8fb0cc", inkDark: "#a1bbd0", portalSlug: "crabe" },
+  { id: "grue", label: "Clan de la Grue", light: "#2f7fb5", inkLight: "#345f7d", dark: "#8cc4ea", inkDark: "#9fcbe8", portalSlug: "grue" },
+  { id: "dragon", label: "Clan du Dragon", light: "#2f7a45", inkLight: "#335b37", dark: "#7fcb93", inkDark: "#96d1a2", portalSlug: "dragon" },
+  { id: "licorne", label: "Clan de la Licorne", light: "#6b3fa0", inkLight: "#533971", dark: "#bb9ae6", inkDark: "#c4a9e6", portalSlug: "licorne" },
+  { id: "lion", label: "Clan du Lion", light: "#a87b0c", inkLight: "#795c20", dark: "#e6bf55", inkDark: "#e6c776", portalSlug: "lion" },
+  { id: "mante", label: "Clan de la Mante", light: "#1f8073", inkLight: "#2e5f54", dark: "#6fd0c1", inkDark: "#8bd5c7", portalSlug: "mante" },
+  { id: "phenix", label: "Clan du Phénix", light: "#c25a14", inkLight: "#8a4921", dark: "#f0a066", inkDark: "#f0ae80", portalSlug: "phenix" },
+  { id: "scorpion", label: "Clan du Scorpion", light: "#a82828", inkLight: "#7b2d26", dark: "#f07a7a", inkDark: "#f1918e", portalSlug: "scorpion" },
   { id: "araignee", label: "Clan de l'Araignée", light: "#4a4a4a", inkLight: "#3e3d3a", dark: "#b5b5b5", inkDark: "#bfbebd" },
   { id: "imperial", label: "Familles impériales", light: "#8a6d12", inkLight: "#66531f", dark: "#dcc06a", inkDark: "#dec884" },
 ];

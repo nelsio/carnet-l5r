@@ -9,7 +9,7 @@ const pageUrl = pathToFileURL(resolve("dist/carnet-l5r.html")).href;
 /** Ouvre le build et crée une fiche avec Kenjutsu et un katana : attaques, manœuvres et dégâts. */
 async function start(page: Page) {
   await page.goto(pageUrl);
-  await page.getByRole("button", { name: "Créer mon personnage" }).click();
+  await page.getByRole("button", { name: "Nouvelle fiche vierge" }).click();
   await page.getByRole("button", { name: "Terminer : Identité & réputation" }).click();
   await page.getByRole("button", { name: "Edit : Compétences" }).click();
   await page.getByRole("button", { name: "+ Compétence" }).click();
@@ -389,14 +389,15 @@ test.describe("M13 à 360 px de large", () => {
 
 test.describe("M11 : en-tête à 360 px de large", () => {
   test.use({ viewport: { width: 360, height: 740 } });
-  test("H7 : sceau de 52 px ; Bibliothèque, Lanceur de dés et Thème en icônes de 40 px sous le nom, à gauche, libellés avec l'état", async ({ page }) => {
+  test("H7 : sceau de 52 px ; Bibliothèque, Lanceur de dés, Thème et Ressources en icônes de 40 px sous le nom, à gauche, libellés avec l'état", async ({ page }) => {
     const buttons = [
       page.getByRole("button", { name: "Bibliothèque", exact: true }),
       page.getByRole("button", { name: "Lanceur de dés : affiché" }),
       page.getByRole("button", { name: "Thème : auto" }),
+      page.getByRole("button", { name: "Ressources" }),
     ];
-    // Multiplicateur de blessures masqué (annexe E.19 S6) : 3 icônes, la Bibliothèque gardée à côté du sceau (annexe G.6).
-    await expect(page.locator("header.top .theme-btn")).toHaveCount(3);
+    // Multiplicateur de blessures masqué (annexe E.19 S6) : 4 icônes, la Bibliothèque gardée à côté du sceau (annexe G.6), Ressources en dernier (annexe L.2, O6).
+    await expect(page.locator("header.top .theme-btn")).toHaveCount(4);
     const seal = (await page.getByRole("button", { name: "Carnet de Rokugan — ouvrir la bibliothèque" }).boundingBox())!;
     const who = (await page.locator("header.top .who").boundingBox())!;
     // Boîte du sceau tourné de 3° : un peu plus de 52 px.
