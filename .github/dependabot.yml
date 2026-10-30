@@ -5,7 +5,19 @@ updates:
     schedule:
       interval: monthly
     open-pull-requests-limit: 5
+    ignore:
+      # typescript-eslint 8 exige typescript < 6.1 : à lever quand il acceptera la 7.
+      - dependency-name: typescript
+        update-types:
+          - version-update:semver-major
     groups:
+      # react, react-dom et leurs types doivent monter ensemble (dépendances croisées).
+      react:
+        patterns:
+          - react
+          - react-dom
+          - "@types/react"
+          - "@types/react-dom"
       npm-mineures:
         update-types:
           - minor
