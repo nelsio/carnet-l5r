@@ -6,11 +6,11 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document.
 
-**État au 28/10/2026 :** version **v2.13.1**, lots 1 à 14 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
+**État au 30/10/2026 :** version **v2.15.0**, lots 1 à 18 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
 
 **Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie), F (lot 13 : shugenja et Magie), G (lot 14 : nom de l'outil dans l'en-tête), H (lots 15 et 16 : dépôt GitHub et correctifs), I (lots 17 à 19 : couleurs, Anneaux, sélecteurs), J (lot 20 : localisation).
 
-**Prochains lots (29/10/2026) :** 15 → 20, dans l'ordre, annexes H, I et J (à livrer).
+**Prochains lots (30/10/2026) :** 19 → 20, dans l'ordre, annexes I.3 et J (à livrer).
 
 ---
 
@@ -572,7 +572,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 15. **v2.13.2 — fichiers du dépôt GitHub** : annexe H.1 à H.4 (**livrée**, écarts en H.11). Licence MIT, contribution, code de conduite, sécurité, `CHANGELOG.md`, modèles d'issue et de PR, Dependabot, `.editorconfig` → cas R1 à R4. Code applicatif inchangé (sauf `package.json`).
 16. **v2.13.3 — correctifs** : annexe H.5 à H.8 (**livrée**, écarts en H.12). Notation `XgY` partout à l'affichage (`formatDR`, données en `g`), boutons en trop et incohérences (relevé X1 à X6, captures avant / après) → cas K1 à K8.
 17. **v2.14.0 — couleurs** : annexe I.1, **remplace le §6.4**. Jetons `--surface-2`, `--accent-ink`, `--on-accent`, couleurs sémantiques `--danger` / `--ok` / `--warn`, jetons `--ring-*`, `theme-color` et thème sans flash (**livrée**, écarts en I.6) → cas N1 à N12.
-18. **v2.15.0 — bloc Anneaux « Ensō »** : annexe I.2, CSS seul (`reference/anneaux-enso.css`) → cas A1 à A8.
+18. **v2.15.0 — bloc Anneaux « Ensō »** : annexe I.2, CSS seul (`reference/anneaux-enso.css`) (**livrée**, écarts en I.7) → cas A1 à A8.
 19. **v2.16.0 — sélecteurs** : annexe I.3. Sélecteurs `appearance: base-select` (`reference/selecteurs.css`), panneau Posture en menu déroulant sans « i » → cas D1 à D10 ; E12 et M10 adaptés.
 20. **v2.17.0 — localisation** : annexe J. Français (référence) et anglais, sélecteur `FR · EN` dans le pied de page, dictionnaires typés sans dépendance → cas I1 à I13.
 21. **À définir** : kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts (fichier personnel importable, pas dans le dépôt), compteurs « N fois par séance » (D-g).
@@ -1665,7 +1665,7 @@ Les points P-H2, P-H3, P-H5 et P-H6 du handoff d'origine portent sur les langues
 
 ## Annexe I — Lots 17 à 19 : couleurs, Anneaux, sélecteurs (v2.14.0 à v2.16.0)
 
-Statut : lot 17 **livré** (écarts en I.6), lots 18 et 19 **à livrer**, maquettes validées (artifacts « Anneaux de la fiche », proposition B, et « Sélecteurs du Carnet », hors dépôt). Sources : `HANDOFF-colors.md`, `handoff-ringstyle.md`, `handoff-selectors.md`. Trois lots, une PR chacun, dans l'ordre : les Anneaux et les sélecteurs utilisent les jetons du lot 17. Ne touche pas aux données de fiche : pas de migration de schéma. La typographie et la mise en page ne changent pas, sauf le bloc Anneaux (I.2) et le panneau Posture (I.3).
+Statut : lots 17 et 18 **livrés** (écarts en I.6 et I.7), lot 19 **à livrer**, maquettes validées (artifacts « Anneaux de la fiche », proposition B, et « Sélecteurs du Carnet », hors dépôt). Sources : `HANDOFF-colors.md`, `handoff-ringstyle.md`, `handoff-selectors.md`. Trois lots, une PR chacun, dans l'ordre : les Anneaux et les sélecteurs utilisent les jetons du lot 17. Ne touche pas aux données de fiche : pas de migration de schéma. La typographie et la mise en page ne changent pas, sauf le bloc Anneaux (I.2) et le panneau Posture (I.3).
 
 | Lot | Version | Contenu |
 |---|---|---|
@@ -2035,6 +2035,11 @@ S1 à S10 du handoff d'origine renommés **D1 à D10** (S1 à S5 existent deux f
 - **Jetons gardés** : `--sunk` sombre (`#1c1e21`) inchangé comme prévu ; `color-mix` des badges d'Anneau (`.b-cocher`, `.b-rappel`, `.tag.el`) gardés en `srgb`.
 - **N7** testé en Playwright (bordures calculées de la barre d'état, bureau et 390 px, clair et sombre) ; **N8** dans Vitest (`tests/colors.spec.ts`) sur tous les `.css` de `src/ui` ; **N9** relève le fond à la première image. Les colonnes « Accent-ink » sont aussi vérifiées contre la formule de mélange (±2 par canal).
 - **Tests existants modifiés** : U3 (`ui/app`, variables `--clan-*`), couleur de clan (`core.engine`, champs `inkLight` / `inkDark`), E8 (`e2e/storage`, `--bg` sombre `#26252a`).
+
+### I.7 Écarts de mise en œuvre (v2.15.0)
+- **CSS fusionné, pas ajouté** : les surcharges de `reference/anneaux-enso.css` sont fondues dans les règles `.ring` existantes de `styles.css` (plus de `border-top`, `padding-top` à 18 px, `.rv` à 26 px) au lieu d'être recopiées après. Rendu identique, une seule source par propriété.
+- **Masques sur `:root`** : `--brush` et `--enso` sont déclarés dans le premier bloc de thème (`:root`), pas sur `.ring::after` / `.rv::before`. Un second bloc `:root` aurait remplacé le premier dans l'analyse de `tests/colors.spec.ts` ; les data URI ne contiennent ni `;` ni couleur. Le lot 19 réutilise `var(--enso)` sans recopier le tracé.
+- **Tests** : A1 à A6 et A8 en Playwright (`tests/e2e/rings.spec.ts`, Chromium) : jsdom ne calcule pas les pseudo-éléments, donc A6 (`::before`) ne peut pas tourner dans Vitest. « Kanji entier » est vérifié par la taille de police calculée (≤ plus petit côté de la carte − 8 px) ; A5 par la largeur du texte « 10 » (≤ diamètre − 20 px). A7 est le lint N8 existant. Les captures (deux thèmes × 1200 et 390 px, bureau étroit 760 px, édition, valeur 10) sont écrites dans `test-results/anneaux/` (hors dépôt).
 
 ---
 
