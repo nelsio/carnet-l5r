@@ -2641,3 +2641,11 @@ export const CARNET_LINKS = {
 | V6 | Navigateur : pied de page sur les quatre écrans, lien « Lire le guide » |
 | V7 | 390 px : pas de défilement horizontal, trois liens visibles sous le nom, pied non recouvert par la barre d'onglets |
 | V8 | Contrastes ≥ 4,5:1 : badge de version sur fond (deux thèmes, tous les clans), kanji du sceau |
+
+### M.5 Lot 28 : sécurité, `sharp` 0.35.5 (v2.21.3)
+
+Trois alertes Dependabot hautes visaient `sharp` 0.33.5 (failles de libvips, libheif et librsvg, corrigées en 0.35.0, 0.35.4 et 0.35.5).
+
+- **`sharp`** : `^0.33.5` → `^0.35.5` (devDependency, voir M.1 et M.2). Il ne sert qu'à `scripts/screenshots.mjs` et n'entre pas dans le build : aucun effet sur l'application livrée.
+- **Vérification** : `npm run build && npm run screenshots` produit les trois captures sans erreur ; `npm run lint` passe ; `npm audit` ne signale plus rien.
+- **Captures du README** : inchangées (le lot ne touche pas à l'interface).

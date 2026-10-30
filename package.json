@@ -1,6 +1,6 @@
 {
   "name": "carnet-l5r",
-  "version": "2.21.2",
+  "version": "2.21.3",
   "private": true,
   "description": "Carnet de Rokugan : compagnon de campagne pour L5R 4e édition",
   "license": "MIT",
@@ -44,7 +44,7 @@
     "fake-indexeddb": "^6.2.6",
     "globals": "^17.13.0",
     "jsdom": "^30.1.3",
-    "sharp": "^0.33.5",
+    "sharp": "^0.35.5",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.72.1",
     "vite": "^8.3.5",

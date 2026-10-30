@@ -6,6 +6,11 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.21.3] - 2026-10-30
+
+### Sécurité
+- Outil de captures du README : `sharp` passe de 0.33.5 à 0.35.5 (failles de libvips, libheif et librsvg). L'application elle-même n'est pas concernée.
+
 ## [2.21.2] - 2026-10-30
 
 ### Modifié
@@ -242,7 +247,8 @@ Simples liens ouverts dans un nouvel onglet : le Carnet ne fait toujours aucune 
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.21.2...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.21.3...HEAD
+[2.21.3]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.21.3
 [2.21.2]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.21.2
 [2.21.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.21.1
 [2.21.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.21.0
