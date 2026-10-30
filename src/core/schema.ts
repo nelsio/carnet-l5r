@@ -163,6 +163,8 @@ export const characterShape = {
   /** Rang d'école ; null = Rang d'Insight. */
   schoolRank: int(1, 10).nullable().optional(),
   insightRank: int(1, 10),
+  /** Facultatif : points d'Insight accordés hors calcul (avantage, technique, MJ), annexe K ; absent = 0. */
+  insightBonus: int(-50, 200).optional(),
   honor: reputation(),
   glory: reputation(),
   status: reputation(),

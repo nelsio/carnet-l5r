@@ -6,11 +6,11 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document.
 
-**État au 30/10/2026 :** version **v2.17.0**, lots 1 à 20 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
+**État au 30/10/2026 :** version **v2.18.0**, lots 1 à 21 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
 
-**Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie), F (lot 13 : shugenja et Magie), G (lot 14 : nom de l'outil dans l'en-tête), H (lots 15 et 16 : dépôt GitHub et correctifs), I (lots 17 à 19 : couleurs, Anneaux, sélecteurs), J (lot 20 : correctifs et retouches).
+**Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie), F (lot 13 : shugenja et Magie), G (lot 14 : nom de l'outil dans l'en-tête), H (lots 15 et 16 : dépôt GitHub et correctifs), I (lots 17 à 19 : couleurs, Anneaux, sélecteurs), J (lot 20 : correctifs et retouches), K (lot 21 : points d'Insight).
 
-**Prochain lot (30/10/2026) :** à définir (§11, point 21). Le lot 20 (annexe J, correctifs et retouches) est livré ; la localisation est reportée.
+**Prochain lot (30/10/2026) :** à définir (§11, point 22). Le lot 21 (annexe K, points d'Insight) est livré ; la localisation est reportée.
 
 ---
 
@@ -575,7 +575,8 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 18. **v2.15.0 — bloc Anneaux « Ensō »** : annexe I.2, CSS seul (`reference/anneaux-enso.css`) (**livrée**, écarts en I.7) → cas A1 à A8.
 19. **v2.16.0 — sélecteurs** : annexe I.3. Sélecteurs `appearance: base-select` (`reference/selecteurs.css`), panneau Posture en menu déroulant sans « i » (**livrée**, écarts en I.8) → cas D1 à D10 ; E12 et M10 adaptés.
 20. **v2.17.0 — correctifs et retouches** (**livrée**, écarts en J.14) : annexe J (retours de jeu du 30/10/2026). Bloc Armes en Edit lisible sur mobile, police du bloc Identité, bouton de technique sans « sort », bonus de jet sans catalogue (modèles par source), modèles de fiche shugenja et courtisan, panneau Vide en menu déroulant, lanceur de dés affiché par défaut, sorts avant les attaques en escarmouche, champ « Dés lancés ± » retiré, Min · Moy. · Max centrés dans le lanceur → cas Q1 à Q19.
-21. **À définir** : **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts (fichier personnel importable, pas dans le dépôt), compteurs « N fois par séance » (D-g).
+21. **v2.18.0 — points d'Insight** (**livrée**, écarts en K.5) : annexe K. Points d'Insight calculés et Rang suggéré dans le bloc Identité, champ facultatif `insightBonus`, étiquette d'écart avec le rang saisi (qui fait foi) → cas I1 à I9, K1.
+22. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts (fichier personnel importable, pas dans le dépôt), compteurs « N fois par séance » (D-g).
 
 ---
 
@@ -1497,7 +1498,7 @@ La règle globale `button{font:inherit}` (0,0,1) est plus faible que `.seal` (0,
 
 ## Annexe H — Lots 15 et 16 : dépôt GitHub et correctifs (v2.13.2, v2.13.3)
 
-Statut : lot 15 **livré** (écarts en H.11), lot 16 **livré** (écarts en H.12). Source : `handoff-lots-15-17.md` (29/10/2026), audit fait sur `main` au commit `dfaac10` (v2.13.1) ; les numéros de ligne cités peuvent avoir bougé, se fier aux extraits. Ordre des lots tranché le 29/10/2026 : **15 → 16 → 17 → 18 → 19 → 20** (visuel avant, annexe I ; langues ensuite, **reportées** le 30/10/2026, §11 point 21). Une PR par lot, CI verte, tag posé après merge (procédure du README).
+Statut : lot 15 **livré** (écarts en H.11), lot 16 **livré** (écarts en H.12). Source : `handoff-lots-15-17.md` (29/10/2026), audit fait sur `main` au commit `dfaac10` (v2.13.1) ; les numéros de ligne cités peuvent avoir bougé, se fier aux extraits. Ordre des lots tranché le 29/10/2026 : **15 → 16 → 17 → 18 → 19 → 20** (visuel avant, annexe I ; langues ensuite, **reportées** le 30/10/2026, §11 point 22). Une PR par lot, CI verte, tag posé après merge (procédure du README).
 
 | Lot | Version | Contenu | Code applicatif touché |
 |---|---|---|---|
@@ -1530,7 +1531,7 @@ Statut : lot 15 **livré** (écarts en H.11), lot 16 **livré** (écarts en H.12
 7. **Branches et commits** : une branche par lot ou correctif (`lot-16-correctifs`, `fix-…`) ; messages en français, à l'impératif ; PR vers `main`.
 8. **Versions** : SemVer, procédure de publication du README. Un changement du format de fiche incrémente `schemaVersion` et ajoute une migration testée.
 9. **Textes du livre** : ne jamais recopier les textes des livres L5R (techniques, sorts, descriptions). Résumés courts et références de page seulement.
-10. **Traductions** : prévues avec la localisation, reportée (§11, point 21).
+10. **Traductions** : prévues avec la localisation, reportée (§11, point 22).
 
 ### H.3 Lot 15 — fichiers modifiés
 - `package.json` : `"license": "MIT"`, `"repository": { "type": "git", "url": "https://github.com/nelsio/carnet-l5r" }`, `"homepage": "https://nelsio.github.io/carnet-l5r/"`. Garder `"private": true` (empêche une publication npm par erreur).
@@ -1560,7 +1561,7 @@ Statut : lot 15 **livré** (écarts en H.11), lot 16 **livré** (écarts en H.12
      return m ? `${Number(m[1])}${letter}${Number(m[2])}` : s.trim();
    }
    ```
-   Le second paramètre servira à la localisation (`g` en français, `k` en anglais), reportée (§11, point 21).
+   Le second paramètre servira à la localisation (`g` en français, `k` en anglais), reportée (§11, point 22).
 2. **Appliquer `formatDR` à chaque affichage** d'une VD. Relevé de l'audit :
 
    | Fichier | Endroit |
@@ -1604,7 +1605,7 @@ Ne sont **pas** en trop (décisions de Nelson, à garder) :
 | X1 | `Sheet.tsx`, `DeleteCharacter` (bloc Identité en Edit) | « Supprimer ce personnage… » reste affiché à côté de « Confirmer la suppression » ; pas de bouton Annuler ; couleur en style inline (`style={{ color: "var(--bad)" }}`). Diffère du motif de la Bibliothèque. | Même motif que la Bibliothèque : au clic, remplacer le bouton par « Supprimer « Nom » ? » + **« Supprimer définitivement »** (`btn sm danger`) + **« Annuler »**. Plus de style inline. |
 | X2 | `Roller.tsx`, `SpellCastLine` en consultation | « Réussi » et « Raté » affichés mais `disabled` : sans effet en consultation. | En consultation, ne pas les afficher. Garder le libellé « Jet aux vrais dés » seulement si un résultat est montré. |
 | X3 | `FileActions.tsx` | `<ImportButton label="Importer un JSON…" />` répète la valeur par défaut. | Retirer la prop (nettoyage). |
-| X4 | `Library.tsx` et `Stats.tsx` | `"fr-FR"` en dur (`Intl.DateTimeFormat`, `toLocaleString`). | Sans effet visible au lot 16. Passera par la langue courante avec la localisation, reportée (§11, point 21). Le noter ici, ne rien changer. |
+| X4 | `Library.tsx` et `Stats.tsx` | `"fr-FR"` en dur (`Intl.DateTimeFormat`, `toLocaleString`). | Sans effet visible au lot 16. Passera par la langue courante avec la localisation, reportée (§11, point 22). Le noter ici, ne rien changer. |
 | X5 | `Sheet.tsx`, Identité | Libellé « Rang (Insight) » et indication « = Insight (n) » : terme anglais isolé dans l'interface française. | Point P-H4 : défaut « Rang d'Insight » partout (déjà utilisé dans `l5r4e.ts`). |
 | X6 | `Roller.tsx`, `MeditationSuccess` en consultation | « Réussi : +n point de Vide » affiché mais `disabled` : sans effet en consultation (même cas que X2). | En consultation, ne pas l'afficher ; le rappel « Vide n/max. » reste. |
 | X7… | *À compléter par Nelson* | | |
@@ -1629,10 +1630,10 @@ Ne sont **pas** en trop (décisions de Nelson, à garder) :
 | P-H1 | Licence du code | **MIT**. Alternative : GPL-3.0 si tu veux que les forks restent libres. |
 | P-H4 | « Insight » dans l'interface française | « Rang d'Insight » partout (X5). Alternative : un terme français de ton choix. |
 
-Les points P-H2, P-H3, P-H5 et P-H6 du handoff d'origine portent sur les langues : ils suivent la localisation, reportée (§11, point 21).
+Les points P-H2, P-H3, P-H5 et P-H6 du handoff d'origine portent sur les langues : ils suivent la localisation, reportée (§11, point 22).
 
 ### H.10 Corrections du handoff d'origine
-- **Numéros de lot** : le handoff prévoyait les langues au lot 17 (v2.14.0). Le visuel (couleurs, Anneaux, sélecteurs, annexe I) passe avant : les langues devenaient le lot 20 (v2.17.0) ; elles sont **reportées** le 30/10/2026 (§11, point 21) et le lot 20 devient correctifs et retouches (annexe J).
+- **Numéros de lot** : le handoff prévoyait les langues au lot 17 (v2.14.0). Le visuel (couleurs, Anneaux, sélecteurs, annexe I) passe avant : les langues devenaient le lot 20 (v2.17.0) ; elles sont **reportées** le 30/10/2026 (§11, point 22) et le lot 20 devient correctifs et retouches (annexe J).
 - **Identifiants** : relevé B1 à B6 renommé **X1 à X6** (B1 à B11 existent déjà, §10.1 bis) ; tests de langue L1 à L13 renommés **I1 à I13** (L1 à L28 existent, E.10). R1 à R4 et K1 à K8 sont gardés.
 - **« lint C8 »** dans `CONTRIBUTING.md` : C8 est ici le catalogue d'armes (E.2) ; le lint des couleurs s'appelle **N8** (annexe I.1) et n'existe qu'à partir du lot 17.
 - `DISARM_DAMAGE` vaut aujourd'hui `"2k1"` (le handoff donnait directement la valeur cible). `formatDR` reçoit dès le lot 16 son paramètre `letter`.
@@ -2048,7 +2049,7 @@ S1 à S10 du handoff d'origine renommés **D1 à D10** (S1 à S5 existent deux f
 
 Statut : **à livrer**. Retours de jeu de Nelson du 30/10/2026, audit fait sur `main` au commit `783c009` (v2.16.0). Les numéros de ligne cités peuvent avoir bougé : se fier aux extraits.
 
-La **localisation** prévue ici (ex-annexe J, français + anglais) est **reportée** : retirée du plan, notée au §11 point 21. `formatDR(s, letter)` garde son second paramètre, sans autre usage pour l'instant.
+La **localisation** prévue ici (ex-annexe J, français + anglais) est **reportée** : retirée du plan, notée au §11 point 22. `formatDR(s, letter)` garde son second paramètre, sans autre usage pour l'instant.
 
 Une PR, CI verte, captures « avant » et « après » (bureau 1280 px et 390 px, clair et sombre) des vues touchées, tag `v2.17.0` après merge. Version **mineure** : nouveaux modèles de fiche et nouveau comportement par défaut du lanceur. **Pas de changement de format de fiche** (`schemaVersion` reste 2).
 
@@ -2284,3 +2285,51 @@ Vaut pour tous les lanceurs (compétences, dégâts, sorts) et pour la case « R
 
 ### Note : localisation reportée
 L'ancienne annexe J (lot 20, français + anglais, `src/i18n`, tests I1 à I13, points P-J1 à P-J4 sur les langues) est retirée du plan le 30/10/2026. Si elle revient, elle repart de `handoff/handoff-lots-15-17.md` (lot 17 d'origine, projet claude.ai) avec de nouveaux numéros de lot, d'identifiants de test et de points ouverts.
+
+## Annexe K — Lot 21 : points d'Insight calculés (v2.18.0)
+
+Statut : **livré**. Source : `handoff-insight.md` (30/10/2026), intitulé « Lot 18 » : renuméroté **lot 21** (le lot 18 est le bloc Anneaux, v2.15.0) ; la version v2.18.0 est inchangée. Une PR, version mineure (ajout compatible).
+
+### K.1 Constat (v2.17.0)
+- `insightRank` est un entier saisi à la main (1 à 10) dans le bloc Identité, sans lien avec les Traits ni les compétences.
+- `xp.total` et `xp.spent` sont saisis à la main ; « XP libre » vaut `total − spent`.
+- Aucun calcul des points d'Insight ni des seuils de rang : le rang affiché peut être incohérent avec la fiche.
+
+### K.2 Règle (livre de base 4e)
+- **Points d'Insight** = (Terre + Eau + Feu + Air + Vide) × 10 + somme des rangs de toutes les compétences. Chaque Anneau vaut le minimum de ses deux Traits (`rings(c)`), le Vide vaut `voidRing`. Spécialisations, avantages, sorts et techniques ne comptent pas.
+- **Rang suggéré** : moins de 150 → 1 ; à partir de 150 → `min(10, 2 + floor((points − 150) / 25))` (Rang 2 de 150 à 174, Rang 3 de 175 à 199, Rang 10 à 350 et plus).
+- **Bonus du MJ** : avantages, techniques ou décisions du MJ peuvent ajouter des points hors calcul.
+
+### K.3 Mise en œuvre
+- `src/core/insight.ts` : `insightPoints(c)` = Anneaux × 10 + Σ `skills[].rank` + `insightBonus ?? 0` ; `suggestedInsightRank(points)`.
+- `src/rules/l5r4e.ts` : `INSIGHT = { ringMultiplier: 10, firstThreshold: 150, step: 25, maxRank: 10 }`.
+- Schéma : champ **facultatif** `insightBonus: int(-50, 200)`, absent = 0. `SCHEMA_VERSION` inchangé ; fusion à l'import par `characterShape`, comme les autres champs scalaires.
+- `insightRank` **reste saisi et fait foi** (initiative, soins, Feinte, rang d'école) ; le calcul ne le modifie jamais.
+- Fiche, bloc Identité : en lecture, ligne « Insight » `125 · Rang 1` (`sheet-insight`) ; en Edit, « Calculé : 125 pts → Rang 1 » sous « Rang d'Insight » (`insight-computed`) et champ « Bonus d'Insight (MJ) » (`OptionalNumber`, −50 à 200). Écart : étiquette `.tag.warn` « Rang saisi 3 · calculé 1 » (`insight-mismatch`), en lecture et en Edit ; ni blocage, ni correction, ni bouton « appliquer ».
+
+### K.4 Tests
+| # | Cas | Attendu |
+|---|-----|---------|
+| I1 | `reference/perso-test-ecoles.json` (Anneaux 2/3/2/2/2) | 119 pts, Rang 1 |
+| I2 | `reference/exemple-personnage.json` | 125 pts, Rang 1 |
+| I3 | Seuils 149 / 150 / 174 / 175 / 200 / 349 / 350 / 420 | 1 / 2 / 2 / 3 / 4 / 9 / 10 / 10 |
+| I4 | Un seul Trait d'une paire monté | Points inchangés |
+| I5 | 2 spécialisations ajoutées | Points inchangés |
+| I6 | `insightBonus: 10` sur I2 | 135 pts |
+| I7 | Fiche sans `insightBonus` importée puis exportée | Champ absent, fiche valide |
+| I8 | `insightRank` 3 sur I2 | Badge d'écart ; initiative calculée avec 3 |
+| I9 | `insightRank` 1 sur I2 | Aucun badge |
+| K1 | E2E bureau, mobile (iPhone 13, Pixel 7) et 360 px | Ligne Insight et badge lisibles, sans débordement |
+
+Les identifiants I1 à I9 sont repris du handoff source (les I1 à I13 de la localisation reportée sont retirés du plan, voir la note de l'annexe J). Le cas E2E est nommé **K1**.
+
+### K.5 Écarts de mise en œuvre
+- Numéro de lot : 21 au lieu de 18 (voir le statut).
+- Référence de page de la règle : aucune dans le commentaire de `INSIGHT` (page non vérifiée).
+- `OptionalNumber` gagne une borne `max` (10 par défaut) pour accepter le bonus jusqu'à 200.
+- `Field` gagne une indication `hint`, affichée sous la saisie hors du libellé : le nom accessible du champ reste « Rang d'Insight ».
+- Tests : `tests/core.insight.spec.ts` (I1 à I8, bornes et fusion), `tests/ui/insight.spec.tsx` (lecture, I8, I9, bonus du MJ), `tests/e2e/insight.spec.ts` et K1 dans `tests/e2e/mobile.spec.ts`. Aucun test existant modifié.
+
+### K.6 Hors périmètre
+- Aucun lien avec l'XP : le coût des achats n'est ni calculé ni vérifié (lot à part, journal d'achats).
+- Pas de mise à jour automatique de `insightRank`.

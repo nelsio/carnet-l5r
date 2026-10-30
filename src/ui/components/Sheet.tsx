@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
 import {
-  activeEffects, affinityOf, armorSheet, attackTrait, catalogGap, catalogWeapon, createSpell, dailyHealing, deficiencyOf, isShugenja, reminderText, computePool, defaultModifiers, isRanged, formatDR, parseDR, parseWeaponKeywords, rings, ROLL_TRAITS, schoolOf,
+  activeEffects, affinityOf, armorSheet, insightPoints, suggestedInsightRank, attackTrait, catalogGap, catalogWeapon, createSpell, dailyHealing, deficiencyOf, isShugenja, reminderText, computePool, defaultModifiers, isRanged, formatDR, parseDR, parseWeaponKeywords, rings, ROLL_TRAITS, schoolOf,
   findSchool, schoolRankOf, schoolsByClan, sortSpells, SPELL_ELEMENTS, SPELL_RINGS, spellcastingOf, spellRaises, spellTn, suggestSchool, techniqueCategories, vocabularyChanges, weaponKeywords,
   type ArmorPart, type Character, type PoolAction, type RollTrait, type TraitKey, type VocabularyChange,
 } from "@carnet/core";
@@ -129,9 +129,20 @@ function Rings() {
   );
 }
 
-/** `wide` : le champ prend toute la ligne de la grille (sélecteur de catalogue, annexe I.3). */
-function Field({ label, wide, children }: { label: string; wide?: boolean; children: ReactNode }) {
-  return <label className={wide ? "field wide" : "field"}><span className="label">{label}</span>{children}</label>;
+/**
+ * `wide` : le champ prend toute la ligne de la grille (sélecteur de catalogue, annexe I.3) ;
+ * `hint` : indication sous la saisie, hors du libellé (annexe K).
+ */
+function Field({ label, wide, hint, children }: { label: string; wide?: boolean; hint?: ReactNode; children: ReactNode }) {
+  const field = <label className={wide ? "field wide" : "field"}><span className="label">{label}</span>{children}</label>;
+  return hint ? <div className="field">{field}{hint}</div> : field;
+}
+
+/** « Rang saisi 3 · calculé 1 » quand le Rang d'Insight saisi diffère du calcul : ni blocage ni correction (annexe K). */
+function InsightMismatch({ c }: { c: Character }) {
+  const computed = suggestedInsightRank(insightPoints(c));
+  if (c.insightRank === computed) return null;
+  return <span className="tag warn" data-testid="insight-mismatch">Rang saisi {c.insightRank} · calculé {computed}</span>;
 }
 
 function Identity() {
@@ -182,7 +193,15 @@ function Identity() {
             onChange={(n) => set(["schoolRank"], n ?? null)}
           />
         </Field>
-        <Field label="Rang d'Insight">{num(["insightRank"], c.insightRank, 1, 10)}</Field>
+        <Field
+          label="Rang d'Insight"
+          hint={<span className="hint" style={{ margin: 0 }} data-testid="insight-computed">
+            Calculé : {insightPoints(c)} pts → Rang {suggestedInsightRank(insightPoints(c))} <InsightMismatch c={c} />
+          </span>}
+        >{num(["insightRank"], c.insightRank, 1, 10)}</Field>
+        <Field label="Bonus d'Insight (MJ)">
+          <OptionalNumber min={-50} max={200} value={c.insightBonus} placeholder="0" onChange={(n) => set(["insightBonus"], n)} />
+        </Field>
         <Field label="Honneur">{num(["honor"], c.honor, 0, 10, 0.1)}</Field>
         <Field label="Gloire">{num(["glory"], c.glory, 0, 10, 0.1)}</Field>
         <Field label="Statut">{num(["status"], c.status, 0, 10, 0.1)}</Field>
@@ -199,6 +218,11 @@ function Identity() {
       <div><span className="label">Gloire</span><b>{decimal(c.glory)}</b></div>
       <div><span className="label">Statut</span><b>{decimal(c.status)}</b></div>
       <div><span className="label">XP libre</span><b>{c.xp.total - c.xp.spent}</b></div>
+      <div>
+        <span className="label">Insight</span>
+        <b data-testid="sheet-insight">{insightPoints(c)} · Rang {suggestedInsightRank(insightPoints(c))}</b>
+        <InsightMismatch c={c} />
+      </div>
       <div><span className="label">Initiative</span><b className="pool" data-testid="sheet-initiative">{poolLabel(init)}</b></div>
     </div>
   );
@@ -421,17 +445,17 @@ function Weapons() {
 }
 
 /** Nombre facultatif : vide = absent. */
-function OptionalNumber({ value, onChange, min = 0, placeholder = "—", ...rest }: {
-  value: number | undefined; onChange: (n: number | undefined) => void; "aria-label"?: string; min?: number; placeholder?: string;
+function OptionalNumber({ value, onChange, min = 0, max = 10, placeholder = "—", ...rest }: {
+  value: number | undefined; onChange: (n: number | undefined) => void; "aria-label"?: string; min?: number; max?: number; placeholder?: string;
 }) {
   return (
     <input
-      {...rest} className="in" type="number" min={min} max={10} placeholder={placeholder}
+      {...rest} className="in" type="number" min={min} max={max} placeholder={placeholder}
       value={value ?? ""}
       onChange={(e) => {
         const n = Number(e.target.value);
         if (e.target.value === "") onChange(undefined);
-        else if (Number.isInteger(n) && n >= min && n <= 10) onChange(n);
+        else if (Number.isInteger(n) && n >= min && n <= max) onChange(n);
       }}
     />
   );

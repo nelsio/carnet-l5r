@@ -6,6 +6,13 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.18.0] - 2026-10-30
+
+### Ajouté
+- Points d'Insight calculés dans le bloc Identité : Anneaux × 10 plus les rangs de compétence, avec le Rang d'Insight correspondant (`125 · Rang 1`).
+- Champ facultatif « Bonus d'Insight (MJ) » (`insightBonus` dans le JSON) pour les points accordés hors calcul.
+- Étiquette d'avertissement quand le Rang d'Insight saisi diffère du calcul ; le rang saisi reste celui de tous les calculs.
+
 ## [2.17.0] - 2026-10-30
 
 ### Ajouté
@@ -186,7 +193,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.17.0...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.18.0...HEAD
+[2.18.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.18.0
 [2.17.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.17.0
 [2.16.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.16.0
 [2.15.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.15.0
