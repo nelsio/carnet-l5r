@@ -1,13 +1,17 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { clanAccent } from "@carnet/core";
 import { CARNET_LINKS } from "../../rules/links";
-import { clanUrl, PORTAL, PORTAL_CLAN_KANJI } from "../../rules/portal";
+import { clanUrl, FORGE_JSON_OK, PORTAL, PORTAL_CLAN_KANJI } from "../../rules/portal";
 import { useStore } from "../store";
 import { ExtIcon } from "./ExternalLink";
+import { ForgePending } from "./ForgePending";
 
-interface Entry { href: string; kanji: string; title: string; desc: string }
+/** `pending` : pastille « JSON pas encore compatible » après le titre (lot 27). */
+interface Entry { href: string; kanji: string; title: string; desc: string; pending?: boolean }
 
-const CREATE: Entry[] = [{ href: PORTAL.forge, kanji: "鍛", title: "Forge de personnage", desc: "Exporte un JSON compatible avec le Carnet" }];
+const CREATE: Entry[] = [FORGE_JSON_OK
+  ? { href: PORTAL.forge, kanji: "鍛", title: "Forge de personnage", desc: "Exporte un JSON compatible avec le Carnet" }
+  : { href: PORTAL.forge, kanji: "鍛", title: "Forge de personnage", desc: "Création guidée. Pour l'instant, recopie le résultat dans une fiche vierge.", pending: true }];
 const REFERENCES: Entry[] = [
   { href: PORTAL.grimoire, kanji: "巻", title: "Grimoire", desc: "Sorts, Kihō, recherche par effet" },
   { href: PORTAL.combat, kanji: "刀", title: "Mémento de combat", desc: "Postures, duel Iaijutsu" },
@@ -84,9 +88,9 @@ export function ResourcesMenu() {
       <div className="res-group" aria-hidden="true">{title}{extra && <span className="v">v{extra.version}</span>}</div>
       {entries.map((x) => (
         <a key={x.href} role="menuitem" href={x.href} target="_blank" rel="noopener noreferrer"
-          aria-label={`${x.title} : ${x.desc} (nouvel onglet)`} onClick={() => close()}>
+          aria-label={`${x.title}${x.pending ? ", JSON pas encore compatible" : ""} : ${x.desc} (nouvel onglet)`} onClick={() => close()}>
           <span className="kj" aria-hidden="true">{x.kanji}</span>
-          <span className="t">{x.title}<span className="d">{x.desc}</span></span>
+          <span className="t">{x.title}{x.pending && <> <ForgePending /></>}<span className="d">{x.desc}</span></span>
           <ExtIcon />
         </a>
       ))}

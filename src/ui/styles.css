@@ -17,7 +17,7 @@
   --danger:#b3261e; --ok:#276b2b; --warn:#8a5800;
   --danger-pale:color-mix(in oklab,var(--danger) 14%,var(--surface));
   --ok-pale:color-mix(in oklab,var(--ok) 14%,var(--surface));
-  --warn-pale:color-mix(in oklab,var(--warn) 14%,var(--surface));
+  --warn-pale:color-mix(in oklab,var(--warn) 12%,var(--surface));
   --ring-earth:#5e6d2c; --ring-water:#245f8c; --ring-fire:#a8382a; --ring-air:#6a7f99; --ring-void:#5d4290;
   --on-ring:#ffffff;
   --seal:#a8382a; --seal-ink:#f7f3ea;
@@ -716,9 +716,9 @@ a.btn .ext{margin-left:8px}
 .start > p{margin:0}
 /* Les deux options partagent les lignes de la grille (subgrid) : en-têtes, étapes et boutons alignés et de même hauteur */
 .start-opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:14px;margin-top:16px}
-.start-opt{display:grid;grid-row:span 3;grid-template-rows:subgrid;row-gap:0;border:1px solid var(--line);border-radius:10px;padding:16px;background:var(--bg)}
+.start-opt{display:grid;grid-row:span 4;grid-template-rows:subgrid;row-gap:0;border:1px solid var(--line);border-radius:10px;padding:16px;background:var(--bg)}
 .start-opt-h{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:start}
-.start-opt-h h3{font-size:18px}
+.start-opt-h h3{font-size:18px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
 .start-opt-h p{margin:2px 0 0;font-size:14px}
 .start-opt-act{justify-self:start}
 .opt-k{display:grid;place-items:center;width:40px;height:40px;border-radius:8px;background:var(--accent-pale);color:var(--accent-ink);font:800 20px/1 var(--f-display)}
@@ -727,7 +727,16 @@ a.btn .ext{margin-left:8px}
 .steps .step-n{font:800 18px/1 var(--f-display);color:var(--accent-ink)}
 .steps .step-s{font-weight:700;font-size:14px}
 .steps .step-x{font-size:12px;color:var(--muted)}
-.templates h2{font-size:20px}
+/* Forge pas encore compatible (lot 27) : carte en pointillés, pastille, encadré 待, étape à venir */
+.start-opt.wait{border-style:dashed}
+.start-opt.wait .opt-k{background:var(--surface);border:1px solid var(--line);color:var(--muted)}
+.steps li.off{border-style:dashed;background:transparent}
+.steps li.off .step-n,.steps li.off .step-s{color:var(--muted)}
+.pend{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:999px;border:1px solid color-mix(in oklab,var(--warn) 45%,transparent);background:var(--warn-pale);color:var(--warn);font:700 11px/1.5 var(--f-body);letter-spacing:.04em;white-space:nowrap;vertical-align:2px}
+.pend::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.warnbox{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;margin-top:12px;padding:10px 12px;border-radius:8px;background:var(--warn-pale);border:1px solid color-mix(in oklab,var(--warn) 30%,transparent);font-size:13px;color:var(--ink)}
+.warnbox .wk{font:800 16px/1.2 var(--f-display);color:var(--warn)}
+.warnbox b{color:var(--warn)}.templates h2{font-size:20px}
 .templates > p{margin:2px 0 12px}
 .tpl-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .tplc{display:grid;grid-template-columns:40px 1fr;gap:10px 12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px}
@@ -759,7 +768,7 @@ a.btn .ext{margin-left:8px}
   .start-opts,.tpl-list{grid-template-columns:1fr}
   /* Une colonne : chaque option garde ses propres lignes */
   .start-opts{row-gap:14px}
-  .start-opt{grid-row:auto;grid-template-rows:auto 1fr auto}
+  .start-opt{grid-row:auto;grid-template-rows:auto auto 1fr auto}
   .start-opt.compact{grid-template-rows:auto auto}
   .steps{grid-template-columns:1fr}
   .steps li{grid-template-columns:24px 1fr;column-gap:10px}

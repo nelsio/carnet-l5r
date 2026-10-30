@@ -6,6 +6,11 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.21.2] - 2026-10-30
+
+### Modifié
+- Accueil : Fiche vierge proposée en premier ; la Forge indique que son export JSON n'est pas encore compatible. Pastille « JSON pas encore compatible » sur la Forge (Bibliothèque vide, carte « Un nouveau personnage ? », menu Ressources), avec la marche à suivre en attendant : créer le personnage sur la Forge, puis le recopier dans une fiche vierge. Les liens vers la Forge restent en place.
+
 ## [2.21.1] - 2026-10-30
 
 ### Corrigé
@@ -237,7 +242,9 @@ Simples liens ouverts dans un nouvel onglet : le Carnet ne fait toujours aucune 
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.21.0...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.21.2...HEAD
+[2.21.2]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.21.2
+[2.21.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.21.1
 [2.21.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.21.0
 [2.20.2]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.20.2
 [2.20.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.20.1

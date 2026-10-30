@@ -83,6 +83,14 @@ describe("O4 : menu Ressources", () => {
     expect(within(openMenu()).getAllByRole("menuitem")).toHaveLength(10);
   });
 
+  it("lot 27 : ligne Forge avec pastille et description « recopie »", async () => {
+    await renderApp();
+    const forge = within(openMenu()).getByRole("menuitem", { name: /^Forge de personnage/ });
+    expect(forge).toHaveAccessibleName("Forge de personnage, JSON pas encore compatible : Création guidée. Pour l'instant, recopie le résultat dans une fiche vierge. (nouvel onglet)");
+    expect(within(forge).getByText("JSON pas encore compatible")).toHaveClass("pend");
+    expect(forge).not.toHaveTextContent("Exporte un JSON compatible");
+  });
+
   it("O3 : chaque entrée est un lien externe", async () => {
     await renderApp();
     for (const a of within(openMenu()).getAllByRole("menuitem")) expectExternal(a);
@@ -134,16 +142,40 @@ describe("O7 : Bibliothèque vide", () => {
     await renderApp(null);
     const start = screen.getByRole("region", { name: "Pas encore de personnage ?" });
     expect(within(start).getByRole("button", { name: "Importer un JSON" })).toHaveClass("linkbtn");
+    expect(start).toHaveTextContent("Tu as déjà un fichier du Carnet ? Importer un JSON");
     const options = within(start).getAllByRole("article");
-    expect(options.map((o) => within(o).getByRole("heading").textContent)).toEqual(["Forger sur le portail", "Fiche vierge"]);
+    // Lot 27 : Fiche vierge d'abord, avec le bouton principal ; la Forge ensuite, bouton secondaire.
+    expect(options.map((o) => within(o).getByRole("heading").textContent)).toEqual(["Fiche vierge", "Forger sur le portail JSON pas encore compatible"]);
     for (const o of options) expect(within(o).getAllByRole("listitem")).toHaveLength(3);
-    const forge = within(options[0]!).getByRole("link", { name: "Ouvrir la Forge (nouvel onglet)" });
+    expect(within(options[0]!).getByRole("button", { name: "Nouvelle fiche vierge" })).toHaveClass("btn", "accent");
+    const forge = within(options[1]!).getByRole("link", { name: "Ouvrir la Forge (nouvel onglet)" });
     expect(forge).toHaveAttribute("href", `${PORTAL}createcharacter.html`);
-    expect(forge).toHaveClass("btn", "accent");
+    expect(forge).toHaveClass("btn");
+    expect(forge).not.toHaveClass("accent");
     expectExternal(forge);
     const discover = screen.getByRole("link", { name: "Découvrir la campagne" });
     expect(discover).toHaveAttribute("href", `${PORTAL}index.html`);
     expectExternal(discover);
+  });
+
+  it("lot 27 : Forge pas encore compatible : pastille, encadré, étape « Recopier », import à venir", async () => {
+    await renderApp(null);
+    const forge = within(screen.getByRole("region", { name: "Pas encore de personnage ?" })).getAllByRole("article")[1]!;
+    expect(forge).toHaveClass("start-opt", "wait");
+    const pend = within(forge).getByText("JSON pas encore compatible");
+    expect(pend).toHaveClass("pend");
+    expect(pend).toHaveAttribute("title", "L'export JSON de la Forge ne s'importe pas encore dans le Carnet");
+    expect(within(forge).getByRole("note")).toHaveTextContent(
+      "L'import direct arrive bientôt. Le fichier JSON de la Forge ne s'ouvre pas encore dans le Carnet. Crée ton personnage sur la Forge, puis recopie-le dans une fiche vierge.",
+    );
+    const steps = within(forge).getAllByRole("listitem");
+    expect(steps.map((s) => s.textContent)).toEqual([
+      "一ForgerClan, école, anneaux, compétences", "二RecopierDans une fiche vierge du Carnet", "三ImporterBientôt : import direct du JSON",
+    ]);
+    expect(steps[2]).toHaveClass("off");
+    const blank = within(screen.getByRole("region", { name: "Pas encore de personnage ?" })).getAllByRole("article")[0]!;
+    expect(blank).toHaveTextContent("Saisie directe dans le Carnet, depuis une fiche papier ou un personnage créé ailleurs.");
+    expect(within(blank).queryByRole("note")).toBeNull();
   });
 
   it("« Nouvelle fiche vierge » crée une fiche", async () => {
@@ -198,8 +230,16 @@ describe("O9 : Bibliothèque avec fiches", () => {
     const head = document.querySelector(".panel-head")!;
     expect(within(head as HTMLElement).getAllByRole("button").map((b) => b.textContent)).toEqual(["Importer un JSON…"]);
     const card = screen.getByRole("region", { name: "Un nouveau personnage ?" });
-    expectExternal(within(card).getByRole("link", { name: "Ouvrir la Forge (nouvel onglet)" }));
-    expect(within(card).getByRole("button", { name: "Nouvelle fiche" })).toBeInTheDocument();
+    const [blank, forge] = within(card).getAllByRole("article");
+    expect(within(blank!).getByRole("heading").textContent).toBe("Fiche vierge");
+    expect(within(blank!).getByRole("button", { name: "Nouvelle fiche" })).toHaveClass("btn", "accent");
+    // Lot 27 : Forge en second, pastille, texte « à recopier », bouton secondaire.
+    expect(forge).toHaveClass("wait");
+    expect(within(forge!).getByText("JSON pas encore compatible")).toHaveClass("pend");
+    expect(forge).toHaveTextContent("Création guidée, à recopier ensuite dans une fiche vierge. L'import direct arrive bientôt.");
+    const link = within(forge!).getByRole("link", { name: "Ouvrir la Forge (nouvel onglet)" });
+    expectExternal(link);
+    expect(link).not.toHaveClass("accent");
     expect(within(card).getAllByRole("button", { name: /^Partir du modèle/ }).map((b) => b.textContent)).toEqual(["Bushi", "Shugenja", "Courtisan"]);
   });
 

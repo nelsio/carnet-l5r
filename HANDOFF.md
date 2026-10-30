@@ -6,7 +6,7 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document.
 
-**État au 30/10/2026 :** version **v2.21.0**, lots 1 à 25 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
+**État au 30/10/2026 :** version **v2.21.2** (correctifs v2.21.1 Safari et v2.21.2 Forge en attente, L.12), lots 1 à 25 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
 
 **Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie), F (lot 13 : shugenja et Magie), G (lot 14 : nom de l'outil dans l'en-tête), H (lots 15 et 16 : dépôt GitHub et correctifs), I (lots 17 à 19 : couleurs, Anneaux, sélecteurs), J (lot 20 : correctifs et retouches), K (lot 21 : points d'Insight), L (lots 22 et 23 : liens vers le portail de campagne), M (lots 24 et 25 : README allégé, liens vers le guide et le dépôt).
 
@@ -589,6 +589,8 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
    - **v2.20.1** (patch, L.11) : options de la Bibliothèque vide alignées (étapes et boutons sur les mêmes lignes, cases de même taille) → O7 renforcé.
 24. **v2.20.2 — README allégé** (**livrée**, écarts en M.2) : annexe M.1. README court (≈ 540 mots, trois captures en thème sombre), mode d'emploi dans `docs/GUIDE.md`, licences et crédits dans `docs/CREDITS.md`, script `npm run screenshots` (hors CI).
 25. **v2.21.0 — liens vers le guide et le dépôt** (**livrée**, écarts en M.4) : annexe M.3. Section « Le Carnet » du menu Ressources, pied de page sur tous les écrans, lien « Lire le guide » dans la Bibliothèque vide.
+   - **v2.21.1** (patch) : menus déroulants lisibles sous Safari (repli liste native).
+   - **v2.21.2** (patch, L.12) : Forge en attente de compatibilité JSON. Fiche vierge proposée en premier, pastille « JSON pas encore compatible », interrupteur `FORGE_JSON_OK`.
 26. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts (fichier personnel importable, pas dans le dépôt), compteurs « N fois par séance » (D-g).
 
 ---
@@ -2362,7 +2364,7 @@ Le Carnet renvoie vers le **portail de la campagne** du MJ (site statique sur Gi
 | Page | Adresse |
 |---|---|
 | Portail | `https://vincenzorpg.github.io/L5R/index.html` |
-| Forge de personnage | `…/createcharacter.html` (exporte un JSON compatible avec le Carnet) |
+| Forge de personnage | `…/createcharacter.html` (export JSON pas encore importable dans le Carnet : `FORGE_JSON_OK`, L.12) |
 | Grimoire | `…/grimoire.html` |
 | Page de clan | `…/clans/<slug>.html` (8 Grands Clans) |
 | Mémento de combat | `…/aides/combat-memento.html` |
@@ -2385,6 +2387,8 @@ Le Carnet renvoie vers le **portail de la campagne** du MJ (site statique sur Gi
 ### L.1 Configuration : `src/rules/portal.ts` (lot 22)
 
 Un seul module porte toutes les adresses, pour qu'un changement d'URL du portail ne touche qu'un fichier : `PORTAL_BASE`, `PORTAL` (`home`, `forge`, `grimoire`, `combat`, `bushido`, `etiquette`), `clanUrl(clanId)` et `spellUrl(name)`.
+
+Constante de configuration **`FORGE_JSON_OK`** (lot 27, L.12), `false` à ce jour. La passer à `true` quand les critères d'acceptation de `issues/issue-export-carnet-rokugan.md` (portail) sont validés, c'est-à-dire quand l'export JSON de la Forge s'importe sans erreur dans le Carnet ; retirer alors les phrases marquées `<!-- FORGE_JSON_OK -->` dans `docs/GUIDE.md`.
 
 - `clanUrl` lit le champ **`portalSlug`** de la table des clans (`CLANS`, `src/rules/l5r4e.ts`) : `crabe`, `grue`, `dragon`, `lion`, `mante`, `phenix`, `scorpion`, `licorne`. Araignée, Familles impériales et clan non reconnu n'en ont pas → `null`.
 - `spellUrl` : `PORTAL.grimoire + "?q=" + encodeURIComponent(name.trim())`. Un nom vide renvoie `PORTAL.grimoire`.
@@ -2528,6 +2532,16 @@ Retour de Nelson le 30/10/2026 : sur bureau, la description de « Fiche vierge �
 - `.start-opts` partage ses lignes avec les deux options (`grid-template-rows: subgrid`, trois lignes : en-tête, étapes, bouton ; deux pour la carte compacte de L.4). En-têtes, étapes et boutons sont alignés, et les six cases ont la même hauteur.
 - Sur une colonne (≤ 720 px), chaque option garde ses propres lignes, comme avant.
 - O7 (Playwright, bureau) vérifie en plus : options de même hauteur, six cases d'étapes au même niveau et de même hauteur, boutons alignés.
+
+### L.12 Lot 27 : Forge en attente de compatibilité JSON (v2.21.2)
+
+L'export JSON de la Forge ne s'importe pas encore dans le Carnet (demande ouverte côté portail : `issues/issue-export-carnet-rokugan.md`). Prototype : `reference/prototype-forge-attente.html`.
+
+- **Interrupteur** `FORGE_JSON_OK` (`src/rules/portal.ts`, voir L.1). À `false` : pastille « JSON pas encore compatible » (`ForgePending`, jetons `--warn` / `--warn-pale`), carte Forge en pointillés, encadré 待 (`role="note"`), étapes Forger · **Recopier** · Importer (« Bientôt », case en pointillés), descriptions « à recopier dans une fiche vierge » dans la carte « Un nouveau personnage ? » et le menu Ressources. À `true` : textes et étapes de L.2 à L.4.
+- **Ordre, dans les deux états** : Fiche vierge d'abord, avec le bouton principal (`btn accent`) ; Forge ensuite, bouton secondaire (`btn`). Description de Fiche vierge (L.3) : « Saisie directe dans le Carnet, depuis une fiche papier ou un personnage créé ailleurs. » En-tête : « Tu as déjà un fichier du Carnet ? »
+- **Grille** : les options pleines partagent quatre lignes (en-tête, encadré, étapes, bouton). La ligne de l'encadré est vide côté Fiche vierge : étapes et boutons restent alignés (L.11).
+- `--warn-pale` passe de 14 % à 12 % de `--warn` : à 14 %, `--warn` sur `--warn-pale` faisait 4,47:1 en clair.
+- **Tests** : `tests/core.portal.spec.ts` (constante à `false`), `tests/ui/portal.spec.tsx` (ordre, pastille, encadré, menu), `tests/ui/forge-ok.spec.tsx` (constante simulée à `true` par `vi.mock` : le build livré ne permet pas de la changer dans Playwright), `tests/e2e/portal.spec.ts` (ordre bureau et 390 px, pastille dans la carte et dans le menu, sans défilement horizontal), `tests/colors.spec.ts` (contraste ≥ 4,5:1 dans les deux thèmes).
 
 ## Annexe M — Lots 24 et 25 : README allégé, liens vers le guide et le dépôt (v2.20.2, v2.21.0)
 
