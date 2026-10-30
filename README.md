@@ -65,6 +65,8 @@ Le bouton **Ressources** (icône de torii, en haut, sur tous les écrans) ouvre 
 
 La **Forge** est une création guidée : elle calcule l'XP, les traits et les bonus d'école, puis exporte un **JSON compatible** avec le Carnet. Importe-le ici avec **Importer un JSON**.
 
+D'autres liens mènent au portail (v2.20) : le **nom du clan**, au-dessus du nom du personnage, ouvre la page du clan ; dans **Rouleaux & invocations**, **Grimoire** ouvre le grimoire et l'icône de chaque sort le cherche par son nom ; dans l'**aide de jeu**, un encadré propose le **Mémento de combat** en Combat, **Étiquette & coutumes** et **Bushido & honneur** en Cour.
+
 ## 4. Jouer avec l'aide de jeu
 
 L'onglet **Aide de jeu** (dans la barre du bas sur mobile) propose les jets de chaque situation :

@@ -9,9 +9,11 @@ import {
   type Stance, type StanceTag,
 } from "../../rules/l5r4e";
 import type { ReminderContext } from "../../rules/ecoles";
+import { SITUATION_LINKS } from "../../rules/portal";
 import { toMeters } from "../format";
 import { contextOf, currentArmorTN, DEFAULT_ROLL_OPTIONS, isActive, isRollable, poolFor, poolLabel, toPoolAction, uiRollStance } from "../rolls";
 import { currentActions, useCharacter, useStore, type AidSituation, type BattleState, type InfoPanel, type VoidChoice } from "../store";
+import { ExtIcon } from "./ExternalLink";
 import { EffectTags, RichSelect } from "./RichSelect";
 import { Roller } from "./Roller";
 import { TakeDamage } from "./StatusBar";
@@ -52,6 +54,7 @@ export function Aid() {
   const actions = currentActions(c, ui);
   const initiative = actions.find((a) => a.kind === "initiative");
   const combat = ui.situation === "combat";
+  const links = SITUATION_LINKS[ui.situation];
 
   return (
     <>
@@ -81,9 +84,22 @@ export function Aid() {
             {combat && !c.weapons.length && <p className="muted">Ajoute des armes dans la fiche pour voir les attaques.</p>}
           </div>
         </div>
-        <div className={`backdrop${ui.sheetOpen ? " open" : ""}`} onClick={() => dispatch({ type: "closeSheet" })} />
-        <div className={`panel roller${ui.sheetOpen ? " open" : ""}`} role="dialog" aria-label="Lanceur de dés">
-          <Roller />
+        {/* Colonne de droite : liens vers le portail (annexe L.8), puis le lanceur ; sous les actions sur mobile. */}
+        <div className="aid-side">
+          {links.length > 0 && (
+            <aside className="portal-links" aria-label="Liens vers le portail">
+              {links.map((l) => (
+                <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer" aria-label={`${l.title} : ${l.desc} (nouvel onglet)`}>
+                  <span><span className="t">{l.title}</span><span className="d">{l.desc}</span></span>
+                  <ExtIcon />
+                </a>
+              ))}
+            </aside>
+          )}
+          <div className={`backdrop${ui.sheetOpen ? " open" : ""}`} onClick={() => dispatch({ type: "closeSheet" })} />
+          <div className={`panel roller${ui.sheetOpen ? " open" : ""}`} role="dialog" aria-label="Lanceur de dés">
+            <Roller />
+          </div>
         </div>
       </div>
     </>

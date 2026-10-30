@@ -6,6 +6,13 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.20.0] - 2026-10-30
+
+### Ajouté
+- Le nom du clan, dans l'en-tête, ouvre la page du clan sur le portail de la campagne (8 Grands Clans).
+- Bloc Rouleaux & invocations : lien « Grimoire » dans le titre et, pour chaque sort, un lien qui ouvre le grimoire du portail avec le nom du sort en recherche.
+- Aide de jeu : encadré de liens vers le portail, au-dessus du lanceur (sous les actions sur mobile) : Mémento de combat en Combat ; Étiquette & coutumes et Bushido & honneur en Cour.
+
 ## [2.19.0] - 2026-10-30
 
 ### Ajouté
@@ -205,7 +212,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.19.0...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.20.0...HEAD
+[2.20.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.20.0
 [2.19.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.19.0
 [2.18.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.18.0
 [2.17.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.17.0

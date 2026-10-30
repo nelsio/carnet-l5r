@@ -6,11 +6,11 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document.
 
-**État au 30/10/2026 :** version **v2.19.0**, lots 1 à 22 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
+**État au 30/10/2026 :** version **v2.20.0**, lots 1 à 23 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
 
 **Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie), F (lot 13 : shugenja et Magie), G (lot 14 : nom de l'outil dans l'en-tête), H (lots 15 et 16 : dépôt GitHub et correctifs), I (lots 17 à 19 : couleurs, Anneaux, sélecteurs), J (lot 20 : correctifs et retouches), K (lot 21 : points d'Insight), L (lots 22 et 23 : liens vers le portail de campagne).
 
-**Prochain lot (30/10/2026) :** lot 23 (annexe L.7 à L.9, v2.20.0) : liens vers le portail dans la Fiche et l'Aide de jeu. Le lot 22 (menu Ressources, Bibliothèque) est livré ; la localisation est reportée.
+**Prochain lot (30/10/2026) :** à définir (§11, point 24). Les lots 22 et 23 (annexe L, liens vers le portail de campagne) sont livrés ; la localisation est reportée.
 
 ---
 
@@ -288,7 +288,7 @@ interface LibraryStore {
 
 ### 6.2 Comportement à reproduire du prototype
 - **En-tête** :
-  - **sceau 帳** de l'outil à gauche, qui ouvre aussi la Bibliothèque, et surtitre « CARNET DE ROKUGAN | ● CLAN … » au-dessus du nom (annexe G) ;
+  - **sceau 帳** de l'outil à gauche, qui ouvre aussi la Bibliothèque, et surtitre « CARNET DE ROKUGAN | ● CLAN … » au-dessus du nom (annexe G) ; le nom du clan est un lien vers sa page sur le portail de campagne quand elle existe (v2.20.0, annexe L.7) ;
   - famille, école et Rang dessous ;
   - bouton de thème (auto, clair, sombre) ;
   - **boutons d'en-tête** Bibliothèque, Lanceur de dés, Thème et **Ressources** (v2.19.0, annexe L.2 : menu de liens vers le portail de campagne, sur tous les écrans) : chacun = **icône + texte** sur bureau (livres, dé, demi-cercle, torii), **icône seule** sur mobile (§7) ; le texte reste présent pour les lecteurs d'écran et en info-bulle, avec l'état courant (« Thème : sombre », « Lanceur de dés : masqué ») ;
@@ -578,7 +578,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 20. **v2.17.0 — correctifs et retouches** (**livrée**, écarts en J.14) : annexe J (retours de jeu du 30/10/2026). Bloc Armes en Edit lisible sur mobile, police du bloc Identité, bouton de technique sans « sort », bonus de jet sans catalogue (modèles par source), modèles de fiche shugenja et courtisan, panneau Vide en menu déroulant, lanceur de dés affiché par défaut, sorts avant les attaques en escarmouche, champ « Dés lancés ± » retiré, Min · Moy. · Max centrés dans le lanceur → cas Q1 à Q19.
 21. **v2.18.0 — points d'Insight** (**livrée**, écarts en K.5) : annexe K. Points d'Insight calculés et Rang suggéré dans le bloc Identité, champ facultatif `insightBonus`, étiquette d'écart avec le rang saisi (qui fait foi) → cas I1 à I9, K1.
 22. **v2.19.0 — portail de campagne : menu et Bibliothèque** (**livrée**, écarts en L.6) : annexe L.1 à L.5. Adresses dans `src/rules/portal.ts`, bouton et menu **Ressources** (panneau bas sur mobile), Bibliothèque vide (Forge ou fiche vierge, cartes de modèles) et avec fiches (« Un nouveau personnage ? ») → cas O1 à O11.
-23. **v2.20.0 — portail de campagne : Fiche et Aide de jeu** : annexe L.7 à L.9. Clan de l'en-tête en lien, liens de sort vers le grimoire, encadré de liens de l'Aide de jeu (Combat, Cour) → cas O12 à O17.
+23. **v2.20.0 — portail de campagne : Fiche et Aide de jeu** (**livrée**, écarts en L.10) : annexe L.7 à L.9. Clan de l'en-tête en lien, liens de sort vers le grimoire, encadré de liens de l'Aide de jeu (Combat, Cour) → cas O12 à O17.
 24. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts (fichier personnel importable, pas dans le dépôt), compteurs « N fois par séance » (D-g).
 
 ---
@@ -2341,7 +2341,7 @@ Les identifiants I1 à I9 sont repris du handoff source (les I1 à I13 de la loc
 
 ## Annexe L — Lots 22 et 23 : liens vers le portail de campagne (v2.19.0, v2.20.0)
 
-Statut : **validé par Nelson le 30/10/2026**. Lot 22 **livré** (v2.19.0, écarts en L.6) ; lot 23 à livrer (v2.20.0). Source : `handoff-outlinks.md` (30/10/2026), intitulé « lots 21 et 22 » en v2.18.0 et v2.19.0 : renuméroté **lots 22 et 23**, **v2.19.0 et v2.20.0** (le lot 21 est le calcul d'Insight, v2.18.0, annexe K). Prototype de référence : `reference/prototype-outlinks.html` (sélecteurs Écran, Personnage, Thème, Largeur). En cas d'écart, le prototype fait foi pour le rendu, cette annexe pour le comportement.
+Statut : **validé par Nelson le 30/10/2026**. Lots 22 et 23 **livrés** (v2.19.0, écarts en L.6 ; v2.20.0, écarts en L.10). Source : `handoff-outlinks.md` (30/10/2026), intitulé « lots 21 et 22 » en v2.18.0 et v2.19.0 : renuméroté **lots 22 et 23**, **v2.19.0 et v2.20.0** (le lot 21 est le calcul d'Insight, v2.18.0, annexe K). Prototype de référence : `reference/prototype-outlinks.html` (sélecteurs Écran, Personnage, Thème, Largeur). En cas d'écart, le prototype fait foi pour le rendu, cette annexe pour le comportement.
 
 Une PR et une version mineure par lot. Pas de changement de format de fiche (`schemaVersion` reste 2). Captures « avant » et « après » des vues touchées (bureau 1280 px et 390 px, clair et sombre) à chaque PR.
 
@@ -2501,3 +2501,12 @@ Remplace le contenu de l'accueil vide. Deux blocs, puis une ligne.
 | O15 | Aide de jeu, Combat puis Cour | 1 lien puis 2 liens, sans titre d'encadré ; autre situation : pas d'encadré |
 | O16 | Aide de jeu à 390 px | Encadré sous les actions ; les onglets de situation tiennent toujours sur une ligne (§7) |
 | O17 | Consultation | Tous les liens présents et actifs |
+
+### L.10 Écarts de mise en œuvre (lot 23)
+
+- **Encadré de l'Aide de jeu** : la colonne de droite de l'Aide de jeu est celle du lanceur (le prototype n'y montrait qu'un espace réservé). L'encadré se place **en tête de cette colonne, au-dessus du lanceur** (`.aid-side`), à droite des actions sur bureau ; sous les actions dès que la grille passe sur une colonne (≤ 860 px), le lanceur restant un panneau bas sur mobile.
+- **Combat** : le lien du Mémento s'affiche pour les trois types de combat (escarmouche, duel, bataille de masse). `SITUATION_LINKS` couvre toutes les situations, liste vide pour Enquête, Déplacement et Magie.
+- **Liens de sort** : en lecture, à droite de la carte du sort ; en édition, au pied du sort, avant le bouton de suppression (×). Pas de lien pour un sort sans nom. La note « Chaque lien ouvre le grimoire… » suit la liste en lecture et en édition.
+- **Noms accessibles** : « Grimoire (nouvel onglet) » pour le lien du titre ; entrées de l'encadré « Titre : description (nouvel onglet) ».
+- **Composant `Block`** : nouvelle prop `extra`, rendue entre le titre et le bouton Edit.
+- **Tests** : `tests/ui/portal-sheet.spec.tsx` (O12 à O15, O17 ; clan non reconnu, sort sans nom, types de combat en plus) ; `tests/e2e/portal.spec.ts` (O15 sur bureau, O16 à 390 px). Aucun test existant modifié.

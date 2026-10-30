@@ -2,7 +2,9 @@ import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
 import { clanAccent, schoolRankOf } from "@carnet/core";
 import { SHOW_WOUND_MULTIPLIER, WOUND_MULTIPLIERS } from "../../rules/l5r4e";
 import { useStore } from "../store";
+import { clanUrl } from "../../rules/portal";
 import { NEXT_THEME, THEME_LABELS } from "../theme";
+import { ExternalLink } from "./ExternalLink";
 import { ResourcesMenu } from "./ResourcesMenu";
 
 export function Header() {
@@ -10,6 +12,7 @@ export function Header() {
   const { character: c, ui } = state;
   const readonly = state.mode === "readonly";
   const clan = c?.clan.trim() ? clanAccent(c.clan) : null;
+  const clanHref = clanUrl(clan?.id ?? null);
   // Sous le nom : école affichée et rang d'école, plus de famille (annexe E.19 S8).
   const sub = c ? [c.school.trim(), `Rang\u00a0${schoolRankOf(c)}`].filter(Boolean).join(" · ") : "";
 
@@ -34,7 +37,10 @@ export function Header() {
             <>
               <div className="eyebrow">
                 <span className="brand">{APP_NAME}</span>
-                {clan && <><span className="sep" aria-hidden="true" /><div className="mon">{clan.label ?? `Clan ${c.clan}`}</div></>}
+                {clan && <><span className="sep" aria-hidden="true" />{clan.label && clanHref ? (
+                  // Page du clan sur le portail de la campagne (annexe L.7).
+                  <ExternalLink href={clanHref} className="mon" label={`${clan.label} : page du clan sur le portail (nouvel onglet)`}>{clan.label}</ExternalLink>
+                ) : <div className="mon">{clan.label ?? `Clan ${c.clan}`}</div>}</>}
               </div>
               <FitName name={c.name}>{readonly && <> <span className="badge">Consultation</span></>}</FitName>
               <div className="sub">{sub}</div>

@@ -1,6 +1,7 @@
 /**
  * Lot 22, v2.19.0 (HANDOFF annexe L) : liens vers le portail de la campagne dans un vrai navigateur.
- * O5 (Entrée et Espace), O6 (panneau bas à 390 px), O7 (largeurs des deux options), O10 (aucune requête vers le portail).
+ * O5 (Entrée et Espace), O6 (panneau bas à 390 px), O7 (largeurs des deux options), O10 (aucune requête vers le portail) ;
+ * lot 23 : O15 sur bureau et O16 à 390 px.
  */
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
@@ -112,4 +113,41 @@ test.describe("O7 : Bibliothèque vide", () => {
     expect(ys[1]!).toBeGreaterThan(ys[0]!);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   });
+});
+
+test.describe("O16 : Aide de jeu à 390 px (lot 23, annexe L.8)", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("encadré sous les actions ; onglets de situation sur une ligne", async ({ page }) => {
+    await page.goto(pageUrl);
+    await page.getByRole("button", { name: "Utiliser le modèle Shugenja" }).click();
+    await page.getByRole("group", { name: "Vue" }).getByRole("button", { name: "Aide de jeu" }).click();
+    const sit = page.getByRole("group", { name: "Situation" });
+    for (const name of ["Combat", "Cour"]) {
+      await sit.getByRole("button", { name }).click();
+      const box = page.getByRole("complementary", { name: "Liens vers le portail" });
+      const actions = (await page.locator(".aid .actions").boundingBox())!;
+      const b = (await box.boundingBox())!;
+      expect(b.y).toBeGreaterThanOrEqual(actions.y + actions.height);
+      expect(Math.round(b.x + b.width)).toBeLessThanOrEqual(390);
+      for (const a of await box.getByRole("link").all()) expect((await a.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    }
+    const tops = await Promise.all((await sit.getByRole("button").all()).map(async (t) => Math.round((await t.boundingBox())!.y)));
+    expect(tops).toHaveLength(5);
+    expect(new Set(tops).size).toBe(1);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  });
+});
+
+test("O15 : encadré à droite des actions sur bureau", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(pageUrl);
+  await page.getByRole("button", { name: "Utiliser le modèle Bushi" }).click();
+  await page.getByRole("group", { name: "Vue" }).getByRole("button", { name: "Aide de jeu" }).click();
+  await page.getByRole("group", { name: "Situation" }).getByRole("button", { name: "Cour" }).click();
+  const actions = (await page.locator(".aid .actions").boundingBox())!;
+  const b = (await page.getByRole("complementary", { name: "Liens vers le portail" }).boundingBox())!;
+  expect(b.x).toBeGreaterThan(actions.x + actions.width);
+  await page.getByRole("group", { name: "Situation" }).getByRole("button", { name: "Enquête" }).click();
+  await expect(page.getByRole("complementary", { name: "Liens vers le portail" })).toHaveCount(0);
 });
