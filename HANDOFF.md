@@ -6,7 +6,7 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document.
 
-**État au 30/10/2026 :** version **v2.20.0**, lots 1 à 23 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
+**État au 30/10/2026 :** version **v2.20.1**, lots 1 à 23 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
 
 **Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie), F (lot 13 : shugenja et Magie), G (lot 14 : nom de l'outil dans l'en-tête), H (lots 15 et 16 : dépôt GitHub et correctifs), I (lots 17 à 19 : couleurs, Anneaux, sélecteurs), J (lot 20 : correctifs et retouches), K (lot 21 : points d'Insight), L (lots 22 et 23 : liens vers le portail de campagne).
 
@@ -579,6 +579,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 21. **v2.18.0 — points d'Insight** (**livrée**, écarts en K.5) : annexe K. Points d'Insight calculés et Rang suggéré dans le bloc Identité, champ facultatif `insightBonus`, étiquette d'écart avec le rang saisi (qui fait foi) → cas I1 à I9, K1.
 22. **v2.19.0 — portail de campagne : menu et Bibliothèque** (**livrée**, écarts en L.6) : annexe L.1 à L.5. Adresses dans `src/rules/portal.ts`, bouton et menu **Ressources** (panneau bas sur mobile), Bibliothèque vide (Forge ou fiche vierge, cartes de modèles) et avec fiches (« Un nouveau personnage ? ») → cas O1 à O11.
 23. **v2.20.0 — portail de campagne : Fiche et Aide de jeu** (**livrée**, écarts en L.10) : annexe L.7 à L.9. Clan de l'en-tête en lien, liens de sort vers le grimoire, encadré de liens de l'Aide de jeu (Combat, Cour) → cas O12 à O17.
+   - **v2.20.1** (patch, L.11) : options de la Bibliothèque vide alignées (étapes et boutons sur les mêmes lignes, cases de même taille) → O7 renforcé.
 24. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts (fichier personnel importable, pas dans le dépôt), compteurs « N fois par séance » (D-g).
 
 ---
@@ -2510,3 +2511,11 @@ Remplace le contenu de l'accueil vide. Deux blocs, puis une ligne.
 - **Noms accessibles** : « Grimoire (nouvel onglet) » pour le lien du titre ; entrées de l'encadré « Titre : description (nouvel onglet) ».
 - **Composant `Block`** : nouvelle prop `extra`, rendue entre le titre et le bouton Edit.
 - **Tests** : `tests/ui/portal-sheet.spec.tsx` (O12 à O15, O17 ; clan non reconnu, sort sans nom, types de combat en plus) ; `tests/e2e/portal.spec.ts` (O15 sur bureau, O16 à 390 px). Aucun test existant modifié.
+
+### L.11 Correctif v2.20.1 : options alignées
+
+Retour de Nelson le 30/10/2026 : sur bureau, la description de « Fiche vierge » passe sur deux lignes, si bien que ses cases d'étapes et son bouton descendent plus bas que ceux de « Forger sur le portail », avec des cases de tailles différentes.
+
+- `.start-opts` partage ses lignes avec les deux options (`grid-template-rows: subgrid`, trois lignes : en-tête, étapes, bouton ; deux pour la carte compacte de L.4). En-têtes, étapes et boutons sont alignés, et les six cases ont la même hauteur.
+- Sur une colonne (≤ 720 px), chaque option garde ses propres lignes, comme avant.
+- O7 (Playwright, bureau) vérifie en plus : options de même hauteur, six cases d'étapes au même niveau et de même hauteur, boutons alignés.

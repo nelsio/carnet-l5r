@@ -703,8 +703,9 @@ a.btn .ext{margin-left:8px}
 .lib-empty{display:grid;gap:22px}
 .start h2{font-size:21px;margin-bottom:6px}
 .start > p{margin:0}
-.start-opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px}
-.start-opt{display:grid;grid-template-rows:auto 1fr auto;border:1px solid var(--line);border-radius:10px;padding:16px;background:var(--bg)}
+/* Les deux options partagent les lignes de la grille (subgrid) : en-têtes, étapes et boutons alignés et de même hauteur */
+.start-opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:14px;margin-top:16px}
+.start-opt{display:grid;grid-row:span 3;grid-template-rows:subgrid;row-gap:0;border:1px solid var(--line);border-radius:10px;padding:16px;background:var(--bg)}
 .start-opt-h{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:start}
 .start-opt-h h3{font-size:18px}
 .start-opt-h p{margin:2px 0 0;font-size:14px}
@@ -728,7 +729,7 @@ a.btn .ext{margin-left:8px}
 .discover a{font-weight:700;text-decoration:underline}
 /* Bibliothèque avec fiches : « Un nouveau personnage ? » sous la liste (L.4) */
 .newchar{margin-top:16px}
-.start-opt.compact{grid-template-rows:auto auto;padding:14px}
+.start-opt.compact{grid-row:span 2;padding:14px}
 .start-opt.compact h3{font-size:16px}
 .start-opt.compact p{font-size:13px}
 .start-opt.compact .start-opt-act{margin:8px 0 0 52px}
@@ -745,6 +746,10 @@ a.btn .ext{margin-left:8px}
   .res-menu .grip{display:block;width:44px;height:5px;border-radius:3px;background:var(--line);margin:8px auto 2px}
   body.menu-open,html:has(body.menu-open){overflow:hidden}
   .start-opts,.tpl-list{grid-template-columns:1fr}
+  /* Une colonne : chaque option garde ses propres lignes */
+  .start-opts{row-gap:14px}
+  .start-opt{grid-row:auto;grid-template-rows:auto 1fr auto}
+  .start-opt.compact{grid-template-rows:auto auto}
   .steps{grid-template-columns:1fr}
   .steps li{grid-template-columns:24px 1fr;column-gap:10px}
   .steps .step-n{grid-row:span 2}
