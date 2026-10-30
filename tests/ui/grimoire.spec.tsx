@@ -99,7 +99,7 @@ describe("GR15 : ouvrir, charger, chercher, ajouter", () => {
     fireEvent.click(panel().getAllByRole("option")[0]!);
     let added = spellGroups().at(-1)!;
     expect(within(added).getByText("✓ Rempli depuis le grimoire")).toBeInTheDocument();
-    fireEvent.change(field(added, "Nom"), { target: { value: "Éteindre les feux" } });
+    fireEvent.change(within(added).getByRole("combobox", { name: "Nom" }), { target: { value: "Éteindre les feux" } });
     expect(within(added).queryByText("✓ Rempli depuis le grimoire")).toBeNull();
 
     fireEvent.change(panel().getByRole("combobox"), { target: { value: "armure de terre" } });

@@ -6,6 +6,16 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.23.0] - 2026-10-31
+
+### Ajouté
+- Rouleaux & invocations, en Edit : **autocomplétion du nom** d'un sort depuis le grimoire chargé. Dès deux lettres, jusqu'à huit sorts proposés (nom français ou anglais, élément, maîtrise, ND, mots-clés) ; ↑ ↓, Entrée ou clic remplit le sort, Échap ferme. L'effet et « Mémorisé » ne changent jamais, et un nom absent du grimoire reste accepté.
+- Avant de remplacer des valeurs déjà saisies, une confirmation les liste : **Remplacer**, **Compléter les vides** ou **Annuler**.
+- Sans grimoire chargé, une ligne « charger le grimoire » sous le nom de chaque sort, sans ouvrir le panneau.
+
+### Modifié
+- Éditeur de sort : Nom, Élément et Maîtrise sur leur propre ligne.
+
 ## [2.22.0] - 2026-10-30
 
 ### Ajouté
@@ -261,7 +271,8 @@ Simples liens ouverts dans un nouvel onglet : le Carnet ne fait toujours aucune 
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.22.0...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.23.0...HEAD
+[2.23.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.23.0
 [2.22.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.22.0
 [2.21.4]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.21.4
 [2.21.3]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.21.3

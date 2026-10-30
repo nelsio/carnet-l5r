@@ -6,7 +6,7 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document.
 
-**État au 30/10/2026 :** version **v2.22.0** (sorts depuis le grimoire du portail, annexe N ; correctifs v2.21.1 Safari, v2.21.2 Forge en attente, L.12, v2.21.3 `sharp`, M.5, et v2.21.4 liens de sort filtrés par élément, L.13), lots 1 à 30 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
+**État au 31/10/2026 :** version **v2.23.0** (sorts depuis le grimoire du portail et autocomplétion de leur nom, annexe N ; correctifs v2.21.1 Safari, v2.21.2 Forge en attente, L.12, v2.21.3 `sharp`, M.5, et v2.21.4 liens de sort filtrés par élément, L.13), lots 1 à 31 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
 
 **Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie), F (lot 13 : shugenja et Magie), G (lot 14 : nom de l'outil dans l'en-tête), H (lots 15 et 16 : dépôt GitHub et correctifs), I (lots 17 à 19 : couleurs, Anneaux, sélecteurs), J (lot 20 : correctifs et retouches), K (lot 21 : points d'Insight), L (lots 22 et 23 : liens vers le portail de campagne), M (lots 24 et 25 : README allégé, liens vers le guide et le dépôt), N (lots 30 et 31 : sorts depuis le grimoire du portail).
 
@@ -278,7 +278,7 @@ interface LibraryStore {
 | Écran | Contenu |
 |---|---|
 | **Bibliothèque** (écran d'accueil s'il n'y a aucune fiche, sinon accessible par l'en-tête) | Liste des fiches locales : nom, clan (pastille de couleur), école, date, badge « Consultation » pour les fiches en lecture seule. Actions : Ouvrir, Importer un JSON, Supprimer (avec confirmation intégrée à la page). **Vide** (v2.19.0, annexe L.3) : « Pas encore de personnage ? » avec deux options (Forger sur le portail, Fiche vierge), cartes **Modèles de personnage** (Utiliser, JSON) et lien « Découvrir la campagne ». **Avec fiches** (L.4) : carte « Un nouveau personnage ? » sous la liste (Forge, Nouvelle fiche, modèles). |
-| **Fiche** | Comme le prototype (§6.2). Dans **Rouleaux & invocations** en édition : panneau **« Ajouter depuis le grimoire »** et état du grimoire (v2.22.0, annexe N.5). |
+| **Fiche** | Comme le prototype (§6.2). Dans **Rouleaux & invocations** en édition : panneau **« Ajouter depuis le grimoire »** et état du grimoire (v2.22.0, annexe N.5) ; autocomplétion du nom de chaque sort (v2.23.0, annexe N.8). |
 | **Aide de jeu** | Comme le prototype (§6.2), avec la situation **Cour** en plus (annexe D.8). |
 | **Statistiques** | Tableau des chances de réussite de tous les jets (§6.2). Troisième vue, à côté de Fiche et Aide de jeu (v2.1.2). |
 
@@ -594,7 +594,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
    - **v2.21.3** (lot 28, M.5) : `sharp` 0.35.5 (alertes Dependabot), outil de captures seulement.
    - **v2.21.4** (lot 29, L.13) : liens des sorts filtrés par élément dans le grimoire (`&el=`, `GRIMOIRE_ELEMENT`).
 26. **v2.22.0 — sorts depuis le grimoire** (**livrée**, écarts en N.7) : annexe N.1 à N.6. Lecture à la demande des 6 fichiers de sorts du portail (JSON5, sans exécution), cache IndexedDB, panneau « Ajouter depuis le grimoire », universels remplis → cas GR1 à GR22.
-27. **v2.23.0 — autocomplétion du nom d'un sort** (à venir) : annexe N.8 et N.9 → cas GR23 à GR32.
+27. **v2.23.0 — autocomplétion du nom d'un sort** (**livrée**, écarts en N.10) : annexe N.8 et N.9. Champ Nom en combobox quand le grimoire est prêt, remplissage du sort, confirmation avant de remplacer des valeurs saisies → cas GR23 à GR32.
 28. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
 
 ---
@@ -2673,7 +2673,7 @@ Trois alertes Dependabot hautes visaient `sharp` 0.33.5 (failles de libvips, lib
 
 ## Annexe N — Lots 30 et 31 : sorts depuis le grimoire du portail (v2.22.0, v2.23.0)
 
-Statut : reçu le 30/10/2026, **accord de l'auteur du portail obtenu** (son dépôt n'a pas de licence : le Carnet lit ses données de sorts avec son accord, sans les inclure). Lot 30 **livré** (v2.22.0, écarts en N.7) ; lot 31 à venir. Base `main` au commit `2d07fb6` (v2.21.4). Source : `handoff-sorts-grimoire.md` (30/10/2026), intitulé « lots 29 et 30 » : renuméroté **lots 30 et 31** (le lot 29 est le filtre d'élément des liens de sort, L.13) ; versions inchangées. Prototype : `reference/prototype-sorts-grimoire.html` (sélecteurs Grimoire au départ, Thème, Largeur ; 162 sorts réels sans descriptions, chargement simulé). En cas d'écart, le prototype fait foi pour le rendu, cette annexe pour le comportement.
+Statut : reçu le 30/10/2026, **accord de l'auteur du portail obtenu** (son dépôt n'a pas de licence : le Carnet lit ses données de sorts avec son accord, sans les inclure). Lots 30 et 31 **livrés** (v2.22.0, écarts en N.7 ; v2.23.0, écarts en N.10). Base `main` au commit `2d07fb6` (v2.21.4). Source : `handoff-sorts-grimoire.md` (30/10/2026), intitulé « lots 29 et 30 » : renuméroté **lots 30 et 31** (le lot 29 est le filtre d'élément des liens de sort, L.13) ; versions inchangées. Prototype : `reference/prototype-sorts-grimoire.html` (sélecteurs Grimoire au départ, Thème, Largeur ; 162 sorts réels sans descriptions, chargement simulé). En cas d'écart, le prototype fait foi pour le rendu, cette annexe pour le comportement.
 
 | Lot | Version | Contenu |
 |---|---|---|
@@ -2905,7 +2905,7 @@ Contrastes : `--ok`, `--warn` et `--danger` sur `--surface-2` et sur les fonds p
 - **GR22** : vérifié le 30/10/2026 contre le vrai portail, build ouvert en `file://` et servi en HTTP local (`vite preview`) : 162 sorts, requêtes sans cookie ni référent ; le portail répond `access-control-allow-origin: *`. Reste un clic de contrôle sur la page GitHub Pages publiée.
 - **Tests** : `tests/core.grimoire.spec.ts` (GR1 à GR10), `tests/storage/grimoire.spec.ts` (GR11 à GR13), `tests/ui/grimoire.spec.tsx` (GR3 au rendu, GR13, GR15 à GR17, GR19 à GR21, étiquette retirée au changement de nom), `tests/e2e/grimoire.spec.ts` (GR14, GR15 avec rechargement, GR18, GR19). Le smoke « aucune requête réseau » et O10 restent verts sans modification. `tests/colors.spec.ts` : `--ok` sur `--ok-pale`, `--ok`, `--warn`, `--danger` et `--muted` sur `--surface-2` (≥ 4,5:1, n'étaient pas testés), `--ring-all` sur les surfaces (≥ 3:1).
 
-### Lot 31 (v2.23.0) : à venir
+### Lot 31 (v2.23.0)
 
 #### N.8 Autocomplétion du champ Nom
 
@@ -2955,3 +2955,14 @@ Le lien vers le grimoire du sort (lot 29, L.13) suit immédiatement le nouveau n
 | GR30 | Après remplissage | lien du sort vers `grimoire.html?q=Frappe%20de%20Jade&el=terre` |
 | GR31 | Mobile 390 px | suggestions lisibles, pas de défilement horizontal, cibles ≥ 44 px |
 | GR32 | Consultation | champ Nom non éditable, pas d'autocomplétion |
+
+#### N.10 Écarts de mise en œuvre (lot 31)
+
+- **Moteur** (`src/core/grimoire.ts`) : `grimoireConflicts(spell, g)` rend les différences (`GrimoireDiff` : champ, valeur saisie, valeur du grimoire, sur une ligne) ; `fillFromGrimoire(spell, g, "all" | "empty")` rend le sort rempli. Comparaison avec `normalize` (sans accents ni casse, espaces réduits) ; VD comparée au format du Carnet (`formatDR` : « 2k2 » = « 2g2 »).
+- **Champ vide dans le grimoire** (pas d'augmentation, pas de mot-clé, pas de VD) : ni comparé ni rempli, même avec « Remplacer ». Le prototype proposait de remplacer la valeur saisie par « vide » ; le Carnet n'efface jamais une saisie avec un blanc.
+- **« VD : … »** dans l'effet vide : seulement si le grimoire n'a pas de VD au format `2g2`, comme `toCarnetSpell` (N.3).
+- **Disposition** : Nom, Élément et Maîtrise passent sur leur propre ligne (`.spellhead`, colonnes `2fr 1fr 110px` comme le prototype ; sur mobile, Nom sur toute la largeur, Élément et Maîtrise côte à côte), puis la ligne « Autocomplétion depuis le grimoire », puis VD, Portée, Zone et Durée. Avant, les sept champs partageaient une seule grille.
+- **Liste** : `z-index` 4, sous la barre d'état collante (5) et les onglets mobiles. Sur bureau, la liste fait au moins 420 px de large (le champ Nom est plus étroit) ; sur mobile, la largeur du champ. Le pied « Entrée ou clic : remplit le sort (sauf effet et mémorisé) » est hors du `listbox`. ↓ sur un nom déjà saisi ouvre la liste sans retaper ; Entrée sans liste ouverte ne fait rien.
+- **Chargement** : la ligne affiche « Chargement… » ; « réessayer » en état `error`. Le bouton « Remplacer » est `btn sm accent` (bouton principal du Carnet, N.7).
+- **Confirmation** : Échap vaut « Annuler » ; après un choix, le focus revient au champ Nom. Sortir du mode édition ferme la confirmation.
+- **Tests** : `tests/core.grimoire.spec.ts` (comparaison et remplissage, GR26 et GR27 côté moteur), `tests/ui/grimoire-name.spec.tsx` (GR23 à GR30, GR32), `tests/e2e/grimoire.spec.ts` (GR25 dans le build, GR31). GR26 avec la Frappe de jade de Tamori : la confirmation liste aussi les mots-clés (« Jade » → « Jade, Tonnerre ») ; le grimoire ne donne pas de VD pour ce sort.

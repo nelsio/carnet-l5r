@@ -1,6 +1,7 @@
 /**
  * Lot 30, v2.22.0 (HANDOFF annexe N.5) : sorts du grimoire dans le build, réseau intercepté par page.route.
  * GR14 (aucune requête avant « Charger »), GR15 (ajout rempli), GR18 (mobile 390 px), GR19 (hors ligne).
+ * Lot 31, v2.23.0 (annexe N.8) : GR25 (autocomplétion du nom) et GR31 (mobile).
  * GR22 (vrai portail, GitHub Pages et file://) reste une vérification manuelle avant merge.
  */
 import { readFileSync } from "node:fs";
@@ -128,4 +129,45 @@ test("GR19 : hors ligne, état error, encadré d'alerte, « + Sort » utilisable
   const before = await groups(page).count();
   await magic(page).getByRole("button", { name: "+ Sort" }).click();
   await expect(groups(page)).toHaveCount(before + 1);
+});
+
+/** Lot 31, v2.23.0 (annexe N.8) : autocomplétion du champ Nom, chargée depuis la ligne du sort. */
+async function loadFromNameHint(page: Page) {
+  await serveGrimoire(page);
+  await openShugenjaMagic(page);
+  await magic(page).getByRole("button", { name: "+ Sort" }).click();
+  await groups(page).last().getByRole("button", { name: "charger le grimoire" }).click();
+  await expect(panel(page)).toHaveCount(0);
+  return groups(page).last().getByRole("combobox", { name: "Nom" });
+}
+
+test("GR25 : « + Sort », taper « armu », Entrée : sort rempli sans confirmation", async ({ page }) => {
+  const name = await loadFromNameHint(page);
+  await name.fill("armu");
+  await expect(name).toHaveAttribute("aria-expanded", "true");
+  await page.keyboard.press("Enter");
+  const added = groups(page).last();
+  await expect(added).toHaveAccessibleName("Sort : Armure de Terre");
+  await expect(added.getByRole("alertdialog")).toHaveCount(0);
+  await expect(added.getByRole("textbox", { name: "Portée" })).toHaveValue("Personnelle");
+  await expect(added.getByText("✓ Rempli depuis le grimoire")).toBeVisible();
+  await expect(name).toHaveAttribute("aria-expanded", "false");
+});
+
+test("GR31 : mobile 390 px, suggestions lisibles, pas de défilement horizontal, cibles ≥ 44 px", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const name = await loadFromNameHint(page);
+  await name.fill("de");
+  const list = groups(page).last().getByRole("listbox", { name: "Sorts du grimoire" });
+  await expect(list).toBeVisible();
+  const lb = (await list.boundingBox())!;
+  expect(lb.x).toBeGreaterThanOrEqual(0);
+  expect(lb.x + lb.width).toBeLessThanOrEqual(390);
+  const options = await list.getByRole("option").all();
+  expect(options).toHaveLength(8);
+  for (const o of options.slice(0, 4)) expect((await o.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  await options[0]!.click();
+  await expect(list).toBeHidden();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
 });

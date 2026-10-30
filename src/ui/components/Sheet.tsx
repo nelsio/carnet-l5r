@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   activeEffects, affinityOf, armorSheet, insightPoints, suggestedInsightRank, attackTrait, catalogGap, catalogWeapon, createSpell, dailyHealing, deficiencyOf, isShugenja, reminderText, computePool, defaultModifiers, isRanged, formatDR, parseDR, parseWeaponKeywords, rings, ROLL_TRAITS, schoolOf,
-  findSchool, normalize, schoolRankOf, schoolsByClan, sortSpells, toCarnetSpell, SPELL_ELEMENTS, SPELL_RINGS, spellcastingOf, spellRaises, spellTn, suggestSchool, techniqueCategories, vocabularyChanges, weaponKeywords,
-  type ArmorPart, type Character, type GrimoireSpell, type PoolAction, type RollTrait, type SpellElement, type TraitKey, type VocabularyChange,
+  fillFromGrimoire, findSchool, grimoireConflicts, normalize, schoolRankOf, schoolsByClan, sortSpells, toCarnetSpell, SPELL_ELEMENTS, SPELL_RINGS, spellcastingOf, spellRaises, spellTn, suggestSchool, techniqueCategories, vocabularyChanges, weaponKeywords,
+  type ArmorPart, type Character, type GrimoireDiff, type GrimoireSpell, type PoolAction, type Spell, type RollTrait, type SpellElement, type TraitKey, type VocabularyChange,
 } from "@carnet/core";
 import { WEAPON_KEYWORD_LABELS } from "../../rules/ecoles";
 import { ELEMENT_LABELS, RINGS, SPELL_KEYWORDS, TRAIT_LABELS, UNIVERSAL_SPELLS, type RingKey } from "../../rules/l5r4e";
@@ -13,7 +13,7 @@ import { useCharacter, useStore, type BlockId, type ListKey } from "../store";
 import { ArmorFields } from "./ArmorCatalog";
 import { ExternalLink } from "./ExternalLink";
 import { FileActions } from "./FileActions";
-import { GrimoirePanel, GrimoireStatus, ScrollIcon } from "./Grimoire";
+import { GrimoireConfirm, GrimoireNameHint, GrimoirePanel, GrimoireStatus, ScrollIcon, SpellNameField } from "./Grimoire";
 import { Modifiers } from "./Modifiers";
 import { RichSelect, RingOption } from "./RichSelect";
 import { ListField, NumberField, TextListField } from "./fields";
@@ -564,6 +564,8 @@ function Spells() {
   /** Sorts remplis depuis le grimoire pendant cette édition (non sauvegardé) ; le dernier porte le halo. */
   const [filled, setFilled] = useState<ReadonlySet<string>>(new Set());
   const [fresh, setFresh] = useState<string | null>(null);
+  /** Suggestion du grimoire en attente de confirmation : elle remplacerait des valeurs saisies (annexe N.8). */
+  const [confirm, setConfirm] = useState<{ id: string; g: GrimoireSpell; diffs: GrimoireDiff[] } | null>(null);
   /** Mobile : sort ajouté vers lequel défiler une fois rendu. */
   const scrollTo = useRef<string | null>(null);
   const toggle = useRef<HTMLButtonElement>(null);
@@ -576,6 +578,7 @@ function Spells() {
       setPanel(false);
       setFilled(new Set());
       setFresh(null);
+      setConfirm(null);
     }
   }
 
@@ -612,6 +615,23 @@ function Spells() {
       }
       if (ids.length) markFilled(ids);
     };
+    /** Remplit le sort depuis le grimoire (annexe N.8) ; l'étiquette et le halo suivent. */
+    const fill = (s: Spell, g: GrimoireSpell, mode: "all" | "empty") => {
+      const i = spells.findIndex((x) => x.id === s.id);
+      if (i < 0) return;
+      set(["spells", i], fillFromGrimoire(s, g, mode));
+      markFilled([s.id]);
+    };
+    const pickFromGrimoire = (s: Spell, g: GrimoireSpell) => {
+      const diffs = grimoireConflicts(s, g);
+      if (diffs.length) setConfirm({ id: s.id, g, diffs });
+      else fill(s, g, "all");
+    };
+    const chooseFill = (s: Spell, choice: "all" | "empty" | "cancel") => {
+      if (confirm && choice !== "cancel") fill(s, confirm.g, choice);
+      setConfirm(null);
+      document.getElementById(`spell-name-${s.id}`)?.focus();
+    };
     const closePanel = (restoreFocus: boolean) => {
       setPanel(false);
       if (restoreFocus) toggle.current?.focus();
@@ -623,22 +643,21 @@ function Spells() {
           const label = s.name || "ce sort";
           return (
             <div key={s.id} className={`spelledit${fresh === s.id ? " fresh" : ""}`} role="group" aria-label={`Sort : ${label}`} data-spell={s.id}>
+              {confirm?.id === s.id && <GrimoireConfirm g={confirm.g} diffs={confirm.diffs} onChoose={(choice) => chooseFill(s, choice)} />}
               {filled.has(s.id) && (
                 <div className="sp-top">
                   <span className="from">✓ Rempli depuis le grimoire</span>
                   {!s.damage && <span className="muted">Résume l'effet ; ajoute la VD si le sort en a une.</span>}
                 </div>
               )}
-              <div className="form-grid">
-                <Field label="Nom">
-                  <input
-                    className="in" type="text" value={s.name} maxLength={120}
-                    onChange={(e) => {
-                      set(["spells", i, "name"], e.target.value);
-                      if (filled.has(s.id)) setFilled((prev) => new Set([...prev].filter((id) => id !== s.id)));
-                    }}
-                  />
-                </Field>
+              <div className="form-grid spellhead">
+                <SpellNameField
+                  spellId={s.id} value={s.name} onPick={(g) => pickFromGrimoire(s, g)}
+                  onChange={(name) => {
+                    set(["spells", i, "name"], name);
+                    if (filled.has(s.id)) setFilled((prev) => new Set([...prev].filter((id) => id !== s.id)));
+                  }}
+                />
                 <Field label="Élément">
                   <RichSelect variant="anneau" value={s.element} onChange={(v) => set(["spells", i, "element"], v)}>
                     <RingOption value="all" label={ELEMENT_LABELS.all} />
@@ -646,6 +665,9 @@ function Spells() {
                   </RichSelect>
                 </Field>
                 <Field label="Maîtrise"><NumberField min={1} max={6} value={s.mastery} onChange={(n) => set(["spells", i, "mastery"], n)} /></Field>
+              </div>
+              <GrimoireNameHint />
+              <div className="form-grid">
                 <Field label="VD (dégâts)">
                   <input className="in mono" type="text" placeholder="—" value={s.damage ?? ""} maxLength={10} onChange={(e) => set(["spells", i, "damage"], e.target.value || undefined)} />
                 </Field>

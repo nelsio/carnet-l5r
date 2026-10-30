@@ -166,6 +166,54 @@ export function searchGrimoire(
   return limit === undefined ? found : found.slice(0, limit);
 }
 
+/** Champs comparés avant de remplir un sort depuis le grimoire (annexe N.8), dans l'ordre de la confirmation. */
+export const GRIMOIRE_FILL_FIELDS = ["range", "area", "duration", "raises", "keywords", "damage"] as const;
+export type GrimoireFillField = (typeof GRIMOIRE_FILL_FIELDS)[number];
+
+/** Valeur saisie remplacée par celle du grimoire, affichée sur une ligne (augmentations séparées par « · »). */
+export interface GrimoireDiff {
+  field: GrimoireFillField;
+  from: string;
+  to: string;
+}
+
+/** Valeur d'un champ comparé, sur une ligne ; "" si vide. */
+function fillValue(s: Pick<Spell, GrimoireFillField>, field: GrimoireFillField): string {
+  if (field === "keywords") return s.keywords.join(", ");
+  if (field === "damage") return s.damage?.trim() ? formatDR(s.damage) : "";
+  if (field === "raises") return s.raises.split("\n").map((r) => r.trim()).filter(Boolean).join(" · ");
+  return s[field].trim();
+}
+
+/**
+ * Champs du sort déjà remplis avec une valeur différente de celle du grimoire (sans accents ni casse).
+ * Un champ vide dans le grimoire (pas de VD, pas d'augmentation…) n'est ni comparé ni rempli.
+ */
+export function grimoireConflicts(spell: Spell, g: GrimoireSpell): GrimoireDiff[] {
+  return GRIMOIRE_FILL_FIELDS.flatMap((field) => {
+    const [from, to] = [fillValue(spell, field), fillValue(g, field)];
+    return from && to && normalize(from) !== normalize(to) ? [{ field, from, to }] : [];
+  });
+}
+
+/**
+ * Sort rempli depuis le grimoire (annexe N.8) : nom, élément et maîtrise toujours remplacés ;
+ * `all` remplace les autres champs, `empty` ne remplit que les vides. Effet et mémorisé ne changent pas,
+ * sauf l'effet vide qui reçoit « VD : … » quand le grimoire n'a qu'une note de dégâts.
+ */
+export function fillFromGrimoire(spell: Spell, g: GrimoireSpell, mode: "all" | "empty"): Spell {
+  const next: Spell = { ...spell, name: g.name, element: g.element, mastery: g.mastery };
+  const take = (field: GrimoireFillField) => fillValue(g, field) !== "" && (mode === "all" || fillValue(spell, field) === "");
+  if (take("range")) next.range = g.range;
+  if (take("area")) next.area = g.area;
+  if (take("duration")) next.duration = g.duration;
+  if (take("raises")) next.raises = g.raises;
+  if (take("keywords")) next.keywords = [...g.keywords];
+  if (take("damage")) next.damage = g.damage;
+  if (!g.damage && g.damageNote && !spell.effect.trim()) next.effect = `VD : ${g.damageNote}`;
+  return next;
+}
+
 /** Le sort de la fiche est-il ce sort du grimoire ? (noms normalisés égaux : « déjà noté »). */
 export function sameSpell(spell: Pick<Spell, "name">, g: Pick<GrimoireSpell, "name">): boolean {
   return normalize(spell.name) === normalize(g.name);

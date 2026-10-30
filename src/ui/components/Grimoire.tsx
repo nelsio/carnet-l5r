@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
-import { sameSpell, searchGrimoire, spellTn, type GrimoireSpell, type Spell, type SpellElement } from "@carnet/core";
+import { normalize, sameSpell, searchGrimoire, spellTn, type GrimoireDiff, type GrimoireFillField, type GrimoireSpell, type Spell, type SpellElement } from "@carnet/core";
 import { ELEMENT_LABELS } from "../../rules/l5r4e";
 import { GRIMOIRE_FILES } from "../../rules/portal";
 import { useStore } from "../store";
@@ -67,6 +67,153 @@ export function GrimoireStatus() {
       {status !== "loading" && <span className="dot" aria-hidden="true" />}
       <span>{body}</span>
     </span>
+  );
+}
+
+/** Loupe décorative du champ Nom quand l'autocomplétion est active. */
+function SearchIcon() {
+  return (
+    <svg className="ac-ico" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <path d="m16 16 4.5 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+const SUGGESTIONS = 8;
+
+interface NameFieldProps {
+  /** Identifiant du sort : ids du champ et de la liste. */
+  spellId: string;
+  value: string;
+  onChange(name: string): void;
+  /** Suggestion choisie (Entrée ou clic). */
+  onPick(g: GrimoireSpell): void;
+}
+
+/**
+ * Champ Nom d'un sort en édition (annexe N.8) : combobox d'autocomplétion quand le grimoire est prêt,
+ * sinon champ libre et ligne « charger le grimoire ». La saisie libre reste toujours possible.
+ */
+export function SpellNameField({ spellId, value, onChange, onPick }: NameFieldProps) {
+  const { grimoire } = useStore();
+  const { status, cache } = grimoire;
+  const [open, setOpen] = useState(false);
+  const [active, setActive] = useState(0);
+  const ready = status === "ready" && cache ? cache : undefined;
+  const results = useMemo(
+    () => (ready && normalize(value).length >= 2 ? searchGrimoire(ready.spells, value, "all-elements", SUGGESTIONS) : []),
+    [ready, value],
+  );
+  const expanded = open && results.length > 0;
+  const current = Math.min(active, Math.max(0, results.length - 1));
+  const listId = `sugg-${spellId}`;
+  const optId = (i: number) => `${listId}-opt-${i}`;
+
+  const pick = (g: GrimoireSpell | undefined) => {
+    if (!g) return;
+    setOpen(false);
+    onPick(g);
+  };
+
+  const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (!ready) return;
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      if (!results.length) return;
+      e.preventDefault();
+      if (!expanded) {
+        setOpen(true);
+        return;
+      }
+      const step = e.key === "ArrowDown" ? 1 : -1;
+      setActive(Math.min(Math.max(0, current + step), results.length - 1));
+    } else if (e.key === "Enter" && expanded) {
+      e.preventDefault();
+      pick(results[current]);
+    } else if (e.key === "Escape" && expanded) {
+      e.preventDefault();
+      e.stopPropagation();
+      setOpen(false);
+    }
+  };
+
+  return (
+    <div className="field ac">
+      <label className="field" htmlFor={`spell-name-${spellId}`}>
+        <span className="label">Nom</span>
+        <span className={ready ? "combo" : undefined}>
+          <input
+            id={`spell-name-${spellId}`} className="in" type="text" value={value} maxLength={120} autoComplete="off"
+            {...(ready ? {
+              role: "combobox", "aria-autocomplete": "list" as const, "aria-expanded": expanded, "aria-controls": listId,
+              "aria-activedescendant": expanded ? optId(current) : undefined, placeholder: "Tape pour chercher dans le grimoire",
+            } : {})}
+            onChange={(e) => { onChange(e.target.value); setOpen(true); setActive(0); }}
+            onKeyDown={onKeyDown} onBlur={() => setOpen(false)}
+          />
+          {ready && <SearchIcon />}
+        </span>
+      </label>
+      {ready && (
+        <div className="sugg" hidden={!expanded}>
+          <ul id={listId} role="listbox" aria-label="Sorts du grimoire">
+            {results.map((g, i) => (
+              <li
+                key={g.gid} id={optId(i)} role="option" className="gres" style={ringColor(g.element)} aria-selected={i === current}
+                onMouseDown={(e) => e.preventDefault()} onClick={() => pick(g)}
+              ><GrimoireRow g={g} /></li>
+            ))}
+          </ul>
+          <p className="foot">Entrée ou clic : remplit le sort (sauf effet et mémorisé)</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Sous la ligne Nom / Élément / Maîtrise tant que le grimoire n'est pas prêt : le charger sans ouvrir le panneau (annexe N.8). */
+export function GrimoireNameHint() {
+  const { grimoire } = useStore();
+  const { status, cache, load } = grimoire;
+  if (status === "ready" && cache) return null;
+  return (
+    <p className="ac-hint" data-testid="grimoire-name-hint">
+      {status === "loading"
+        ? "Chargement…"
+        : <>Autocomplétion depuis le grimoire : <button type="button" className="linkbtn" onClick={() => void load()}>{status === "error" ? "réessayer" : "charger le grimoire"}</button></>}
+    </p>
+  );
+}
+
+const FIELD_LABELS: Readonly<Record<GrimoireFillField, string>> = {
+  range: "Portée", area: "Zone d'effet", duration: "Durée", raises: "Augmentations", keywords: "Mots-clés", damage: "VD",
+};
+
+interface ConfirmProps {
+  g: GrimoireSpell;
+  diffs: readonly GrimoireDiff[];
+  onChoose(choice: "all" | "empty" | "cancel"): void;
+}
+
+/** Confirmation intégrée en haut du sort quand le grimoire remplacerait des valeurs saisies (annexe N.8). */
+export function GrimoireConfirm({ g, diffs, onChoose }: ConfirmProps) {
+  const replace = useRef<HTMLButtonElement>(null);
+  useEffect(() => replace.current?.focus(), []);
+  return (
+    <div
+      className="gconfirm" role="alertdialog" aria-label="Remplacer les valeurs saisies ?" aria-describedby={`gconfirm-${g.gid}`}
+      onKeyDown={(e) => { if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); onChoose("cancel"); } }}
+    >
+      <p id={`gconfirm-${g.gid}`}><b>« {g.name} »</b> : des valeurs déjà saisies seraient remplacées.</p>
+      <ul className="diff">
+        {diffs.map((d) => <li key={d.field}>{FIELD_LABELS[d.field]} : « {d.from} » → « {d.to} »</li>)}
+      </ul>
+      <div className="row">
+        <button ref={replace} type="button" className="btn sm accent" onClick={() => onChoose("all")}>Remplacer</button>
+        <button type="button" className="btn sm" onClick={() => onChoose("empty")}>Compléter les vides</button>
+        <button type="button" className="btn sm" onClick={() => onChoose("cancel")}>Annuler</button>
+      </div>
+    </div>
   );
 }
 
