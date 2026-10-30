@@ -2,7 +2,7 @@
 import { describe, expect, it } from "vitest";
 import { clanAccent } from "@carnet/core";
 import { CLANS } from "../src/rules/l5r4e";
-import { clanUrl, PORTAL, PORTAL_BASE, PORTAL_CLAN_KANJI, spellUrl } from "../src/rules/portal";
+import { clanUrl, FORGE_JSON_OK, PORTAL, PORTAL_BASE, PORTAL_CLAN_KANJI, spellUrl } from "../src/rules/portal";
 
 describe("O1 : page de clan", () => {
   const withPage = ["crabe", "grue", "dragon", "lion", "mante", "phenix", "scorpion", "licorne"];
@@ -39,6 +39,12 @@ describe("O2 : sort dans le grimoire", () => {
   it("nom vide : le grimoire seul", () => {
     expect(spellUrl("  ")).toBe("https://vincenzorpg.github.io/L5R/grimoire.html");
     expect(spellUrl("")).toBe(PORTAL.grimoire);
+  });
+});
+
+describe("Forge en attente (lot 27)", () => {
+  it("FORGE_JSON_OK existe et vaut false tant que l'export de la Forge ne s'importe pas", () => {
+    expect(FORGE_JSON_OK).toBe(false);
   });
 });
 

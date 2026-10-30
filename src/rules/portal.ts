@@ -16,6 +16,9 @@ export const PORTAL = {
   etiquette: PORTAL_BASE + "aides/etiquette-coutumes.html",
 } as const;
 
+/** Passer à true quand l'export JSON de la Forge s'importe sans erreur dans le Carnet. */
+export const FORGE_JSON_OK = false;
+
 /** Kanji de l'Anneau du clan affiché sur le portail, pour le menu Ressources (annexe L.2). */
 export const PORTAL_CLAN_KANJI: Readonly<Record<string, string>> = {
   crabe: "土", grue: "風", dragon: "龍", lion: "武", mante: "雷", phenix: "鳳", scorpion: "忍", licorne: "馬",

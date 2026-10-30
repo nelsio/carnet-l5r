@@ -102,6 +102,10 @@ describe("Contrastes (annexe I.1.11)", () => {
       for (const bg of ["--bg", "--surface"]) expect(contrast(token(fg, t), token(bg, t)), `${fg} / ${bg}`).toBeGreaterThanOrEqual(4.5);
     }
   });
+  it.each(THEMES)("lot 27 : %s : pastille et encadré de la Forge (warn sur warn-pale) ≥ 4,5:1", (t) => {
+    expect(contrast(token("--warn", t), token("--warn-pale", t))).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(token("--ink", t), token("--warn-pale", t))).toBeGreaterThanOrEqual(4.5);
+  });
   it.each(THEMES)("N6 : %s : Anneaux face à --on-ring et à la surface ≥ 3:1", (t) => {
     for (const ring of ["earth", "water", "fire", "air", "void"]) {
       const color = token(`--ring-${ring}`, t);

@@ -2,11 +2,12 @@ import { useState, type ReactNode } from "react";
 import { clanAccent, schoolRankOf, serializeCharacter } from "@carnet/core";
 import { EXAMPLES, type Example } from "../../rules/example";
 import { CARNET_LINKS } from "../../rules/links";
-import { PORTAL } from "../../rules/portal";
+import { FORGE_JSON_OK, PORTAL } from "../../rules/portal";
 import { downloadText } from "../download";
 import type { LibraryEntry } from "../../storage";
 import { useStore } from "../store";
 import { ExternalLink } from "./ExternalLink";
+import { ForgePending } from "./ForgePending";
 import { ImportButton } from "./FileActions";
 
 const dateFormat = new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeStyle: "short" });
@@ -21,21 +22,26 @@ export function Library() {
       <div className="lib-empty">
         <section className="panel start" aria-labelledby="start-title">
           <h2 id="start-title">Pas encore de personnage ?</h2>
-          <p className="muted">Deux façons de commencer. Tu as déjà un fichier ? <ImportButton label="Importer un JSON" className="linkbtn" /></p>
+          <p className="muted">Deux façons de commencer. Tu as déjà un fichier du Carnet ? <ImportButton label="Importer un JSON" className="linkbtn" /></p>
           <div className="start-opts">
             <StartOption
-              kanji="鍛" title="Forger sur le portail"
-              desc="Création guidée : le portail calcule l'XP, les traits et les bonus d'école."
-              steps={[["Forger", "Clan, école, anneaux, compétences"], ["Exporter", "Bouton « JSON » de la Forge"], ["Importer", "Ici, avec « Importer un JSON »"]]}
-            >
-              <ForgeLink />
-            </StartOption>
-            <StartOption
               kanji="筆" title="Fiche vierge"
-              desc="Saisie directe dans le Carnet, pour recopier une fiche papier existante."
+              desc="Saisie directe dans le Carnet, depuis une fiche papier ou un personnage créé ailleurs."
               steps={[["Créer", "Nom, clan, école et Rang"], ["Remplir", "Anneaux, compétences, techniques"], ["Jouer", "Enregistrée dans ce navigateur"]]}
             >
               <button type="button" className="btn accent" onClick={() => void library.create()}>Nouvelle fiche vierge</button>
+            </StartOption>
+            <StartOption
+              kanji="鍛" title="Forger sur le portail" pending={!FORGE_JSON_OK}
+              desc="Création guidée : le portail calcule l'XP, les traits et les bonus d'école."
+              note={FORGE_JSON_OK ? undefined : (
+                <><b>L'import direct arrive bientôt.</b> Le fichier JSON de la Forge ne s'ouvre pas encore dans le Carnet. Crée ton personnage sur la Forge, puis recopie-le dans une fiche vierge.</>
+              )}
+              steps={FORGE_JSON_OK
+                ? [["Forger", "Clan, école, anneaux, compétences"], ["Exporter", "Bouton « JSON » de la Forge"], ["Importer", "Ici, avec « Importer un JSON »"]]
+                : [["Forger", "Clan, école, anneaux, compétences"], ["Recopier", "Dans une fiche vierge du Carnet"], ["Importer", "Bientôt : import direct du JSON", true]]}
+            >
+              <ForgeLink />
             </StartOption>
           </div>
           <p className="guide-hint">Première visite ? <ExternalLink href={CARNET_LINKS.guide}>Lire le guide</ExternalLink></p>
@@ -68,11 +74,16 @@ export function Library() {
       <section className="panel newchar" aria-labelledby="newchar-title">
         <h2 id="newchar-title">Un nouveau personnage ?</h2>
         <div className="start-opts">
-          <StartOption compact kanji="鍛" title="Forger sur le portail" desc="Création guidée, puis export JSON à importer ici.">
-            <ForgeLink />
-          </StartOption>
           <StartOption compact kanji="筆" title="Fiche vierge" desc="Saisie directe dans le Carnet, depuis une fiche papier.">
             <button type="button" className="btn accent" onClick={() => void library.create()}>Nouvelle fiche</button>
+          </StartOption>
+          <StartOption
+            compact kanji="鍛" title="Forger sur le portail" pending={!FORGE_JSON_OK}
+            desc={FORGE_JSON_OK
+              ? "Création guidée, puis export JSON à importer ici."
+              : "Création guidée, à recopier ensuite dans une fiche vierge. L'import direct arrive bientôt."}
+          >
+            <ForgeLink />
           </StartOption>
         </div>
         <p className="newchar-foot">
@@ -90,28 +101,36 @@ export function Library() {
 }
 
 function ForgeLink() {
-  return <ExternalLink href={PORTAL.forge} className="btn accent" label="Ouvrir la Forge (nouvel onglet)">Ouvrir la Forge</ExternalLink>;
+  return <ExternalLink href={PORTAL.forge} className="btn" label="Ouvrir la Forge (nouvel onglet)">Ouvrir la Forge</ExternalLink>;
 }
 
 const STEP_NUMBERS = ["一", "二", "三"];
 
-/** Une des deux façons de commencer : Forge du portail ou fiche vierge (annexe L.3, L.4). */
-function StartOption({ kanji, title, desc, steps, compact, children }: {
-  kanji: string; title: string; desc: string; steps?: [string, string][]; compact?: boolean; children: ReactNode;
+/** Étape : titre, détail, et `true` pour une étape pas encore possible (case en pointillés). */
+type Step = [string, string, boolean?];
+
+/**
+ * Une des deux façons de commencer : fiche vierge ou Forge du portail (annexe L.3, L.4).
+ * `pending` : Forge pas encore compatible (lot 27), carte en pointillés et pastille ; `note` : encadré sous l'en-tête.
+ */
+function StartOption({ kanji, title, desc, steps, note, pending, compact, children }: {
+  kanji: string; title: string; desc: string; steps?: Step[]; note?: ReactNode; pending?: boolean; compact?: boolean; children: ReactNode;
 }) {
   return (
-    <article className={`start-opt${compact ? " compact" : ""}`}>
+    <article className={`start-opt${compact ? " compact" : ""}${pending ? " wait" : ""}`}>
       <div className="start-opt-h">
         <span className="opt-k" aria-hidden="true">{kanji}</span>
         <div>
-          <h3>{title}</h3>
+          <h3>{title}{pending && <> <ForgePending /></>}</h3>
           <p className="muted">{desc}</p>
         </div>
       </div>
+      {/* Ligne de l'encadré, vide sans encadré : les étapes des deux cartes restent alignées (subgrid) */}
+      {steps && (note ? <div className="warnbox" role="note"><span className="wk" aria-hidden="true">待</span><span>{note}</span></div> : <div />)}
       {steps && (
         <ol className="steps">
-          {steps.map(([s, x], i) => (
-            <li key={s}><span className="step-n" aria-hidden="true">{STEP_NUMBERS[i]}</span><span className="step-s">{s}</span><span className="step-x">{x}</span></li>
+          {steps.map(([s, x, off], i) => (
+            <li key={s} className={off ? "off" : undefined}><span className="step-n" aria-hidden="true">{STEP_NUMBERS[i]}</span><span className="step-s">{s}</span><span className="step-x">{x}</span></li>
           ))}
         </ol>
       )}
