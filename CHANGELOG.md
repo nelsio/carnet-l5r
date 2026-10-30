@@ -6,6 +6,14 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.16.0] - 2026-10-30
+
+### Modifié
+- Listes déroulantes stylées dans les navigateurs qui le permettent (Chrome, Edge, Chrome Android) : menu surélevé aux couleurs du thème, option choisie à la couleur du clan. Ailleurs, la liste native reste.
+- Choix d'un Anneau (affinité, élément d'un sort, Anneau du jet) avec le kanji dans un ensō à la couleur de l'Anneau, et ses Traits.
+- Techniques d'école groupées par clan, avec la classe et la technique de rang 1 de chaque école.
+- Panneau Posture : un menu déroulant remplace les boutons ; chaque posture montre ses effets en étiquettes et sa description, et celle de la posture choisie reste affichée sous le menu. Le bouton « i » du panneau disparaît.
+
 ## [2.15.0] - 2026-10-30
 
 ### Modifié

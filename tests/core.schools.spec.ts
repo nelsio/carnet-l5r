@@ -5,7 +5,7 @@
 import { describe, expect, it } from "vitest";
 import {
   activeEffects, armorTN, computePool, describeEffect, isSimpleAttack, maneuverFreeRaises, maneuverRaises, migrate, movementBonus,
-  nextRoundContext, rollEffects, schoolContext, schoolReduction, suggestSchool, verdict, weaponKeywords, woundState,
+  nextRoundContext, rollEffects, schoolContext, schoolReduction, stanceEffects, suggestSchool, verdict, weaponKeywords, woundState,
   DEFAULT_MANEUVERS, REFERENCE_CONTEXT,
   type Character, type PoolAction, type PoolMods, type Stance, type WeaponLike,
 } from "@carnet/core";
@@ -227,6 +227,13 @@ describe("Moteur d'effets : détails", () => {
     const p2 = computePool(r2, attack(r2, "Katana"), { stance: "center" });
     expect(p2.applied!.map((e) => `${describeEffect(e, r2)} · ${e.source}`)).toEqual(["+1g1 +2 · Kakita R1"]);
     expect(p2.optional!.map((e) => e.source)).toEqual(["Kakita R2"]);
+  });
+
+  it("effets réservés à une posture : Hiruma R1 et R2 en Attaque, rien en Assaut (annexe I.3.4)", () => {
+    const c = char("hiruma-bushi", 3);
+    expect(stanceEffects(c, "attack").map((e) => `${describeEffect(e, c)} · ${e.source}`))
+      .toEqual(["+1g0 · Hiruma R1", "+5 au ND d'armure par cran · Hiruma R2"]);
+    expect(stanceEffects(c, "fullAttack")).toEqual([]);
   });
 
   it("Moto R1 : le cimeterre compte comme arme Samouraï", () => {

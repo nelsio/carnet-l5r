@@ -6,11 +6,11 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document.
 
-**État au 30/10/2026 :** version **v2.15.0**, lots 1 à 18 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
+**État au 30/10/2026 :** version **v2.16.0**, lots 1 à 19 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
 
 **Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie), F (lot 13 : shugenja et Magie), G (lot 14 : nom de l'outil dans l'en-tête), H (lots 15 et 16 : dépôt GitHub et correctifs), I (lots 17 à 19 : couleurs, Anneaux, sélecteurs), J (lot 20 : localisation).
 
-**Prochains lots (30/10/2026) :** 19 → 20, dans l'ordre, annexes I.3 et J (à livrer).
+**Prochain lot (30/10/2026) :** 20, annexe J (à livrer).
 
 ---
 
@@ -339,10 +339,10 @@ interface LibraryStore {
   - Cellules teintées en vert proportionnellement à la chance de réussite.
   - Trois cases à cocher : « Avec un point de Vide », « Spécialisations appliquées » (cochée par défaut), « Pénalité de blessure actuelle » (cochée par défaut).
   - Mention : chaque augmentation ajoute +5 au ND, il suffit de lire une colonne plus à droite. Sur mobile, le tableau défile horizontalement dans son cadre.
-- **Détails repliables (« i »)** (au lot 19, Posture devient un menu déroulant sans « i », annexe I.3.4) :
-  - les boutons des panneaux **Posture** et **Dépenser du Vide** n'affichent que leur titre ;
-  - **un seul** petit bouton rond « i » par panneau, placé dans l'en-tête à côté du titre (« Posture i », « Dépenser du Vide i » ; pas de compteur « reste » dans cet en-tête, les points de Vide restants sont dans la barre d'état ; en-tête sur une seule ligne, y compris sur mobile) ; il déplie ou replie **toutes** les descriptions du panneau à la fois, sans rien sélectionner ;
-  - le « i » est rempli en couleur d'accent quand les détails sont ouverts ; les deux panneaux sont indépendants ;
+- **Détails repliables (« i »)** (depuis le lot 19, le panneau Posture est un menu déroulant sans « i », description toujours affichée, annexe I.3.4) :
+  - les boutons du panneau **Dépenser du Vide** n'affichent que leur titre ;
+  - **un seul** petit bouton rond « i » par panneau, placé dans l'en-tête à côté du titre (« Dépenser du Vide i » ; pas de compteur « reste » dans cet en-tête, les points de Vide restants sont dans la barre d'état ; en-tête sur une seule ligne, y compris sur mobile) ; il déplie ou replie **toutes** les descriptions du panneau à la fois, sans rien sélectionner ;
+  - le « i » est rempli en couleur d'accent quand les détails sont ouverts ; les panneaux sont indépendants ;
   - l'encart **Se déplacer en combat** affiche par défaut seulement les trois distances en pieds ; son « i », à côté du titre, déplie les mètres, les formules et le rappel « terrain difficile » ;
   - l'état ouvert ou fermé reste en mémoire de l'onglet (non persisté). Accessibilité : `aria-expanded` et libellé « Afficher / Masquer le détail : <panneau> ». Zone de toucher d'au moins 40 px (pseudo-élément étendu).
 - **Arbre attaque → dégâts** : chaque carte « Dégâts » est rattachée à son attaque (champ `parent` de l'action). Elle est affichée juste sous cette attaque, décalée d'environ 26 px, avec un connecteur en coude (└). Son titre garde l'arme : « Dégâts · Katana ». Le connecteur passe en couleur d'accent quand des dés de dégâts sont en attente pour ce parent, avec la mention « +Ng0 en attente ». Concerne : armes, mains nues, et Frappe → Dégâts en duel.
@@ -395,7 +395,7 @@ Point de rupture : **largeur ≤ 720 px**. Au-dessus, mise en page bureau inchan
 | Barre d'état | Les quatre tuiles Dépl. / ND armure / Réduction / Pénalité occupent **toute la largeur sur 4 colonnes égales**, texte centré. **Résumé sur une ligne** (niveau de blessure, pénalité, `blessures / seuil max`), cliquable, bordure rouge si le personnage est blessé. Un appui déplie la piste complète en **2 rangées de 4**. En dessous : compteur −/+ (boutons 40 px) et pastilles de Vide (26 px). |
 | Lanceur | **Panneau glissant depuis le bas**, ouvert au choix d'une action (pas à l'ouverture de l'écran). Hauteur max 88 vh, défilement interne, fond assombri derrière. Poignée et bouton × en haut ; fermeture par ×, appui sur le fond ou Échap. Bouton « Lancer » **collé en bas** du panneau. Après un lancer, le résultat est amené à l'écran et le panneau reste ouvert. Changer une option ne remet pas le défilement du panneau à zéro. Le défilement de la page est bloqué pendant l'ouverture. |
 | Situations | Rangées Enquête / Déplacement / Combat et sous-types en **défilement horizontal**, sans retour à la ligne. |
-| Postures et Vide | (Posture : menu déroulant au lot 19, annexe I.3.4.) Grille de 2 colonnes, titres seuls ; un « i » de 26 px dans l'en-tête de chaque panneau, zone de toucher ≥ 40 px. |
+| Vide | Grille de 2 colonnes, titres seuls ; un « i » de 26 px dans l'en-tête du panneau, zone de toucher ≥ 40 px. (Posture : menu déroulant pleine largeur en 16 px, annexe I.3.4.) |
 | Saisie | Champs en **16 px** (pas de zoom automatique sur iOS). Cibles tactiles d'au moins 40 px. |
 | Anneaux | 2 colonnes, le Vide sur toute la largeur. |
 | Encoches | Gouttières latérales `max(16px, env(safe-area-inset-left/right))`. Barre du bas et panneau respectent les zones sûres. |
@@ -522,7 +522,7 @@ Ces cas complètent la spec fournie. L'agent les écrit dans `tests/core.modifie
 | E9 | Statistiques | Une ligne par compétence, attaque, dégâts et initiative ; cocher « point de Vide » augmente les réserves de +1g1 et les pourcentages |
 | E10 | Lanceur : ajouter une augmentation | Le ND final monte de 5 et la chance de réussite baisse |
 | E11 | Kenjutsu passé à 7 (dés forcés : 9, 4…) | Les dégâts du katana affichent la note de maîtrise ; le 9 est relancé et le dé affiche « 13 » avec « 9+4 » ; la compétence de l'arme est trouvée même écrite « kenjutsu » ou avec des espaces |
-| E12 | Boutons « i » de Posture, Vide et Déplacement (Posture retirée au lot 19, remplacée par D3, I.3.7) | Descriptions masquées par défaut ; un clic sur le « i » d'un panneau déplie toutes ses descriptions, un second les replie ; aucun effet sur la posture, le Vide ni l'autre panneau |
+| E12 | Boutons « i » de Vide, Déplacement et Rappels d'école (Posture retirée au lot 19, remplacée par D3, I.3.7) | Descriptions masquées par défaut ; un clic sur le « i » d'un panneau déplie toutes ses descriptions, un second les replie ; aucun effet sur la posture, le Vide ni l'autre panneau |
 | E13 | Lanceur sur Dégâts · Katana | « Dés lancés ± » et « Bonus fixe » sur une seule ligne ; ligne « Les 10 explosent… » sans phrase « Lance… » ; avec Kenjutsu 7, « Les 9 et 10 explosent… » |
 | E14 | Appui sur la tuile ND armure | L'éditeur d'armure s'ouvre ; bonus 5 avec Réflexes 2 → tuile ND 20 ; réduction 3 → tuile Réduction 3 ; valeurs conservées au rechargement |
 | E15 | Option « Lanceur de dés » | Par défaut « masqué » : aucun bouton « Lancer » ni historique dans les lanceurs  ; « affiché » : le bouton apparaît partout ; le choix survit au rechargement |
@@ -539,7 +539,7 @@ Ces cas complètent la spec fournie. L'agent les écrit dans `tests/core.modifie
 | M7 | Champs en mode modification | Taille de police calculée ≥ 16 px |
 | M8 | Cibles tactiles (boutons −/+, pastilles, onglets) | Au moins 40 × 40 px |
 | M9 | Tuiles de la barre d'état à 360 px de large | Les 4 libellés et valeurs sont entièrement visibles, sans troncature ni retour à la ligne |
-| M10 | Boutons « i » (reformulé au lot 19, I.3.7) | Zone de toucher ≥ 40 × 40 px ; les panneaux Posture et Vide tiennent sur moins d'un écran détails fermés |
+| M10 | Boutons « i » (reformulé au lot 19, I.3.7) | Zone de toucher ≥ 40 × 40 px ; le panneau Vide tient sur moins d'un écran détails fermés ; le panneau Posture tient sur moins d'un écran avec sa description |
 | M11 | En-tête à 360 px de large | Sceau de 52 px ; Bibliothèque, Lanceur de dés et Thème en icônes de 40 px sous le nom, alignés à gauche ; libellé accessible avec l'état courant (annexe G, H7) |
 | M12 | Combat sur mobile, et à 360 px de large | Carte « Nouveau round » entre l'Initiative et la Posture ; sa description tient sur 2 lignes au plus |
 | M13 | Aide de jeu sur mobile, et à 360 px de large | Les 4 onglets de situation (Enquête, Cour, Déplacement, Combat) sur une ligne, sans défilement ni texte tronqué, zones de 40 px de haut ; Statistiques est dans la barre du bas |
@@ -573,7 +573,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 16. **v2.13.3 — correctifs** : annexe H.5 à H.8 (**livrée**, écarts en H.12). Notation `XgY` partout à l'affichage (`formatDR`, données en `g`), boutons en trop et incohérences (relevé X1 à X6, captures avant / après) → cas K1 à K8.
 17. **v2.14.0 — couleurs** : annexe I.1, **remplace le §6.4**. Jetons `--surface-2`, `--accent-ink`, `--on-accent`, couleurs sémantiques `--danger` / `--ok` / `--warn`, jetons `--ring-*`, `theme-color` et thème sans flash (**livrée**, écarts en I.6) → cas N1 à N12.
 18. **v2.15.0 — bloc Anneaux « Ensō »** : annexe I.2, CSS seul (`reference/anneaux-enso.css`) (**livrée**, écarts en I.7) → cas A1 à A8.
-19. **v2.16.0 — sélecteurs** : annexe I.3. Sélecteurs `appearance: base-select` (`reference/selecteurs.css`), panneau Posture en menu déroulant sans « i » → cas D1 à D10 ; E12 et M10 adaptés.
+19. **v2.16.0 — sélecteurs** : annexe I.3. Sélecteurs `appearance: base-select` (`reference/selecteurs.css`), panneau Posture en menu déroulant sans « i » (**livrée**, écarts en I.8) → cas D1 à D10 ; E12 et M10 adaptés.
 20. **v2.17.0 — localisation** : annexe J. Français (référence) et anglais, sélecteur `FR · EN` dans le pied de page, dictionnaires typés sans dépendance → cas I1 à I13.
 21. **À définir** : kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts (fichier personnel importable, pas dans le dépôt), compteurs « N fois par séance » (D-g).
 
@@ -1665,7 +1665,7 @@ Les points P-H2, P-H3, P-H5 et P-H6 du handoff d'origine portent sur les langues
 
 ## Annexe I — Lots 17 à 19 : couleurs, Anneaux, sélecteurs (v2.14.0 à v2.16.0)
 
-Statut : lots 17 et 18 **livrés** (écarts en I.6 et I.7), lot 19 **à livrer**, maquettes validées (artifacts « Anneaux de la fiche », proposition B, et « Sélecteurs du Carnet », hors dépôt). Sources : `HANDOFF-colors.md`, `handoff-ringstyle.md`, `handoff-selectors.md`. Trois lots, une PR chacun, dans l'ordre : les Anneaux et les sélecteurs utilisent les jetons du lot 17. Ne touche pas aux données de fiche : pas de migration de schéma. La typographie et la mise en page ne changent pas, sauf le bloc Anneaux (I.2) et le panneau Posture (I.3).
+Statut : lots 17 à 19 **livrés** (écarts en I.6 à I.8), maquettes validées (artifacts « Anneaux de la fiche », proposition B, et « Sélecteurs du Carnet », hors dépôt). Sources : `HANDOFF-colors.md`, `handoff-ringstyle.md`, `handoff-selectors.md`. Trois lots, une PR chacun, dans l'ordre : les Anneaux et les sélecteurs utilisent les jetons du lot 17. Ne touche pas aux données de fiche : pas de migration de schéma. La typographie et la mise en page ne changent pas, sauf le bloc Anneaux (I.2) et le panneau Posture (I.3).
 
 | Lot | Version | Contenu |
 |---|---|---|
@@ -2040,6 +2040,15 @@ S1 à S10 du handoff d'origine renommés **D1 à D10** (S1 à S5 existent deux f
 - **CSS fusionné, pas ajouté** : les surcharges de `reference/anneaux-enso.css` sont fondues dans les règles `.ring` existantes de `styles.css` (plus de `border-top`, `padding-top` à 18 px, `.rv` à 26 px) au lieu d'être recopiées après. Rendu identique, une seule source par propriété.
 - **Masques sur `:root`** : `--brush` et `--enso` sont déclarés dans le premier bloc de thème (`:root`), pas sur `.ring::after` / `.rv::before`. Un second bloc `:root` aurait remplacé le premier dans l'analyse de `tests/colors.spec.ts` ; les data URI ne contiennent ni `;` ni couleur. Le lot 19 réutilise `var(--enso)` sans recopier le tracé.
 - **Tests** : A1 à A6 et A8 en Playwright (`tests/e2e/rings.spec.ts`, Chromium) : jsdom ne calcule pas les pseudo-éléments, donc A6 (`::before`) ne peut pas tourner dans Vitest. « Kanji entier » est vérifié par la taille de police calculée (≤ plus petit côté de la carte − 8 px) ; A5 par la largeur du texte « 10 » (≤ diamètre − 20 px). A7 est le lint N8 existant. Les captures (deux thèmes × 1200 et 390 px, bureau étroit 760 px, édition, valeur 10) sont écrites dans `test-results/anneaux/` (hors dépôt).
+
+### I.8 Écarts de mise en œuvre (v2.16.0)
+- **Composant `RichSelect`** (`src/ui/components/RichSelect.tsx`) pour les cinq variantes : `<select>` contrôlé de classes `in cs cs-<variante>`, avec `<button><selectedcontent>` en tête pour les variantes riches. `.in` est gardé pour la liste native de repli. `RingOption` (kanji, nom, Traits tirés de `RINGS` / `TRAIT_LABELS`) et `EffectTags` (étiquettes `.fx`) évitent de répéter la structure. Le type `selectedcontent` est déclaré pour JSX dans ce fichier.
+- **Variantes retenues** pour les 16 `<select>` : Champ pour Trait d'une compétence et tous les champs du bloc Bonus de jet (dont « Modèle de bonus ») ; En ligne pour Spécialisation, ND de base et zone du Coup ciblé (lanceur), et « Armure du livre » dans l'éditeur de la barre d'état (Champ dans le bloc Armure, prop `variant` d'`ArmorFields`) ; Anneau pour Affinité, Élément d'un sort (option « Tous » sans kanji ni ensō), Élément du sort universel et Anneau du jet ; Catalogue groupé pour Techniques d'école. Clan et Famille restent des champs texte (pas de `<select>`), l'état de bataille de masse reste en boutons.
+- **Catalogue groupé** : les écoles n'ont pas de référence de page ; `.m` affiche la classe (« Bushi », « Courtisan », « Shugenja ») et `.d` la technique de rang 1. Le champ prend **toute une ligne** de la grille du bloc Identité (`Field wide`, `.form-grid .field.wide`), comme le sélecteur Posture dans son panneau : largeur `min(100%, 24rem)` au lieu de 22rem, liste à la largeur du champ (`anchor-size(width)`), nom, classe et technique de rang 1 en entier, sur plusieurs lignes au besoin ; rien n'est tronqué (vérifié en D8). Le `<optgroup>` garde son `label` pour la liste native, avec un `<legend>` pour `base-select`.
+- **CSS** : `min-width: 13rem` des variantes Champ et Anneau retiré (cellules de tableau de 140 px, colonnes de 150 px) ; `font: inherit` déjà posé sur tous les `select`, donc retiré de `.cs` (il écrasait `.mono` du ND de base). Descriptions `.d` des variantes Avec effets et Catalogue en `white-space: normal` (sinon coupées). Les étiquettes `.fx` de `.posture-desc` reprennent le style de celles de la liste, hors `@supports`, pour le repli. Mobile : Champ, Anneau, Catalogue et Avec effets en pleine largeur et 16 px.
+- **Panneau Posture** : en-tête « Posture » + ND d'armure, sans « i » ; `InfoPanel` perd `stance`. L'Assaut monté sans Équitation 3 devient une option désactivée avec la même raison en `title`. Étiquettes d'effet : champ `tags` de `STANCES` (P-I4 au défaut) ; les effets d'école réservés à une posture viennent de `stanceEffects` (moteur), au format « +1g0 · Hiruma R1 ».
+- **Tests** : D3 à D8 dans Vitest (`tests/ui/selectors.spec.tsx`, structure DOM, posture par `tests/helpers/stance.ts`) ; D1, D7 et D8 dans Playwright (`tests/e2e/selectors.spec.ts`, Chromium, deux thèmes, captures dans `test-results/selecteurs/`, hors dépôt) ; D9 dans `mobile.spec.ts` (« Pixel 7 » en `base-select`, « iPhone 13 » en WebKit, donc en liste native) ; D10 est le lint N8. **D2 (Firefox) n'est pas automatisé** : Firefox n'est pas installé pour Playwright ; le repli sans `base-select` est couvert par WebKit (D9, M1 à M19).
+- **Tests existants modifiés** : les tests qui cliquaient un bouton de posture choisissent l'option (`app`, `combat`, `schools`, `slots`, e2e `schools` et `mobile`) ; E12 et M10 selon I.3.7 ; liste de l'Affinité (`spells`) lue dans `.n` ; e2e `schools` choisit l'école par valeur, le texte de l'option n'étant plus le seul nom.
 
 ---
 

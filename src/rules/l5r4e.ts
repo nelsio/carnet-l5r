@@ -86,12 +86,24 @@ export const ARMOR_TN = {
   defenseSkill: "Défense",
 } as const;
 
-export const STANCES: readonly { id: Stance; label: string; description: string }[] = [
-  { id: "attack", label: "Attaque", description: "Posture normale." },
-  { id: "fullAttack", label: "Assaut", description: "+2g1 à l'attaque, −10 au ND d'armure." },
-  { id: "defense", label: "Défense", description: "Ajoute Air + Défense au ND d'armure." },
-  { id: "fullDefense", label: "Défense totale", description: "Jet Défense (Réflexes), + moitié (arrondie au supérieur) au ND d'armure." },
-  { id: "center", label: "Centre", description: "Aucune action ; bonus au round suivant (voir livre)." },
+/** Étiquette d'effet d'une posture (sélecteur Posture, annexe I.3.4) : `up` pour un bonus. */
+export interface StanceTag { label: string; up?: boolean }
+
+export const STANCES: readonly { id: Stance; label: string; description: string; tags: readonly StanceTag[] }[] = [
+  { id: "attack", label: "Attaque", description: "Posture normale.", tags: [{ label: "aucun modificateur" }] },
+  {
+    id: "fullAttack", label: "Assaut", description: "+2g1 à l'attaque, −10 au ND d'armure.",
+    tags: [{ label: "+2g1 attaque", up: true }, { label: "ND armure −10" }],
+  },
+  { id: "defense", label: "Défense", description: "Ajoute Air + Défense au ND d'armure.", tags: [{ label: "ND armure +Défense +Air", up: true }] },
+  {
+    id: "fullDefense", label: "Défense totale", description: "Jet Défense (Réflexes), + moitié (arrondie au supérieur) au ND d'armure.",
+    tags: [{ label: "ND armure +jet", up: true }, { label: "pas d'attaque" }],
+  },
+  {
+    id: "center", label: "Centre", description: "Aucune action ; bonus au round suivant (voir livre).",
+    tags: [{ label: "bonus au round suivant", up: true }, { label: "aucune action" }],
+  },
 ];
 
 /** Modificateurs de réserve. */

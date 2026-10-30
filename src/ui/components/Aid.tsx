@@ -1,16 +1,18 @@
 import { Fragment, useEffect } from "react";
 import {
-  armorEffects, armyStatus, battleOutcome, battleRollBonus, battleRollTotal, describeModifier, rollBattleDice, fullAttackAllowed, guardRule, initiativeScore, isSimpleAttack, stanceRestriction, modifiersOf, movement, movementBonus, movementWater, resolveValue,
+  armorEffects, armyStatus, battleOutcome, battleRollBonus, battleRollTotal, describeEffect, describeModifier, rollBattleDice, stanceEffects, fullAttackAllowed, guardRule, initiativeScore, isSimpleAttack, stanceRestriction, modifiersOf, movement, movementBonus, movementWater, resolveValue,
   isShugenja, reminderText, rings, schoolOf, schoolReminders, spellRestriction, stackCount, stackEffects, stackMax, terrainWaiver, voidMultiplier,
   type ActionDef, type ActiveEffect,
 } from "@carnet/core";
 import {
   ARMY_STATUSES, BATTLE_COMMAND, BATTLE_EVENT_LABELS, BATTLE_ROLL, CENTER_BONUS, COMBAT_SUBS, ENGAGEMENTS, SITUATIONS, STANCES, TERRAINS, VOID_COMBAT,
+  type Stance, type StanceTag,
 } from "../../rules/l5r4e";
 import type { ReminderContext } from "../../rules/ecoles";
 import { toMeters } from "../format";
 import { contextOf, currentArmorTN, DEFAULT_ROLL_OPTIONS, isActive, isRollable, poolFor, poolLabel, toPoolAction, uiRollStance } from "../rolls";
 import { currentActions, useCharacter, useStore, type AidSituation, type BattleState, type InfoPanel } from "../store";
+import { EffectTags, RichSelect } from "./RichSelect";
 import { Roller } from "./Roller";
 import { TakeDamage } from "./StatusBar";
 
@@ -120,30 +122,43 @@ function StancePanel() {
   const { ui } = state;
   const tn = currentArmorTN(c, ui);
   const armorMods = modifiersOf(c).filter((m) => m.appliesTo === "armor");
+  // Étiquettes de la posture, puis effets de technique réservés à cette posture (Hiruma R1, annexe I.3.4).
+  const tagsOf = (s: (typeof STANCES)[number]): StanceTag[] => [
+    ...s.tags, ...stanceEffects(c, s.id).map((e) => ({ label: `${describeEffect(e, c) || e.technique} · ${e.source}`, up: true })),
+  ];
+  const current = STANCES.find((s) => s.id === ui.stance);
   return (
     <div className="panel" style={{ padding: 12 }}>
       <div className="panel-head" style={{ marginBottom: 8 }}>
-        <span className="panel-title"><span className="label">Posture</span><InfoButton panel="stance" label="Posture" /></span>
+        <span className="label">Posture</span>
         <span className="muted" style={{ fontSize: 13 }}>
           ND d'armure <b className="mono" style={{ color: "var(--ink)", fontSize: 16 }}>{tn}</b>
           {ui.voidArmor && <> <span className="tag">+{10 * voidMultiplier(c)} Vide</span></>}
         </span>
       </div>
-      <div className="stance" role="group" aria-label="Posture">
+      {/* Menu déroulant à la place des boutons (annexe I.3.4) : nom, étiquettes et description de chaque posture. */}
+      <RichSelect
+        variant="effet" aria-label="Posture" aria-describedby="posture-desc" value={ui.stance}
+        onChange={(v) => dispatch({ type: "stance", stance: v as Stance })}
+      >
         {STANCES.map((s) => {
           // Assaut monté : seulement avec Équitation 3 (F2).
           const locked = s.id === "fullAttack" && !fullAttackAllowed(c, ui.mounted);
           return (
-            <button
-              key={s.id} type="button" aria-pressed={ui.stance === s.id} disabled={locked}
-              title={locked ? "Assaut à cheval : Équitation 3 requise" : undefined}
-              onClick={() => dispatch({ type: "stance", stance: s.id })}
-            >
-              <b>{s.label}</b>{ui.info.stance && <span className="muted">{s.description}</span>}
-            </button>
+            <option key={s.id} value={s.id} disabled={locked} title={locked ? "Assaut à cheval : Équitation 3 requise" : undefined}>
+              <span className="n">{s.label}</span>
+              <EffectTags tags={tagsOf(s)} />
+              <span className="d">{s.description}</span>
+            </option>
           );
         })}
-      </div>
+      </RichSelect>
+      {current && (
+        <div className="posture-desc" id="posture-desc" data-testid="posture-desc">
+          <EffectTags tags={tagsOf(current)} />
+          {current.description}
+        </div>
+      )}
       <div className="grid" style={{ gap: 4, marginTop: 8 }}>
         <label className="chk">
           <input type="checkbox" checked={ui.mounted} onChange={(e) => dispatch({ type: "mounted", on: e.target.checked })} /> Monté

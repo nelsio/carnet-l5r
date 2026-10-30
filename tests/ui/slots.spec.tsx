@@ -6,6 +6,7 @@ import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import perso from "../../reference/perso-test-shugenja.json";
 import kakita from "../fixtures/kakita-v1.json";
+import { chooseStance } from "../helpers/stance";
 
 const kuni = (patch: Partial<Character> = {}): Character => ({ ...CharacterSchema.parse(structuredClone(perso)), ...patch });
 
@@ -128,21 +129,19 @@ describe("Emplacements au lancer (F.5)", () => {
 });
 
 describe("Sorts en escarmouche et Rester concentré (F.5)", () => {
-  const stance = (name: string) => fireEvent.click(within(screen.getByRole("group", { name: "Posture" })).getByRole("button", { name: new RegExp(`^${name}`) }));
-
   it("G16 : groupe « Sorts » ; Assaut et Défense totale grisent les sorts, Défense non", async () => {
     await renderApp(kuni());
     click("Aide de jeu");
     click("Combat");
     expect(screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent)).toContain("Sorts");
     expect(card("Lancer · Frappe de jade")).toHaveTextContent("5g3");
-    stance("Assaut");
+    chooseStance("Assaut");
     expect(screen.getByTestId("blocked-sk-spell-jade-strike")).toHaveTextContent("Assaut : attaques seulement, pas de sort.");
-    stance("Défense totale");
+    chooseStance("Défense totale");
     expect(screen.getByTestId("blocked-sk-spell-jade-strike")).toHaveTextContent("Défense totale : actions gratuites seulement, pas de sort.");
     click("Lancer quand même : Lancer · Frappe de jade");
     expect(roller().getByTestId("stance-restriction")).toHaveTextContent("actions gratuites seulement");
-    stance("Défense(?! totale)");
+    chooseStance("Défense");
     expect(screen.queryByTestId("blocked-sk-spell-jade-strike")).toBeNull();
     // La déficience grise aussi en escarmouche.
     expect(screen.getByTestId("blocked-sk-spell-air-1")).toHaveTextContent("Déficience : impossible au rang 1.");
@@ -152,9 +151,9 @@ describe("Sorts en escarmouche et Rester concentré (F.5)", () => {
     await renderApp(kuni());
     click("Aide de jeu");
     click("Combat");
-    stance("Centre");
+    chooseStance("Centre");
     click("Nouveau round");
-    stance("Attaque");
+    chooseStance("Attaque");
     fireEvent.click(card("Lancer · Frappe de jade"));
     fireEvent.click(roller().getByRole("checkbox", { name: /Bonus de Centre/ }));
     expect(roller().getByTestId("pool")).toHaveTextContent("6g4");

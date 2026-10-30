@@ -5,6 +5,7 @@ import type { Character } from "@carnet/core";
 import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
+import { chooseStance, currentStance, stanceOption } from "../helpers/stance";
 import { openWounds, woundsField } from "../helpers/wounds";
 
 const base = () => structuredClone(kakita) as Character;
@@ -19,7 +20,6 @@ async function renderApp(character: Character = base(), rng = always(5)) {
 }
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
 const roller = () => within(screen.getByRole("dialog", { name: "Lanceur de dés" }));
-const stance = (name: string) => fireEvent.click(within(screen.getByRole("group", { name: "Posture" })).getByRole("button", { name: new RegExp(`^${name}`) }));
 const toCombat = (sub?: string) => {
   click("Aide de jeu");
   click("Combat");
@@ -39,14 +39,14 @@ describe("Centre (F1)", () => {
     click("Lanceur de dés : masqué");
     click("Lancer 4g3");
     expect(screen.getByTestId("initiative")).toHaveTextContent("15");
-    stance("Centre");
+    chooseStance("Centre");
     expect(screen.getByTestId("blocked-atk-skirmish-Katana")).toHaveTextContent("Posture Centre : aucune action ce round.");
     click("Lancer quand même : Attaque · Katana");
     expect(roller().getByTestId("stance-restriction")).toHaveTextContent("aucune action ce round");
     click("Nouveau round");
     expect(screen.getByTestId("initiative")).toHaveTextContent("25");
     expect(screen.getByTestId("initiative-bonus")).toHaveTextContent("+10 Centre");
-    stance("Attaque");
+    chooseStance("Attaque");
     click(/^Attaque · Katana/);
     const box = roller().getByRole("checkbox", { name: /Bonus de Centre/ });
     fireEvent.click(box);
@@ -63,14 +63,13 @@ describe("Restrictions de posture (F2)", () => {
   it("L10 : Assaut → carte Tir grisée ; Assaut monté refusé avec Équitation 1, permis avec Équitation 3", async () => {
     await renderApp(withBow());
     toCombat();
-    stance("Assaut");
+    chooseStance("Assaut");
     expect(screen.getByTestId("blocked-atk-skirmish-Yumi")).toHaveTextContent("Assaut : pas d'attaque à distance.");
     expect(screen.queryByTestId("blocked-atk-skirmish-Katana")).toBeNull();
     fireEvent.click(screen.getByRole("checkbox", { name: /^Monté/ }));
     // Équitation 1 : l'Assaut est désactivé, la posture repasse en Attaque.
-    const assault = within(screen.getByRole("group", { name: "Posture" })).getByRole("button", { name: /^Assaut/ });
-    expect(assault).toBeDisabled();
-    expect(within(screen.getByRole("group", { name: "Posture" })).getByRole("button", { name: /^Attaque/ })).toHaveAttribute("aria-pressed", "true");
+    expect(stanceOption("Assaut")).toBeDisabled();
+    expect(currentStance()).toBe("Attaque");
   });
 
   it("L10 : Équitation 3 → Assaut monté permis", async () => {
@@ -79,13 +78,13 @@ describe("Restrictions de posture (F2)", () => {
     await renderApp(c);
     toCombat();
     fireEvent.click(screen.getByRole("checkbox", { name: /^Monté/ }));
-    expect(within(screen.getByRole("group", { name: "Posture" })).getByRole("button", { name: /^Assaut/ })).toBeEnabled();
+    expect(stanceOption("Assaut")).toBeEnabled();
   });
 
   it("Défense : les attaques sont grisées, la Défense totale reste jouable", async () => {
     await renderApp();
     toCombat();
-    stance("Défense totale");
+    chooseStance("Défense totale");
     expect(screen.getByTestId("blocked-atk-skirmish-Katana")).toHaveTextContent("Posture Défense");
     expect(screen.queryByTestId("blocked-full-defense")).toBeNull();
   });
@@ -134,7 +133,7 @@ describe("Vide, Feinte, Garde, encaissement (F3 à F6)", () => {
     expect(screen.getByTestId("guard-note")).toHaveTextContent("ton allié : +10 au ND d'armure");
     click("Nouveau round");
     expect(guard()).toBeChecked();
-    stance("Assaut");
+    chooseStance("Assaut");
     expect(guard()).not.toBeChecked();
     expect(guard()).toBeDisabled();
   });

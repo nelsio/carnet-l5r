@@ -581,3 +581,85 @@ header.top + main{margin-top:18px}
   .slot .label{font-size:9px;letter-spacing:.03em}
   .slotrow .stepper button{width:40px;height:40px}
 }
+/* ---------- v2.16.0 : sélecteurs stylés (annexe I.3, reference/selecteurs.css) ----------
+   Classes « in cs cs-<variante> » posées par RichSelect. Tout le style est sous @supports : ailleurs, liste native (.in).
+   Menu = élément surélevé (--surface-2, --shadow) ; --enso vient de :root (bloc Anneaux, I.2.3). */
+@supports (appearance:base-select){
+  .cs,.cs::picker(select){appearance:base-select}
+  .cs{--cs-hover:color-mix(in oklab,var(--ink) 7%,var(--surface-2));color:var(--ink)}
+  .cs:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .cs::picker-icon{color:var(--muted);transition:rotate .18s}
+  .cs:open::picker-icon{rotate:180deg;color:var(--accent)}
+  .cs::picker(select){margin-block:4px;padding:4px;max-height:min(60vh,26rem);border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);box-shadow:var(--shadow)}
+  .cs option{color:var(--ink);border-radius:6px;min-height:40px}
+  .cs option:hover,.cs option:focus-visible{background:var(--cs-hover);outline:none}
+  .cs option:checked{background:var(--accent-pale)}
+  .cs option:disabled{opacity:.45;cursor:not-allowed}
+  .cs option::checkmark{color:var(--accent)}
+  .cs optgroup{font-weight:400}
+  .cs legend{padding:.7rem .7rem .25rem;font:700 .7rem var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+  /* Champ : formulaires d'édition */
+  .cs-champ{padding:.55rem .8rem;min-height:40px;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+  .cs-champ:hover{border-color:color-mix(in oklab,var(--ink) 40%,transparent)}
+  .cs-champ:open{border-color:var(--accent)}
+  .cs-champ option{padding:.55rem .7rem}
+  .cs-champ option:checked{color:var(--accent-ink);font-weight:700}
+
+  /* En ligne : options du lanceur, éditeur de la barre d'état */
+  .cs-ligne{padding:.15rem .2rem .15rem .1rem;min-height:32px;border:0;border-bottom:1px dashed var(--line);border-radius:0;background:transparent;font-weight:700;color:var(--accent-ink)}
+  .cs-ligne:hover{border-bottom-color:var(--accent)}
+  .cs-ligne::picker-icon{color:var(--accent)}
+  .cs-ligne::picker(select){min-width:12rem}
+  .cs-ligne option{padding:.5rem .7rem;font-weight:400}
+  .cs-ligne option:checked{font-weight:700}
+
+  /* Anneau : kanji dans l'ensō, à la couleur de l'Anneau (--rc posé sur chaque option) */
+  .cs-anneau{padding:.4rem .7rem .4rem .45rem;min-height:40px;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+  .cs-anneau option{display:grid;grid-template-columns:2.3rem 1fr;column-gap:.7rem;align-items:center;padding:.45rem .6rem}
+  .cs-anneau option::checkmark{display:none}
+  .cs-anneau .k{position:relative;grid-row:span 2;width:2.3rem;height:2.3rem;display:grid;place-items:center;color:var(--rc);font:800 1.05rem/1 var(--f-display)}
+  .cs-anneau .k::before{content:"";position:absolute;inset:-1px;background:var(--rc);-webkit-mask:var(--enso) center/contain no-repeat;mask:var(--enso) center/contain no-repeat}
+  .cs-anneau .n{font-weight:700}
+  .cs-anneau .d{font:.76rem var(--f-body);color:var(--muted)}
+  .cs-anneau option:checked{box-shadow:inset 3px 0 0 var(--rc)}
+  .cs-anneau selectedcontent{display:flex;align-items:center;gap:.55rem}
+  .cs-anneau selectedcontent .d{display:none}
+  .cs-anneau selectedcontent .k{width:1.8rem;height:1.8rem;font-size:.85rem}
+
+  /* Catalogue groupé : Techniques d'école, groupées par clan */
+  .cs-catalogue{width:min(100%,24rem);padding:.45rem .8rem;min-height:40px;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+  .cs-catalogue::picker(select){width:anchor-size(width)}
+  .cs-catalogue option{display:grid;grid-template-columns:1fr auto;column-gap:.8rem;padding:.5rem .7rem}
+  .cs-catalogue option::checkmark{display:none}
+  .cs-catalogue .n{font-weight:700;white-space:normal}
+  .cs-catalogue .m{font:.72rem var(--f-mono);color:var(--muted);align-self:center;white-space:nowrap}
+  .cs-catalogue .d{grid-column:1/-1;font-size:.76rem;color:var(--muted);white-space:normal}
+  .cs-catalogue option:checked{box-shadow:inset 3px 0 0 var(--accent)}
+  .cs-catalogue option:checked .n{color:var(--accent-ink)}
+  .cs-catalogue selectedcontent{display:flex;align-items:baseline;gap:.6rem}
+  .cs-catalogue selectedcontent .d{display:none}
+
+  /* Avec effets : panneau Posture */
+  .cs-effet{width:min(100%,24rem);padding:.45rem .8rem;min-height:40px;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+  .cs-effet::picker(select){width:anchor-size(width)}
+  .cs-effet option{display:grid;gap:.2rem;padding:.55rem .7rem}
+  .cs-effet .n{font:600 1rem var(--f-display)}
+  .cs-effet .d{font-size:.78rem;line-height:1.45;color:var(--muted);white-space:normal}
+  .cs-effet option:checked{box-shadow:inset 3px 0 0 var(--accent)}
+  .cs-effet option::checkmark{display:none}
+  .cs-effet selectedcontent .fx,.cs-effet selectedcontent .d{display:none}
+  .cs-effet selectedcontent .n{font-size:.95rem}
+}
+/* Étiquettes d'effet : dans la liste Posture et sous le sélecteur (visibles aussi sans base-select) */
+.cs-effet .fx,.posture-desc .fx{display:flex;flex-wrap:wrap;gap:.3rem}
+.cs-effet .fx span,.posture-desc .fx span{font:600 .7rem var(--f-mono);padding:.1rem .4rem;border-radius:4px;background:color-mix(in oklab,var(--ink) 7%,var(--surface-2));color:var(--ink)}
+.cs-effet .fx .up,.posture-desc .fx .up{background:var(--accent-pale);color:var(--accent-ink)}
+/* Description permanente de la posture choisie, sous le sélecteur (I.3.4) */
+.posture-desc{margin:.5rem 0 0;font-size:.85rem;line-height:1.5;color:var(--muted)}
+.posture-desc .fx{margin-bottom:.3rem}
+/* Sélecteur de catalogue sur toute une ligne du formulaire, comme le sélecteur Posture dans son panneau */
+.form-grid .field.wide{grid-column:1/-1}
+@media (max-width:720px){
+  .cs-champ,.cs-anneau,.cs-catalogue,.cs-effet{width:100%;font-size:16px}
+}

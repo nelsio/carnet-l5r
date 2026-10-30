@@ -17,7 +17,10 @@ async function importKakita(page: Page) {
 
 async function chooseSchool(page: Page, school: string, insight: string) {
   await page.getByRole("button", { name: "Edit : Identité & réputation" }).click();
-  await page.getByRole("combobox", { name: "Techniques d'école" }).selectOption({ label: school });
+  // Option du catalogue groupé (annexe I.3.3) : le nom de l'école est dans `.n`.
+  const select = page.getByRole("combobox", { name: "Techniques d'école" });
+  const option = select.locator("option").filter({ has: page.locator(".n", { hasText: new RegExp(`^${school}$`) }) });
+  await select.selectOption((await option.getAttribute("value"))!);
   await page.getByRole("spinbutton", { name: "Rang d'Insight" }).fill(insight);
   await page.getByRole("button", { name: "Terminer : Identité & réputation" }).click();
 }
@@ -46,7 +49,7 @@ test("E17 : Hiruma 2, compteur « Touches » à 2 : ND d'armure +10, perdu en As
   await add.click();
   await add.click();
   await expect(armor).toHaveText("30");
-  await page.getByRole("group", { name: "Posture" }).getByRole("button", { name: /^Assaut/ }).click();
+  await page.getByRole("combobox", { name: "Posture" }).selectOption("fullAttack");
   await expect(armor).toHaveText("10");
 });
 
@@ -54,7 +57,7 @@ test("E18 : Kakita 2 en Centre : étiquette Kakita R1, case « Initiative plus b
   await importKakita(page);
   await chooseSchool(page, "École de bushi Kakita", "2");
   await skirmish(page);
-  await page.getByRole("group", { name: "Posture" }).getByRole("button", { name: /^Centre/ }).click();
+  await page.getByRole("combobox", { name: "Posture" }).selectOption("center");
   // En Centre, la carte est grisée (annexe E.3 F2) : « Lancer quand même ».
   await page.getByRole("button", { name: "Lancer quand même : Attaque · Katana" }).click();
   const roller = page.getByRole("dialog", { name: "Lanceur de dés" });
