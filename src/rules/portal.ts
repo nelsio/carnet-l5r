@@ -3,7 +3,7 @@
  * Un seul module pour toutes les adresses : un changement d'URL du portail ne touche que ce fichier.
  * Ce sont de simples liens : le Carnet ne fait aucune requête vers le portail.
  */
-import { CLANS } from "./l5r4e";
+import { CLANS, type Situation } from "./l5r4e";
 
 export const PORTAL_BASE = "https://vincenzorpg.github.io/L5R/";
 
@@ -32,3 +32,19 @@ export function spellUrl(name: string): string {
   const q = name.trim();
   return q ? `${PORTAL.grimoire}?q=${encodeURIComponent(q)}` : PORTAL.grimoire;
 }
+
+/** Lien de l'encadré de l'Aide de jeu (annexe L.8). */
+export interface PortalLink { url: string; title: string; desc: string }
+
+/** Liens vers le portail par situation de l'Aide de jeu ; une situation sans lien n'a pas d'encadré (annexe L.8). */
+export const SITUATION_LINKS: Readonly<Record<Situation, readonly PortalLink[]>> = {
+  investigation: [],
+  court: [
+    { url: PORTAL.etiquette, title: "Étiquette & coutumes", desc: "Castes, cadeaux, cérémonie du thé" },
+    { url: PORTAL.bushido, title: "Bushido & honneur", desc: "Vertus, gains et pertes d'honneur" },
+  ],
+  movement: [],
+  // Toutes les formes de combat : escarmouche, duel, bataille de masse.
+  combat: [{ url: PORTAL.combat, title: "Mémento de combat", desc: "Round d'escarmouche, postures, duel Iaijutsu" }],
+  magic: [],
+};

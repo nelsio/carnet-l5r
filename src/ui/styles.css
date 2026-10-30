@@ -750,3 +750,27 @@ a.btn .ext{margin-left:8px}
   .steps .step-n{grid-row:span 2}
   .tplc .btn,.start-opt .btn{min-height:44px}
 }
+
+/* ---------- Portail de la campagne dans la Fiche et l'Aide de jeu (annexe L.7, L.8, v2.20.0) ---------- */
+/* Clan de l'en-tête en lien vers sa page */
+a.mon{border-radius:4px}
+a.mon:hover{text-decoration:underline}
+a.mon .ext{margin-left:0}
+/* Bloc Sorts : lien « Grimoire » dans le titre, un lien par sort */
+.panel-head .head-link{margin-left:auto;display:inline-flex;align-items:center;font-size:13px;font-weight:700}
+.spell{grid-template-columns:minmax(0,1fr) auto;align-items:start}
+.spell-body{display:grid;gap:3px;min-width:0}
+.spell-link{display:inline-grid;place-items:center;width:44px;height:44px;margin:-6px -6px -6px 0;border-radius:8px;color:var(--accent-ink)}
+.spell-link:hover{background:var(--accent-pale)}
+.spell-link .ext{width:18px;height:18px;margin:0}
+.spellfoot .spell-link{margin:0 4px 0 auto}
+.grimoire-note{font-size:12px}
+/* Aide de jeu : encadré de liens, sans titre, au-dessus du lanceur */
+.aid-side{display:grid;gap:12px;align-content:start;min-width:0}
+.portal-links{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:2px 14px}
+.portal-links a{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line);min-height:44px;text-decoration:none}
+.portal-links a:first-child{border-top:0}
+.portal-links .t{font-weight:700;color:var(--accent-ink);font-size:14px}
+.portal-links .d{display:block;font-size:12px;color:var(--muted)}
+.portal-links .ext{color:var(--muted);margin:0}
+.portal-links a:hover .t{text-decoration:underline}

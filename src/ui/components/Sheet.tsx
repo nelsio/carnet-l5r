@@ -6,10 +6,12 @@ import {
 } from "@carnet/core";
 import { WEAPON_KEYWORD_LABELS } from "../../rules/ecoles";
 import { ELEMENT_LABELS, RINGS, SPELL_KEYWORDS, TRAIT_LABELS, UNIVERSAL_SPELLS, type RingKey } from "../../rules/l5r4e";
+import { PORTAL, spellUrl } from "../../rules/portal";
 import { decimal } from "../format";
 import { poolLabel } from "../rolls";
 import { useCharacter, useStore, type BlockId, type ListKey } from "../store";
 import { ArmorFields } from "./ArmorCatalog";
+import { ExternalLink } from "./ExternalLink";
 import { FileActions } from "./FileActions";
 import { Modifiers } from "./Modifiers";
 import { RichSelect, RingOption } from "./RichSelect";
@@ -57,7 +59,7 @@ export function Sheet() {
           <Block id="armor" title="Armure"><Armor /></Block>
           <Block id="techniques" title="Techniques d'école"><Techniques /></Block>
           {(isShugenja(c) || state.ui.editing.has("magic")) && (
-            <Block id="magic" title={<>Rouleaux &amp; invocations</>} label="Rouleaux & invocations"><Spells /></Block>
+            <Block id="magic" title={<>Rouleaux &amp; invocations</>} label="Rouleaux & invocations" extra={<GrimoireLink />}><Spells /></Block>
           )}
           <Block id="modifiers" title="Bonus de jet"><Modifiers /></Block>
         </div>
@@ -78,7 +80,8 @@ export function Sheet() {
  * Bloc de la fiche avec son bouton « Edit » (« Terminer » pendant l'édition), annexe E.9 S2.
  * Plusieurs blocs peuvent être ouverts ensemble ; aucun bouton en consultation.
  */
-function Block({ id, title, label, children }: { id: BlockId; title: ReactNode; label?: string; children: ReactNode }) {
+/** `extra` : à droite du titre, avant le bouton Edit (lien « Grimoire » du bloc Sorts, annexe L.7). */
+function Block({ id, title, label, extra, children }: { id: BlockId; title: ReactNode; label?: string; extra?: ReactNode; children: ReactNode }) {
   const { state, dispatch } = useStore();
   const edit = state.ui.editing.has(id);
   const name = label ?? (typeof title === "string" ? title : id);
@@ -86,6 +89,7 @@ function Block({ id, title, label, children }: { id: BlockId; title: ReactNode; 
     <section className={`panel${edit ? " editing" : ""}`} aria-label={name} data-testid={`block-${id}`}>
       <div className="panel-head">
         <h2>{title}</h2>
+        {extra}
         {state.mode === "edit" && (
           <button
             type="button" className={`btn sm${edit ? " accent" : ""}`} aria-pressed={edit}
@@ -606,6 +610,7 @@ function Spells() {
                   <input type="checkbox" checked={s.memorized} onChange={(e) => set(["spells", i, "memorized"], e.target.checked)} />
                   {" "}Mémorisé <span className="muted">· {s.mastery} XP</span>
                 </label>
+                <SpellLink name={s.name} />
                 <RemoveButton list="spells" index={i} name={s.name} />
               </div>
             </div>
@@ -620,6 +625,7 @@ function Spells() {
             >Ajouter les sorts universels</button>
           )}
         </div>
+        {spells.length > 0 && <GrimoireNote />}
       </>
     );
   }
@@ -633,6 +639,7 @@ function Spells() {
           const line = [s.range && `Portée ${s.range}`, s.area && `Zone ${s.area}`, s.duration && `Durée ${s.duration}`].filter(Boolean).join(" · ");
           return (
             <div key={s.id} className={`spell el-${s.element}`} data-testid={`spell-${s.id}`}>
+              <div className="spell-body">
               <div className="sp1">
                 <b>{s.name}</b>
                 <span className="tag el">{ELEMENT_LABELS[s.element]}</span>
@@ -648,12 +655,30 @@ function Spells() {
               )}
               {raises.length > 0 && <div className="sp4"><span className="label">Augm.</span> {raises.join(" · ")}</div>}
               {s.effect && <div className="prose sp5">{s.effect}</div>}
+              </div>
+              <SpellLink name={s.name} />
             </div>
           );
         })}
       </div>
+      <GrimoireNote />
     </>
   );
+}
+
+/** Lien « Grimoire » du titre du bloc Sorts (annexe L.7). */
+function GrimoireLink() {
+  return <ExternalLink href={PORTAL.grimoire} className="head-link" label="Grimoire (nouvel onglet)">Grimoire</ExternalLink>;
+}
+
+/** Sort dans le grimoire du portail, recherche par nom ; rien pour un sort sans nom (annexe L.7). */
+function SpellLink({ name }: { name: string }) {
+  if (!name.trim()) return null;
+  return <ExternalLink href={spellUrl(name)} className="spell-link" label={`${name.trim()} dans le grimoire (nouvel onglet)`} />;
+}
+
+function GrimoireNote() {
+  return <p className="hint grimoire-note">Chaque lien ouvre le grimoire avec le nom du sort en recherche.</p>;
 }
 
 /** « Affinité Terre · Déficience Air » sous l'école de shugenja (annexe F.5), à la couleur de l'Anneau. */
