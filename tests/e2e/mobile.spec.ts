@@ -268,6 +268,51 @@ test("M10 : Vide et Posture tiennent sur un écran avec leur description ; menu 
   await expect(voidPanel.getByRole("button", { name: /le détail/ })).toHaveCount(0);
 });
 
+/** Lisible : ni tronqué, ni hors de la fenêtre, sans défilement horizontal de la page. */
+async function fits(el: Locator) {
+  const r = await el.evaluate((e) => {
+    const b = e.getBoundingClientRect();
+    return { truncated: e.scrollWidth > e.clientWidth + 0.5, left: b.left, right: b.right, vw: document.documentElement.clientWidth,
+      scroll: document.documentElement.scrollWidth };
+  });
+  expect(r.truncated).toBe(false);
+  expect(r.left).toBeGreaterThanOrEqual(0);
+  expect(r.right).toBeLessThanOrEqual(r.vw);
+  expect(r.scroll).toBeLessThanOrEqual(r.vw);
+}
+
+// Lot 21 (annexe K) : ligne Insight et badge d'écart lisibles sur mobile.
+test("K1 : ligne Insight et badge d'écart lisibles, sans débordement", async ({ page }) => {
+  await page.getByRole("button", { name: "Edit : Identité & réputation" }).click();
+  await page.getByRole("spinbutton", { name: "Rang d'Insight" }).fill("3");
+  const identity = page.getByTestId("block-identity");
+  await expect(identity.getByTestId("insight-computed")).toBeVisible();
+  await expect(identity.getByTestId("insight-mismatch")).toHaveText(/Rang saisi 3 · calculé \d+/);
+  await fits(identity.getByTestId("insight-mismatch"));
+  await page.getByRole("button", { name: "Terminer : Identité & réputation" }).click();
+  for (const id of ["sheet-insight", "insight-mismatch"]) {
+    await expect(identity.getByTestId(id)).toBeVisible();
+    await fits(identity.getByTestId(id));
+  }
+});
+
+test.describe("K1 à 360 px de large", () => {
+  test.use({ viewport: { width: 360, height: 740 } });
+  test("ligne Insight et badge d'écart lisibles, sans débordement", async ({ page }) => {
+    await page.getByRole("button", { name: "Edit : Identité & réputation" }).click();
+    await page.getByRole("spinbutton", { name: "Rang d'Insight" }).fill("3");
+    const identity = page.getByTestId("block-identity");
+    await expect(identity.getByTestId("insight-computed")).toBeVisible();
+    await expect(identity.getByTestId("insight-mismatch")).toHaveText(/Rang saisi 3 · calculé \d+/);
+    await fits(identity.getByTestId("insight-mismatch"));
+    await page.getByRole("button", { name: "Terminer : Identité & réputation" }).click();
+    for (const id of ["sheet-insight", "insight-mismatch"]) {
+      await expect(identity.getByTestId(id)).toBeVisible();
+      await fits(identity.getByTestId(id));
+    }
+});
+});
+
 // Lot 20 (annexe J.1) : bloc Armes en cartes, lisible à 390 px.
 test("Q1 : Armes en Edit, une carte par arme ; Nom, Compétence, VD lisibles en entier, 16 px, sans défilement horizontal", async ({ page }) => {
   await page.getByRole("button", { name: "Edit : Armes" }).click();
