@@ -2325,7 +2325,7 @@ Les identifiants I1 à I9 sont repris du handoff source (les I1 à I13 de la loc
 
 ### K.5 Écarts de mise en œuvre
 - Numéro de lot : 21 au lieu de 18 (voir le statut).
-- Référence de page de la règle : non vérifiée, notée « page à vérifier » dans le commentaire de `INSIGHT`.
+- Référence de page de la règle : aucune dans le commentaire de `INSIGHT` (page non vérifiée).
 - `OptionalNumber` gagne une borne `max` (10 par défaut) pour accepter le bonus jusqu'à 200.
 - `Field` gagne une indication `hint`, affichée sous la saisie hors du libellé : le nom accessible du champ reste « Rang d'Insight ».
 - Tests : `tests/core.insight.spec.ts` (I1 à I8, bornes et fusion), `tests/ui/insight.spec.tsx` (lecture, I8, I9, bonus du MJ), `tests/e2e/insight.spec.ts` et K1 dans `tests/e2e/mobile.spec.ts`. Aucun test existant modifié.

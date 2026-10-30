@@ -49,7 +49,7 @@ export const TN_SCALE = [
 export const TN_PER_RAISE = 5;
 
 /**
- * Points d'Insight (livre de base 4e, Rang d'Insight ; page à vérifier, annexe K) :
+ * Points d'Insight (livre de base 4e, annexe K) :
  * Anneaux × 10 + rangs de compétence ; Rang 1 sous 150, puis un rang tous les 25 points, au plus 10.
  */
 export const INSIGHT = { ringMultiplier: 10, firstThreshold: 150, step: 25, maxRank: 10 } as const;
