@@ -6,6 +6,11 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.21.4] - 2026-10-30
+
+### Modifié
+- Liens des sorts : le grimoire s'ouvre filtré sur l'élément du sort (« Sentir » ou « Invoquer » n'y donnent plus qu'un résultat).
+
 ## [2.21.3] - 2026-10-30
 
 ### Sécurité
@@ -247,7 +252,8 @@ Simples liens ouverts dans un nouvel onglet : le Carnet ne fait toujours aucune 
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.21.3...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.21.4...HEAD
+[2.21.4]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.21.4
 [2.21.3]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.21.3
 [2.21.2]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.21.2
 [2.21.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.21.1

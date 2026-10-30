@@ -1,6 +1,7 @@
 /**
  * Lot 23, v2.20.0 (HANDOFF annexe L.7, L.8) : liens vers le portail dans la Fiche et l'Aide de jeu, cas O12 à O15 et O17.
  * O16 (Aide de jeu à 390 px) : tests/e2e/portal.spec.ts.
+ * Lot 29, v2.21.4 : liens de sort filtrés par élément (`&el=`).
  */
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
@@ -55,13 +56,23 @@ describe("O12 : clan de l'en-tête", () => {
 });
 
 describe("O13 : bloc Sorts d'un shugenja", () => {
-  it("lien « Grimoire » dans le titre ; un lien par sort, recherche par nom ; note sous la liste", async () => {
+  it("lien « Grimoire » dans le titre ; un lien par sort, recherche par nom et élément ; note sous la liste", async () => {
     await renderApp(shugenja());
     const block = within(screen.getByTestId("block-magic"));
     expectExternal(block.getByRole("link", { name: "Grimoire (nouvel onglet)" }), `${PORTAL}grimoire.html`);
-    expectExternal(block.getByRole("link", { name: "Sentir dans le grimoire (nouvel onglet)" }), `${PORTAL}grimoire.html?q=Sentir`);
-    expectExternal(block.getByRole("link", { name: "Frappe de jade dans le grimoire (nouvel onglet)" }), `${PORTAL}grimoire.html?q=Frappe%20de%20jade`);
-    expect(block.getByText("Chaque lien ouvre le grimoire avec le nom du sort en recherche.")).toBeInTheDocument();
+    expectExternal(block.getByRole("link", { name: "Sentir dans le grimoire (nouvel onglet)" }), `${PORTAL}grimoire.html?q=Sentir&el=universel`);
+    expectExternal(block.getByRole("link", { name: "Frappe de jade dans le grimoire (nouvel onglet)" }), `${PORTAL}grimoire.html?q=Frappe%20de%20jade&el=terre`);
+    expect(block.getByText("Chaque lien ouvre le grimoire sur ce sort, filtré par son élément.")).toBeInTheDocument();
+  });
+
+  it("en édition, le lien suit l'élément choisi", async () => {
+    await renderApp(shugenja());
+    fireEvent.click(screen.getByRole("button", { name: "Edit : Rouleaux & invocations" }));
+    const group = within(within(screen.getByTestId("block-magic")).getByRole("group", { name: "Sort : Frappe de jade" }));
+    const link = () => group.getByRole("link", { name: "Frappe de jade dans le grimoire (nouvel onglet)" });
+    expect(link()).toHaveAttribute("href", `${PORTAL}grimoire.html?q=Frappe%20de%20jade&el=terre`);
+    fireEvent.change(group.getByRole("combobox", { name: "Élément" }), { target: { value: "fire" } });
+    expect(link()).toHaveAttribute("href", `${PORTAL}grimoire.html?q=Frappe%20de%20jade&el=feu`);
   });
 
   it("en édition, les liens restent à côté des contrôles ; pas de lien pour un sort sans nom", async () => {
@@ -121,6 +132,8 @@ describe("O17 : consultation", () => {
     expect(within(header()).getByRole("link", { name: /^Clan du Dragon : page du clan/ })).toHaveAttribute("href", `${PORTAL}clans/dragon.html`);
     const block = within(screen.getByTestId("block-magic"));
     expect(block.getAllByRole("link")).toHaveLength(3);
+    expect(block.getByRole("link", { name: "Sentir dans le grimoire (nouvel onglet)" })).toHaveAttribute("href", `${PORTAL}grimoire.html?q=Sentir&el=universel`);
+    expect(block.getByRole("link", { name: "Frappe de jade dans le grimoire (nouvel onglet)" })).toHaveAttribute("href", `${PORTAL}grimoire.html?q=Frappe%20de%20jade&el=terre`);
     view("Aide de jeu");
     situation("Cour");
     expect(within(linksBox()!).getAllByRole("link")).toHaveLength(2);

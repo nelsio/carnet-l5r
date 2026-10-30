@@ -3,6 +3,7 @@
  * Un seul module pour toutes les adresses : un changement d'URL du portail ne touche que ce fichier.
  * Ce sont de simples liens : le Carnet ne fait aucune requête vers le portail.
  */
+import type { SpellElement } from "../core/schema";
 import { CLANS, type Situation } from "./l5r4e";
 
 export const PORTAL_BASE = "https://vincenzorpg.github.io/L5R/";
@@ -30,10 +31,17 @@ export function clanUrl(clanId: string | null): string | null {
   return slug ? `${PORTAL_BASE}clans/${slug}.html` : null;
 }
 
-/** Lien vers un sort dans le grimoire : grimoire.html?q=<nom encodé>. */
-export function spellUrl(name: string): string {
+/** Valeur du filtre « Élément / Voie » du grimoire pour un élément de sort du Carnet (lot 29). */
+export const GRIMOIRE_ELEMENT: Readonly<Record<SpellElement, string>> = {
+  air: "air", earth: "terre", fire: "feu", water: "eau", void: "vide", all: "universel",
+};
+
+/** Sort dans le grimoire : grimoire.html?q=<nom encodé>&el=<élément> ; nom vide → le grimoire seul. */
+export function spellUrl(name: string, element?: SpellElement): string {
   const q = name.trim();
-  return q ? `${PORTAL.grimoire}?q=${encodeURIComponent(q)}` : PORTAL.grimoire;
+  if (!q) return PORTAL.grimoire;
+  const el = element ? `&el=${GRIMOIRE_ELEMENT[element]}` : "";
+  return `${PORTAL.grimoire}?q=${encodeURIComponent(q)}${el}`;
 }
 
 /** Lien de l'encadré de l'Aide de jeu (annexe L.8). */

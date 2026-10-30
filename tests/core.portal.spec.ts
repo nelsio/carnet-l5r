@@ -2,7 +2,8 @@
 import { describe, expect, it } from "vitest";
 import { clanAccent } from "@carnet/core";
 import { CLANS } from "../src/rules/l5r4e";
-import { clanUrl, FORGE_JSON_OK, PORTAL, PORTAL_BASE, PORTAL_CLAN_KANJI, spellUrl } from "../src/rules/portal";
+import { SPELL_ELEMENTS } from "../src/core/schema";
+import { clanUrl, FORGE_JSON_OK, GRIMOIRE_ELEMENT, PORTAL, PORTAL_BASE, PORTAL_CLAN_KANJI, spellUrl } from "../src/rules/portal";
 
 describe("O1 : page de clan", () => {
   const withPage = ["crabe", "grue", "dragon", "lion", "mante", "phenix", "scorpion", "licorne"];
@@ -39,6 +40,18 @@ describe("O2 : sort dans le grimoire", () => {
   it("nom vide : le grimoire seul", () => {
     expect(spellUrl("  ")).toBe("https://vincenzorpg.github.io/L5R/grimoire.html");
     expect(spellUrl("")).toBe(PORTAL.grimoire);
+  });
+
+  it("élément en filtre (lot 29)", () => {
+    expect(spellUrl("Frappe de jade", "earth")).toBe("https://vincenzorpg.github.io/L5R/grimoire.html?q=Frappe%20de%20jade&el=terre");
+    expect(spellUrl("  Sentir ", "all")).toBe(`${PORTAL.grimoire}?q=Sentir&el=universel`);
+    expect(spellUrl("  ", "fire")).toBe(PORTAL.grimoire);
+    expect(spellUrl("", "air")).toBe(PORTAL.grimoire);
+  });
+
+  it("GRIMOIRE_ELEMENT : une valeur du grimoire par élément de sort", () => {
+    expect(Object.keys(GRIMOIRE_ELEMENT).sort()).toEqual([...SPELL_ELEMENTS].sort());
+    expect(Object.values(GRIMOIRE_ELEMENT).sort()).toEqual(["air", "eau", "feu", "terre", "universel", "vide"]);
   });
 });
 
