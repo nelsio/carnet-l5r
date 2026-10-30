@@ -461,52 +461,46 @@ export interface ModifierTemplate {
   stance?: Stance;
   mode: "always" | "optional";
   note?: string;
+  /** Ce qu'il faut écrire dans le nom, laissé vide (« Nom de l'avantage »). */
+  placeholder: string;
 }
 
-const T = { rolled: 0, kept: 0, flat: 0, freeRaises: 0, tn: 0 } as const;
+/** Nom à écrire selon la source du bonus : placeholder des modèles et de l'éditeur (annexe J.4). */
+export const MODIFIER_NAME_PLACEHOLDERS: Record<ModifierTemplate["source"], string> = {
+  advantage: "Nom de l'avantage",
+  disadvantage: "Nom du désavantage",
+  technique: "Nom de la technique",
+  other: "Nom du bonus",
+};
+
+const T = { rolled: 0, kept: 0, flat: 0, freeRaises: 0, tn: 0, mode: "always" } as const;
+const adv = { ...T, source: "advantage", placeholder: MODIFIER_NAME_PLACEHOLDERS.advantage } as const;
+const dis = { ...T, source: "disadvantage", placeholder: MODIFIER_NAME_PLACEHOLDERS.disadvantage } as const;
+const tech = { ...T, source: "technique", placeholder: MODIFIER_NAME_PLACEHOLDERS.technique } as const;
 
 /**
- * Modèles génériques : des formes d'effet courantes, à ajuster (valeurs, compétence visée).
- * Ils ne reprennent aucune technique ni aucun avantage du livre.
+ * Modèles de bonus (annexe J.4) : des formes d'effet regroupées par source, à ajuster (valeurs, cible), nom vide.
+ * Aucun nom ni texte du livre : le joueur nomme son avantage, son désavantage ou sa technique.
  */
 export const MODIFIER_TEMPLATES: readonly ModifierTemplate[] = [
-  { ...T, id: "skill-1g0", label: "+1g0 à une compétence", source: "technique", appliesTo: "skill", rolled: 1, mode: "always" },
-  { ...T, id: "skill-1g1", label: "+1g1 à une compétence", source: "technique", appliesTo: "skill", rolled: 1, kept: 1, mode: "always" },
-  { ...T, id: "skill-free-raise", label: "Augmentation gratuite sur une compétence", source: "advantage", appliesTo: "skill", freeRaises: 1, mode: "always" },
-  { ...T, id: "attack-1g0", label: "+1g0 aux attaques", source: "technique", appliesTo: "attack", rolled: 1, mode: "always" },
-  { ...T, id: "damage-1g0", label: "+1g0 aux dégâts", source: "technique", appliesTo: "damage", rolled: 1, mode: "always" },
-  { ...T, id: "initiative-1g0", label: "+1g0 à l'initiative", source: "technique", appliesTo: "initiative", rolled: 1, mode: "always" },
-  { ...T, id: "armor-5", label: "+5 au ND d'armure", source: "technique", appliesTo: "armor", flat: 5, mode: "always" },
-  { ...T, id: "situational-1g1", label: "+1g1 situationnel (à cocher au jet)", source: "advantage", appliesTo: "all", rolled: 1, kept: 1, mode: "optional" },
-  { ...T, id: "social-tn", label: "+5 au ND des compétences sociales (désavantage)", source: "disadvantage", appliesTo: "social", tn: 5, mode: "always" },
-  { ...T, id: "wounds-3", label: "Pénalité de blessure réduite de 3", source: "advantage", appliesTo: "wounds", flat: 3, mode: "always" },
-  { ...T, id: "trait-malus", label: "Malus de −1g0 sur un trait (désavantage)", source: "disadvantage", appliesTo: "trait", rolled: -1, mode: "always" },
-  { ...T, id: "flat-malus", label: "Malus de −5 au total, situationnel (désavantage)", source: "disadvantage", appliesTo: "all", flat: -5, mode: "optional" },
-];
-
-/**
- * Catalogue nommé : techniques et avantages du livre de base 4e, résumés (effet chiffré seulement).
- * Sources : wikis de règles 4e (magicalsamurai.wikidot.com, lasthaiku.wikidot.com), concordants.
- * À vérifier dans le livre avant de s'y fier ; les effets non chiffrables restent dans le texte des techniques.
- */
-export const NAMED_MODIFIERS: readonly ModifierTemplate[] = [
-  // Les techniques d'école vivent dans le catalogue d'écoles (ecoles-bushi.json, annexe C).
-  // Avantages et désavantages, livre de base 4e.
-  {
-    ...T, id: "force-de-la-terre", label: "Force de la Terre (Strength of the Earth)", source: "advantage",
-    appliesTo: "wounds", flat: 3, mode: "always",
-    note: "Avantage physique, 3 points (2 pour un bushi) : pénalités de ND des niveaux de blessure réduites de 3. À vérifier dans le livre.",
-  },
-  {
-    ...T, id: "aspect-derangeant", label: "Aspect dérangeant (Disturbing Countenance)", source: "disadvantage",
-    appliesTo: "social", tn: 5, mode: "always",
-    note: "Désavantage physique, 3 points : +5 au ND de tous les jets de compétences sociales. À vérifier dans le livre.",
-  },
-  {
-    ...T, id: "seuil-de-douleur-bas", label: "Seuil de douleur bas (Low Pain Threshold)", source: "disadvantage",
-    appliesTo: "wounds", flat: -5, mode: "always",
-    note: "Désavantage physique : +5 à la pénalité de chaque niveau de blessure (livre p. 162).",
-  },
+  { ...T, id: "free", label: "Bonus libre", source: "other", appliesTo: "skill", placeholder: MODIFIER_NAME_PLACEHOLDERS.other },
+  { ...adv, id: "adv-skill-dice", label: "Dés en plus sur une compétence", appliesTo: "skill", rolled: 1, kept: 1 },
+  { ...adv, id: "adv-trait-dice", label: "Dés en plus sur un trait", appliesTo: "trait", rolled: 1 },
+  { ...adv, id: "adv-skill-free-raise", label: "Augmentation gratuite sur une compétence", appliesTo: "skill", freeRaises: 1 },
+  { ...adv, id: "adv-social-dice", label: "Bonus sur les jets sociaux", appliesTo: "social", rolled: 1 },
+  { ...adv, id: "adv-wounds", label: "Pénalité de blessure réduite", appliesTo: "wounds", flat: 3 },
+  { ...adv, id: "adv-armor", label: "Bonus au ND d'armure", appliesTo: "armor", flat: 5 },
+  { ...adv, id: "adv-situational", label: "Bonus situationnel (à cocher au jet)", appliesTo: "all", rolled: 1, kept: 1, mode: "optional" },
+  { ...dis, id: "dis-skill-dice", label: "Malus de dés sur une compétence", appliesTo: "skill", rolled: -1 },
+  { ...dis, id: "dis-trait-dice", label: "Malus de dés sur un trait", appliesTo: "trait", rolled: -1 },
+  { ...dis, id: "dis-social-tn", label: "ND augmenté sur les jets sociaux", appliesTo: "social", tn: 5 },
+  { ...dis, id: "dis-skill-tn", label: "ND augmenté sur une compétence", appliesTo: "skill", tn: 5 },
+  { ...dis, id: "dis-wounds", label: "Pénalité de blessure aggravée", appliesTo: "wounds", flat: -5 },
+  { ...dis, id: "dis-situational", label: "Malus situationnel au total (à cocher)", appliesTo: "all", flat: -5, mode: "optional" },
+  { ...tech, id: "tech-attack-dice", label: "Dés en plus aux attaques", appliesTo: "attack", rolled: 1 },
+  { ...tech, id: "tech-damage-dice", label: "Dés en plus aux dégâts", appliesTo: "damage", rolled: 1 },
+  { ...tech, id: "tech-initiative-dice", label: "Dés en plus à l'initiative", appliesTo: "initiative", rolled: 1 },
+  { ...tech, id: "tech-stance", label: "Bonus en posture (au choix de la posture)", appliesTo: "attack", rolled: 1, stance: "attack" },
 ];
 
 /** Magie (annexe F) : libellés des éléments d'un sort, « Tous » pour un sort universel. */

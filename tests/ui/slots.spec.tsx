@@ -62,6 +62,7 @@ describe("Ligne « Sorts » de la barre d'état (F.5)", () => {
 describe("Emplacements au lancer (F.5)", () => {
   it("ligne « Emplacement » : Terre 3/3, puis « libre » quand la Terre est épuisée, puis « aucun emplacement » (G7)", async () => {
     await renderApp(kuni({ spellSlotsUsed: { earth: 3, free: 1 } }));
+    click("Lanceur de dés : affiché");
     toMagic();
     fireEvent.click(card("Lancer · Frappe de jade"));
     expect(roller().getByTestId("spell-slot")).toHaveTextContent("libre 1/2");
@@ -74,6 +75,7 @@ describe("Emplacements au lancer (F.5)", () => {
 
   it("G8 aux vrais dés : Raté dépense l'emplacement ; Réussi puis « Annuler (interrompu) » le rend", async () => {
     const storage = await renderApp(kuni());
+    click("Lanceur de dés : affiché");
     toMagic();
     fireEvent.click(card("Lancer · Frappe de jade"));
     expect(roller().getByTestId("spell-slot")).toHaveTextContent("Terre 3/3");
@@ -93,7 +95,6 @@ describe("Emplacements au lancer (F.5)", () => {
   it("G8 avec le lanceur de dés : emplacement dépensé au lancer, réussite annulable, échec non", async () => {
     await renderApp(kuni());
     toMagic();
-    click("Lanceur de dés : masqué");
     fireEvent.click(card("Lancer · Frappe de jade"));
     expect(roller().queryByRole("button", { name: "Réussi" })).toBeNull();
     click("Lancer 5g3");

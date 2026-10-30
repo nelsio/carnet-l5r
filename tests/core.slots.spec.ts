@@ -75,15 +75,29 @@ describe("Sorts en escarmouche (F.5, v2.12.0)", () => {
   const c = kuni();
   const cast: PoolAction = { kind: "spell", spell: spellOf(c, "jade-strike") };
 
-  it("groupe « Sorts » après les attaques, ids préfixés sk-, dégâts rattachés", () => {
+  it("Q14 : Initiative, groupe « Sorts », puis groupe « Attaques » (armes, actions fixes) ; ids préfixés sk-, dégâts rattachés (J.8)", () => {
     const actions = buildActions(c, "combat", "skirmish");
     const spells = actions.filter((a) => a.group === "Sorts");
     expect(spells.map((a) => a.id)).toEqual([
       "sk-spell-sentir", "sk-spell-air-1", "sk-spell-jade-strike", "sk-spelldmg-jade-strike", "sk-spell-earth-2", "sk-spell-fire-1", "sk-spelldmg-fire-1",
     ]);
     expect(spells.find((a) => a.id === "sk-spelldmg-fire-1")?.parent).toBe("sk-spell-fire-1");
-    expect(actions.indexOf(spells[0]!)).toBeGreaterThan(actions.findIndex((a) => a.attack));
+    expect(actions[0]?.kind).toBe("initiative");
+    expect(actions.slice(1, spells.length + 1)).toEqual(spells);
+    const attacks = actions.slice(spells.length + 1);
+    expect(attacks.every((a) => a.group === "Attaques")).toBe(true);
+    expect(attacks.some((a) => a.attack && a.weapon)).toBe(true);
+    expect(attacks.at(-1)?.id).toBe("full-defense");
     expect(buildActions(c, "combat", "duel").some((a) => a.kind === "spell")).toBe(false);
+  });
+
+  it("Q15 : bushi sans sort, ordre inchangé (Initiative, armes, actions fixes), aucun titre de groupe", () => {
+    const bushi = { ...c, spells: [] };
+    const actions = buildActions(bushi, "combat", "skirmish");
+    expect(actions[0]?.kind).toBe("initiative");
+    expect(actions.some((a) => a.group)).toBe(false);
+    expect(actions[1]?.weapon).toBeDefined();
+    expect(actions.at(-1)?.id).toBe("full-defense");
   });
 
   it("G16 : Assaut « attaques seulement » ; Défense totale « actions gratuites seulement » ; Défense et Attaque permises ; Centre", () => {

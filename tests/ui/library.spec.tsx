@@ -6,6 +6,7 @@ import { memoryStorage, type LibraryEntry, type Storage } from "../../src/storag
 import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
 import { clickWounds } from "../helpers/wounds";
+import { spendVoid } from "../helpers/void";
 
 const base = () => structuredClone(kakita) as Character;
 const entry = (id: string, patch: Partial<LibraryEntry> = {}): LibraryEntry => ({
@@ -13,7 +14,6 @@ const entry = (id: string, patch: Partial<LibraryEntry> = {}): LibraryEntry => (
 });
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
 /** Le bouton « Lancer » n'apparaît qu'avec le lanceur de dés affiché (masqué par défaut). */
-const showDice = () => click("Lanceur de dés : masqué");
 let ids = 0;
 const newId = () => `id-${++ids}`;
 
@@ -190,12 +190,11 @@ describe("Fiche en consultation", () => {
     click("Aide de jeu");
     click(/^Remarquer un détail/);
     fireEvent.click(screen.getByRole("checkbox", { name: /Dépenser 1 point de Vide \(\+1g1\)/ }));
-    showDice();
     click("Lancer 4g3");
     expect(screen.getByLabelText("Dés")).toBeInTheDocument();
     expect(screen.getByText("Points de Vide 2/2")).toBeInTheDocument();
     click("Combat");
-    click(/^\+10 ND d'armure/);
+    spendVoid("armor");
     expect(screen.getByTestId("armor-tn")).toHaveTextContent("30");
     expect(screen.getByText("Points de Vide 2/2")).toBeInTheDocument();
     await act(() => new Promise((r) => setTimeout(r, 600)));

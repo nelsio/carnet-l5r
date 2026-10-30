@@ -98,7 +98,6 @@ describe("Situation « Magie » (F.5)", () => {
   it("G12 : Agasha, sort de Feu lancé avec l'Anneau d'Eau : réserve sur l'Eau, 1 point de Vide dépensé au lancer", async () => {
     const storage = await renderApp(kuni({ schoolId: "agasha-shugenja" }));
     toMagic();
-    click("Lanceur de dés : masqué");
     fireEvent.click(card("Lancer · Feux intérieurs"));
     expect(roller().getByTestId("pool")).toHaveTextContent("4g2");
     fireEvent.click(roller().getByRole("checkbox", { name: /lancer avec un autre Anneau/ }));

@@ -6,11 +6,11 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document.
 
-**État au 30/10/2026 :** version **v2.16.0**, lots 1 à 19 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
+**État au 30/10/2026 :** version **v2.17.0**, lots 1 à 20 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
 
-**Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie), F (lot 13 : shugenja et Magie), G (lot 14 : nom de l'outil dans l'en-tête), H (lots 15 et 16 : dépôt GitHub et correctifs), I (lots 17 à 19 : couleurs, Anneaux, sélecteurs), J (lot 20 : localisation).
+**Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie), F (lot 13 : shugenja et Magie), G (lot 14 : nom de l'outil dans l'en-tête), H (lots 15 et 16 : dépôt GitHub et correctifs), I (lots 17 à 19 : couleurs, Anneaux, sélecteurs), J (lot 20 : correctifs et retouches).
 
-**Prochain lot (30/10/2026) :** 20, annexe J (à livrer).
+**Prochain lot (30/10/2026) :** à définir (§11, point 21). Le lot 20 (annexe J, correctifs et retouches) est livré ; la localisation est reportée.
 
 ---
 
@@ -127,7 +127,7 @@ interface LibraryEntry {
   linkedFile?: { handle: FileSystemFileHandle; name: string; lastModified: number };  // Chrome/Edge uniquement
 }
 ```
-Préférences, dans un magasin séparé : thème, **lanceur de dés** (`showDiceRoller`, booléen, **masqué par défaut**), **multiplicateur de blessures** (`woundMultiplier`, 2 à 5, 2 par défaut, v2.5 : annexe E.6), dernière fiche ouverte.
+Préférences, dans un magasin séparé : thème, **lanceur de dés** (`diceRoller`, booléen, **affiché par défaut** depuis la v2.17.0 ; l'ancienne clé `showDiceRoller` est ignorée puis supprimée, annexe J.7), **multiplicateur de blessures** (`woundMultiplier`, 2 à 5, 2 par défaut, v2.5 : annexe E.6), dernière fiche ouverte.
 
 ### 3.3 État non persisté
 Restent en mémoire de l'onglet :
@@ -291,7 +291,7 @@ interface LibraryStore {
   - famille, école et Rang dessous ;
   - bouton de thème (auto, clair, sombre) ;
   - **boutons d'en-tête** Bibliothèque, Lanceur de dés et Thème : chacun = **icône + texte** sur bureau (livres, dé, demi-cercle), **icône seule** sur mobile (§7) ; le texte reste présent pour les lecteurs d'écran et en info-bulle, avec l'état courant (« Thème : sombre », « Lanceur de dés : masqué ») ;
-  - bouton **« Lanceur de dés : masqué / affiché »**, à côté du thème et de la Bibliothèque (même style ; fond d'accent pâle quand affiché). **Masqué par défaut**, choix mémorisé dans les préférences :
+  - bouton **« Lanceur de dés : masqué / affiché »**, à côté du thème et de la Bibliothèque (même style ; fond d'accent pâle quand affiché). **Affiché par défaut** (v2.17.0, annexe J.7), choix mémorisé dans les préférences :
     - **masqué** : le panneau d'action reste un panneau d'aide (réserve, ligne « lancer à la main », Min · Moy. · Max, chance de réussite, ND final, options, manœuvres) mais **sans** bouton « Lancer », sans dés obtenus, sans verdict et sans historique. Les enchaînements qui dépendent d'un lancer (score d'initiative affiché, bonus de Défense totale, dés de dégâts pré-remplis) ne se déclenchent pas ; les dépenses de Vide se font par les pastilles et le panneau Vide ;
     - **affiché** : le bouton « Lancer » et les résultats apparaissent dans tous les lanceurs (Enquête, Cour, Déplacement, Combat) ;
     - le changement s'applique immédiatement, sans recharger ;
@@ -522,10 +522,10 @@ Ces cas complètent la spec fournie. L'agent les écrit dans `tests/core.modifie
 | E9 | Statistiques | Une ligne par compétence, attaque, dégâts et initiative ; cocher « point de Vide » augmente les réserves de +1g1 et les pourcentages |
 | E10 | Lanceur : ajouter une augmentation | Le ND final monte de 5 et la chance de réussite baisse |
 | E11 | Kenjutsu passé à 7 (dés forcés : 9, 4…) | Les dégâts du katana affichent la note de maîtrise ; le 9 est relancé et le dé affiche « 13 » avec « 9+4 » ; la compétence de l'arme est trouvée même écrite « kenjutsu » ou avec des espaces |
-| E12 | Boutons « i » de Vide, Déplacement et Rappels d'école (Posture retirée au lot 19, remplacée par D3, I.3.7) | Descriptions masquées par défaut ; un clic sur le « i » d'un panneau déplie toutes ses descriptions, un second les replie ; aucun effet sur la posture, le Vide ni l'autre panneau |
-| E13 | Lanceur sur Dégâts · Katana | « Dés lancés ± » et « Bonus fixe » sur une seule ligne ; ligne « Les 10 explosent… » sans phrase « Lance… » ; avec Kenjutsu 7, « Les 9 et 10 explosent… » |
+| E12 | Boutons « i » de Déplacement et Rappels d'école (Posture retirée au lot 19, remplacée par D3, I.3.7 ; Vide retiré au lot 20, remplacé par Q10, J.6) | Descriptions masquées par défaut ; un clic sur le « i » d'un panneau déplie toutes ses descriptions, un second les replie ; aucun effet sur la posture, le Vide ni l'autre panneau |
+| E13 | Lanceur sur Dégâts · Katana | « Bonus fixe » seul sur sa ligne, sans case vide (« Dés lancés ± » retiré, J.9) ; ligne « Les 10 explosent… » sans phrase « Lance… » ; avec Kenjutsu 7, « Les 9 et 10 explosent… » |
 | E14 | Appui sur la tuile ND armure | L'éditeur d'armure s'ouvre ; bonus 5 avec Réflexes 2 → tuile ND 20 ; réduction 3 → tuile Réduction 3 ; valeurs conservées au rechargement |
-| E15 | Option « Lanceur de dés » | Par défaut « masqué » : aucun bouton « Lancer » ni historique dans les lanceurs  ; « affiché » : le bouton apparaît partout ; le choix survit au rechargement |
+| E15 | Option « Lanceur de dés » | Par défaut « affiché » (J.7) : le bouton « Lancer » apparaît partout ; « masqué » : aucun bouton « Lancer » ni historique dans les lanceurs ; le choix survit au rechargement |
 
 ### 10.5 Mobile (Playwright, appareils « iPhone 13 » et « Pixel 7 »)
 | # | Scénario | Attendu |
@@ -574,8 +574,8 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 17. **v2.14.0 — couleurs** : annexe I.1, **remplace le §6.4**. Jetons `--surface-2`, `--accent-ink`, `--on-accent`, couleurs sémantiques `--danger` / `--ok` / `--warn`, jetons `--ring-*`, `theme-color` et thème sans flash (**livrée**, écarts en I.6) → cas N1 à N12.
 18. **v2.15.0 — bloc Anneaux « Ensō »** : annexe I.2, CSS seul (`reference/anneaux-enso.css`) (**livrée**, écarts en I.7) → cas A1 à A8.
 19. **v2.16.0 — sélecteurs** : annexe I.3. Sélecteurs `appearance: base-select` (`reference/selecteurs.css`), panneau Posture en menu déroulant sans « i » (**livrée**, écarts en I.8) → cas D1 à D10 ; E12 et M10 adaptés.
-20. **v2.17.0 — localisation** : annexe J. Français (référence) et anglais, sélecteur `FR · EN` dans le pied de page, dictionnaires typés sans dépendance → cas I1 à I13.
-21. **À définir** : kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts (fichier personnel importable, pas dans le dépôt), compteurs « N fois par séance » (D-g).
+20. **v2.17.0 — correctifs et retouches** (**livrée**, écarts en J.14) : annexe J (retours de jeu du 30/10/2026). Bloc Armes en Edit lisible sur mobile, police du bloc Identité, bouton de technique sans « sort », bonus de jet sans catalogue (modèles par source), modèles de fiche shugenja et courtisan, panneau Vide en menu déroulant, lanceur de dés affiché par défaut, sorts avant les attaques en escarmouche, champ « Dés lancés ± » retiré, Min · Moy. · Max centrés dans le lanceur → cas Q1 à Q19.
+21. **À définir** : **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts (fichier personnel importable, pas dans le dépôt), compteurs « N fois par séance » (D-g).
 
 ---
 
@@ -645,17 +645,9 @@ interface Modifier {
 - **Fusion** (§8) : liste avec clé, par `id` puis par nom normalisé.
 
 ### Saisie
-Panneau « Bonus de jet » de la fiche : bonus libre, ou départ d'un **modèle** générique (`MODIFIER_TEMPLATES` dans `src/rules/l5r4e.ts` : +1g0 à une compétence, augmentation gratuite, +5 au ND d'armure, +5 au ND des jets sociaux, pénalité de blessure réduite, malus situationnel…).
+Panneau « Bonus de jet » de la fiche : départ d'un **modèle** (`MODIFIER_TEMPLATES` dans `src/rules/l5r4e.ts`, liste en J.4), « Bonus libre » par défaut ; ou saisie dans le JSON de la fiche (champ `modifiers`).
 
-Le **catalogue nommé** (`NAMED_MODIFIERS`) ne contient que des entrées demandées, résumées par leur effet chiffré (aucun texte du livre), avec leur source et la mention « à vérifier dans le livre » :
-
-| Entrée | Effet encodé | Source |
-|---|---|---|
-| Hiruma Bushi, rang 1 (Torch's Flame Flickers) | +1g0 aux attaques en posture Attaque, d'office | magicalsamurai.wikidot.com/schools-crab ; lasthaiku.wikidot.com/sccrab |
-| Hiruma Bushi, rang 2 (Wolf's Little Lesson) | +5 au ND d'armure par touche au corps à corps en posture Attaque (cumulable jusqu'au rang d'école), à cocher | idem |
-| Hiruma Bushi, rang 3 (Hummingbird Wings) | + 2 × rang d'école au ND d'armure contre une attaque, une fois par round, à cocher | idem |
-| Force de la Terre (Strength of the Earth) | pénalités de blessure réduites de 3 | magicalsamurai.wikidot.com/advantages |
-| Aspect dérangeant (Disturbing Countenance) | +5 au ND des jets de compétences sociales | magicalsamurai.wikidot.com/disadvantages |
+**Lot 20 (annexe J.4)** : le catalogue nommé (`NAMED_MODIFIERS`) est **retiré**. Les modèles sont des formes d'effet regroupées par source (avantage, désavantage, technique, autre), sans nom ni texte du livre ; le joueur peut aussi écrire ses bonus dans le JSON de sa fiche (champ `modifiers`).
 
 Les rangs 4 et 5 de l'école Hiruma Bushi n'ont pas d'effet sur les jets (attaque en action simple, blessures excédentaires reportées) : ils restent dans le texte des techniques de la fiche.
 
@@ -1338,7 +1330,7 @@ Les écoles s'ajoutent au sélecteur « Techniques d'école » du bloc Identité
   - groupes par élément ; carte « Lancer · <sort> » : réserve, « ND 15 · 2 actions », mots-clés ; grisée avec la raison si maîtrise > rang ou rang effectif 0 ;
   - « Dégâts · <sort> » rattachés (comme une arme) si VD : VD seule, sans Force, sans point de Vide ;
   - action **« Rester concentré (Volonté) »** après une interruption : Volonté, ND 10 (5 + dégâts subis à saisir).
-- **Aide de jeu, Combat › Escarmouche** (v2.12.0, shugenja seulement) : groupe **« Sorts »** après les attaques, mêmes cartes que la situation Magie (ids préfixés `sk-`). Restrictions de posture (F2, p. 86) : **Assaut** « attaques seulement, pas de sort », **Défense totale** « actions gratuites seulement, pas de sort », **Centre** « aucune action ce round » ; Attaque et Défense permises ; carte grisée et « Lancer quand même ». Le bonus de Centre (F1) vaut pour un jet de sort. Le lanceur affiche la même restriction.
+- **Aide de jeu, Combat › Escarmouche** (v2.12.0, shugenja seulement) : groupe **« Sorts »** juste après l'Initiative, **avant** le groupe « Attaques » (armes et actions fixes, v2.17.0, annexe J.8), mêmes cartes que la situation Magie (ids préfixés `sk-`). Restrictions de posture (F2, p. 86) : **Assaut** « attaques seulement, pas de sort », **Défense totale** « actions gratuites seulement, pas de sort », **Centre** « aucune action ce round » ; Attaque et Défense permises ; carte grisée et « Lancer quand même ». Le bonus de Centre (F1) vaut pour un jet de sort. Le lanceur affiche la même restriction.
 - **Lanceur d'un sort** :
   - réserve et origine (« Feu 3 + rang 1 + affinité 1 ») ; ND de base fixe ; augmentations (max Vide), dont **« Augm. pour le temps d'incantation »** → ligne « Temps d'incantation : N action(s) complexe(s) » ;
   - sort universel : choix de l'élément ; Agasha : case Vide + choix de l'Anneau ;
@@ -1505,7 +1497,7 @@ La règle globale `button{font:inherit}` (0,0,1) est plus faible que `.seal` (0,
 
 ## Annexe H — Lots 15 et 16 : dépôt GitHub et correctifs (v2.13.2, v2.13.3)
 
-Statut : lot 15 **livré** (écarts en H.11), lot 16 **livré** (écarts en H.12). Source : `handoff-lots-15-17.md` (29/10/2026), audit fait sur `main` au commit `dfaac10` (v2.13.1) ; les numéros de ligne cités peuvent avoir bougé, se fier aux extraits. Ordre des lots tranché le 29/10/2026 : **15 → 16 → 17 → 18 → 19 → 20** (langues en dernier, annexe J ; visuel avant, annexe I). Une PR par lot, CI verte, tag posé après merge (procédure du README).
+Statut : lot 15 **livré** (écarts en H.11), lot 16 **livré** (écarts en H.12). Source : `handoff-lots-15-17.md` (29/10/2026), audit fait sur `main` au commit `dfaac10` (v2.13.1) ; les numéros de ligne cités peuvent avoir bougé, se fier aux extraits. Ordre des lots tranché le 29/10/2026 : **15 → 16 → 17 → 18 → 19 → 20** (visuel avant, annexe I ; langues ensuite, **reportées** le 30/10/2026, §11 point 21). Une PR par lot, CI verte, tag posé après merge (procédure du README).
 
 | Lot | Version | Contenu | Code applicatif touché |
 |---|---|---|---|
@@ -1538,7 +1530,7 @@ Statut : lot 15 **livré** (écarts en H.11), lot 16 **livré** (écarts en H.12
 7. **Branches et commits** : une branche par lot ou correctif (`lot-16-correctifs`, `fix-…`) ; messages en français, à l'impératif ; PR vers `main`.
 8. **Versions** : SemVer, procédure de publication du README. Un changement du format de fiche incrémente `schemaVersion` et ajoute une migration testée.
 9. **Textes du livre** : ne jamais recopier les textes des livres L5R (techniques, sorts, descriptions). Résumés courts et références de page seulement.
-10. **Traductions** (ajouté au lot 20) : renvoi à J.8.
+10. **Traductions** : prévues avec la localisation, reportée (§11, point 21).
 
 ### H.3 Lot 15 — fichiers modifiés
 - `package.json` : `"license": "MIT"`, `"repository": { "type": "git", "url": "https://github.com/nelsio/carnet-l5r" }`, `"homepage": "https://nelsio.github.io/carnet-l5r/"`. Garder `"private": true` (empêche une publication npm par erreur).
@@ -1568,7 +1560,7 @@ Statut : lot 15 **livré** (écarts en H.11), lot 16 **livré** (écarts en H.12
      return m ? `${Number(m[1])}${letter}${Number(m[2])}` : s.trim();
    }
    ```
-   Le second paramètre sert au lot 20 (`g` en français, `k` en anglais, annexe J).
+   Le second paramètre servira à la localisation (`g` en français, `k` en anglais), reportée (§11, point 21).
 2. **Appliquer `formatDR` à chaque affichage** d'une VD. Relevé de l'audit :
 
    | Fichier | Endroit |
@@ -1612,7 +1604,7 @@ Ne sont **pas** en trop (décisions de Nelson, à garder) :
 | X1 | `Sheet.tsx`, `DeleteCharacter` (bloc Identité en Edit) | « Supprimer ce personnage… » reste affiché à côté de « Confirmer la suppression » ; pas de bouton Annuler ; couleur en style inline (`style={{ color: "var(--bad)" }}`). Diffère du motif de la Bibliothèque. | Même motif que la Bibliothèque : au clic, remplacer le bouton par « Supprimer « Nom » ? » + **« Supprimer définitivement »** (`btn sm danger`) + **« Annuler »**. Plus de style inline. |
 | X2 | `Roller.tsx`, `SpellCastLine` en consultation | « Réussi » et « Raté » affichés mais `disabled` : sans effet en consultation. | En consultation, ne pas les afficher. Garder le libellé « Jet aux vrais dés » seulement si un résultat est montré. |
 | X3 | `FileActions.tsx` | `<ImportButton label="Importer un JSON…" />` répète la valeur par défaut. | Retirer la prop (nettoyage). |
-| X4 | `Library.tsx` et `Stats.tsx` | `"fr-FR"` en dur (`Intl.DateTimeFormat`, `toLocaleString`). | Sans effet visible au lot 16. Passe par la langue courante au lot 20 (J.4). Le noter ici, ne rien changer. |
+| X4 | `Library.tsx` et `Stats.tsx` | `"fr-FR"` en dur (`Intl.DateTimeFormat`, `toLocaleString`). | Sans effet visible au lot 16. Passera par la langue courante avec la localisation, reportée (§11, point 21). Le noter ici, ne rien changer. |
 | X5 | `Sheet.tsx`, Identité | Libellé « Rang (Insight) » et indication « = Insight (n) » : terme anglais isolé dans l'interface française. | Point P-H4 : défaut « Rang d'Insight » partout (déjà utilisé dans `l5r4e.ts`). |
 | X6 | `Roller.tsx`, `MeditationSuccess` en consultation | « Réussi : +n point de Vide » affiché mais `disabled` : sans effet en consultation (même cas que X2). | En consultation, ne pas l'afficher ; le rappel « Vide n/max. » reste. |
 | X7… | *À compléter par Nelson* | | |
@@ -1637,10 +1629,10 @@ Ne sont **pas** en trop (décisions de Nelson, à garder) :
 | P-H1 | Licence du code | **MIT**. Alternative : GPL-3.0 si tu veux que les forks restent libres. |
 | P-H4 | « Insight » dans l'interface française | « Rang d'Insight » partout (X5). Alternative : un terme français de ton choix. |
 
-Les points P-H2, P-H3, P-H5 et P-H6 du handoff d'origine portent sur les langues : ils deviennent P-J1 à P-J4 (annexe J.9).
+Les points P-H2, P-H3, P-H5 et P-H6 du handoff d'origine portent sur les langues : ils suivent la localisation, reportée (§11, point 21).
 
 ### H.10 Corrections du handoff d'origine
-- **Numéros de lot** : le handoff prévoyait les langues au lot 17 (v2.14.0). Le visuel (couleurs, Anneaux, sélecteurs, annexe I) passe avant : les langues deviennent le **lot 20 (v2.17.0)**, annexe J.
+- **Numéros de lot** : le handoff prévoyait les langues au lot 17 (v2.14.0). Le visuel (couleurs, Anneaux, sélecteurs, annexe I) passe avant : les langues devenaient le lot 20 (v2.17.0) ; elles sont **reportées** le 30/10/2026 (§11, point 21) et le lot 20 devient correctifs et retouches (annexe J).
 - **Identifiants** : relevé B1 à B6 renommé **X1 à X6** (B1 à B11 existent déjà, §10.1 bis) ; tests de langue L1 à L13 renommés **I1 à I13** (L1 à L28 existent, E.10). R1 à R4 et K1 à K8 sont gardés.
 - **« lint C8 »** dans `CONTRIBUTING.md` : C8 est ici le catalogue d'armes (E.2) ; le lint des couleurs s'appelle **N8** (annexe I.1) et n'existe qu'à partir du lot 17.
 - `DISARM_DAMAGE` vaut aujourd'hui `"2k1"` (le handoff donnait directement la valeur cible). `formatDR` reçoit dès le lot 16 son paramètre `letter`.
@@ -1649,7 +1641,7 @@ Les points P-H2, P-H3, P-H5 et P-H6 du handoff d'origine portent sur les langues
 - **Code de conduite** : texte officiel `content/version/2/1/code_of_conduct.fr.md` du dépôt `EthicalSource/contributor_covenant`, en-tête TOML retiré ; seul le contact `[INSÉRER UNE ADRESSE EMAIL]` est remplacé par la fonction « Report content » de GitHub (« Report to repository admins »).
 - **Étiquettes** : `bug.yml` → `bug`, `idee.yml` → `enhancement` (étiquettes existantes) ; `regle.yml` → `règle`, **étiquette à créer par Nelson** (sans elle, GitHub n'en pose aucune).
 - **CHANGELOG** : à la livraison, v2.9.0 à v2.13.1 étaient sur `main` sans tag ni release ; leurs entrées sont datées du merge. Tags et releases créés le 29/10/2026 ; liens ajoutés au lot 17.
-- **CONTRIBUTING** : point 10 = renvoi au code de conduite ; les traductions (lot 20) prendront le point 11. Le README gagne aussi, à l'étape 1 de « Publier une version », la mise à jour de `CHANGELOG.md`.
+- **CONTRIBUTING** : point 10 = renvoi au code de conduite ; les traductions prendront le point 11 quand la localisation reviendra. Le README gagne aussi, à l'étape 1 de « Publier une version », la mise à jour de `CHANGELOG.md`.
 - **R3** vérifié en local : `dist/carnet-l5r.html` ne diffère de la v2.13.1 que par le numéro de version (1 octet).
 
 ### H.12 Écarts de mise en œuvre (v2.13.3)
@@ -2052,116 +2044,243 @@ S1 à S10 du handoff d'origine renommés **D1 à D10** (S1 à S5 existent deux f
 
 ---
 
-## Annexe J — Lot 20 : localisation (v2.17.0)
+## Annexe J — Lot 20 : correctifs et retouches (v2.17.0)
 
-Statut : **à livrer** après l'annexe I. Source : `handoff-lots-15-17.md` (lot 17 d'origine). Français (référence) + anglais, sélecteur de langue. Réutilise `formatDR` (H.5) ; traduit aussi les textes ajoutés aux lots 17 à 19 (étiquettes de posture, sélecteurs).
+Statut : **à livrer**. Retours de jeu de Nelson du 30/10/2026, audit fait sur `main` au commit `783c009` (v2.16.0). Les numéros de ligne cités peuvent avoir bougé : se fier aux extraits.
 
-### J.1 Décisions
-| Sujet | Décision |
-|---|---|
-| Langues | **Français** (langue de référence, complète) et **anglais**. Le portugais ou d'autres langues s'ajoutent ensuite par un simple fichier de traduction (P-J1). |
-| Langue par défaut | « Auto » : français si `navigator.language` commence par `fr`, anglais sinon. Choix forcé mémorisé dans les préférences (comme le thème). |
-| Sélecteur | Dans le **pied de page**, à côté de la version : `FR · EN`, la langue active en gras. L'en-tête ne change pas (déjà chargé sur mobile). Libellé accessible : « Langue » / « Language ». |
-| Bibliothèque | Aucune. Dictionnaires TypeScript typés, maison, sans dépendance (fichier unique, aucune requête réseau). |
-| Données de fiche | **Inchangées.** Les noms saisis par le joueur (personnage, arme, compétence, notes) ne sont jamais traduits. Pas de changement de `schemaVersion`. Un JSON exporté en anglais se réimporte à l'identique en français. |
-| Notation des dés | `XgY` en français, `XkY` en anglais (`formatDR(s, t.diceLetter)`). En saisie, les deux lettres restent acceptées dans les deux langues. |
-| Terminologie anglaise | Celle du livre de base 4e anglais (Rings, Traits, Insight Rank, Raises, Void Points, TN, Armor TN, Wound ranks…). Glossaire J.6. |
-| Textes de règles | Les résumés de techniques, sorts et maîtrises sont **traduits en résumé**, jamais copiés du livre anglais. Un texte non traduit s'affiche en français (repli), sans erreur. |
+La **localisation** prévue ici (ex-annexe J, français + anglais) est **reportée** : retirée du plan, notée au §11 point 21. `formatDR(s, letter)` garde son second paramètre, sans autre usage pour l'instant.
 
-### J.2 Architecture
-```
-src/i18n/
-├─ index.ts        # Locale, setLocale(), getLocale(), t(), plural(), formatDate(), formatNumber()
-├─ fr.ts           # dictionnaire de référence : export const fr = { … } as const
-├─ en.ts           # export const en: Messages = { … }  (Messages = type dérivé de fr)
-└─ rules.en.ts     # traductions des catalogues de règles (J.5), par id
-```
-- **`src/core` reste pur et sans DOM.** Il importe `t()` depuis `src/i18n` (module pur lui aussi). La langue courante est une variable de module réglée par `setLocale()` ; défaut `"fr"`. Ainsi **toutes les suites de tests existantes restent vertes sans modification** : elles tournent en français.
-- **Typage strict** : `type Messages = DeepStringify<typeof fr>` ; `en.ts` doit satisfaire `Messages`. Une clé manquante en anglais = **erreur de compilation** (`tsc --noEmit` en CI).
-- Clés **par zone** : `header.*`, `library.*`, `sheet.*`, `aid.*`, `roller.*`, `stats.*`, `status.*`, `import.*`, `link.*`, `rules.*` (postures, niveaux de blessure, manœuvres, ND…), `common.*`.
-- Paramètres : `t("library.deleteConfirm", { name })` avec gabarit `"Supprimer « {name} » ?"`. Pas de HTML dans les messages ; la mise en forme reste en JSX.
-- Pluriels : `plural(n, { one, other })` via `Intl.PluralRules(locale)`.
-- Dates et nombres : `formatDate()` / `formatNumber()` remplacent les `"fr-FR"` en dur (X4). Les décimales gardent la virgule en français, le point en anglais (`decimal()`, `toMeters()` de `src/ui/format.ts`).
-- **React** : un hook `useLocale()` (contexte ou état du store) provoque le re-rendu au changement de langue. Changer de langue ne recharge pas la page et ne perd ni l'état de jeu ni l'historique des jets.
-- **`<html lang>`** suit la langue ; `document.title` aussi (« Carnet de Rokugan » / « Rokugan Notebook », P-J2).
+Une PR, CI verte, captures « avant » et « après » (bureau 1280 px et 390 px, clair et sombre) des vues touchées, tag `v2.17.0` après merge. Version **mineure** : nouveaux modèles de fiche et nouveau comportement par défaut du lanceur. **Pas de changement de format de fiche** (`schemaVersion` reste 2).
 
-### J.3 Ce qui est traduit
-| Zone | Exemples |
-|---|---|
-| Interface | Tous les libellés, boutons, titres, info-bulles, `aria-label`, messages d'erreur, bandeaux (fichier lié, mode dégradé, vocabulaire) |
-| Moteur (`src/core`) | Libellés et descriptions d'actions générées, notes de réserve, verdicts, avertissements de fusion (`traits.agility : doit être…`), messages Zod |
-| Données de règles | Postures (noms, descriptions, étiquettes d'effet du lot 19), manœuvres par défaut, échelle des ND, niveaux de blessure, situations et sous-types, terrains et états de bataille, noms d'Anneaux et de Traits, noms de clans |
-| Catalogues | Noms d'écoles, rangs et résumés de techniques, sorts, maîtrises, armes et armures du catalogue (J.5) |
-| README | Section courte « English » en tête renvoyant vers `README.en.md` (guide joueur traduit, P-J3) |
+| # | Retour | Zone |
+|---|---|---|
+| J.1 | Panneau Armes en mobile : champs tronqués, difficile de tout effacer | `Sheet.tsx` `Weapons`, `styles.css` |
+| J.2 | Police du bloc Identité & réputation incohérente | `Sheet.tsx` `Identity`, `styles.css` |
+| J.3 | Bouton d'ajout de technique qui mentionne les sorts | `Sheet.tsx` `Techniques` |
+| J.4 | Bonus de jet : plus de catalogue, un modèle structuré ; saisie à la main ou par JSON | `Modifiers.tsx`, `l5r4e.ts`, annexe B |
+| J.5 | Modèles JSON de shugenja et de courtisan | `reference/`, `src/rules/example.ts`, `Library.tsx` |
+| J.6 | Panneau « Dépenser du Vide » comme le panneau Posture | `Aid.tsx` `VoidPanel` |
+| J.7 | Lanceur de dés affiché par défaut | `store.ts`, `useLibrary.ts`, prefs |
+| J.8 | Shugenja en escarmouche : sorts avant les attaques | `core/actions.ts` |
+| J.9 | Lanceur : retirer le champ « Dés lancés ± » (Bonus fixe gardé, champs d'augmentations inchangés) | `Roller.tsx` |
+| J.10 | Lanceur : Min et Moy. pas centrés en hauteur à côté de Max | `styles.css` `.statline` |
 
-**Non traduit :** contenu saisi par le joueur ; `HANDOFF.md` ; messages de commit ; `CHANGELOG.md`.
+### J.1 Panneau Armes sur mobile
 
-### J.4 Points délicats
-1. **Noms de compétences.** Les fiches stockent des noms (en français dans les fiches existantes) et le moteur les retrouve par `findSkill` + alias (annexe D-d). On ne change **pas** le nom stocké : à l'affichage, un nom de compétence **connu du catalogue** est montré dans la langue courante ; un nom libre reste tel quel. Les alias anglais (`Kenjutsu`, `Investigation`, `Etiquette`…) s'ajoutent à `SKILL_ALIASES` pour qu'une fiche créée en anglais fonctionne avec les mêmes calculs.
-2. **Reconnaissance des clans** : déjà bilingue (§6.4). Le libellé affiché (« Clan du Crabe » / « Crab Clan ») suit la langue.
-3. **Bandeau « Mettre à jour le vocabulaire »** (E.7) : propre à l'édition française. **Masqué en anglais.**
-4. **Export** : nom de fichier inchangé (`<nom>-l5r.json`).
-5. **Sceau 帳** : identique dans les deux langues.
-6. **Largeurs** : les libellés anglais sont souvent plus courts, mais vérifier les boutons ronds mobiles, la barre d'état et la barre d'onglets du bas (« Game aid », « Statistics »).
+**Constat.** En Edit, `Weapons` est un tableau de 6 colonnes dans `.tbl` (défilement horizontal) avec des largeurs fixes (`td` de 80 et 70 px, mots-clés `minWidth: 140`). À 390 px, les champs Nom, Compétence et VD n'affichent que quelques caractères : on ne voit pas ce qu'on tape et on vise mal le texte à effacer.
 
-### J.5 Catalogues de règles
-- Les JSON de `src/rules/` restent en français (source). `rules.en.ts` fournit, **par identifiant**, les champs à afficher : `name`, `effect`, `description`, `techniques[rank].name/summary`.
-- Un identifiant sans traduction affiche le français : jamais de clé brute à l'écran.
-- Test de complétude (I6) : liste les entrées sans traduction anglaise et échoue au-delà de **0 pour l'interface et les règles de base**, **avertit seulement** pour les catalogues d'écoles et de sorts (une traduction partielle est acceptable en v2.17.0 ; le compte figure dans la PR).
+**Correctif.** Même présentation que les sorts en Edit (`.spelledit`) **à toutes les largeurs**, plus de tableau en Edit :
+- une **carte par arme** (`.weaponedit`, mêmes règles que `.spelledit`) : ligne 1 **Nom** (pleine largeur) + bouton Retirer ; puis grille `form-grid` : **Compétence**, **VD**, **Force de l'arc** ; puis **Mots-clés** (pleine largeur) ;
+- chaque champ avec un `label` visible (`Field`), les `aria-label` actuels deviennent inutiles ;
+- mobile ≤ 720 px : grille sur 2 colonnes (Compétence pleine largeur, VD + Force de l'arc côte à côte), champs à **16 px** (pas de zoom iOS) et 40 px de haut ;
+- les champs texte gardent `type="text"` ; ajouter `enterkeyhint="next"` et `autocapitalize="off"` sur VD ;
+- « Force de l'arc » n'apparaît que pour une arme à distance (`isRanged(w)` ou mot-clé `arc`) ; sinon la cellule disparaît ;
+- `CatalogGap` (mise à jour proposée depuis le livre) reste sous la carte concernée.
 
-### J.6 Glossaire de départ (fr → en)
-| Français | Anglais |
-|---|---|
-| Anneaux : Terre, Eau, Feu, Air, Vide | Rings: Earth, Water, Fire, Air, Void |
-| Constitution, Volonté, Force, Perception, Agilité, Intelligence, Réflexes, Vigilance | Stamina, Willpower, Strength, Perception, Agility, Intelligence, Reflexes, Awareness |
-| Rang d'Insight | Insight Rank |
-| Augmentation (annoncée, libre) | Raise (called, free) |
-| ND / ND d'armure | TN / Armor TN |
-| Points de Vide | Void Points |
-| Spécialisation | Emphasis |
-| Postures : Attaque, Assaut, Défense, Défense totale, Centre | Attack, Full Attack, Defense, Full Defense, Center |
-| Indemne, Égratigné, Éraflé, Blessé, Gravement blessé, Estropié, À terre, Hors de combat, Mort | Healthy, Nicked, Grazed, Hurt, Injured, Crippled, Down, Out, Dead |
-| Réduction | Reduction |
-| Escarmouche, Duel iaijutsu, Bataille | Skirmish, Iaijutsu duel, Mass battle |
-| Fiche, Aide de jeu, Statistiques, Bibliothèque | Sheet, Game aid, Statistics, Library |
-| Consultation | Read-only |
-| Nouvelle journée, Nouveau round | New day, New round |
+Le mode lecture (tableau Arme / Attaque / Dégâts) ne change pas.
 
-À compléter par l'agent avec la terminologie du livre anglais. Un terme douteux se liste dans la PR, il ne s'invente pas.
+**Effacement.** Vérifier sur téléphone que chaque champ se vide entièrement (sélection + suppression) et que la valeur vide est acceptée pendant la saisie : `TextListField` (mots-clés) et `OptionalNumber` (Force de l'arc) le permettent déjà ; le VD vide doit rester saisissable (validation au moment du jet, pas à la frappe).
 
-### J.7 Tests
-L1 à L13 du handoff d'origine renommés **I1 à I13** (L1 à L28 existent, E.10).
+### J.2 Police du bloc Identité & réputation
+
+**Constat (à confirmer par capture).** Le bloc mélange plusieurs polices sans règle visible :
+- en lecture, `.kv b` affiche Honneur, Gloire, Statut, XP **et** l'Initiative en JetBrains Mono 18 px, alors que les réserves ailleurs (Compétences, Armes) sont en `.pool` (mono gras, couleur `--accent-ink`) et les valeurs simples en mono 15 px (`.cstats`, tableaux) ;
+- en Edit, le placeholder du Rang d'école (« n (Rang d'Insight) ») hérite de `input.in[type=number]` et s'affiche en mono, au milieu de champs texte en police du corps.
+
+**Règle à appliquer** (la même que le reste de l'outil) : **chiffres en mono, textes en police du corps, réserves en `.pool`**.
+- `.kv b` : mono, **même corps que les valeurs des autres blocs** (aligner sur `.cstats b` ou la valeur la plus proche dans la fiche, à choisir sur capture) ;
+- Initiative : classe `pool` (couleur d'accent, comme les colonnes « Jet » des tableaux) ;
+- `input.in[type=number]::placeholder { font-family: var(--f-body) }` (vaut pour tous les champs numériques facultatifs) ;
+- nom du bloc : identique aux autres titres (`h2`, `--f-display`).
+
+**Avant de coder**, l'agent compare le bloc Identité aux blocs Compétences, Armes et Armure sur les captures (lecture et Edit, bureau et 390 px) et liste dans la PR chaque différence de famille, de corps ou de graisse trouvée. Si le défaut vu par Nelson est ailleurs, il est ajouté au relevé et traité avec la même règle.
+
+### J.3 Bouton d'ajout de technique
+
+Les sorts ont leur propre bloc (Rouleaux & invocations, annexe F). Dans `Techniques` :
+- bouton `+ Technique / sort / kata` → **`+ Technique / kata`** ;
+- titre `Autres techniques, kata, sorts` → **`Autres techniques, kata`**.
+
+Les fiches qui ont un sort noté en technique ne sont pas modifiées (pas de migration).
+
+### J.4 Bonus de jet : modèle structuré, sans catalogue
+
+**Décision.** Comme pour les sorts : **aucun catalogue nommé** dans l'outil. Le joueur saisit ses bonus **à la main** (formulaire structuré) ou **par le JSON** de sa fiche (champ `modifiers`, format de l'annexe B, inchangé).
+
+**Retraits.**
+- `NAMED_MODIFIERS` (`src/rules/l5r4e.ts`) et son groupe « Catalogue (livre de base 4e, à vérifier) » du menu ;
+- les tests qui s'y rapportent (les lister dans la PR).
+
+Les bonus déjà présents dans une fiche (créés depuis le catalogue) restent tels quels : ce sont des données du joueur.
+
+**Modèle.** Le menu « Modèle de bonus » propose les **formes d'effet** possibles, regroupées par source. Chaque modèle préremplit `source`, `appliesTo`, `mode` et les valeurs, avec un **nom vide** et un placeholder qui dit quoi écrire (« Nom de l'avantage », etc.). Aucun nom ni texte du livre.
+
+| Groupe (`source`) | Modèle | Champs préremplis |
+|---|---|---|
+| **Avantage** | Dés en plus sur une compétence | `skill`, `rolled: 1`, `kept: 1`, `always` |
+| | Dés en plus sur un trait | `trait`, `rolled: 1`, `always` |
+| | Augmentation gratuite sur une compétence | `skill`, `freeRaises: 1`, `always` |
+| | Bonus sur les jets sociaux | `social`, `rolled: 1`, `always` |
+| | Pénalité de blessure réduite | `wounds`, `flat: 3`, `always` |
+| | Bonus au ND d'armure | `armor`, `flat: 5`, `always` |
+| | Bonus situationnel (à cocher au jet) | `all`, `rolled: 1`, `kept: 1`, `optional` |
+| **Désavantage** | Malus de dés sur une compétence | `skill`, `rolled: -1`, `always` |
+| | Malus de dés sur un trait | `trait`, `rolled: -1`, `always` |
+| | ND augmenté sur les jets sociaux | `social`, `tn: 5`, `always` |
+| | ND augmenté sur une compétence | `skill`, `tn: 5`, `always` |
+| | Pénalité de blessure aggravée | `wounds`, `flat: -5`, `always` |
+| | Malus situationnel au total (à cocher) | `all`, `flat: -5`, `optional` |
+| **Technique** | Dés en plus aux attaques | `attack`, `rolled: 1`, `always` |
+| | Dés en plus aux dégâts | `damage`, `rolled: 1`, `always` |
+| | Dés en plus à l'initiative | `initiative`, `rolled: 1`, `always` |
+| | Bonus en posture (au choix de la posture) | `attack`, `rolled: 1`, `stance: "attack"`, `always` |
+| **Autre** | Bonus libre | tout à 0, `appliesTo: "skill"`, `always` |
+
+- Le menu est un `RichSelect` variante **Catalogue groupé** (comme les écoles) : `<optgroup>` par source, chaque option avec son nom (`.n`) et l'effet en clair (`.d`, `describeModifier` du modèle). « Bonus libre » en tête, choisi par défaut.
+- `MODIFIER_TEMPLATES` est réécrit selon le tableau (identifiants stables `adv-skill-dice`, `dis-social-tn`…) ; le type `ModifierTemplate` gagne `placeholder: string`.
+- Dans l'éditeur, le nom vide affiche le placeholder du modèle ; la case « Condition, précision » garde son placeholder.
+- Texte d'aide en tête du panneau en Edit (une ligne de plus) : « Tu peux aussi les écrire dans le JSON de ta fiche (champ `modifiers`) : voir les modèles de fiche de la Bibliothèque. »
+
+**Annexe B à mettre à jour** (section *Saisie*) : retirer le tableau du catalogue nommé, renvoyer à J.4. **README** : section Bonus de jet, remplacer la liste des modèles par « à la main, à partir d'une forme d'effet (avantage, désavantage, technique), ou dans le JSON » et retirer toute mention du catalogue.
+
+### J.5 Modèles de fiche JSON : shugenja et courtisan
+
+**Fichiers fournis** (validés contre le schéma v2 par `importCharacter`, joints au handoff) :
+
+| Fichier | Personnage | Contenu notable |
+|---|---|---|
+| `reference/exemple-personnage.json` | Kakita Haruto, bushi Kakita R1 (existant) | inchangé |
+| `reference/exemple-shugenja.json` | Tamori Ayane, shugenja Tamori R1 (Dragon) | 2 sorts : *Sentir* (universel, non mémorisé) et *Frappe de jade* (Terre, maîtrise 1, VD `2g2`, mémorisé) ; Sortilèges, Méditation, Artisanat : Forge |
+| `reference/exemple-courtisan.json` | Doji Sayuri, courtisane Doji R1 (Grue) | compétences de l'école ; 2 bonus de jet : *Voix* (avantage, +1g1) et un désavantage-modèle vide à adapter |
+
+Les deux fiches portent une note « Modèle … Remplace tout par ton personnage ». Les effets de sort sont des résumés d'une ligne, pas du texte du livre.
+
+**Bibliothèque.** Le bouton « Télécharger un exemple de fiche (JSON) » devient un groupe de trois boutons `btn sm`, sur une ligne qui passe à la ligne sur mobile :
+« **Exemple bushi** », « **Exemple shugenja** », « **Exemple courtisan** », précédés du libellé « Modèles de fiche (JSON) : ». Fichiers téléchargés : `exemple-bushi-l5r.json`, `exemple-shugenja-l5r.json`, `exemple-courtisan-l5r.json`.
+
+**Code.** `src/rules/example.ts` exporte `EXAMPLES: { id, label, fileName, build(): Character }[]` (trois entrées, `migrate()` sur chaque JSON). `EXAMPLE_FILE_NAME` et `exampleCharacter()` disparaissent ; adapter leurs usages et tests.
+
+**README** : la ligne « Exemple » cite les trois modèles.
+
+### J.6 Panneau « Dépenser du Vide » comme le panneau Posture
+
+**Constat.** `VoidPanel` affiche encore l'ancien motif des postures (grille de boutons `.stance` + bouton « i » qui déplie les descriptions), alors que le panneau Posture est passé au menu déroulant au lot 19 (I.3.4).
+
+**Correctif : même structure que `StancePanel`.**
+- **En-tête** : « Dépenser du Vide » à gauche ; à droite « Points de Vide **n** » (même style que « ND d'armure n ») puis les dépenses actives en étiquettes (`+2g2 au jet`, `+20 ND d'armure`, `Compétence au rang 1`). **Plus de bouton « i »** : `InfoPanel` perd `"void"`.
+- **Menu** `RichSelect variant="effet"`, une option par dépense, avec nom (`.n`), étiquettes d'effet (`EffectTags`) et description (`.d`) :
+
+  | Option | Étiquettes | Description | Effet |
+  |---|---|---|---|
+  | Au jet | `+{m}g{m}` | Dépensé au prochain jet lancé. | bascule `opts.voidPoint` |
+  | ND d'armure | `+{10m}` | Jusqu'au prochain round. | bascule `voidArmor` |
+  | Compétence au rang 1 | — | Jouer une compétence que tu n'as pas. | bascule `opts.voidSkill` |
+  | Activer une capacité | `1 point` | Technique, kata ou avantage payé en Vide. | `voidTechnique` |
+  | Initiative (escarmouche seulement) | `+{10m}` | Jusqu'à la fin de l'escarmouche. | `voidInitiative` |
+  | Échanger l'Initiative (escarmouche seulement) | `1 point` | Avec un allié consentant ; échangez vos scores à la main. | `voidTechnique` |
+
+  (`m` = `voidMultiplier(c)`.) Choisir une option **ne dépense rien**.
+- **Sous le menu** : description de l'option choisie (`.posture-desc`, mêmes étiquettes), puis **un bouton** :
+  - pour une bascule : « Dépenser 1 point de Vide » (`btn sm accent`) ou, si elle est active, « Annuler » (`btn sm`), `aria-pressed` ;
+  - pour une action ponctuelle : « Dépenser 1 point de Vide » ;
+  - désactivé sans point de Vide (sauf « Annuler »).
+- Option choisie : nouvel état UI `voidChoice` (défaut « Au jet »), non mémorisé, remis au défaut quand on quitte l'escarmouche si l'option n'existe plus.
+- Le message « Déjà un point de Vide dépensé ce round » reste au-dessus du menu.
+
+E12 perd le panneau Vide (reste Déplacement et Rappels d'école).
+
+### J.7 Lanceur de dés affiché par défaut
+
+**Décision.** Le lanceur de dés est **affiché par défaut** (inverse de la v1.1, §3 et §6.2 à mettre à jour, E15 à réécrire). Le bouton d'en-tête et le choix mémorisé restent.
+
+- `store.ts` : `showDiceRoller: true` à l'état initial ;
+- `useLibrary.ts` : `dispatch({ type: "diceRoller", show: prefs.showDiceRoller ?? true })` (aujourd'hui seul `true` est relu) ;
+- **préférence déjà enregistrée** : la v2.16.0 écrit `showDiceRoller: false` dans les préférences de tout le monde dès l'ouverture. Pour que le nouveau défaut s'applique, la préférence est **renommée** `diceRoller` (lecture : `prefs.diceRoller ?? true`, l'ancienne clé est ignorée puis supprimée à la première écriture). Conséquence assumée : un joueur qui avait masqué le lanceur le retrouve affiché une fois ;
+- README : « Par défaut, l'outil lance les dés… Pour jouer avec tes vrais dés, appuie sur **Lanceur de dés** pour le masquer. »
+
+### J.8 Shugenja en escarmouche : sorts avant les attaques
+
+**Constat.** `buildActions`, cas `skirmish` : Initiative → armes → actions fixes → `skirmishSpellActions(c)` (« après les attaques », v2.12.0).
+
+**Correctif** (shugenja seulement, les autres personnages ne changent pas) :
+1. Initiative ;
+2. **groupe « Sorts »** (`skirmishSpellActions`) ;
+3. **groupe « Attaques »** : armes puis actions fixes (mains nues, lutte, Défense totale). Le titre de groupe n'est posé que si le personnage a des sorts, pour que le titre « Sorts » ne coiffe pas les armes.
+
+Mettre à jour F.5 / F.11 (« groupe Sorts après les attaques » → avant) et les tests d'ordre (`core.slots.spec.ts`, `tests/ui/slots.spec.tsx`).
+
+### J.9 Lanceur : retirer « Dés lancés ± »
+
+**Constat.** Le champ « Dés lancés ± » (`opts.extraRolled`) fait doublon avec les bonus de jet et le bonus fixe. **Attention** : il sert aussi à transmettre les **augmentations de dégâts** de l'attaque au jet de dégâts (`store.ts`, `opts.extraRolled = pendingDamage.dice`, cas E7).
+
+**Correctif.**
+- retirer le champ de `.opts` dans `Roller.tsx` ; la grille garde ND, augmentations, augmentations gratuites et **Bonus fixe**, **libellés inchangés** (« Augm. libres » / « Augmentations », « Augm. gratuites », décision du 30/10/2026) (E13 : « Bonus fixe » seul sur sa ligne, sans case vide) ;
+- **garder** `extraRolled` dans `RollOptions` et le moteur : il ne vient plus que de `pendingDamage` ;
+- quand `extraRolled > 0`, l'afficher en lecture seule sous la réserve : « +n g0 · augmentations de l'attaque » (étiquette, comme les bonus) avec un bouton « Retirer » qui le remet à 0 ;
+- la ligne « lancer à la main » (`Roller.tsx`, `extra`) garde son texte.
+
+### J.10 Lanceur : Min · Moy. · Max centrés
+
+**Constat.** Dans la ligne de statistiques du lanceur (`.statline`), quand les dégâts explosent sur 9 (Kenjutsu ou Armes lourdes 7), la case Max contient l'étiquette « 9+ ». Or la règle `.statline span` s'applique **aussi** à cette étiquette imbriquée (fond, `padding: 4px 9px`) : la case Max grandit, les cases voisines s'étirent à sa hauteur (`align-items: stretch` par défaut) et leur texte reste collé en haut. Min et Moy. ne sont donc plus centrés verticalement.
+
+**Correctif** (`styles.css`) :
+- restreindre la règle aux cases : `.statline > span { … }` au lieu de `.statline span`, pour que l'étiquette « 9+ » garde le style `.tag` ;
+- centrer le contenu de chaque case : `.statline > span { display: inline-flex; align-items: center; gap: 4px }` ; les cases gardent la même hauteur.
+
+Vaut pour tous les lanceurs (compétences, dégâts, sorts) et pour la case « Réussite ».
+
+### J.11 Tests du lot 20
 
 | ID | Cas | Attendu |
 |---|---|---|
-| I1 | `tsc --noEmit` avec une clé retirée de `en.ts` | Échec de compilation (test de type ou vérification manuelle documentée dans la PR) |
-| I2 | Suites existantes | Toutes vertes **sans modification**, langue par défaut `fr` |
-| I3 | `navigator.language = "en-US"`, première ouverture | Interface en anglais ; `<html lang="en">` |
-| I4 | `navigator.language = "fr-FR"` | Interface en français |
-| I5 | Choix forcé EN, rechargement | Anglais conservé ; « Auto » revient au navigateur |
-| I6 | Complétude | Aucune chaîne française visible en anglais (hors données du joueur et catalogues partiellement traduits) : parcours Playwright de toutes les vues, comparaison avec une liste de mots français témoins (`Fiche`, `Blessures`, `Posture`, `Lancer`…) |
-| I7 | Notation | En anglais, aucune correspondance de `/\b\d+g\d+\b/` ; en français, aucune de `/\b\d+k\d+\b/` (reprise de K2) |
-| I8 | Fiche créée en anglais (compétence « Kenjutsu », trait « Awareness »), export, import en français | Mêmes réserves calculées ; aucun champ modifié par l'import |
-| I9 | Changement de langue en plein jeu (lanceur ouvert, historique de 3 jets, initiative posée) | Rien n'est perdu ; libellés mis à jour sans rechargement |
-| I10 | Dates et nombres | Bibliothèque : date au format local ; Statistiques : « 10 000 » en français, « 10,000 » en anglais |
-| I11 | Mobile 390 px, anglais | M1 à M8 toujours verts ; aucun libellé tronqué dans la barre du bas |
-| I12 | Bandeau vocabulaire | Absent en anglais |
-| I13 | `document.title` | Suit la langue et le nom du personnage |
+| Q1 | 390 px, bloc Armes en Edit, arme « Katana » | Une carte par arme ; Nom, Compétence, VD visibles en entier (largeur du texte ≤ largeur du champ) ; champs à 16 px ; pas de défilement horizontal |
+| Q2 | 390 px, effacer le nom, le VD et les mots-clés d'une arme | Chaque champ se vide entièrement ; le VD vide est accepté pendant la saisie |
+| Q3 | Arme sans mot-clé `arc` | Pas de champ « Force de l'arc » ; présent pour un Yumi |
+| Q4 | Bloc Identité, lecture et Edit | Valeurs numériques en `--f-mono` au même corps que les autres blocs ; Initiative en `.pool` ; placeholder du Rang d'école en `--f-body` (style calculé) |
+| Q5 | Bloc Techniques en Edit | Bouton « + Technique / kata » ; aucun texte « sort » dans le bloc |
+| Q6 | Menu « Modèle de bonus » | 4 groupes (Avantage, Désavantage, Technique, Autre) ; aucune entrée nommée d'après le livre ; `NAMED_MODIFIERS` absent du code |
+| Q7 | Ajouter le modèle « ND augmenté sur les jets sociaux » | Bonus `source: disadvantage`, `appliesTo: social`, `tn: 5`, nom vide avec placeholder ; un jet d'Étiquette a son ND +5 |
+| Q8 | Import d'une fiche avec un bonus créé depuis l'ancien catalogue | Bonus conservé tel quel, toujours appliqué |
+| Q9 | Bibliothèque : les 3 modèles | 3 boutons ; chaque fichier téléchargé se réimporte en « Nouvelle fiche » sans erreur ; le shugenja a 2 sorts et l'école Tamori, la courtisane l'école Doji et 2 bonus |
+| Q10 | Panneau Vide | Menu déroulant (variante Avec effets), pas de « i » ; choisir une option ne dépense rien ; « Dépenser » sur « Au jet » coche le Vide du lanceur et l'étiquette apparaît dans l'en-tête ; « Annuler » la retire |
+| Q11 | Panneau Vide hors escarmouche (duel) | Options Initiative et Échanger absentes |
+| Q12 | Première ouverture (préférences vides) | Lanceur affiché : bouton « Lancer » présent |
+| Q13 | Préférences v2.16.0 avec `showDiceRoller: false` | Lanceur affiché ; masqué puis rechargé : reste masqué |
+| Q14 | Escarmouche, shugenja (fiche exemple) | Ordre : Initiative, titre « Sorts », sorts, titre « Attaques », armes, actions fixes |
+| Q15 | Escarmouche, bushi | Ordre inchangé (Initiative, armes, actions fixes), aucun titre de groupe |
+| Q16 | Lanceur sur une compétence | Pas de champ « Dés lancés ± » |
+| Q17 | Attaque réussie avec 2 augmentations de dégâts, puis Dégâts (E7) | Réserve de dégâts +2g0 ; étiquette « +2g0 · augmentations de l'attaque » ; « Retirer » la ramène à la réserve de base |
+| Q18 | Non-régression | `core.rules.spec.ts` inchangé et vert ; tests existants modifiés listés dans la PR (E12, E13, E15, ordre des sorts, catalogue de bonus, exemple de fiche) |
+| Q19 | Lanceur sur Dégâts · Katana avec Kenjutsu 7 (étiquette « 9+ ») | Min, Moy., Max et Réussite de même hauteur ; le centre vertical du texte de chaque case est au centre de la case (± 1 px) ; « 9+ » a le style `.tag` |
 
-### J.8 Ajouter une langue (à copier dans `CONTRIBUTING.md`)
-1. Copier `src/i18n/en.ts` en `src/i18n/<code>.ts` (code BCP 47 : `pt`, `es`…) et traduire. Le compilateur signale toute clé manquante.
-2. Ajouter la langue à la liste `LOCALES` de `src/i18n/index.ts` (code, nom natif, lettre des dés).
-3. Facultatif : `rules.<code>.ts` pour les catalogues ; sinon repli sur le français.
-4. Lancer `npm test` et `npm run test:e2e` ; joindre une capture bureau et 390 px à la PR.
+### J.12 Documents à mettre à jour dans la même PR
+- `HANDOFF.md` : §3 (préférence `diceRoller`, affichée par défaut), §6.2 (lanceur affiché par défaut), §10 (E12, E13, E15 réécrits), annexe B (*Saisie*), annexe F (ordre des sorts en escarmouche), §11 point 20 « livrée », J.14 écarts de mise en œuvre ;
+- `README.md` : lanceur de dés, bonus de jet, modèles de fiche ;
+- `CHANGELOG.md` : entrée `[2.17.0]` (Ajouté : modèles shugenja et courtisan, modèles de bonus par source ; Modifié : lanceur affiché par défaut, panneau Vide, sorts avant les attaques, bloc Armes en Edit ; Corrigé : Min et Moy. centrés dans le lanceur ; Retiré : catalogue nommé des bonus, champ « Dés lancés ± ») ;
+- `CONTRIBUTING.md` : point 11 (traductions) non ajouté, la localisation étant reportée.
 
-### J.9 Points ouverts (à trancher par Nelson)
+### J.14 Écarts de mise en œuvre (v2.17.0)
+- **J.1** : chaque carte est un groupe « Arme : <nom> » (« Arme : sans nom » tant que le nom est vide) ; ses champs portent leur libellé visible (Nom, Compétence, VD, Force de l'arc, Mots-clés). « Force de l'arc » suit `isRanged(w)`, qui couvre déjà le mot-clé `arc`. `CatalogGap` reste aussi sous l'arme en lecture (mode modification), comme avant.
+- **J.2** : relevé sur captures. Écarts trouvés : `.kv b` en mono **18 px** (contre 15 px pour `.cstats b`, les tableaux et `.pool`) ; Initiative en mono noir au lieu de `.pool` ; placeholder du Rang d'école en mono. Corrigé : `.kv b` passe à 15 px (même corps que `.cstats b`), Initiative en `.pool`, `input.in[type=number]::placeholder` en `--f-body`. Le titre du bloc était déjà un `h2` en `--f-display`.
+- **J.4** : le groupe **« Autre »** (Bonus libre) est placé **en tête** du menu, puis Avantage, Désavantage, Technique. Le placeholder du nom vient de `MODIFIER_NAME_PLACEHOLDERS[source]` (le champ `placeholder` des modèles en est tiré) : il suit la source si le joueur la change. L'option d'un modèle situationnel ajoute « · au choix » à son effet. « Bonus libre » a la source `other` (auparavant `technique`).
+- **J.5** : les trois boutons sont dans un groupe accessible « Modèles de fiche (JSON) ». `EXAMPLES[].build()` (au lieu de `exampleCharacter()`).
+- **J.6** : le panneau est un groupe « Dépenser du Vide » ; le menu s'appelle « Dépense de Vide ». `voidChoice` revient à « Au jet » au changement de type de combat si l'option n'existe plus ; une option absente retombe aussi sur « Au jet » à l'affichage. `InfoPanel` perd `"void"`.
+- **J.7** : `PrefsStore.set` supprime les clés passées à `undefined` (`mergePrefs`) : chaque écriture des préférences retire `showDiceRoller`.
+- **J.8** : le titre « Attaques » est posé sur toutes les armes et actions fixes d'escarmouche (dégâts compris), seulement si le personnage a des sorts.
+- **J.9** : l'étiquette « +n g0 · augmentations de l'attaque » et son bouton « Retirer » sont sous la réserve, avant les étiquettes de technique. Sans augmentations mais avec un ND, ND et Bonus fixe sont côte à côte (l'ancienne case d'alignement vide est retirée).
+- **Tests existants modifiés** (Q18) : E12, E13 (×2), E15 (unitaires et e2e), M10 et M14 (e2e mobile), « Nouveau round » (repère du panneau Vide), ordre des sorts (`core.slots.spec.ts`), catalogue de bonus (`core.modifiers.spec.ts`, `core.lot12.spec.ts` L21 et Seuil de douleur bas avec des bonus saisis, `tests/ui/modifiers.spec.tsx`), exemple de fiche (`tests/ui/import.spec.tsx`), champs d'arme (E25, Mots-clés d'arme, parcours mobile), dépenses de Vide (F3, consultation, Shiba 5 via `tests/helpers/void.ts`), et les clics « Lanceur de dés : masqué » devenus inutiles (ou inversés pour les parcours aux vrais dés). `core.rules.spec.ts` inchangé.
+- **Nouveaux tests** : `tests/ui/lot20.spec.tsx` (Q1 à Q5, Q14, Q15), `tests/e2e/lot20.spec.ts` (Q4, Q19), Q1 dans `tests/e2e/mobile.spec.ts`, Q6 à Q13, Q16, Q17 dans les suites existantes.
+
+### J.13 Points ouverts (à trancher par Nelson)
+
 | # | Point | Défaut si non tranché |
 |---|---|---|
-| P-J1 | Langues du lot 20 (ex P-H2) | Français + anglais. Portugais possible ensuite (fichier `pt.ts`, J.8). |
-| P-J2 | Nom de l'outil en anglais (ex P-H3) | « Rokugan Notebook » ; le sceau 帳 ne change pas. Alternative : garder « Carnet de Rokugan » partout. |
-| P-J3 | README anglais (ex P-H5) | `README.en.md` complet. Alternative : une section courte en anglais dans le README. |
-| P-J4 | Bouton « Edit » en français (ex P-H6) | Gardé (E.9 S2). En anglais : « Edit » / « Done ». |
+| P-J1 | Panneau Vide : dépense par menu + bouton (deux gestes) | Défaut retenu (J.6) : choisir ne dépense jamais par erreur. Alternative : menu seul, la dépense ponctuelle demandant une confirmation. |
+| P-J2 | Police d'Identité : quel élément t'a gêné (lecture ou Edit, valeurs, Initiative, Rang d'école) ? | Règle de J.2 appliquée à tout le bloc |
+| P-J3 | Lanceur réaffiché une fois pour ceux qui l'avaient masqué (J.7) | Accepté |
+| P-J4 | Escarmouche d'un shugenja : titre « Attaques » sur les armes et actions fixes | « Attaques » |
 
-### J.10 Corrections du handoff d'origine
-- Lot 17 / v2.14.0 → **lot 20 / v2.17.0** (H.10) ; L1 à L13 → I1 à I13 ; P-H2, P-H3, P-H5, P-H6 → P-J1 à P-J4 ; renvois B4 → X4, §17.x → J.x.
-- Glossaire : la posture *Full Attack* s'appelle **« Assaut »** dans l'appli (vocabulaire de l'édition française, E.7), pas « Attaque totale ».
+---
+
+### Note : localisation reportée
+L'ancienne annexe J (lot 20, français + anglais, `src/i18n`, tests I1 à I13, points P-J1 à P-J4 sur les langues) est retirée du plan le 30/10/2026. Si elle revient, elle repart de `handoff/handoff-lots-15-17.md` (lot 17 d'origine, projet claude.ai) avec de nouveaux numéros de lot, d'identifiants de test et de points ouverts.

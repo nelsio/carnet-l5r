@@ -1,6 +1,6 @@
 import { wrap, type DBSchema, type IDBPDatabase } from "idb";
 import { migrate, upgrade, type Character } from "@carnet/core";
-import type { LibraryEntry, LibraryStore, Prefs, PrefsStore, SaveReport } from "./types";
+import { mergePrefs, type LibraryEntry, type LibraryStore, type Prefs, type PrefsStore, type SaveReport } from "./types";
 
 export const DB_NAME = "carnet-l5r";
 export const DB_VERSION = 1;
@@ -74,7 +74,7 @@ export class IndexedDbPrefs implements PrefsStore {
   async set(patch: Partial<Prefs>): Promise<void> {
     const tx = this.db.transaction("prefs", "readwrite");
     const current = (await tx.store.get(PREFS_KEY)) ?? {};
-    await tx.store.put({ ...current, ...patch }, PREFS_KEY);
+    await tx.store.put(mergePrefs(current, patch), PREFS_KEY);
     await tx.done;
   }
 }

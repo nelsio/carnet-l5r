@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { describeModifier, modifiersOf, ROLL_TRAITS, type Modifier } from "@carnet/core";
 import {
-  MODIFIER_SOURCE_LABELS, MODIFIER_TARGET_LABELS, MODIFIER_TEMPLATES, NAMED_MODIFIERS, STANCES, TRAIT_LABELS, type ModifierTemplate,
+  MODIFIER_NAME_PLACEHOLDERS, MODIFIER_SOURCE_LABELS, MODIFIER_TARGET_LABELS, MODIFIER_TEMPLATES, STANCES, TRAIT_LABELS, type ModifierTemplate,
 } from "../../rules/l5r4e";
 import { useCharacter, useStore } from "../store";
 import { RichSelect } from "./RichSelect";
 import { NumberField } from "./fields";
 
-const CATALOG: readonly ModifierTemplate[] = [...NAMED_MODIFIERS, ...MODIFIER_TEMPLATES];
+/** Groupes du menu « Modèle de bonus », « Autre » (Bonus libre) en tête (annexe J.4). */
+const TEMPLATE_GROUPS = (["other", "advantage", "disadvantage", "technique"] as const).map((source) => ({
+  source, templates: MODIFIER_TEMPLATES.filter((t) => t.source === source),
+}));
 
 const stanceLabel = (id: Modifier["stance"]) => STANCES.find((s) => s.id === id)?.label;
 
@@ -18,10 +21,10 @@ function targetLabel(m: Modifier): string {
   return m.stance ? `${base}, en posture ${stanceLabel(m.stance)}` : base;
 }
 
-/** Bonus créé depuis une entrée du catalogue ou un modèle. */
+/** Bonus créé depuis un modèle : nom vide, à écrire par le joueur (annexe J.4). */
 function fromTemplate(t: ModifierTemplate): Modifier {
   return {
-    id: `mod-${crypto.randomUUID()}`, name: t.label, source: t.source, appliesTo: t.appliesTo,
+    id: `mod-${crypto.randomUUID()}`, name: "", source: t.source, appliesTo: t.appliesTo,
     ...(t.skill ? { skill: t.skill } : {}), ...(t.trait ? { trait: t.trait } : {}), ...(t.stance ? { stance: t.stance } : {}),
     rolled: t.rolled, kept: t.kept, flat: t.flat, freeRaises: t.freeRaises, tn: t.tn, mode: t.mode, note: t.note ?? "",
   };
@@ -60,6 +63,9 @@ export function Modifiers() {
       <p className="hint" style={{ marginTop: 0 }}>
         « D'office » : appliqué à chaque jet concerné (décochable au moment du jet). « Au choix » : situationnel, à cocher dans le lanceur.
       </p>
+      <p className="hint">
+        Tu peux aussi les écrire dans le JSON de ta fiche (champ <code>modifiers</code>) : voir les modèles de fiche de la Bibliothèque.
+      </p>
       {list.map((m, i) => <ModifierEditor key={m.id} m={m} index={i} set={set} />)}
       <AddModifier />
     </>
@@ -73,7 +79,7 @@ function ModifierEditor({ m, index: i, set }: { m: Modifier; index: number; set:
   return (
     <fieldset className="modifier" aria-label={`Bonus ${m.name || i + 1}`}>
       <div style={{ display: "flex", gap: 6 }}>
-        <input className="in" type="text" aria-label="Nom du bonus" placeholder="ex. Voie de la Grue (Rang 1)" maxLength={120} value={m.name} onChange={(e) => set(i, { name: e.target.value })} />
+        <input className="in" type="text" aria-label="Nom du bonus" placeholder={MODIFIER_NAME_PLACEHOLDERS[m.source]} maxLength={120} value={m.name} onChange={(e) => set(i, { name: e.target.value })} />
         <button type="button" className="x" aria-label={`Supprimer ${m.name || "le bonus"}`} onClick={() => dispatch({ type: "remove", list: "modifiers", index: i })}>×</button>
       </div>
       <div className="form-grid">
@@ -146,24 +152,30 @@ function ModifierEditor({ m, index: i, set }: { m: Modifier; index: number; set:
   );
 }
 
-/** Ajout d'un bonus, à partir d'un modèle ou libre. */
+/** Ajout d'un bonus à partir d'une forme d'effet, groupée par source ; « Bonus libre » par défaut (annexe J.4). */
 function AddModifier() {
   const { dispatch } = useStore();
-  const [choice, setChoice] = useState("");
+  const [choice, setChoice] = useState("free");
   const add = () => {
-    const t = CATALOG.find((x) => x.id === choice);
-    const item: Modifier = t
-      ? fromTemplate(t)
-      : { id: `mod-${crypto.randomUUID()}`, name: "", source: "technique", appliesTo: "skill", rolled: 0, kept: 0, flat: 0, freeRaises: 0, tn: 0, mode: "always", note: "" };
-    dispatch({ type: "add", list: "modifiers", item });
-    setChoice("");
+    const t = MODIFIER_TEMPLATES.find((x) => x.id === choice);
+    if (!t) return;
+    dispatch({ type: "add", list: "modifiers", item: fromTemplate(t) });
+    setChoice("free");
   };
   return (
     <div className="file-actions" style={{ marginTop: 8 }}>
-      <RichSelect variant="champ" style={{ width: "auto", flex: "1 1 220px" }} aria-label="Modèle de bonus" value={choice} onChange={setChoice}>
-        <option value="">Bonus libre</option>
-        {NAMED_MODIFIERS.length > 0 && <optgroup label="Catalogue (livre de base 4e, à vérifier)">{NAMED_MODIFIERS.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}</optgroup>}
-        <optgroup label="Modèles">{MODIFIER_TEMPLATES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}</optgroup>
+      <RichSelect variant="catalogue" style={{ flex: "1 1 220px" }} aria-label="Modèle de bonus" value={choice} onChange={setChoice}>
+        {TEMPLATE_GROUPS.map((g) => (
+          <optgroup key={g.source} label={MODIFIER_SOURCE_LABELS[g.source]}>
+            <legend>{MODIFIER_SOURCE_LABELS[g.source]}</legend>
+            {g.templates.map((t) => (
+              <option key={t.id} value={t.id}>
+                <span className="n">{t.label}</span>
+                <span className="d">{describeModifier(t)}{t.mode === "optional" ? " · au choix" : ""}</span>
+              </option>
+            ))}
+          </optgroup>
+        ))}
       </RichSelect>
       <button type="button" className="btn sm" onClick={add}>+ Bonus</button>
     </div>

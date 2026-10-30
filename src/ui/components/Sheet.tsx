@@ -199,7 +199,7 @@ function Identity() {
       <div><span className="label">Gloire</span><b>{decimal(c.glory)}</b></div>
       <div><span className="label">Statut</span><b>{decimal(c.status)}</b></div>
       <div><span className="label">XP libre</span><b>{c.xp.total - c.xp.spent}</b></div>
-      <div><span className="label">Initiative</span><b data-testid="sheet-initiative">{poolLabel(init)}</b></div>
+      <div><span className="label">Initiative</span><b className="pool" data-testid="sheet-initiative">{poolLabel(init)}</b></div>
     </div>
   );
 }
@@ -358,33 +358,36 @@ function Weapons() {
   const { c, edit, set } = useSheet("weapons");
   const { state } = useStore();
   if (edit) {
+    // Une carte par arme, comme les sorts (annexe J.1) : champs lisibles en entier sur mobile.
     return (
       <>
-        <div className="tbl">
-          <table>
-            <thead><tr><th>Arme</th><th>Compétence</th><th>VD</th><th>Force arc</th><th>Mots-clés</th><th /></tr></thead>
-            <tbody>
-              {c.weapons.map((w, i) => (
-                <tr key={i}>
-                  <td><input className="in" type="text" aria-label="Nom de l'arme" value={w.name} maxLength={80} onChange={(e) => set(["weapons", i, "name"], e.target.value)} /></td>
-                  <td><input className="in" type="text" aria-label={`Compétence de ${w.name}`} value={w.skill} maxLength={80} onChange={(e) => set(["weapons", i, "skill"], e.target.value)} /></td>
-                  <td style={{ width: 80 }}><input className="in" type="text" aria-label={`VD de ${w.name}`} placeholder="3g2" value={w.dr} onChange={(e) => set(["weapons", i, "dr"], e.target.value)} /></td>
-                  <td style={{ width: 70 }}>
-                    <OptionalNumber value={w.bowStrength} aria-label={`Force de l'arc ${w.name}`} onChange={(n) => set(["weapons", i, "bowStrength"], n)} />
-                  </td>
-                  <td style={{ minWidth: 140 }}>
-                    <TextListField
-                      aria-label={`Mots-clés de ${w.name}`} value={w.keywords ?? []} parse={parseWeaponKeywords}
-                      placeholder={catalogWeapon(w.name)?.keywords.join(", ") ?? "samourai, lourde…"}
-                      onChange={(v) => set(["weapons", i, "keywords"], v)}
-                    />
-                  </td>
-                  <td><RemoveButton list="weapons" index={i} name={w.name} /></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        {c.weapons.map((w, i) => (
+          <div key={i} className="weaponedit" role="group" aria-label={`Arme : ${w.name || "sans nom"}`}>
+            <div className="weaponname">
+              <Field label="Nom"><input className="in" type="text" value={w.name} maxLength={80} onChange={(e) => set(["weapons", i, "name"], e.target.value)} /></Field>
+              <RemoveButton list="weapons" index={i} name={w.name} />
+            </div>
+            <div className="form-grid">
+              <Field label="Compétence"><input className="in" type="text" value={w.skill} maxLength={80} onChange={(e) => set(["weapons", i, "skill"], e.target.value)} /></Field>
+              <Field label="VD">
+                <input className="in" type="text" placeholder="3g2" value={w.dr} enterKeyHint="next" autoCapitalize="off" onChange={(e) => set(["weapons", i, "dr"], e.target.value)} />
+              </Field>
+              {isRanged(w) && (
+                <Field label="Force de l'arc">
+                  <OptionalNumber value={w.bowStrength} onChange={(n) => set(["weapons", i, "bowStrength"], n)} />
+                </Field>
+              )}
+              <Field label="Mots-clés" wide>
+                <TextListField
+                  value={w.keywords ?? []} parse={parseWeaponKeywords}
+                  placeholder={catalogWeapon(w.name)?.keywords.join(", ") ?? "samourai, lourde…"}
+                  onChange={(v) => set(["weapons", i, "keywords"], v)}
+                />
+              </Field>
+            </div>
+            <CatalogGap index={i} />
+          </div>
+        ))}
         <AddButton list="weapons" label="+ Arme" item={() => ({ name: "", skill: "Kenjutsu", dr: "3g2", keywords: [] })} />
       </>
     );
@@ -419,7 +422,7 @@ function Weapons() {
 
 /** Nombre facultatif : vide = absent. */
 function OptionalNumber({ value, onChange, min = 0, placeholder = "—", ...rest }: {
-  value: number | undefined; onChange: (n: number | undefined) => void; "aria-label": string; min?: number; placeholder?: string;
+  value: number | undefined; onChange: (n: number | undefined) => void; "aria-label"?: string; min?: number; placeholder?: string;
 }) {
   return (
     <input
@@ -438,7 +441,7 @@ function Techniques() {
   const { c, edit, set } = useSheet("techniques");
   const school = <SchoolTechniques />;
   const others = schoolOf(c) && (c.techniques.length > 0 || edit)
-    ? <div className="label" style={{ marginTop: 12 }}>Autres techniques, kata, sorts</div>
+    ? <div className="label" style={{ marginTop: 12 }}>Autres techniques, kata</div>
     : null;
   if (edit) {
     return (
@@ -454,7 +457,7 @@ function Techniques() {
             <textarea className="in" aria-label={`Effet de ${t.name}`} placeholder="Effet" value={t.text} onChange={(e) => set(["techniques", i, "text"], e.target.value)} />
           </div>
         ))}
-        <AddButton list="techniques" label="+ Technique / sort / kata" item={() => ({ name: "", text: "" })} />
+        <AddButton list="techniques" label="+ Technique / kata" item={() => ({ name: "", text: "" })} />
       </>
     );
   }

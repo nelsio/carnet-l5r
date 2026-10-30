@@ -112,6 +112,13 @@ export function Roller() {
         <span className="poolbig" data-testid="pool">{formatDice(pool.rolled, pool.kept)}</span>
         <span className="muted" style={{ fontSize: 13 }}>{poolOrigin(c, a, opts)}{pool.bonus ? ` · ${pool.bonus > 0 ? "+" : ""}${pool.bonus} au total` : ""}</span>
       </div>
+      {/* Augmentations de dégâts de l'attaque, seule source de dés lancés en plus (annexe J.9). */}
+      {opts.extraRolled > 0 && (
+        <div className="tchips" data-testid="attack-raises">
+          <span className="tchip">+{opts.extraRolled}g0 · augmentations de l'attaque</span>
+          <button type="button" className="btn sm" onClick={() => set({ extraRolled: 0 })}>Retirer</button>
+        </div>
+      )}
       {chips.length > 0 && (
         <div className="tchips" data-testid="tech-chips">
           {chips.map((e) => (
@@ -140,23 +147,19 @@ export function Roller() {
 
       <div className="opts">
         <TnField action={a} opts={opts} set={set} />
-        {/* Grille sans case vide : la cellule d'alignement ne sert qu'à un ND sans augmentations (HANDOFF §6.2). */}
-        {pool.canRaise ? (
+        {/* Grille sans case vide (annexe J.9) : ND et Bonus fixe côte à côte quand il n'y a pas d'augmentations. */}
+        {pool.canRaise && (
           <label className="field">
             <span className="label">{a.attack ? "Augm. libres" : "Augmentations"}</span>
             <NumberField className="in mono" min={0} value={opts.raises} onChange={(n) => set({ raises: n })} />
           </label>
-        ) : a.tn !== null && <div />}
+        )}
         {pool.canRaise && (
           <label className="field">
             <span className="label">Augm. gratuites{bonusFree ? ` (+${bonusFree} bonus)` : ""}</span>
             <NumberField className="in mono" min={0} value={opts.free} onChange={(n) => set({ free: n })} />
           </label>
         )}
-        <label className="field">
-          <span className="label">Dés lancés ±</span>
-          <NumberField className="in mono" value={opts.extraRolled} onChange={(n) => set({ extraRolled: n })} />
-        </label>
         <label className="field">
           <span className="label">Bonus fixe</span>
           <NumberField className="in mono" value={opts.flat} onChange={(n) => set({ flat: n })} />

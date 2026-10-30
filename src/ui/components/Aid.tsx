@@ -11,7 +11,7 @@ import {
 import type { ReminderContext } from "../../rules/ecoles";
 import { toMeters } from "../format";
 import { contextOf, currentArmorTN, DEFAULT_ROLL_OPTIONS, isActive, isRollable, poolFor, poolLabel, toPoolAction, uiRollStance } from "../rolls";
-import { currentActions, useCharacter, useStore, type AidSituation, type BattleState, type InfoPanel } from "../store";
+import { currentActions, useCharacter, useStore, type AidSituation, type BattleState, type InfoPanel, type VoidChoice } from "../store";
 import { EffectTags, RichSelect } from "./RichSelect";
 import { Roller } from "./Roller";
 import { TakeDamage } from "./StatusBar";
@@ -426,44 +426,92 @@ function RoundPanel() {
   );
 }
 
+/** Dépenses du panneau Vide (annexe J.6) : bascule (Annuler possible) ou action ponctuelle. */
+interface VoidOption {
+  id: VoidChoice;
+  label: string;
+  tags: StanceTag[];
+  description: string;
+  /** Étiquette de l'en-tête quand la bascule est active. */
+  active?: string;
+  on?: boolean;
+  spend: () => void;
+}
+
 function VoidPanel() {
   const { state, dispatch } = useStore();
   const c = useCharacter();
   const { ui } = state;
-  const none = c.voidPoints < 1;
-  const details = !!ui.info.void;
+  const m = voidMultiplier(c);
+  const toggle = (patch: Partial<typeof ui.opts>) => () => dispatch({ type: "option", patch });
+  const atRoll: VoidOption = {
+    id: "roll", label: "Au jet", tags: [{ label: `+${m}g${m}`, up: true }], description: "Dépensé au prochain jet lancé.",
+    active: `+${m}g${m} au jet`, on: ui.opts.voidPoint, spend: toggle({ voidPoint: !ui.opts.voidPoint }),
+  };
+  const options: VoidOption[] = [
+    atRoll,
+    {
+      id: "armor", label: "ND d'armure", tags: [{ label: `+${10 * m}`, up: true }], description: "Jusqu'au prochain round.",
+      active: `+${10 * m} ND d'armure`, on: ui.voidArmor, spend: () => dispatch({ type: "voidArmor" }),
+    },
+    {
+      id: "skill", label: "Compétence au rang 1", tags: [], description: "Jouer une compétence que tu n'as pas.",
+      active: "Compétence au rang 1", on: ui.opts.voidSkill, spend: toggle({ voidSkill: !ui.opts.voidSkill }),
+    },
+    {
+      id: "ability", label: "Activer une capacité", tags: [{ label: "1 point" }], description: "Technique, kata ou avantage payé en Vide.",
+      spend: () => dispatch({ type: "voidTechnique" }),
+    },
+  ];
+  if (ui.situation === "combat" && ui.sub === "skirmish") {
+    options.push(
+      {
+        id: "initiative", label: "Initiative", tags: [{ label: `+${VOID_COMBAT.initiative * m}`, up: true }], description: "Jusqu'à la fin de l'escarmouche.",
+        spend: () => dispatch({ type: "voidInitiative" }),
+      },
+      {
+        id: "swap", label: "Échanger l'Initiative", tags: [{ label: "1 point" }], description: "Avec un allié consentant ; échangez vos scores à la main.",
+        spend: () => dispatch({ type: "voidTechnique" }),
+      },
+    );
+  }
+  const current = options.find((o) => o.id === ui.voidChoice) ?? atRoll;
+  const toggleable = current.on !== undefined;
+  const cancel = toggleable && current.on;
   return (
-    <div className="panel" style={{ padding: 12 }}>
+    <div className="panel" style={{ padding: 12 }} role="group" aria-label="Dépenser du Vide">
       <div className="panel-head" style={{ marginBottom: 8 }}>
-        <span className="panel-title"><span className="label">Dépenser du Vide</span><InfoButton panel="void" label="Dépenser du Vide" /></span>
+        <span className="label">Dépenser du Vide</span>
+        <span className="muted" style={{ fontSize: 13 }}>
+          Points de Vide <b className="mono" style={{ color: "var(--ink)", fontSize: 16 }}>{c.voidPoints}</b>
+          {options.filter((o) => o.on).map((o) => <Fragment key={o.id}> <span className="tag" data-testid="void-active">{o.active}</span></Fragment>)}
+        </span>
       </div>
       {ui.voidSpentThisRound && (
         <p className="hint" style={{ color: "var(--danger)", margin: "0 0 8px" }}>Déjà un point de Vide dépensé ce round (limite normale : 1 par round).</p>
       )}
-      <div className="stance">
-        <button type="button" aria-pressed={ui.opts.voidPoint} disabled={none && !ui.opts.voidPoint} onClick={() => dispatch({ type: "option", patch: { voidPoint: !ui.opts.voidPoint } })}>
-          <b>+{voidMultiplier(c)}g{voidMultiplier(c)} au jet</b>{details && <span className="muted">Dépensé au prochain jet lancé.</span>}
-        </button>
-        <button type="button" aria-pressed={ui.voidArmor} disabled={none && !ui.voidArmor} onClick={() => dispatch({ type: "voidArmor" })}>
-          <b>+{10 * voidMultiplier(c)} ND d'armure</b>{details && <span className="muted">Jusqu'au prochain round.</span>}
-        </button>
-        <button type="button" aria-pressed={ui.opts.voidSkill} disabled={none && !ui.opts.voidSkill} onClick={() => dispatch({ type: "option", patch: { voidSkill: !ui.opts.voidSkill } })}>
-          <b>Compétence au rang 1</b>{details && <span className="muted">Jouer une compétence que tu n'as pas.</span>}
-        </button>
-        <button type="button" disabled={none} onClick={() => dispatch({ type: "voidTechnique" })}>
-          <b>Activer une capacité</b>{details && <span className="muted">Technique, kata ou avantage payé en Vide.</span>}
-        </button>
-        {ui.situation === "combat" && ui.sub === "skirmish" && (
-          <>
-            <button type="button" disabled={none} onClick={() => dispatch({ type: "voidInitiative" })}>
-              <b>+{VOID_COMBAT.initiative * voidMultiplier(c)} Initiative (escarmouche)</b>{details && <span className="muted">Jusqu'à la fin de l'escarmouche.</span>}
-            </button>
-            <button type="button" disabled={none} onClick={() => dispatch({ type: "voidTechnique" })}>
-              <b>Échanger l'Initiative</b>{details && <span className="muted">Avec un allié consentant ; échangez vos scores à la main.</span>}
-            </button>
-          </>
-        )}
+      {/* Même motif que le panneau Posture (annexe I.3.4) : choisir une option ne dépense rien. */}
+      <RichSelect
+        variant="effet" aria-label="Dépense de Vide" aria-describedby="void-desc" value={current.id}
+        onChange={(v) => dispatch({ type: "voidChoice", choice: v as VoidChoice })}
+      >
+        {options.map((o) => (
+          <option key={o.id} value={o.id}>
+            <span className="n">{o.label}</span>
+            <EffectTags tags={o.tags} />
+            <span className="d">{o.description}</span>
+          </option>
+        ))}
+      </RichSelect>
+      <div className="posture-desc" id="void-desc" data-testid="void-desc">
+        <EffectTags tags={current.tags} />
+        {current.description}
       </div>
+      <button
+        type="button" className={`btn sm${cancel ? "" : " accent"}`} style={{ marginTop: 8 }}
+        aria-pressed={toggleable ? !!current.on : undefined} disabled={!cancel && c.voidPoints < 1}
+        onClick={current.spend}
+      >{cancel ? "Annuler" : "Dépenser 1 point de Vide"}</button>
     </div>
   );
 }

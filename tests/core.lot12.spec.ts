@@ -9,10 +9,11 @@ import {
   migrate, movement, rollEffects, schoolContext, schoolReduction, targetNumber, woundPenaltyAt, woundState,
   type Character, type PoolAction, type PoolMods, type Weapon, type WeaponLike,
 } from "@carnet/core";
-import { exampleCharacter } from "../src/rules/example";
-import { NAMED_MODIFIERS } from "../src/rules/l5r4e";
+import { EXAMPLES } from "../src/rules/example";
 import perso from "../reference/perso-test-ecoles.json";
 import courtiers from "../reference/perso-test-courtisans.json";
+
+const exampleCharacter = () => EXAMPLES[0]!.build();
 
 const char = (patch: Partial<Character> = {}): Character => ({ ...(structuredClone(perso) as Character), ...patch });
 const withSkill = (c: Character, name: string, rank: number, trait: Character["skills"][number]["trait"] = "agility"): Character => {
@@ -33,12 +34,12 @@ const show = (c: Character, a: PoolAction, mods: PoolMods = {}) => {
 
 const WAKIZASHI: Weapon = { name: "Wakizashi", skill: "Kenjutsu", dr: "2k2", keywords: ["samourai", "moyenne"] };
 const DAIKYU: Weapon = { name: "Dai-kyu", skill: "Kyujutsu", dr: "2k2", bowStrength: 4, keywords: ["arc", "distance", "grande"] };
-const earthStrength = NAMED_MODIFIERS.find((m) => m.id === "force-de-la-terre")!;
-const lowPain = NAMED_MODIFIERS.find((m) => m.id === "seuil-de-douleur-bas")!;
-const asModifier = (t: typeof earthStrength) => ({
-  id: t.id, name: t.label, source: t.source, appliesTo: t.appliesTo, rolled: t.rolled, kept: t.kept, flat: t.flat,
-  freeRaises: t.freeRaises, tn: t.tn, mode: t.mode, note: t.note ?? "",
+// Bonus saisis par le joueur (le catalogue nommé est retiré au lot 20, annexe J.4).
+const woundsModifier = (id: string, name: string, source: "advantage" | "disadvantage", flat: number) => ({
+  id, name, source, appliesTo: "wounds" as const, rolled: 0, kept: 0, flat, freeRaises: 0, tn: 0, mode: "always" as const, note: "",
 });
+const earthStrength = woundsModifier("force-de-la-terre", "Force de la Terre", "advantage", 3);
+const lowPain = woundsModifier("seuil-de-douleur-bas", "Seuil de douleur bas", "disadvantage", -5);
 
 describe("Lot 12, v2.2.0 : correctifs de règles (annexe E.2)", () => {
   it("L1 : dégâts katana, Kenjutsu 2 → 5g2 sur 10 ; 3 → 6g2 sur 10 ; 7 → 6g2 sur 9 (C1, maîtrises E.4)", () => {
@@ -120,14 +121,14 @@ describe("Lot 12, v2.2.0 : correctifs de règles (annexe E.2)", () => {
   });
 
   it("L21 : détail des blessures, Terre 2, Force de la Terre → 0, 0, 2, 7, 12, 17, 37, ✕ (S5)", () => {
-    const c = char({ modifiers: [asModifier(earthStrength)] });
+    const c = char({ modifiers: [earthStrength] });
     expect([0, 1, 2, 3, 4, 5, 6, 7].map((i) => woundPenaltyAt(c, i))).toEqual([0, 0, 2, 7, 12, 17, 37, null]);
     // E27 : 11 blessures, la tuile reprend le même calcul.
     expect(woundState({ ...c, wounds: 11 })).toMatchObject({ label: "Égratigné", penalty: 0 });
   });
 
   it("Seuil de douleur bas : +5 à la pénalité de chaque niveau, Indemne reste à 0", () => {
-    const c = char({ modifiers: [asModifier(lowPain)] });
+    const c = char({ modifiers: [lowPain] });
     expect([0, 1, 2, 3, 4, 5, 6, 7].map((i) => woundPenaltyAt(c, i))).toEqual([0, 8, 10, 15, 20, 25, 45, null]);
     expect(woundState({ ...c, wounds: 11 }).penalty).toBe(8);
   });

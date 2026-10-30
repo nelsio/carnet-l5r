@@ -31,13 +31,13 @@ describe("Fiche : « Edit » par bloc (annexe E.9 S2)", () => {
     click("Edit : Compétences");
     click("Edit : Armes");
     expect(block("skills").getAllByRole("textbox", { name: "Nom de la compétence" }).length).toBeGreaterThan(0);
-    expect(block("weapons").getAllByRole("textbox", { name: "Nom de l'arme" })).toHaveLength(2);
+    expect(block("weapons").getAllByRole("textbox", { name: "Nom" })).toHaveLength(2);
     // Les autres blocs restent en lecture.
-    expect(screen.queryByRole("textbox", { name: "Nom" })).toBeNull();
+    expect(block("identity").queryByRole("textbox", { name: "Nom" })).toBeNull();
     expect(screen.queryByRole("spinbutton", { name: "Agilité" })).toBeNull();
     click("Terminer : Compétences");
     expect(block("skills").queryByRole("textbox", { name: "Nom de la compétence" })).toBeNull();
-    expect(block("weapons").getAllByRole("textbox", { name: "Nom de l'arme" })).toHaveLength(2);
+    expect(block("weapons").getAllByRole("textbox", { name: "Nom" })).toHaveLength(2);
     expect(screen.getByRole("button", { name: "Terminer : Armes" })).toHaveTextContent("Terminer");
     expect(screen.getByRole("button", { name: "Edit : Compétences" })).toHaveTextContent("Edit");
   });
@@ -164,7 +164,6 @@ describe("Lanceur : correctifs de règles (annexe E.2)", () => {
     click(/^Attaque · Katana/);
     fireEvent.change(roller().getByRole("spinbutton", { name: "ND d'armure cible" }), { target: { value: "10" } });
     click(/^Désarmement/);
-    click("Lanceur de dés : masqué");
     click("Lancer 5g3");
     expect(roller().getByTestId("disarm-note")).toHaveTextContent("2g1 sans la Force");
     click(/^Dégâts · Katana/);
@@ -176,7 +175,6 @@ describe("Lanceur : correctifs de règles (annexe E.2)", () => {
     await renderApp(base(), always(5));
     toCombat();
     click(/^Défense totale.*moitié du résultat/);
-    click("Lanceur de dés : masqué");
     click("Lancer 4g3");
     expect(screen.getByTestId("armor-tn")).toHaveTextContent("28");
     expect(roller().getByText(/^\+8 au ND d'armure ce round/)).toBeInTheDocument();

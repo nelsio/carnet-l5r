@@ -5,7 +5,8 @@ import {
   describeModifier, mergeCharacter, migrate, modifierApplies, modifiersOf, modifierTN, poolStats, woundState,
   type Character, type Modifier, type PoolAction, type Stance,
 } from "@carnet/core";
-import { MODIFIER_TEMPLATES, NAMED_MODIFIERS } from "../src/rules/l5r4e";
+import * as rules from "../src/rules/l5r4e";
+import { MODIFIER_TEMPLATES } from "../src/rules/l5r4e";
 import kakita from "./fixtures/kakita-v1.json";
 
 const base = () => structuredClone(kakita) as Character;
@@ -95,7 +96,7 @@ describe("Format de fiche", () => {
 
 describe("Modèles", () => {
   it("chaque modèle donne un bonus valide", () => {
-    for (const t of [...MODIFIER_TEMPLATES, ...NAMED_MODIFIERS]) {
+    for (const t of MODIFIER_TEMPLATES) {
       const { id, label, ...effect } = t;
       const m = { id, name: label, skill: effect.appliesTo === "skill" ? "Kenjutsu" : undefined, trait: effect.appliesTo === "trait" ? "agility" as const : undefined, note: "", ...effect };
       expect(() => CharacterSchema.parse({ ...base(), schemaVersion: 2, modifiers: [m] })).not.toThrow();
@@ -158,17 +159,20 @@ describe("Compétences sociales, pénalité de blessure, ND, posture", () => {
   });
 });
 
-describe("Catalogue nommé (livre de base 4e, résumés à vérifier)", () => {
-  const entry = (id: string) => NAMED_MODIFIERS.find((t) => t.id === id)!;
-  it("les techniques Hiruma sont passées au catalogue d'écoles (annexe C.2)", () => {
-    expect(NAMED_MODIFIERS.map((t) => t.id)).toEqual(["force-de-la-terre", "aspect-derangeant", "seuil-de-douleur-bas"]);
+describe("Modèles par source, sans catalogue nommé (annexe J.4)", () => {
+  it("Q6 : plus de catalogue nommé ; quatre sources, « Bonus libre » en tête", () => {
+    expect("NAMED_MODIFIERS" in rules).toBe(false);
+    expect(new Set(MODIFIER_TEMPLATES.map((t) => t.source))).toEqual(new Set(["other", "advantage", "disadvantage", "technique"]));
+    expect(MODIFIER_TEMPLATES[0]).toMatchObject({ id: "free", label: "Bonus libre", source: "other", appliesTo: "skill", rolled: 0, mode: "always" });
   });
-  it("Force de la Terre : pénalité de blessure −3 ; Aspect dérangeant : +5 au ND des compétences sociales", () => {
-    expect(entry("force-de-la-terre")).toMatchObject({ source: "advantage", appliesTo: "wounds", flat: 3, mode: "always" });
-    expect(entry("aspect-derangeant")).toMatchObject({ source: "disadvantage", appliesTo: "social", tn: 5, mode: "always" });
+  it("identifiants stables et uniques, un placeholder de nom par modèle", () => {
+    const ids = MODIFIER_TEMPLATES.map((t) => t.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(ids).toEqual(expect.arrayContaining(["adv-skill-dice", "dis-social-tn", "tech-stance"]));
+    for (const t of MODIFIER_TEMPLATES) expect(t.placeholder).toMatch(/^Nom /);
   });
-  it("chaque entrée signale qu'elle est à vérifier dans le livre", () => {
-    for (const t of NAMED_MODIFIERS) expect(t.note).toMatch(/À vérifier dans le livre|livre p\. \d+/);
+  it("Q7 : « ND augmenté sur les jets sociaux » → désavantage, social, ND +5", () => {
+    expect(MODIFIER_TEMPLATES.find((t) => t.id === "dis-social-tn")).toMatchObject({ source: "disadvantage", appliesTo: "social", tn: 5, mode: "always" });
   });
 });
 

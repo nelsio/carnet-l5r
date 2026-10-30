@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { clanAccent, serializeCharacter } from "@carnet/core";
-import { EXAMPLE_FILE_NAME, exampleCharacter } from "../../rules/example";
+import { EXAMPLES } from "../../rules/example";
 import { downloadText } from "../download";
 import type { LibraryEntry } from "../../storage";
 import { useStore } from "../store";
@@ -82,11 +82,14 @@ function EntryRow({ entry: e }: { entry: LibraryEntry }) {
   );
 }
 
-/** Fiche d'exemple déjà remplie, à modifier puis importer. */
+/** Modèles de fiche déjà remplis, à modifier puis importer (annexe J.5). */
 function ExampleButton() {
   return (
-    <button type="button" className="btn sm" onClick={() => downloadText(EXAMPLE_FILE_NAME, serializeCharacter(exampleCharacter()))}>
-      Télécharger un exemple de fiche (JSON)
-    </button>
+    <span className="file-actions" role="group" aria-label="Modèles de fiche (JSON)">
+      <span className="muted">Modèles de fiche (JSON) :</span>
+      {EXAMPLES.map((x) => (
+        <button key={x.id} type="button" className="btn sm" onClick={() => downloadText(x.fileName, serializeCharacter(x.build()))}>{x.label}</button>
+      ))}
+    </span>
   );
 }

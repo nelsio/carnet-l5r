@@ -7,6 +7,7 @@ import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
 import { chooseStance, currentStance, stanceOption } from "../helpers/stance";
 import { openWounds, woundsField } from "../helpers/wounds";
+import { spendVoid } from "../helpers/void";
 
 const base = () => structuredClone(kakita) as Character;
 const always = (v: number) => () => v;
@@ -36,7 +37,6 @@ describe("Centre (F1)", () => {
     await renderApp();
     toCombat();
     click(/^Initiative/);
-    click("Lanceur de dés : masqué");
     click("Lancer 4g3");
     expect(screen.getByTestId("initiative")).toHaveTextContent("15");
     chooseStance("Centre");
@@ -95,9 +95,8 @@ describe("Vide, Feinte, Garde, encaissement (F3 à F6)", () => {
     await renderApp();
     toCombat();
     click(/^Initiative/);
-    click("Lanceur de dés : masqué");
     click("Lancer 4g3");
-    click(/^\+10 Initiative \(escarmouche\)/);
+    spendVoid("initiative");
     expect(screen.getByTestId("initiative")).toHaveTextContent("25");
     expect(screen.getByText("Points de Vide 1/2")).toBeInTheDocument();
     click("Nouveau round");
@@ -111,7 +110,6 @@ describe("Vide, Feinte, Garde, encaissement (F3 à F6)", () => {
     fireEvent.change(roller().getByRole("spinbutton", { name: "ND d'armure cible" }), { target: { value: "20" } });
     click(/^Feinte/);
     expect(screen.getByTestId("final-tn")).toHaveTextContent("30");
-    click("Lanceur de dés : masqué");
     click("Lancer 5g3");
     // 3 × 9 = 27 contre 30 : échec, pas de Feinte.
     expect(roller().queryByTestId("feint-note")).toBeNull();
@@ -174,7 +172,6 @@ describe("Jets et duel (F7 à F12)", () => {
     fireEvent.change(roller().getByRole("spinbutton", { name: "Augmentations" }), { target: { value: "2" } });
     expect(roller().getByTestId("opposed-margin")).toHaveTextContent("10");
     fireEvent.change(roller().getByRole("spinbutton", { name: "Total adverse" }), { target: { value: "15" } });
-    click("Lanceur de dés : masqué");
     click("Lancer 4g3");
     expect(roller().getByTestId("opposed-verdict")).toHaveTextContent("Tu l'emportes");
   });

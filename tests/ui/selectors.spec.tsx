@@ -68,7 +68,6 @@ describe("Panneau Posture en menu déroulant (annexe I.3.4)", () => {
     await mount();
     skirmish();
     click(/^Défense totale.*moitié du résultat/);
-    click("Lanceur de dés : masqué");
     click("Lancer 4g3");
     expect(currentStance()).toBe("Défense totale");
     expect(desc()).toHaveTextContent("ND armure +jet");

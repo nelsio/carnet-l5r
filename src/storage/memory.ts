@@ -1,5 +1,5 @@
 import { LinkedLibrary } from "./linkedLibrary";
-import type { LibraryEntry, LibraryStore, Prefs, PrefsStore, SaveReport, Storage } from "./types";
+import { mergePrefs, type LibraryEntry, type LibraryStore, type Prefs, type PrefsStore, type SaveReport, type Storage } from "./types";
 
 /** Copie profonde, sauf la poignée du fichier lié, gardée telle quelle. */
 export function cloneEntry(e: LibraryEntry): LibraryEntry {
@@ -34,7 +34,7 @@ export class MemoryPrefs implements PrefsStore {
     return { ...this.prefs };
   }
   async set(patch: Partial<Prefs>): Promise<void> {
-    this.prefs = { ...this.prefs, ...patch };
+    this.prefs = mergePrefs(this.prefs, patch);
   }
 }
 

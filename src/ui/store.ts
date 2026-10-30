@@ -22,7 +22,10 @@ export type BlockId = "rings" | "identity" | "skills" | "weapons" | "armor" | "t
 /** Bloc ouvert à la création d'une fiche : le nom en premier. */
 export const NEW_CHARACTER_BLOCK: BlockId = "identity";
 /** Panneaux de l'aide de jeu dotés d'un bouton « i » (HANDOFF §6.2). */
-export type InfoPanel = "void" | "move" | "reminders" | "battle";
+export type InfoPanel = "move" | "reminders" | "battle";
+/** Option du panneau « Dépenser du Vide » (annexe J.6) ; Initiative et Échanger en escarmouche seulement. */
+export type VoidChoice = "roll" | "armor" | "skill" | "ability" | "initiative" | "swap";
+const SKIRMISH_VOID: ReadonlySet<VoidChoice> = new Set(["initiative", "swap"]);
 type Path = readonly (string | number)[];
 
 export interface RollRecord {
@@ -80,6 +83,8 @@ export interface UiState {
   /** Bonus de Défense totale (moitié du jet). */
   fullDefenseBonus: number;
   voidArmor: boolean;
+  /** Option choisie dans le panneau Vide (non mémorisée) : la choisir ne dépense rien. */
+  voidChoice: VoidChoice;
   /** Un point de Vide a déjà été dépensé ce round (avertissement). */
   voidSpentThisRound: boolean;
   initiative: number | null;
@@ -160,7 +165,7 @@ export const HISTORY_SIZE = 6;
 
 export const initialUi: UiState = {
   theme: "auto",
-  showDiceRoller: false,
+  showDiceRoller: true,
   woundMultiplier: WOUND_NEXT_MULTIPLIER,
   info: {},
   armorEdit: false,
@@ -177,6 +182,7 @@ export const initialUi: UiState = {
   stance: "attack",
   fullDefenseBonus: 0,
   voidArmor: false,
+  voidChoice: "roll",
   voidSpentThisRound: false,
   initiative: null,
   selectedId: null,
@@ -248,6 +254,7 @@ export type AppAction =
   | { type: "option"; patch: Partial<RollOptions> }
   | { type: "maneuver"; id: string; count: number }
   | { type: "voidArmor" }
+  | { type: "voidChoice"; choice: VoidChoice }
   | { type: "voidTechnique" }
   | { type: "newRound" }
   | { type: "statsOption"; patch: Partial<UiState["stats"]> }
@@ -340,7 +347,12 @@ function uiReducer(state: AppState, action: AppAction): AppState {
         ? { ...state, ui: selectFirst(c, { ...ui, view: "aid", editing: new Set() }) }
         : withUi({ view: action.view, sheetOpen: false });
     case "situation": return { ...state, ui: selectFirst(c, { ...ui, situation: action.situation }) };
-    case "sub": return { ...state, ui: selectFirst(c, { ...ui, sub: action.sub }) };
+    case "sub": {
+      // Hors escarmouche, Initiative et Échanger n'existent plus : retour à « Au jet ».
+      const voidChoice = action.sub !== "skirmish" && SKIRMISH_VOID.has(ui.voidChoice) ? "roll" : ui.voidChoice;
+      return { ...state, ui: selectFirst(c, { ...ui, sub: action.sub, voidChoice }) };
+    }
+    case "voidChoice": return withUi({ voidChoice: action.choice });
     case "stance":
       // La Garde est impossible en Assaut (F5).
       return withUi({
