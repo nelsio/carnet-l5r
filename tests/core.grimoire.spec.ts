@@ -1,8 +1,8 @@
 /** Lot 30, v2.22.0 (HANDOFF annexe N.3) : lecture, validation, conversion et recherche des sorts du grimoire, cas GR1 à GR10. */
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
-  GrimoireFormatError, parseGrimoireFile, readGrimoireFile, sameSpell, searchGrimoire, toCarnetSpell, toGrimoireSpell, SpellSchema,
-  type GrimoireSpell,
+  createSpell, fillFromGrimoire, grimoireConflicts, GrimoireFormatError, parseGrimoireFile, readGrimoireFile, sameSpell, searchGrimoire, toCarnetSpell, toGrimoireSpell, SpellSchema,
+  type GrimoireSpell, type Spell,
 } from "@carnet/core";
 import { GRIMOIRE_KEYS, grimoireFile, grimoireFixture } from "./helpers/grimoire";
 
@@ -181,5 +181,53 @@ describe("GR10 : recherche", () => {
     const g = toGrimoireSpell(entry())!;
     expect(sameSpell({ name: " frappe de jade " }, g)).toBe(true);
     expect(sameSpell({ name: "Frappe" }, g)).toBe(false);
+  });
+});
+
+/** Lot 31, v2.23.0 (HANDOFF annexe N.8) : remplir un sort existant depuis le grimoire, cas GR26 et GR27 côté moteur. */
+describe("N.8 : remplir un sort saisi", () => {
+  const jade = () => toGrimoireSpell(entry({ area: "Une cible", duration: "Instantanée" }))!;
+  const typed = (patch: Partial<Spell> = {}): Spell => ({
+    ...createSpell("Frappe de jade", "earth"), keywords: ["Jade", "Tonnerre"], range: "30 m", area: "une cible", duration: "INSTANTANEE",
+    raises: "Dégâts (+1g0)\nCibles (+1)", damage: "2k2", memorized: true, effect: "Projectile de jade.", ...patch,
+  });
+
+  it("grimoireConflicts : seuls les champs remplis et différents (sans accents ni casse) ; VD absente du grimoire non comparée", () => {
+    expect(grimoireConflicts(typed(), jade())).toEqual([{ field: "range", from: "30 m", to: "30 mètres (100')" }]);
+    expect(grimoireConflicts(typed({ range: "", keywords: [], raises: "" }), jade())).toEqual([]);
+    expect(grimoireConflicts(createSpell(), jade())).toEqual([]);
+  });
+
+  it("augmentations sur une ligne avec « · », mots-clés joints ; VD comparée au format du Carnet", () => {
+    const g = { ...jade(), damage: "3g3" };
+    expect(grimoireConflicts(typed({ range: "30 mètres (100')", raises: "Portée (+10 pieds)\nCibles (+1)", keywords: ["Jade"], damage: "3 k 3" }), g)).toEqual([
+      { field: "raises", from: "Portée (+10 pieds) · Cibles (+1)", to: "Dégâts (+1g0) · Cibles (+1)" },
+      { field: "keywords", from: "Jade", to: "Jade, Tonnerre" },
+    ]);
+    expect(grimoireConflicts(typed({ range: "" }), g)).toEqual([{ field: "damage", from: "2g2", to: "3g3" }]);
+  });
+
+  it("Remplacer : tout est remplacé, sauf effet et mémorisé", () => {
+    const s = fillFromGrimoire(typed({ element: "fire", mastery: 3 }), jade(), "all");
+    expect(s).toMatchObject({ name: "Frappe de Jade", element: "earth", mastery: 1, range: "30 mètres (100')", area: "Une cible", duration: "Instantanée" });
+    expect(s).toMatchObject({ damage: "2k2", memorized: true, effect: "Projectile de jade." });
+  });
+
+  it("Compléter les vides : nom, élément et maîtrise, puis seulement les champs vides", () => {
+    const s = fillFromGrimoire(typed({ area: "", raises: "", keywords: [] }), jade(), "empty");
+    expect(s).toMatchObject({ name: "Frappe de Jade", range: "30 m", area: "Une cible", raises: "Dégâts (+1g0)\nCibles (+1)", keywords: ["Jade", "Tonnerre"] });
+    expect(s.memorized).toBe(true);
+  });
+
+  it("un champ vide dans le grimoire n'efface rien ; VD remplie si le grimoire en a une et le champ est vide", () => {
+    const g = { ...jade(), raises: "", keywords: [], damage: "3g3" };
+    const s = fillFromGrimoire(typed({ damage: undefined }), g, "all");
+    expect(s).toMatchObject({ raises: "Dégâts (+1g0)\nCibles (+1)", keywords: ["Jade", "Tonnerre"], damage: "3g3" });
+  });
+
+  it("note de dégâts : « VD : … » seulement dans un effet vide", () => {
+    const g = { ...jade(), damageNote: "Feu + Maîtrise" };
+    expect(fillFromGrimoire(typed({ effect: "" }), g, "all").effect).toBe("VD : Feu + Maîtrise");
+    expect(fillFromGrimoire(typed(), g, "empty").effect).toBe("Projectile de jade.");
   });
 });

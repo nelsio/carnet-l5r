@@ -888,3 +888,26 @@ a.mon .ext{margin-left:0}
   .gpanel .grip{display:block;width:44px;height:5px;border-radius:3px;background:var(--line);margin:8px auto 0}
   .gresults{max-height:none}
 }
+/* ---------- v2.23.0 : autocomplétion du nom d'un sort (annexe N.8) ---------- */
+.field.ac{position:relative}
+.combo{position:relative;display:block}
+.combo .in{width:100%;padding-right:36px}
+.combo .ac-ico{position:absolute;right:10px;top:50%;translate:0 -50%;width:18px;height:18px;color:var(--muted);pointer-events:none}
+.spelledit .form-grid.spellhead{grid-template-columns:minmax(0,2fr) minmax(0,1fr) 110px}
+.ac-hint{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:0;font-size:12px;color:var(--muted)}
+.ac-hint .linkbtn{font-weight:700;text-underline-offset:3px}
+.sugg{position:absolute;left:0;top:calc(100% + 4px);z-index:4;width:max(100%,min(420px,calc(100vw - 32px)));padding:6px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow)}
+.sugg[hidden]{display:none}
+.sugg ul{display:grid;gap:2px;max-height:280px;overflow:auto;overscroll-behavior:contain;list-style:none;margin:0;padding:0}
+.sugg .gres{grid-template-columns:4px minmax(0,1fr)}
+.sugg .foot{margin:4px 0 0;padding:6px 10px 2px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+.gconfirm{display:grid;gap:8px;padding:10px 12px;background:var(--surface-2);border:1px solid var(--accent);border-radius:8px}
+.gconfirm p{margin:0;font-size:14px}
+.gconfirm .diff{margin:0;padding-left:18px;font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+.gconfirm .row{display:flex;flex-wrap:wrap;gap:6px}
+@media (max-width:720px){
+  .spelledit .form-grid.spellhead{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .spellhead .field.ac{grid-column:1/-1}
+  .sugg{width:100%}
+  .gconfirm .btn{min-height:44px;flex:1 1 auto}
+}
