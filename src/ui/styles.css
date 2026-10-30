@@ -164,7 +164,7 @@ tr:last-child td{border-bottom:0}
 .tag{display:inline-block;font-size:11.5px;padding:1px 7px;border-radius:999px;background:var(--sunk);color:var(--muted);margin:1px 2px 1px 0}
 .kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}
 .kv div{min-width:0}
-.kv b{display:block;font-family:var(--f-mono);font-size:18px}
+.kv b{display:block;font-family:var(--f-mono);font-size:15px}
 .prose{white-space:pre-wrap}
 .tech{border-left:3px solid var(--accent);padding-left:10px;margin-bottom:10px}
 .tech b{font-family:var(--f-display)}
@@ -195,6 +195,7 @@ tr:last-child td{border-bottom:0}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .in{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:5px 7px;min-width:0}
 input.in[type=number]{font-family:var(--f-mono)}
+input.in[type=number]::placeholder{font-family:var(--f-body)}
 textarea.in{min-height:80px;resize:vertical}
 .field{display:grid;gap:3px;min-width:0}
 .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
@@ -237,7 +238,7 @@ textarea.in{min-height:80px;resize:vertical}
 .manual{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.45}
 .manual b{color:var(--ink);font-family:var(--f-mono);font-weight:700}
 .statline{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.statline span{background:var(--bg);border-radius:6px;padding:4px 9px;font-size:13px;color:var(--muted)}
+.statline>span{display:inline-flex;align-items:center;gap:4px;background:var(--bg);border-radius:6px;padding:4px 9px;font-size:13px;color:var(--muted)}
 .statline b{font-family:var(--f-mono);color:var(--ink);font-size:14px}
 .statline .ch{background:var(--accent-pale)}
 .moves{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
@@ -552,6 +553,17 @@ header.top + main{margin-top:18px}
 .kwpick button{padding:3px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:12.5px;font-weight:600}
 .kwpick button[aria-pressed=true]{border-color:var(--accent);background:var(--accent-pale)}
 .spellfoot{display:flex;justify-content:space-between;align-items:center}
+/* ---------- v2.17.0 : bloc Armes en Edit (annexe J.1) ---------- */
+.weaponedit{display:grid;gap:8px;margin-bottom:10px;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.weaponedit .form-grid{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+.weaponedit .suggest{margin-bottom:0}
+.weaponname{display:flex;align-items:flex-end;gap:6px}
+.weaponname .field{flex:1}
+@media (max-width:720px){
+  .weaponedit .form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .weaponedit .form-grid .field:first-child{grid-column:1/-1}
+  .weaponedit .in{min-height:40px}
+}
 .affin{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:-2px 0 8px}
 /* ---------- v2.11.0 : lanceur de sort (annexe F.5) ---------- */
 .spellbox{display:grid;gap:8px;margin-bottom:12px;padding:10px;border-radius:8px;background:var(--bg);border-left:3px solid var(--accent)}

@@ -17,10 +17,8 @@ async function start(page: Page) {
   await page.getByRole("button", { name: "Terminer : Compétences" }).click();
   await page.getByRole("button", { name: "Edit : Armes" }).click();
   await page.getByRole("button", { name: "+ Arme" }).click();
-  await page.getByRole("textbox", { name: "Nom de l'arme" }).fill("Katana");
+  await page.getByRole("group", { name: /^Arme : / }).getByRole("textbox", { name: "Nom" }).fill("Katana");
   await page.getByRole("button", { name: "Terminer : Armes" }).click();
-  // Le bouton « Lancer » n'apparaît qu'avec le lanceur de dés affiché (masqué par défaut).
-  await page.getByRole("button", { name: "Lanceur de dés : masqué" }).click();
 }
 
 /** Ouvre tous les blocs de la fiche en modification (bouton « Edit » de chacun, annexe E.9 S2). */
@@ -252,8 +250,8 @@ async function touchArea(el: Locator) {
   expect(hits, await el.getAttribute("aria-label") ?? "").toEqual([true, true, true, true]);
 }
 
-// Lot 19 (annexe I.3.7) : le panneau Posture n'a plus de « i », il tient sur un écran avec sa description.
-test("M10 : boutons « i » touchables sur 40 × 40 px ; Vide tient sur un écran détails fermés, Posture avec sa description", async ({ page }) => {
+// Lot 19 (annexe I.3.7) : le panneau Posture n'a plus de « i » ; lot 20 (annexe J.6) : le panneau Vide non plus.
+test("M10 : Vide et Posture tiennent sur un écran avec leur description ; menu Vide de 40 px", async ({ page }) => {
   await tab(page, "Aide de jeu").click();
   await page.getByRole("group", { name: "Situation" }).getByRole("button", { name: "Combat", exact: true }).click();
   const vp = page.viewportSize()!;
@@ -262,17 +260,28 @@ test("M10 : boutons « i » touchables sur 40 × 40 px ; Vide tient sur un écra
   await expect(page.getByTestId("posture-desc")).toBeVisible();
   const stancePanel = (await stance.locator("xpath=ancestor::div[contains(@class,'panel')][1]").boundingBox())!;
   expect(stancePanel.height, "Posture").toBeLessThan(vp.height);
-  for (const name of ["Dépenser du Vide"]) {
-    const info = page.getByRole("button", { name: `Afficher le détail : ${name}` });
-    await info.evaluate((e) => e.scrollIntoView({ block: "center" }));
-    await touchArea(info);
-    const panelBox = (await info.locator("xpath=ancestor::div[contains(@class,'panel')][1]").boundingBox())!;
-    expect(panelBox.height, name).toBeLessThan(vp.height);
-    // En-tête sur une seule ligne : le « i » est aligné sur le titre.
-    const title = (await info.locator("xpath=preceding-sibling::span[1]").boundingBox())!;
-    const ib = (await info.boundingBox())!;
-    expect(Math.abs(title.y + title.height / 2 - (ib.y + ib.height / 2)), name).toBeLessThan(6);
+  const voidPanel = page.getByRole("group", { name: "Dépenser du Vide" });
+  await voidPanel.evaluate((e) => e.scrollIntoView({ block: "center" }));
+  await expect(voidPanel.getByTestId("void-desc")).toBeVisible();
+  expect((await voidPanel.boundingBox())!.height, "Vide").toBeLessThan(vp.height);
+  await touchArea(voidPanel.getByRole("combobox", { name: "Dépense de Vide" }));
+  await expect(voidPanel.getByRole("button", { name: /le détail/ })).toHaveCount(0);
+});
+
+// Lot 20 (annexe J.1) : bloc Armes en cartes, lisible à 390 px.
+test("Q1 : Armes en Edit, une carte par arme ; Nom, Compétence, VD lisibles en entier, 16 px, sans défilement horizontal", async ({ page }) => {
+  await page.getByRole("button", { name: "Edit : Armes" }).click();
+  const card = page.getByRole("group", { name: "Arme : Katana" });
+  await expect(card).toBeVisible();
+  for (const name of ["Nom", "Compétence", "VD"]) {
+    const field = card.getByRole("textbox", { name, exact: true });
+    const { fontSize, fits } = await field.evaluate((el: HTMLInputElement) => ({
+      fontSize: parseFloat(getComputedStyle(el).fontSize), fits: el.scrollWidth <= el.clientWidth,
+    }));
+    expect(fontSize, name).toBeGreaterThanOrEqual(16);
+    expect(fits, name).toBe(true);
   }
+  await noHorizontalScroll(page, "Armes en Edit");
 });
 
 /** « Nouveau round » : entre l'initiative et la posture ; sa description tient sur 2 lignes au plus. */
@@ -366,9 +375,12 @@ test.describe("M11 : en-tête à 360 px de large", () => {
 /** Bonus de jet en lecture : trois lignes (nom, effet, cible), sans texte tronqué (annexe E.9 S1, E24). */
 async function modifiersOnThreeLines(page: Page) {
   await page.getByRole("button", { name: "Edit : Bonus de jet" }).click();
-  for (const id of ["skill-1g1", "force-de-la-terre"]) {
+  // Modèles sans nom (annexe J.4) : le joueur écrit celui de son avantage.
+  const added = [["adv-skill-dice", "Voix"], ["adv-wounds", "Force de la Terre"]] as const;
+  for (const [i, [id, name]] of added.entries()) {
     await page.getByRole("combobox", { name: "Modèle de bonus" }).selectOption(id);
     await page.getByRole("button", { name: "+ Bonus" }).click();
+    await page.getByRole("textbox", { name: "Nom du bonus" }).nth(i).fill(name);
   }
   await page.getByRole("button", { name: "Terminer : Bonus de jet" }).click();
   const rows = page.locator(".modrow");

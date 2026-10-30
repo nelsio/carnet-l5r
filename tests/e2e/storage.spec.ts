@@ -92,21 +92,20 @@ test.describe("Préférences et armure après rechargement (file://)", () => {
     await expect(page.locator(".cstats .ct").filter({ hasText: "Réduction" })).toContainText("3");
   });
 
-  test("E15 : lanceur de dés masqué par défaut ; affiché partout ; le choix survit au rechargement", async ({ page }) => {
+  test("E15 : lanceur de dés affiché par défaut, partout ; masqué, le choix survit au rechargement (J.7)", async ({ page }) => {
     await page.goto(url);
     await page.getByRole("button", { name: "Créer mon personnage" }).click();
     await page.getByRole("button", { name: "Terminer" }).click();
     await page.getByRole("button", { name: "Aide de jeu" }).click();
-    await page.locator("button.act").first().click();
-    await expect(page.getByRole("button", { name: /^Lancer/ })).toHaveCount(0);
-    await page.getByRole("button", { name: "Lanceur de dés : masqué" }).click();
     for (const s of ["Enquête", "Déplacement", "Combat"]) {
       await page.getByRole("group", { name: "Situation" }).getByRole("button", { name: s, exact: true }).click();
       await page.locator("button.act").first().click();
       await expect(page.getByRole("button", { name: /^Lancer/ }), s).toBeVisible();
     }
+    await page.getByRole("button", { name: "Lanceur de dés : affiché" }).click();
+    await expect(page.getByRole("button", { name: /^Lancer/ })).toHaveCount(0);
     await page.waitForTimeout(200);
     await page.reload();
-    await expect(page.getByRole("button", { name: "Lanceur de dés : affiché" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Lanceur de dés : masqué" })).toBeVisible();
   });
 });

@@ -167,32 +167,69 @@ describe("Export", () => {
   });
 });
 
-describe("Exemple de fiche", () => {
-  it("la Bibliothèque propose un exemple déjà rempli, valide et réimportable", async () => {
+describe("Modèles de fiche (annexe J.5)", () => {
+  async function download(label: string) {
     const blobs: Blob[] = [];
     const names: string[] = [];
     URL.createObjectURL = vi.fn((b: Blob) => { blobs.push(b); return "blob:exemple"; });
     URL.revokeObjectURL = vi.fn();
     vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(function (this: HTMLAnchorElement) { names.push(this.download); });
-    const { storage } = await mount([]);
-    click("Télécharger un exemple de fiche (JSON)");
-    expect(names).toEqual(["exemple-fiche-l5r.json"]);
+    click(label);
     const text = await blobs[0]!.text();
-    const json = JSON.parse(text) as Character;
+    return { name: names[0], text, json: JSON.parse(text) as Character };
+  }
+
+  it("Q9 : trois boutons sous « Modèles de fiche (JSON) »", async () => {
+    await mount([]);
+    const group = within(screen.getByRole("group", { name: "Modèles de fiche (JSON)" }));
+    expect(group.getAllByRole("button").map((b) => b.textContent)).toEqual(["Exemple bushi", "Exemple shugenja", "Exemple courtisan"]);
+    expect(screen.queryByRole("button", { name: "Télécharger un exemple de fiche (JSON)" })).toBeNull();
+  });
+
+  it("Q9 : l'exemple bushi est valide et se réimporte en « Nouvelle fiche »", async () => {
+    const { storage } = await mount([]);
+    const { name, text, json } = await download("Exemple bushi");
+    expect(name).toBe("exemple-bushi-l5r.json");
     expect(json).toMatchObject({ schemaVersion: 2, name: "Kakita Haruto" });
     expect(json.modifiers?.map((m) => m.name)).toEqual(["Voix"]);
     expect(importCharacter(json)).toEqual({ ok: true, character: json });
 
-    const dialog = await chooseFile(new File([text], "exemple-fiche-l5r.json", { type: "application/json" }));
+    const dialog = await chooseFile(new File([text], name!, { type: "application/json" }));
     fireEvent.click(within(dialog).getByRole("button", { name: "Importer" }));
     expect(await screen.findByRole("heading", { level: 1, name: "Kakita Haruto" })).toBeInTheDocument();
     expect(screen.getByTestId("modifier-voix")).toHaveTextContent("+1g1 · d'office");
     expect(await storage.library.list()).toHaveLength(1);
   });
 
+  it("Q9 : le shugenja a l'école Tamori et 2 sorts, et se réimporte", async () => {
+    await mount([]);
+    const { name, text, json } = await download("Exemple shugenja");
+    expect(name).toBe("exemple-shugenja-l5r.json");
+    expect(json).toMatchObject({ name: "Tamori Ayane", schoolId: "tamori-shugenja" });
+    expect(json.spells?.map((x) => x.name)).toEqual(["Sentir", "Frappe de jade"]);
+    expect(importCharacter(json)).toEqual({ ok: true, character: json });
+    const dialog = await chooseFile(new File([text], name!, { type: "application/json" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Importer" }));
+    expect(await screen.findByRole("heading", { level: 1, name: "Tamori Ayane" })).toBeInTheDocument();
+    expect(screen.getByTestId("spell-frappe-de-jade")).toBeInTheDocument();
+  });
+
+  it("Q9 : la courtisane a l'école Doji et 2 bonus, et se réimporte", async () => {
+    await mount([]);
+    const { name, text, json } = await download("Exemple courtisan");
+    expect(name).toBe("exemple-courtisan-l5r.json");
+    expect(json).toMatchObject({ name: "Doji Sayuri", schoolId: "doji-courtisan" });
+    expect(json.modifiers).toHaveLength(2);
+    expect(importCharacter(json)).toEqual({ ok: true, character: json });
+    const dialog = await chooseFile(new File([text], name!, { type: "application/json" }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Importer" }));
+    expect(await screen.findByRole("heading", { level: 1, name: "Doji Sayuri" })).toBeInTheDocument();
+    expect(screen.getByTestId("school-techniques")).toHaveTextContent("École de courtisans Doji");
+  });
+
   it("aussi depuis une Bibliothèque déjà remplie", async () => {
     await mount();
     click("Carnet de Rokugan — ouvrir la bibliothèque");
-    expect(await screen.findByRole("button", { name: "Télécharger un exemple de fiche (JSON)" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "Exemple shugenja" })).toBeInTheDocument();
   });
 });

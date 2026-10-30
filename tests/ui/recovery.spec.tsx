@@ -60,7 +60,6 @@ describe("Nouvelle journée", () => {
 
   it("remet l'initiative à zéro", async () => {
     await renderApp();
-    click("Lanceur de dés : masqué");
     click("Aide de jeu");
     click("Combat");
     fireEvent.click(screen.getByRole("button", { name: /^Initiative/ }));

@@ -4,9 +4,11 @@ import { describe, expect, it, vi } from "vitest";
 import type { Character } from "@carnet/core";
 import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
-import { exampleCharacter } from "../../src/rules/example";
+import { EXAMPLES } from "../../src/rules/example";
 import kakita from "../fixtures/kakita-v1.json";
 import { openWounds, WOUNDS_TILE } from "../helpers/wounds";
+
+const exampleCharacter = () => EXAMPLES[0]!.build();
 
 const base = (patch: Partial<Character> = {}) => ({ ...(structuredClone(kakita) as Character), ...patch });
 

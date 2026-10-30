@@ -6,11 +6,11 @@ import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
 import { chooseStance } from "../helpers/stance";
+import { chooseVoid, voidPanel } from "../helpers/void";
 
 const base = () => structuredClone(kakita) as Character;
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
 const roller = () => within(screen.getByRole("dialog", { name: "Lanceur de dés" }));
-const showDice = () => click("Lanceur de dés : masqué");
 
 async function mount(patch: Partial<Character> = {}, rng = () => 5) {
   const storage = memoryStorage();
@@ -48,7 +48,7 @@ describe("Techniques d'école : parcours E16 à E19", () => {
     }
     expect(screen.getByTestId("school-rank-1")).not.toHaveClass("locked");
     expect(screen.getByTestId("attack-pool-Katana")).toHaveTextContent("6g3");
-    expect(screen.getByText("Autres techniques, kata, sorts")).toBeInTheDocument();
+    expect(screen.getByText("Autres techniques, kata")).toBeInTheDocument();
     await waitFor(async () => expect((await storage.library.get("a"))?.character).toMatchObject({ schoolId: "hiruma-bushi", insightRank: 2 }), { timeout: 1500 });
   });
 
@@ -117,12 +117,12 @@ describe("Techniques d'école : détails de l'interface", () => {
     click(/^Attaque · Katana/);
     expect(roller().getByText(/Dépenser 1 point de Vide \(\+2g2\)/)).toBeInTheDocument();
     expect(roller().getByText(/Dépenser 2 points de Vide \(\+4g4\)/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /\+20 ND d'armure/ })).toBeInTheDocument();
+    chooseVoid("armor");
+    expect(voidPanel().getByTestId("void-desc")).toHaveTextContent("+20");
   });
 
   it("Akodo 5 : ND 20 + 2 augmentations, total 21 → Échec, réussite sans les augmentations", async () => {
     await mount({ schoolId: "akodo-bushi", insightRank: 5 }, () => 7);
-    showDice();
     skirmish();
     click(/^Attaque · Katana/);
     fireEvent.change(roller().getByRole("spinbutton", { name: "Augm. libres" }), { target: { value: "2" } });
@@ -139,7 +139,7 @@ describe("Techniques d'école : détails de l'interface", () => {
   it("Mots-clés d'arme : saisie libre, étiquettes en lecture", async () => {
     await mount();
     click("Edit : Armes");
-    const field = screen.getByRole("textbox", { name: "Mots-clés de Katana" });
+    const field = within(screen.getByRole("group", { name: "Arme : Katana" })).getByRole("textbox", { name: "Mots-clés" });
     expect(field).toHaveValue("samourai, moyenne");
     fireEvent.change(field, { target: { value: "Samouraï, deux mains, inconnu" } });
     expect(field).toHaveValue("Samouraï, deux mains, inconnu");

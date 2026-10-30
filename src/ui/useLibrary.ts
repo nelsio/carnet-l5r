@@ -72,7 +72,8 @@ export function useLibrary(
       if (cancelled) return;
       // IndexedDB fait foi face au cache de localStorage (annexe I.1.8).
       dispatch({ type: "theme", theme: prefs.theme ?? "auto" });
-      if (prefs.showDiceRoller) dispatch({ type: "diceRoller", show: true });
+      // Lanceur affiché par défaut ; l'ancienne clé `showDiceRoller` est ignorée (annexe J.7).
+      dispatch({ type: "diceRoller", show: prefs.diceRoller ?? true });
       if (prefs.woundMultiplier) dispatch({ type: "woundMultiplier", value: prefs.woundMultiplier });
       setEntries(list);
       const last = list.find((e) => e.id === prefs.lastOpenedId) ?? list[0];
@@ -88,7 +89,7 @@ export function useLibrary(
   // Thème, lanceur de dés et multiplicateur de blessures mémorisés dans les préférences.
   const { theme, showDiceRoller, woundMultiplier } = state.ui;
   useEffect(() => {
-    if (ready) void storage.prefs.set({ theme, showDiceRoller, woundMultiplier });
+    if (ready) void storage.prefs.set({ theme, diceRoller: showDiceRoller, showDiceRoller: undefined, woundMultiplier });
   }, [ready, theme, showDiceRoller, woundMultiplier, storage]);
 
   /** Bilan de l'écriture du fichier lié. */

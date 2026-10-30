@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 2,
+  "name": "Tamori Ayane",
+  "clan": "Dragon",
+  "family": "Tamori",
+  "school": "École de shugenja Tamori",
+  "schoolId": "tamori-shugenja",
+  "schoolRank": null,
+  "insightRank": 1,
+  "honor": 4.5,
+  "glory": 1.0,
+  "status": 1.0,
+  "xp": { "total": 40, "spent": 34 },
+  "traits": {
+    "stamina": 3, "willpower": 2,
+    "strength": 2, "perception": 2,
+    "agility": 2, "intelligence": 3,
+    "reflexes": 2, "awareness": 2
+  },
+  "voidRing": 2,
+  "voidPoints": 2,
+  "wounds": 0,
+  "armor": { "name": "", "bonus": 0, "reduction": 0 },
+  "skills": [
+    { "name": "Calligraphie", "rank": 1, "trait": "intelligence", "emphases": ["Chiffrage"] },
+    { "name": "Connaissance : Théologie", "rank": 1, "trait": "intelligence", "emphases": [] },
+    { "name": "Défense", "rank": 1, "trait": "reflexes", "emphases": [] },
+    { "name": "Divination", "rank": 1, "trait": "intelligence", "emphases": [] },
+    { "name": "Artisanat : Forge", "rank": 2, "trait": "intelligence", "emphases": [] },
+    { "name": "Méditation", "rank": 1, "trait": "void", "emphases": [] },
+    { "name": "Étiquette", "rank": 1, "trait": "awareness", "emphases": [] },
+    { "name": "Sortilèges", "rank": 1, "trait": "intelligence", "emphases": [] }
+  ],
+  "weapons": [
+    { "name": "Wakizashi", "skill": "Kenjutsu", "dr": "2g2", "keywords": ["samourai", "moyenne"] }
+  ],
+  "techniques": [],
+  "maneuvers": [],
+  "spells": [
+    {
+      "id": "sentir", "name": "Sentir", "element": "all", "mastery": 1, "keywords": [],
+      "range": "Personnel", "area": "Rayon de 50 pieds", "duration": "Instantanée",
+      "raises": "Zone (+10 pieds)", "memorized": false,
+      "effect": "Perçoit la présence et l'humeur des kami de l'élément choisi."
+    },
+    {
+      "id": "frappe-de-jade", "name": "Frappe de jade", "element": "earth", "mastery": 1, "keywords": ["Jade"],
+      "range": "100 pieds", "area": "Une cible", "duration": "Instantanée",
+      "raises": "Portée (+10 pieds)\nCibles (+1)", "damage": "2g2", "memorized": true,
+      "effect": "Projectile de jade contre une créature souillée. Valeurs à vérifier dans ton livre."
+    }
+  ],
+  "spellSlotsUsed": {},
+  "modifiers": [],
+  "advantages": "",
+  "disadvantages": "",
+  "notes": "Modèle de shugenja (Dragon, école Tamori, rang 1). Remplace tout par ton personnage ; recopie tes rouleaux dans « Rouleaux & invocations »."
+}

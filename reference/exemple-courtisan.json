@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 2,
+  "name": "Doji Sayuri",
+  "clan": "Grue",
+  "family": "Doji",
+  "school": "École de courtisans Doji",
+  "schoolId": "doji-courtisan",
+  "schoolRank": null,
+  "insightRank": 1,
+  "honor": 6.5,
+  "glory": 1.0,
+  "status": 1.0,
+  "xp": { "total": 40, "spent": 34 },
+  "traits": {
+    "stamina": 2, "willpower": 2,
+    "strength": 2, "perception": 3,
+    "agility": 2, "intelligence": 2,
+    "reflexes": 2, "awareness": 3
+  },
+  "voidRing": 2,
+  "voidPoints": 2,
+  "wounds": 0,
+  "armor": { "name": "", "bonus": 0, "reduction": 0 },
+  "skills": [
+    { "name": "Calligraphie", "rank": 1, "trait": "intelligence", "emphases": [] },
+    { "name": "Courtisan", "rank": 2, "trait": "awareness", "emphases": ["Manipulation"] },
+    { "name": "Étiquette", "rank": 2, "trait": "awareness", "emphases": ["Courtoisie"] },
+    { "name": "Représentation : Conte", "rank": 1, "trait": "awareness", "emphases": [] },
+    { "name": "Sincérité", "rank": 2, "trait": "awareness", "emphases": ["Honnêteté"] },
+    { "name": "Cérémonie du thé", "rank": 1, "trait": "void", "emphases": [] },
+    { "name": "Investigation", "rank": 1, "trait": "perception", "emphases": ["Remarquer"] }
+  ],
+  "weapons": [
+    { "name": "Tanto", "skill": "Kenjutsu", "dr": "1g1", "keywords": ["petite"] }
+  ],
+  "techniques": [],
+  "maneuvers": [],
+  "modifiers": [
+    {
+      "id": "voix", "name": "Voix", "source": "advantage", "appliesTo": "skill", "skill": "Représentation : Conte",
+      "rolled": 1, "kept": 1, "flat": 0, "tn": 0, "freeRaises": 0, "mode": "always",
+      "note": "Exemple : +1g1 aux jets de Représentation qui passent par la voix."
+    },
+    {
+      "id": "timide", "name": "Exemple de désavantage", "source": "disadvantage", "appliesTo": "social",
+      "rolled": 0, "kept": 0, "flat": 0, "tn": 0, "freeRaises": 0, "mode": "optional",
+      "note": "Modèle vide à adapter : malus en dés (rolled/kept négatifs), au total (flat) ou au ND (tn)."
+    }
+  ],
+  "advantages": "Voix",
+  "disadvantages": "",
+  "notes": "Modèle de courtisan (Grue, école Doji, rang 1). Remplace tout par ton personnage."
+}

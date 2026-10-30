@@ -13,8 +13,6 @@ const mod = (patch: Partial<Modifier>): Modifier => ({
   mode: "always", note: "", ...patch,
 });
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
-/** Le bouton « Lancer » n'apparaît qu'avec le lanceur de dés affiché (masqué par défaut). */
-const showDice = () => click("Lanceur de dés : masqué");
 const roller = () => within(screen.getByRole("dialog", { name: "Lanceur de dés" }));
 
 async function mount(modifiers: Modifier[] = [], mode: LibraryEntry["mode"] = "edit", rng = () => 5) {
@@ -26,24 +24,28 @@ async function mount(modifiers: Modifier[] = [], mode: LibraryEntry["mode"] = "e
 }
 
 describe("Saisie sur la fiche", () => {
-  it("ajout depuis un modèle : +1g0 à Kenjutsu met à jour les réserves de la fiche", async () => {
+  it("ajout depuis un modèle : « Dés en plus sur une compétence » (+1g1) à Kenjutsu met à jour les réserves de la fiche", async () => {
     const { storage } = await mount();
     expect(screen.getByText(/Aucun bonus/)).toBeInTheDocument();
     click("Edit : Bonus de jet");
-    fireEvent.change(screen.getByRole("combobox", { name: "Modèle de bonus" }), { target: { value: "skill-1g0" } });
+    fireEvent.change(screen.getByRole("combobox", { name: "Modèle de bonus" }), { target: { value: "adv-skill-dice" } });
     click("+ Bonus");
-    const editor = screen.getByRole("group", { name: "Bonus +1g0 à une compétence" });
-    fireEvent.change(within(editor).getByRole("textbox", { name: "Nom du bonus" }), { target: { value: "Voie de la Grue" } });
+    // Nom vide, placeholder selon la source (annexe J.4).
+    const editor = screen.getByRole("group", { name: "Bonus 1" });
+    const name = within(editor).getByRole("textbox", { name: "Nom du bonus" });
+    expect(name).toHaveValue("");
+    expect(name).toHaveAttribute("placeholder", "Nom de l'avantage");
+    fireEvent.change(name, { target: { value: "Voie de la Grue" } });
     fireEvent.change(within(editor).getByRole("combobox", { name: "Compétence" }), { target: { value: "Kenjutsu" } });
-    expect(within(editor).getByText("Effet : +1g0")).toBeInTheDocument();
+    expect(within(editor).getByText("Effet : +1g1")).toBeInTheDocument();
     click("Terminer : Bonus de jet");
-    expect(screen.getByTestId("skill-pool-Kenjutsu")).toHaveTextContent("6g3");
+    expect(screen.getByTestId("skill-pool-Kenjutsu")).toHaveTextContent("6g4");
     expect(screen.getByTestId("skill-pool-Iaijutsu")).toHaveTextContent("6g3");
     const katana = screen.getAllByRole("row").find((r) => r.textContent?.startsWith("KatanaKenjutsu"))!;
-    expect(katana).toHaveTextContent("6g3");
+    expect(katana).toHaveTextContent("6g4");
     expect(screen.getByText("Compétence : Kenjutsu")).toBeInTheDocument();
     expect(screen.getByText("· d'office")).toBeInTheDocument();
-    await waitFor(async () => expect((await storage.library.get("a"))?.character.modifiers?.[0]).toMatchObject({ name: "Voie de la Grue", skill: "Kenjutsu", rolled: 1 }), { timeout: 1500 });
+    await waitFor(async () => expect((await storage.library.get("a"))?.character.modifiers?.[0]).toMatchObject({ name: "Voie de la Grue", source: "advantage", skill: "Kenjutsu", rolled: 1, kept: 1 }), { timeout: 1500 });
   });
 
   it("bonus libre : champs selon la cible, suppression", async () => {
@@ -98,7 +100,6 @@ describe("Lanceur", () => {
     click(/^Remarquer un détail/);
     expect(roller().getByText("Augm. gratuites (+1 bonus)")).toBeInTheDocument();
     expect(roller().getByText("Investigation 1 + Perception 2 · +3 au total")).toBeInTheDocument();
-    showDice();
     click("Lancer 3g2");
     // 2 dés gardés à 5 + 3 = 13 contre 15 : échec ; ND 10 : réussite avec 1 augmentation gratuite.
     expect(roller().getByText(/Échec/)).toHaveTextContent("13 / 15");
@@ -138,44 +139,49 @@ describe("Lanceur", () => {
   });
 });
 
-describe("Catalogue : Force de la Terre, Aspect dérangeant", () => {
-  async function addFromCatalogue(...ids: string[]) {
+describe("Modèles par source, sans catalogue (annexe J.4)", () => {
+  async function addFromTemplate(...ids: string[]) {
     click("Edit : Bonus de jet");
     for (const id of ids) {
       fireEvent.change(screen.getByRole("combobox", { name: "Modèle de bonus" }), { target: { value: id } });
       click("+ Bonus");
     }
-    click("Terminer : Bonus de jet");
   }
 
-  it("les entrées du catalogue sont proposées en tête de liste", async () => {
+  it("Q6 : menu en 4 groupes (Autre, Avantage, Désavantage, Technique), « Bonus libre » choisi par défaut, aucune entrée nommée", async () => {
     await mount();
     click("Edit : Bonus de jet");
     const select = screen.getByRole("combobox", { name: "Modèle de bonus" });
-    const group = within(select).getByRole("group", { name: "Catalogue (livre de base 4e, à vérifier)" });
-    expect(within(group).getAllByRole("option").map((o) => o.textContent)).toEqual([
-      "Force de la Terre (Strength of the Earth)",
-      "Aspect dérangeant (Disturbing Countenance)",
-      "Seuil de douleur bas (Low Pain Threshold)",
-    ]);
+    expect(select).toHaveValue("free");
+    expect(within(select).getAllByRole("group").map((g) => g.getAttribute("label"))).toEqual(["Autre", "Avantage", "Désavantage", "Technique"]);
+    expect(within(select).queryByRole("group", { name: /Catalogue/ })).toBeNull();
+    expect(select).not.toHaveTextContent(/Force de la Terre|Aspect dérangeant|Seuil de douleur/);
+    expect(screen.getByText(/Tu peux aussi les écrire dans le JSON de ta fiche/)).toBeInTheDocument();
   });
 
-  it("Force de la Terre : la pénalité de blessure baisse de 3", async () => {
-    await mount();
-    await addFromCatalogue("force-de-la-terre");
-    fireEvent.change(woundsField(), { target: { value: "18" } });
-    expect(screen.getByText("+2", { selector: ".pen b" })).toBeInTheDocument();
-    expect(screen.getByText("-3 à la pénalité de blessure")).toBeInTheDocument();
-  });
-
-  it("Aspect dérangeant : +5 au ND des jets sociaux, pas des autres", async () => {
-    await mount();
-    await addFromCatalogue("aspect-derangeant");
+  it("Q7 : « ND augmenté sur les jets sociaux » → désavantage, social, ND +5, nom vide ; +5 au ND d'un jet social, pas des autres", async () => {
+    const { storage } = await mount();
+    await addFromTemplate("dis-social-tn");
+    const name = within(screen.getByRole("group", { name: "Bonus 1" })).getByRole("textbox", { name: "Nom du bonus" });
+    expect(name).toHaveAttribute("placeholder", "Nom du désavantage");
+    click("Terminer : Bonus de jet");
+    await waitFor(async () => expect((await storage.library.get("a"))?.character.modifiers?.[0]).toMatchObject({ name: "", source: "disadvantage", appliesTo: "social", tn: 5 }), { timeout: 1500 });
     click("Aide de jeu");
     click(/^Garder contenance/);
     expect(screen.getByTestId("final-tn")).toHaveTextContent("20");
     expect(roller().getByText(/= 15 \+ 5 bonus/)).toBeInTheDocument();
     click(/^Remarquer un détail/);
     expect(screen.getByTestId("final-tn")).toHaveTextContent("15");
+  });
+
+  it("Q8 : un bonus créé depuis l'ancien catalogue reste tel quel et s'applique", async () => {
+    await mount([mod({
+      id: "force-de-la-terre", name: "Force de la Terre (Strength of the Earth)", source: "advantage", appliesTo: "wounds", flat: 3,
+      note: "Avantage physique, 3 points (2 pour un bushi) : pénalités de ND des niveaux de blessure réduites de 3. À vérifier dans le livre.",
+    })]);
+    expect(screen.getByText("Force de la Terre (Strength of the Earth)")).toBeInTheDocument();
+    fireEvent.change(woundsField(), { target: { value: "18" } });
+    expect(screen.getByText("+2", { selector: ".pen b" })).toBeInTheDocument();
+    expect(screen.getByText("-3 à la pénalité de blessure")).toBeInTheDocument();
   });
 });

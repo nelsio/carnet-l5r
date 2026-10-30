@@ -80,6 +80,7 @@ describe("Bataille de masse (E.8)", () => {
 
   it("vrais dés : saisie du total, encaisser le total des dés de blessures (Réduction 3)", async () => {
     await renderApp({ ...base(), armor: { name: "Armure légère", bonus: 5, reduction: 3 } });
+    fireEvent.click(screen.getByRole("button", { name: "Lanceur de dés : affiché" }));
     toBattle();
     expect(panel().queryByRole("button", { name: "Lancer 1d10" })).not.toBeInTheDocument();
     total("8");
@@ -94,7 +95,6 @@ describe("Bataille de masse (E.8)", () => {
 
   it("lanceur affiché : 1d10 tiré, Tacticien ±5, dés de blessures tirés et pré-remplis", async () => {
     await renderApp();
-    click("Lanceur de dés : masqué");
     toBattle();
     click("Lancer 1d10");
     expect(panel().getByTestId("battle-roll")).toHaveTextContent("d10 : 5");

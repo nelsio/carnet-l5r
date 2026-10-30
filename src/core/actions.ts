@@ -7,6 +7,9 @@ import type { Character } from "./schema";
 import { skillIs } from "./schools";
 import { CONCENTRATE_ACTION, skirmishSpellActions, spellActions } from "./spells";
 
+/** Titre des armes et actions fixes d'escarmouche, posé seulement après les sorts d'un shugenja (annexe J.8). */
+const SKIRMISH_ATTACKS_GROUP = "Attaques";
+
 const fixed = (situation: Situation, sub?: CombatSub) =>
   FIXED_ACTIONS.filter((a) => a.situation === situation && a.sub === sub);
 
@@ -63,15 +66,16 @@ export function buildActions(c: Character, situation: Situation, sub?: CombatSub
   if (situation !== "combat") return fixed(situation);
   switch (sub ?? "skirmish") {
     case "skirmish": {
-      // Initiative en tête, puis les armes, puis les actions fixes (mains nues, lutte, Défense totale).
+      // Initiative en tête, puis les sorts du shugenja (groupe « Sorts », annexe J.8), puis les armes
+      // et les actions fixes (mains nues, lutte, Défense totale), sous le titre « Attaques » s'il y a des sorts.
       const actions = fixed("combat", "skirmish");
       const isInitiative = (a: ActionDef) => a.kind === "initiative";
+      const spells = skirmishSpellActions(c);
+      const attacks = [...c.weapons.flatMap((w) => weaponActions(w, "skirmish")), ...actions.filter((a) => !isInitiative(a))];
       return [
         ...actions.filter(isInitiative),
-        ...c.weapons.flatMap((w) => weaponActions(w, "skirmish")),
-        ...actions.filter((a) => !isInitiative(a)),
-        // Sorts du Rouleaux & invocations, après les attaques (v2.12.0).
-        ...skirmishSpellActions(c),
+        ...spells,
+        ...(spells.length ? attacks.map((a) => ({ ...a, group: SKIRMISH_ATTACKS_GROUP })) : attacks),
       ];
     }
     case "duel":

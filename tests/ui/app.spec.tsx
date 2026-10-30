@@ -23,8 +23,7 @@ async function renderApp(character: Character | null = base(), rng = always(5), 
   return { ...view, storage };
 }
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
-/** Le bouton « Lancer » n'apparaît qu'avec le lanceur de dés affiché (masqué par défaut). */
-const showDice = () => click("Lanceur de dés : masqué");
+/** Le lanceur de dés est affiché par défaut (annexe J.7) : bouton « Lancer » présent. */
 const goToAid = () => click("Aide de jeu");
 const roller = () => within(screen.getByRole("dialog", { name: "Lanceur de dés" }));
 const chance = () => Number(screen.getByTestId("chance").textContent?.replace(/\D/g, ""));
@@ -160,7 +159,6 @@ describe("Aide de jeu", () => {
     chooseStance("Assaut");
     expect(screen.getByTestId("armor-tn")).toHaveTextContent("10");
     fireEvent.click(cards[0]!);
-    showDice();
     click("Lancer 4g3");
     expect(screen.getByTestId("initiative")).toHaveTextContent("15");
     click("Nouveau round");
@@ -179,7 +177,7 @@ describe("Aide de jeu", () => {
     expect(follows(round, stance)).toBe(true);
     expect(screen.getByTestId("round-desc")).toHaveTextContent("garde l'initiative et les compteurs");
     // Plus dans le panneau Vide.
-    const voidPanel = screen.getByRole("button", { name: "Afficher le détail : Dépenser du Vide" }).closest(".panel")!;
+    const voidPanel = screen.getByRole("group", { name: "Dépenser du Vide" });
     expect(within(voidPanel as HTMLElement).queryByRole("button", { name: "Nouveau round" })).toBeNull();
     click("Duel iaijutsu");
     expect(screen.getByRole("button", { name: "Nouveau round" })).toBeInTheDocument();
@@ -194,7 +192,6 @@ describe("Aide de jeu", () => {
     click("Ajouter Augmentation des dégâts");
     click("Ajouter Augmentation des dégâts");
     expect(screen.getByTestId("final-tn")).toHaveTextContent("20");
-    showDice();
     click("Lancer 5g3");
     expect(roller().getByText(/Réussite/, { selector: ".verdict" })).toHaveTextContent("27 / 20");
     expect(screen.getByText("+2g0 en attente")).toBeInTheDocument();
@@ -214,36 +211,58 @@ describe("Aide de jeu", () => {
     click(/^Dégâts · Katana/);
     expect(roller().getByTestId("mastery")).toHaveTextContent("Maîtrise Kenjutsu 7 : les dés explosent sur 9 et 10");
     expect(roller().getByTitle("Explose sur 9")).toHaveTextContent("9+");
-    showDice();
     click("Lancer 6g2");
     const die = roller().getByTitle("9 + 4");
     expect(die).toHaveTextContent(/^13/);
     expect(within(die).getByText("9+4")).toBeInTheDocument();
   });
 
-  it("E12 : un « i » par panneau (Vide, Déplacement) déplie toutes ses descriptions, sans rien sélectionner", async () => {
+  it("E12 : le « i » de Déplacement déplie ses descriptions, sans rien sélectionner (le panneau Vide n'a plus de « i », J.6)", async () => {
     await renderApp();
     goToAid();
     click("Combat");
-    expect(screen.queryByText("Jusqu'au prochain round.")).toBeNull();
-    expect(screen.getByRole("button", { name: "Afficher le détail : Dépenser du Vide" })).toHaveAttribute("aria-expanded", "false");
-    click("Afficher le détail : Dépenser du Vide");
-    expect(screen.getByText("Jusqu'au prochain round.")).toBeInTheDocument();
-    expect(screen.getByText("Dépensé au prochain jet lancé.")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Masquer le détail : Dépenser du Vide" })).toHaveAttribute("aria-expanded", "true");
-    expect(screen.getByRole("button", { name: /^\+10 ND d'armure/ })).toHaveAttribute("aria-pressed", "false");
-    expect(currentStance()).toBe("Attaque");
-    expect(screen.getByTestId("armor-tn")).toHaveTextContent("20");
-    expect(screen.getByText("Points de Vide 2/2")).toBeInTheDocument();
-    // Le « i » de Déplacement reste fermé, puis s'ouvre sans toucher au Vide.
+    expect(screen.queryByRole("button", { name: /le détail : Dépenser du Vide/ })).toBeNull();
     click("Déplacement");
     expect(screen.queryByText(/^3,0 m/)).toBeNull();
     click("Afficher le détail : Se déplacer en combat");
     expect(screen.getByText(/^3,0 m/)).toBeInTheDocument();
+    click("Masquer le détail : Se déplacer en combat");
+    expect(screen.queryByText(/^3,0 m/)).toBeNull();
+  });
+
+  it("Q10 : panneau Vide en menu déroulant ; choisir ne dépense rien ; « Dépenser » puis « Annuler » (J.6)", async () => {
+    await renderApp();
+    goToAid();
     click("Combat");
-    expect(screen.getByText("Jusqu'au prochain round.")).toBeInTheDocument();
-    click("Masquer le détail : Dépenser du Vide");
-    expect(screen.queryByText("Jusqu'au prochain round.")).toBeNull();
+    const panel = within(screen.getByRole("group", { name: "Dépenser du Vide" }));
+    const menu = panel.getByRole("combobox", { name: "Dépense de Vide" });
+    expect(menu).toHaveValue("roll");
+    expect(panel.getByTestId("void-desc")).toHaveTextContent("+1g1Dépensé au prochain jet lancé.");
+    fireEvent.change(menu, { target: { value: "armor" } });
+    expect(panel.getByTestId("void-desc")).toHaveTextContent("Jusqu'au prochain round.");
+    expect(screen.getByText("Points de Vide 2/2")).toBeInTheDocument();
+    expect(screen.getByTestId("armor-tn")).toHaveTextContent("20");
+    fireEvent.change(menu, { target: { value: "roll" } });
+    fireEvent.click(panel.getByRole("button", { name: "Dépenser 1 point de Vide" }));
+    expect(panel.getByTestId("void-active")).toHaveTextContent("+1g1 au jet");
+    click(/^Attaque · Katana/);
+    expect(roller().getByRole("checkbox", { name: /Dépenser 1 point de Vide/ })).toBeChecked();
+    fireEvent.click(panel.getByRole("button", { name: "Annuler" }));
+    expect(panel.queryByTestId("void-active")).toBeNull();
+    expect(roller().getByRole("checkbox", { name: /Dépenser 1 point de Vide/ })).not.toBeChecked();
+  });
+
+  it("Q11 : hors escarmouche (duel), pas d'Initiative ni d'Échanger ; le choix revient à « Au jet »", async () => {
+    await renderApp();
+    goToAid();
+    click("Combat");
+    const menu = () => screen.getByRole("combobox", { name: "Dépense de Vide" });
+    const values = () => [...menu().querySelectorAll("option")].map((o) => o.getAttribute("value"));
+    expect(values()).toEqual(["roll", "armor", "skill", "ability", "initiative", "swap"]);
+    fireEvent.change(menu(), { target: { value: "swap" } });
+    click("Duel iaijutsu");
+    expect(values()).toEqual(["roll", "armor", "skill", "ability"]);
+    expect(menu()).toHaveValue("roll");
   });
 
   it("E13 : dégâts au katana : options sur une ligne, règle d'explosion, puis maîtrise", async () => {
@@ -252,8 +271,10 @@ describe("Aide de jeu", () => {
     goToAid();
     click("Combat");
     click(/^Dégâts · Katana/);
-    const fields = [...roller().getByText("Dés lancés ±").closest(".opts")!.children];
-    expect(fields.map((f) => f.textContent)).toEqual(["Dés lancés ±", "Bonus fixe"]);
+    // Q16 : plus de champ « Dés lancés ± » ; « Bonus fixe » seul sur sa ligne (J.9).
+    const fields = [...roller().getByText("Bonus fixe").closest(".opts")!.children];
+    expect(fields.map((f) => f.textContent)).toEqual(["Bonus fixe"]);
+    expect(roller().queryByText("Dés lancés ±")).toBeNull();
     expect(roller().getByTestId("manual")).toHaveTextContent("Les 10 explosent : relance le dé et additionne, tant qu'il retombe sur 10.");
     expect(roller().queryByText(/^Lance /)).toBeNull();
     fireEvent.change(roller().getByRole("spinbutton", { name: "Bonus fixe" }), { target: { value: "2" } });
@@ -271,9 +292,9 @@ describe("Aide de jeu", () => {
     click("Escarmouche");
     click(/^Lutte/);
     expect(roller().getByTestId("manual")).toHaveTextContent("Aucun dé n'explose (compétence non maîtrisée).");
-    // ND sans augmentations : une cellule vide garde l'alignement.
-    const cells = [...roller().getByText("Dés lancés ±").closest(".opts")!.children];
-    expect(cells.map((f) => f.textContent)).toEqual(["ND d'armure cible", "", "Dés lancés ±", "Bonus fixe"]);
+    // ND sans augmentations : ND et Bonus fixe côte à côte, sans case vide (J.9).
+    const cells = [...roller().getByText("Bonus fixe").closest(".opts")!.children];
+    expect(cells.map((f) => f.textContent)).toEqual(["ND d'armure cible", "Bonus fixe"]);
   });
 
   it("E14 : la tuile ND armure ouvre l'éditeur d'armure ; bonus et réduction mis à jour", async () => {
@@ -296,25 +317,54 @@ describe("Aide de jeu", () => {
     await vi.waitFor(async () => expect((await storage.library.get("kakita"))?.character.armor).toEqual({ name: "Armure légère", bonus: 5, reduction: 3 }));
   });
 
-  it("E15 : lanceur de dés masqué par défaut, affiché partout sur demande, mémorisé", async () => {
+  it("E15 / Q12 : lanceur de dés affiché par défaut, masqué partout sur demande, mémorisé (J.7)", async () => {
     const { storage } = await renderApp();
     goToAid();
     click(/^Remarquer un détail/);
-    expect(roller().queryByRole("button", { name: /^Lancer/ })).toBeNull();
-    expect(screen.getByTestId("final-tn")).toBeInTheDocument();
-    const toggle = screen.getByRole("button", { name: "Lanceur de dés : masqué" });
-    expect(toggle).toHaveAttribute("aria-pressed", "false");
-    fireEvent.click(toggle);
-    expect(screen.getByRole("button", { name: "Lanceur de dés : affiché" })).toHaveAttribute("aria-pressed", "true");
+    const toggle = screen.getByRole("button", { name: "Lanceur de dés : affiché" });
+    expect(toggle).toHaveAttribute("aria-pressed", "true");
     click("Lancer 3g2");
     expect(roller().getByText("Derniers jets")).toBeInTheDocument();
     click("Combat");
     click(/^Attaque · Katana/);
     expect(roller().getByRole("button", { name: "Lancer 5g3" })).toBeInTheDocument();
-    await vi.waitFor(async () => expect((await storage.prefs.get()).showDiceRoller).toBe(true));
-    click("Lanceur de dés : affiché");
+    fireEvent.click(toggle);
+    expect(screen.getByRole("button", { name: "Lanceur de dés : masqué" })).toHaveAttribute("aria-pressed", "false");
     expect(roller().queryByRole("button", { name: /^Lancer/ })).toBeNull();
     expect(roller().queryByText("Derniers jets")).toBeNull();
+    expect(screen.getByTestId("final-tn")).toBeInTheDocument();
+    await vi.waitFor(async () => expect(await storage.prefs.get()).toMatchObject({ diceRoller: false }));
+    expect("showDiceRoller" in (await storage.prefs.get())).toBe(false);
+  });
+
+  it("Q13 : préférences v2.16.0 avec showDiceRoller: false → lanceur affiché ; masqué puis rechargé, reste masqué", async () => {
+    const storage = memoryStorage();
+    await storage.library.put({ id: "kakita", character: base(), mode: "edit", updatedAt: "2026-10-18T10:00:00.000Z" });
+    await storage.prefs.set({ showDiceRoller: false });
+    const first = render(<App storage={storage} rng={always(5)} />);
+    fireEvent.click(await screen.findByRole("button", { name: "Lanceur de dés : affiché" }));
+    await vi.waitFor(async () => expect(await storage.prefs.get()).toMatchObject({ diceRoller: false }));
+    expect("showDiceRoller" in (await storage.prefs.get())).toBe(false);
+    first.unmount();
+    render(<App storage={storage} rng={always(5)} />);
+    expect(await screen.findByRole("button", { name: "Lanceur de dés : masqué" })).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("Q17 : attaque réussie avec 2 augmentations de dégâts → étiquette « +2g0 · augmentations de l'attaque », « Retirer » (J.9)", async () => {
+    await renderApp(base(), always(9));
+    goToAid();
+    click("Combat");
+    click(/^Attaque · Katana/);
+    fireEvent.change(roller().getByRole("spinbutton", { name: "ND d'armure cible" }), { target: { value: "10" } });
+    click("Ajouter Augmentation des dégâts");
+    click("Ajouter Augmentation des dégâts");
+    click("Lancer 5g3");
+    click(/^Dégâts · Katana/);
+    expect(roller().getByTestId("pool")).toHaveTextContent("7g2");
+    expect(roller().getByTestId("attack-raises")).toHaveTextContent("+2g0 · augmentations de l'attaque");
+    fireEvent.click(roller().getByRole("button", { name: "Retirer" }));
+    expect(roller().queryByTestId("attack-raises")).toBeNull();
+    expect(roller().getByTestId("pool")).toHaveTextContent("5g2");
   });
 
   it("E10 : ajouter une augmentation monte le ND final de 5 et baisse la chance de réussite", async () => {
@@ -352,7 +402,6 @@ describe("Aide de jeu", () => {
     click(/^Remarquer un détail/);
     fireEvent.click(roller().getByRole("checkbox", { name: /Dépenser 1 point de Vide \(\+1g1\)/ }));
     expect(screen.getByTestId("pool")).toHaveTextContent("4g3");
-    showDice();
     click("Lancer 4g3");
     expect(screen.getByText("Points de Vide 1/2")).toBeInTheDocument();
     expect(screen.getByTestId("pool")).toHaveTextContent("3g2");
@@ -363,7 +412,6 @@ describe("Aide de jeu", () => {
     goToAid();
     click("Combat");
     click(/^Défense totale.*moitié du résultat/);
-    showDice();
     click("Lancer 4g3");
     // 3 dés gardés à 5 = 15 → +8 au ND d'armure, moitié arrondie au supérieur (20 + 8)
     expect(screen.getByTestId("armor-tn")).toHaveTextContent("28");

@@ -6,6 +6,27 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.17.0] - 2026-10-30
+
+### Ajouté
+- Modèles de fiche **shugenja** (Tamori) et **courtisan** (Doji) dans la Bibliothèque, à côté du modèle bushi.
+- Modèles de bonus de jet par source (avantage, désavantage, technique, autre) : des formes d'effet sans nom, à compléter.
+
+### Modifié
+- Le lanceur de dés est affiché par défaut ; un joueur qui l'avait masqué le retrouve affiché une fois.
+- Panneau « Dépenser du Vide » en menu déroulant, comme le panneau Posture : choisir une dépense ne dépense rien, un bouton la confirme ou l'annule.
+- En escarmouche, les sorts d'un shugenja passent avant les attaques (groupes « Sorts » puis « Attaques »).
+- Bloc Armes en modification : une carte par arme, champs lisibles en entier sur mobile ; « Force de l'arc » pour les armes à distance seulement.
+- Bloc Identité : valeurs au même corps que les autres blocs, Initiative à la couleur des réserves.
+- Bouton « + Technique / kata » (les sorts ont leur bloc).
+
+### Corrigé
+- Min et Moy. centrés verticalement à côté de Max dans le lanceur, même avec l'étiquette « 9+ ».
+
+### Retiré
+- Catalogue nommé des bonus de jet (Force de la Terre, Aspect dérangeant, Seuil de douleur bas) ; les bonus déjà créés restent dans les fiches.
+- Champ « Dés lancés ± » du lanceur ; les augmentations de dégâts de l'attaque s'affichent en étiquette.
+
 ## [2.16.0] - 2026-10-30
 
 ### Modifié
@@ -165,7 +186,9 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.15.0...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.17.0...HEAD
+[2.17.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.17.0
+[2.16.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.16.0
 [2.15.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.15.0
 [2.14.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.14.0
 [2.13.3]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.13.3

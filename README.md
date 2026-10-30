@@ -74,7 +74,7 @@ En **Escarmouche**, de haut en bas :
 1. **Initiative** : à lancer au début du combat, elle affiche ensuite ton score (avec `+10` au round qui suit le Centre, et `+10` par point de Vide dépensé pour l'escarmouche).
 2. **Nouveau round** : efface le Vide en armure et la Défense totale ; **garde l'initiative et les compteurs**.
 3. **Posture** : un menu Attaque, Assaut, Défense, Défense totale, Centre, où chaque posture montre ses effets et sa description ; celle de la posture choisie reste affichée dessous et le **ND d'armure** se met à jour. Dessous : la case **Monté** (pas d'Assaut à cheval sans Équitation 3) et **Je garde un allié** (ton ND d'armure `−5`, le sien `+10`).
-4. **Dépenser du Vide** : `+1g1` au jet, `+10` au ND d'armure, compétence jouée au rang 1, capacité payée en Vide, `+10` à l'Initiative ou échange d'Initiative.
+4. **Dépenser du Vide** : choisis la dépense dans le menu (`+1g1` au jet, `+10` au ND d'armure, compétence jouée au rang 1, capacité payée en Vide, `+10` à l'Initiative ou échange d'Initiative), puis appuie sur **Dépenser 1 point de Vide** ; choisir ne dépense rien, **Annuler** rend le point.
 5. Les **attaques** de chaque arme, avec leurs **dégâts** juste dessous (`└`). Une action que ta posture interdit (attaque en Défense, tir en Assaut, tout sauf l'Initiative en Centre) est **grisée** avec la raison, et reste jouable par **Lancer quand même**.
 
 Au round qui suit le Centre, le lanceur propose le **Bonus de Centre** (`+1g1` et ton Anneau de Vide au total, sur un seul jet). Une **Feinte** réussie pré-remplit son bonus sur les dégâts. Pour **encaisser** un coup, la tuile **Blessures** de la barre d'état, puis **Dégâts de l'attaque**, retire ta Réduction (et `10` avec un point de Vide) et ajoute les blessures.
@@ -99,11 +99,13 @@ Choisir une action ouvre le **lanceur** (un panneau qui monte du bas sur mobile)
 - la **réserve** en grand, par exemple `5g2` (5 dés lancés, 2 gardés) ;
 - la ligne **« lancer à la main »** : les règles de relance pour **jouer avec tes propres dés** (« Les `10` explosent… », spécialisation, bonus à ajouter au total) ;
 - **Min · Moy. · Max** et ta **chance de réussite** contre le **ND final** ;
-- les options : **augmentations** (`+5` au ND chacune, au plus ton Anneau de Vide), augmentations gratuites, dés lancés `±`, bonus fixe, point de Vide, **spécialisation** (choisie dans la liste de la compétence : elle relance les `1`), manœuvres sur les attaques.
+- les options : **augmentations** (`+5` au ND chacune, au plus ton Anneau de Vide), augmentations gratuites, bonus fixe, point de Vide, **spécialisation** (choisie dans la liste de la compétence : elle relance les `1`), manœuvres sur les attaques.
 
-Par défaut, l'outil **ne lance pas les dés**. Pour lancer dans l'outil, appuie sur **Lanceur de dés** dans l'en-tête (l'icône de dé sur mobile) : le bouton **Lancer**, les résultats et l'historique apparaissent dans toutes les situations. Le choix est **mémorisé**.
+Par défaut, l'outil **lance les dés** : le bouton **Lancer**, les résultats et l'historique apparaissent dans toutes les situations. Pour jouer avec tes vrais dés, appuie sur **Lanceur de dés** dans l'en-tête (l'icône de dé sur mobile) pour le masquer. Le choix est **mémorisé**.
 
-> Avec le lanceur de dés affiché, une attaque réussie avec **Augmentation des dégâts** pré-remplit les dés en plus sur le jet de dégâts.
+> Avec le lanceur de dés affiché, une attaque réussie avec **Augmentation des dégâts** pré-remplit les dés en plus sur le jet de dégâts (étiquette « +2g0 · augmentations de l'attaque », que **Retirer** annule).
+
+En **escarmouche**, un shugenja voit ses **sorts** juste après l'Initiative, puis ses **attaques**.
 
 Pour un **sort**, le lanceur montre l'origine de la réserve (« Terre 3 + rang 1 + affinité 1 »), le ND fixé par la maîtrise et, sous les augmentations : l'élément à choisir pour un **sort universel**, les **cases de ton école** (cible non humaine, il fait jour…), ses **augmentations gratuites** appliquées d'office (mot-clé Jade, élément d'affinité d'Isawa), le champ **Augm. pour le temps d'incantation** (« Temps d'incantation : 1 action complexe »), les augmentations du sort, et les rappels (parchemin si le sort n'est pas mémorisé, jet de Volonté si tu es interrompu, effet). L'école **Agasha** peut lancer avec un autre Anneau : le point de Vide est dépensé au lancer. La maîtrise **Sortilèges 5** ajoute `+1g0` aux jets de sort.
 
@@ -149,8 +151,8 @@ Une fiche d'une version précédente propose d'**associer** l'école reconnue da
 
 Pour une technique hors catalogue (shugenja, kata), un avantage ou un désavantage qui modifie les jets, le panneau **Bonus de jet** de la fiche (en modification) permet de les saisir :
 
-- **librement**, ou à partir d'un **modèle** (`+1g0` à une compétence, augmentation gratuite, `+5` au ND d'armure, pénalité de blessure réduite, malus situationnel…) ;
-- ou depuis le **catalogue** : **Force de la Terre** et **Aspect dérangeant** (résumés à vérifier dans ton livre).
+- à la main, à partir d'une **forme d'effet** classée par source : **avantage** (dés en plus, augmentation gratuite, pénalité de blessure réduite…), **désavantage** (malus de dés, ND augmenté…), **technique** (dés en plus aux attaques, aux dégâts, en posture…) ou **bonus libre** ; tu écris le nom de ton avantage ou de ta technique ;
+- ou dans le JSON de ta fiche (champ `modifiers`) : voir les modèles de fiche de la Bibliothèque.
 
 Un bonus **« d'office »** compte dans toutes les réserves ; un bonus **« au choix »** se coche dans le lanceur quand sa condition est remplie.
 
@@ -161,7 +163,7 @@ Un bonus **« d'office »** compte dans toutes les réserves ; un bonus **« au 
   - Après un rechargement, le navigateur redemande la permission : clique sur **Reprendre l'enregistrement**.
   - Si le fichier a été modifié ailleurs, l'outil te laisse choisir : **Charger la version du fichier**, **Écraser avec ma version**, ou **Fusionner** après un aperçu.
   - **Délier** retire le lien sans toucher au fichier.
-- **Exemple** : dans la Bibliothèque, **Télécharger un exemple de fiche (JSON)** donne une fiche complète, déjà remplie, à adapter puis importer.
+- **Exemple** : dans la Bibliothèque, **Modèles de fiche (JSON)** propose trois fiches complètes, déjà remplies, à adapter puis importer : **Exemple bushi** (Kakita), **Exemple shugenja** (Tamori, avec deux sorts) et **Exemple courtisan** (Doji, avec deux bonus de jet).
 
 ## 10. Changer d'appareil
 
