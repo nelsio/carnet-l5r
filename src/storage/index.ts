@@ -1,10 +1,11 @@
-import { IndexedDbLibrary, IndexedDbPrefs, openDatabase } from "./indexeddb";
+import { IndexedDbGrimoireCache, IndexedDbLibrary, IndexedDbPrefs, openDatabase } from "./indexeddb";
 import { LinkedLibrary } from "./linkedLibrary";
 import { memoryStorage } from "./memory";
 import type { Storage } from "./types";
 
 export * from "./types";
-export { memoryStorage, MemoryLibrary, MemoryPrefs } from "./memory";
+export { memoryStorage, MemoryGrimoireCache, MemoryLibrary, MemoryPrefs } from "./memory";
+export * from "./grimoire";
 export { readCharacter } from "./indexeddb";
 export { LinkedLibrary } from "./linkedLibrary";
 export * from "./linkedFile";
@@ -27,7 +28,9 @@ export async function openStorage({ indexedDB = globalThis.indexedDB, timeoutMs 
       openDatabase(indexedDB),
       new Promise<never>((_, reject) => setTimeout(() => reject(new Error("IndexedDB ne répond pas")), timeoutMs)),
     ]);
-    return { library: new LinkedLibrary(new IndexedDbLibrary(db)), prefs: new IndexedDbPrefs(db), degraded: false };
+    return {
+      library: new LinkedLibrary(new IndexedDbLibrary(db)), prefs: new IndexedDbPrefs(db), grimoire: new IndexedDbGrimoireCache(db), degraded: false,
+    };
   } catch (e) {
     console.warn("Stockage du navigateur indisponible : la fiche vit en mémoire", e);
     return memoryStorage(true);

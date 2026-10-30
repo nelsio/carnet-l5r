@@ -6,6 +6,15 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.22.0] - 2026-10-30
+
+### Ajouté
+- Rouleaux & invocations, en Edit : **Ajouter depuis le grimoire**. Sur ton clic, le Carnet télécharge la liste des sorts du grimoire de la campagne (environ 110 Ko, rien n'est envoyé) et la garde dans le navigateur, disponible hors ligne. Recherche par nom français ou anglais, filtre par élément, ajout au clavier ou à la souris : nom, élément, maîtrise, portée, zone, durée, mots-clés et augmentations sont remplis ; l'effet et « Mémorisé » restent à toi. Le fichier est lu comme du texte, jamais exécuté, et les sorts de Mahō et de Kihō ne sont jamais chargés.
+- État du grimoire à droite des boutons (date, nombre de sorts, **Actualiser**, ou grimoire injoignable).
+
+### Modifié
+- **Ajouter les sorts universels** remplit Sentir, Communier et Invoquer depuis le grimoire quand il est chargé.
+
 ## [2.21.4] - 2026-10-30
 
 ### Modifié
@@ -252,7 +261,8 @@ Simples liens ouverts dans un nouvel onglet : le Carnet ne fait toujours aucune 
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.21.4...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.22.0...HEAD
+[2.22.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.22.0
 [2.21.4]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.21.4
 [2.21.3]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.21.3
 [2.21.2]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.21.2

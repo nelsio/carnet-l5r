@@ -1,14 +1,16 @@
 import { wrap, type DBSchema, type IDBPDatabase } from "idb";
 import { migrate, upgrade, type Character } from "@carnet/core";
-import { mergePrefs, type LibraryEntry, type LibraryStore, type Prefs, type PrefsStore, type SaveReport } from "./types";
+import { mergePrefs, type GrimoireCacheStore, type LibraryEntry, type LibraryStore, type Prefs, type PrefsStore, type SaveReport } from "./types";
 
 export const DB_NAME = "carnet-l5r";
 export const DB_VERSION = 1;
 const PREFS_KEY = "prefs";
+/** Cache du grimoire (lot 30), dans le magasin des préférences : pas de nouvelle version de base. */
+const GRIMOIRE_KEY = "grimoireCache";
 
 interface CarnetDB extends DBSchema {
   entries: { key: string; value: LibraryEntry };
-  prefs: { key: string; value: Prefs };
+  prefs: { key: string; value: Prefs | unknown };
 }
 
 /** Ouvre la base ; la fabrique est injectable (tests, navigateurs sans IndexedDB). */
@@ -69,12 +71,23 @@ export class IndexedDbPrefs implements PrefsStore {
   constructor(private readonly db: IDBPDatabase<CarnetDB>) {}
 
   async get(): Promise<Prefs> {
-    return (await this.db.get("prefs", PREFS_KEY)) ?? {};
+    return ((await this.db.get("prefs", PREFS_KEY)) ?? {}) as Prefs;
   }
   async set(patch: Partial<Prefs>): Promise<void> {
     const tx = this.db.transaction("prefs", "readwrite");
-    const current = (await tx.store.get(PREFS_KEY)) ?? {};
+    const current = ((await tx.store.get(PREFS_KEY)) ?? {}) as Prefs;
     await tx.store.put(mergePrefs(current, patch), PREFS_KEY);
     await tx.done;
+  }
+}
+
+export class IndexedDbGrimoireCache implements GrimoireCacheStore {
+  constructor(private readonly db: IDBPDatabase<CarnetDB>) {}
+
+  get(): Promise<unknown> {
+    return this.db.get("prefs", GRIMOIRE_KEY);
+  }
+  async set(cache: unknown): Promise<void> {
+    await this.db.put("prefs", cache, GRIMOIRE_KEY);
   }
 }

@@ -1,7 +1,8 @@
 /**
  * Adresses du portail de la campagne (site statique du MJ, annexe L.1).
  * Un seul module pour toutes les adresses : un changement d'URL du portail ne touche que ce fichier.
- * Ce sont de simples liens : le Carnet ne fait aucune requête vers le portail.
+ * Ce sont de simples liens. Seule exception, déclenchée par le joueur : la lecture des sorts du grimoire
+ * (GRIMOIRE_FILES, lot 30, annexe N.1).
  */
 import type { SpellElement } from "../core/schema";
 import { CLANS, type Situation } from "./l5r4e";
@@ -16,6 +17,10 @@ export const PORTAL = {
   bushido:   PORTAL_BASE + "aides/bushido-honneur.html",
   etiquette: PORTAL_BASE + "aides/etiquette-coutumes.html",
 } as const;
+
+/** Fichiers de sorts du grimoire lus par le Carnet (lot 30). Jamais Mahō ni Kihō. */
+export const GRIMOIRE_FILES: readonly string[] = ["universels", "air", "terre", "feu", "eau", "vide"]
+  .map((k) => `${PORTAL_BASE}data/sorts/sorts-${k}.js`);
 
 /** Passer à true quand l'export JSON de la Forge s'importe sans erreur dans le Carnet. */
 export const FORGE_JSON_OK = false;

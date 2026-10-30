@@ -1,8 +1,8 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   activeEffects, affinityOf, armorSheet, insightPoints, suggestedInsightRank, attackTrait, catalogGap, catalogWeapon, createSpell, dailyHealing, deficiencyOf, isShugenja, reminderText, computePool, defaultModifiers, isRanged, formatDR, parseDR, parseWeaponKeywords, rings, ROLL_TRAITS, schoolOf,
-  findSchool, schoolRankOf, schoolsByClan, sortSpells, SPELL_ELEMENTS, SPELL_RINGS, spellcastingOf, spellRaises, spellTn, suggestSchool, techniqueCategories, vocabularyChanges, weaponKeywords,
-  type ArmorPart, type Character, type PoolAction, type RollTrait, type SpellElement, type TraitKey, type VocabularyChange,
+  findSchool, normalize, schoolRankOf, schoolsByClan, sortSpells, toCarnetSpell, SPELL_ELEMENTS, SPELL_RINGS, spellcastingOf, spellRaises, spellTn, suggestSchool, techniqueCategories, vocabularyChanges, weaponKeywords,
+  type ArmorPart, type Character, type GrimoireSpell, type PoolAction, type RollTrait, type SpellElement, type TraitKey, type VocabularyChange,
 } from "@carnet/core";
 import { WEAPON_KEYWORD_LABELS } from "../../rules/ecoles";
 import { ELEMENT_LABELS, RINGS, SPELL_KEYWORDS, TRAIT_LABELS, UNIVERSAL_SPELLS, type RingKey } from "../../rules/l5r4e";
@@ -13,6 +13,7 @@ import { useCharacter, useStore, type BlockId, type ListKey } from "../store";
 import { ArmorFields } from "./ArmorCatalog";
 import { ExternalLink } from "./ExternalLink";
 import { FileActions } from "./FileActions";
+import { GrimoirePanel, GrimoireStatus, ScrollIcon } from "./Grimoire";
 import { Modifiers } from "./Modifiers";
 import { RichSelect, RingOption } from "./RichSelect";
 import { ListField, NumberField, TextListField } from "./fields";
@@ -551,23 +552,93 @@ function SchoolTechniques() {
 
 const isListedKeyword = (k: string) => (SPELL_KEYWORDS as readonly string[]).includes(k);
 
-/** Section « Rouleaux & invocations » (annexe F.5) : sorts en champs libres, recopiés par le joueur. */
+const MOBILE_QUERY = "(max-width: 720px)";
+
+/** Section « Rouleaux & invocations » (annexe F.5) : sorts en champs libres, recopiés par le joueur ou remplis depuis le grimoire (annexe N). */
 function Spells() {
   const { c, edit, set, dispatch } = useSheet("magic");
+  const { grimoire } = useStore();
   const spells = c.spells ?? [];
   const starting = spellcastingOf(c)?.startingSpells;
+  const [panel, setPanel] = useState(false);
+  /** Sorts remplis depuis le grimoire pendant cette édition (non sauvegardé) ; le dernier porte le halo. */
+  const [filled, setFilled] = useState<ReadonlySet<string>>(new Set());
+  const [fresh, setFresh] = useState<string | null>(null);
+  /** Mobile : sort ajouté vers lequel défiler une fois rendu. */
+  const scrollTo = useRef<string | null>(null);
+  const toggle = useRef<HTMLButtonElement>(null);
+
+  // En sortant du mode édition : panneau fermé, étiquettes « Rempli depuis le grimoire » retirées.
+  const [wasEdit, setWasEdit] = useState(edit);
+  if (wasEdit !== edit) {
+    setWasEdit(edit);
+    if (!edit) {
+      setPanel(false);
+      setFilled(new Set());
+      setFresh(null);
+    }
+  }
+
+  useEffect(() => {
+    if (!scrollTo.current) return;
+    document.querySelector(`[data-spell="${scrollTo.current}"]`)?.scrollIntoView?.({ block: "center" });
+    scrollTo.current = null;
+  });
+
   const head = starting && <p className="hint" style={{ marginTop: 0 }} data-testid="starting-spells">Sorts de départ de l'école : {starting}.</p>;
   if (edit) {
-    const missing = UNIVERSAL_SPELLS.filter((n) => !spells.some((s) => s.name === n));
+    const ready = grimoire.status === "ready" ? grimoire.cache : undefined;
+    const missing = UNIVERSAL_SPELLS.filter((n) => !spells.some((s) => normalize(s.name).startsWith(normalize(n))));
+    const markFilled = (ids: string[]) => {
+      setFilled((prev) => new Set([...prev, ...ids]));
+      setFresh(ids.at(-1) ?? null);
+    };
+    const addFromGrimoire = (g: GrimoireSpell) => {
+      const spell = toCarnetSpell(g);
+      dispatch({ type: "add", list: "spells", item: spell });
+      markFilled([spell.id]);
+      if (window.matchMedia?.(MOBILE_QUERY).matches) {
+        setPanel(false);
+        scrollTo.current = spell.id;
+      }
+    };
+    const addUniversals = () => {
+      const ids: string[] = [];
+      for (const n of missing) {
+        const g = ready?.spells.find((x) => x.element === "all" && normalize(x.name).startsWith(normalize(n)));
+        const spell = g ? toCarnetSpell(g) : createSpell(n, "all");
+        dispatch({ type: "add", list: "spells", item: spell });
+        if (g) ids.push(spell.id);
+      }
+      if (ids.length) markFilled(ids);
+    };
+    const closePanel = (restoreFocus: boolean) => {
+      setPanel(false);
+      if (restoreFocus) toggle.current?.focus();
+    };
     return (
       <>
         {head}
         {spells.map((s, i) => {
           const label = s.name || "ce sort";
           return (
-            <div key={s.id} className="spelledit" role="group" aria-label={`Sort : ${label}`}>
+            <div key={s.id} className={`spelledit${fresh === s.id ? " fresh" : ""}`} role="group" aria-label={`Sort : ${label}`} data-spell={s.id}>
+              {filled.has(s.id) && (
+                <div className="sp-top">
+                  <span className="from">✓ Rempli depuis le grimoire</span>
+                  {!s.damage && <span className="muted">Résume l'effet ; ajoute la VD si le sort en a une.</span>}
+                </div>
+              )}
               <div className="form-grid">
-                <Field label="Nom"><input className="in" type="text" value={s.name} maxLength={120} onChange={(e) => set(["spells", i, "name"], e.target.value)} /></Field>
+                <Field label="Nom">
+                  <input
+                    className="in" type="text" value={s.name} maxLength={120}
+                    onChange={(e) => {
+                      set(["spells", i, "name"], e.target.value);
+                      if (filled.has(s.id)) setFilled((prev) => new Set([...prev].filter((id) => id !== s.id)));
+                    }}
+                  />
+                </Field>
                 <Field label="Élément">
                   <RichSelect variant="anneau" value={s.element} onChange={(v) => set(["spells", i, "element"], v)}>
                     <RingOption value="all" label={ELEMENT_LABELS.all} />
@@ -616,15 +687,16 @@ function Spells() {
             </div>
           );
         })}
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <div className="spell-tools">
           <AddButton list="spells" label="+ Sort" item={() => createSpell()} />
-          {missing.length > 0 && (
-            <button
-              type="button" className="btn sm"
-              onClick={() => missing.forEach((n) => dispatch({ type: "add", list: "spells", item: createSpell(n, "all") }))}
-            >Ajouter les sorts universels</button>
-          )}
+          <button
+            ref={toggle} type="button" className={`btn sm ${panel ? "on" : "accent"}`}
+            aria-expanded={panel} aria-controls={panel ? "grimoire-panel" : undefined} onClick={() => setPanel(!panel)}
+          ><ScrollIcon />Ajouter depuis le grimoire</button>
+          {missing.length > 0 && <button type="button" className="btn sm" onClick={addUniversals}>Ajouter les sorts universels</button>}
+          <GrimoireStatus />
         </div>
+        {panel && <GrimoirePanel spells={spells} onAdd={addFromGrimoire} onClose={closePanel} />}
         {spells.length > 0 && <GrimoireNote />}
       </>
     );

@@ -10,6 +10,7 @@ import { Stats } from "./components/Stats";
 import { StatusBar } from "./components/StatusBar";
 import { initialState, reducer, StoreContext, type PendingImport, type Store } from "./store";
 import { cachedTheme, useThemeAndClan } from "./theme";
+import { useGrimoire } from "./useGrimoire";
 import { useLibrary, type LibraryOptions } from "./useLibrary";
 
 const d10 = () => 1 + Math.floor(Math.random() * 10);
@@ -24,10 +25,11 @@ export function App({ storage, rng = d10, ...libraryOptions }: AppProps) {
   const [state, dispatch] = useReducer(reducer, cachedTheme(), initialState);
   const [pending, setPending] = useState<PendingImport | null>(null);
   const { ready, api } = useLibrary(storage, state, dispatch, setPending, libraryOptions);
+  const grimoire = useGrimoire(storage);
   const startImport = useCallback((file: File) => {
     void file.text().then((text) => setPending({ fileName: file.name, text }));
   }, []);
-  const store = useMemo<Store>(() => ({ state, dispatch, rng, library: api, startImport }), [state, rng, api, startImport]);
+  const store = useMemo<Store>(() => ({ state, dispatch, rng, library: api, grimoire, startImport }), [state, rng, api, grimoire, startImport]);
   const { character: c, ui } = state;
   useThemeAndClan(ui.theme, c?.clan);
 
