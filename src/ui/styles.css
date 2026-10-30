@@ -628,19 +628,17 @@ header.top + main{margin-top:18px}
   .cs-anneau selectedcontent .k{width:1.8rem;height:1.8rem;font-size:.85rem}
 
   /* Catalogue groupé : Techniques d'école, groupées par clan */
-  .cs-catalogue{width:min(100%,22rem);padding:.45rem .8rem;min-height:40px;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
-  /* Champ étroit dans la grille du bloc Identité : la liste en fait au moins la largeur, le contenu jusqu'à 24rem */
-  .cs-catalogue::picker(select){min-width:anchor-size(width);width:max-content;max-width:min(24rem,100vw - 32px)}
+  .cs-catalogue{width:min(100%,24rem);padding:.45rem .8rem;min-height:40px;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+  .cs-catalogue::picker(select){width:anchor-size(width)}
   .cs-catalogue option{display:grid;grid-template-columns:1fr auto;column-gap:.8rem;padding:.5rem .7rem}
   .cs-catalogue option::checkmark{display:none}
-  .cs-catalogue .n{font-weight:700}
+  .cs-catalogue .n{font-weight:700;white-space:normal}
   .cs-catalogue .m{font:.72rem var(--f-mono);color:var(--muted);align-self:center;white-space:nowrap}
   .cs-catalogue .d{grid-column:1/-1;font-size:.76rem;color:var(--muted);white-space:normal}
   .cs-catalogue option:checked{box-shadow:inset 3px 0 0 var(--accent)}
   .cs-catalogue option:checked .n{color:var(--accent-ink)}
-  .cs-catalogue selectedcontent{display:flex;align-items:baseline;gap:.6rem;min-width:0}
-  .cs-catalogue selectedcontent .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .cs-catalogue selectedcontent .m,.cs-catalogue selectedcontent .d{display:none}
+  .cs-catalogue selectedcontent{display:flex;align-items:baseline;gap:.6rem}
+  .cs-catalogue selectedcontent .d{display:none}
 
   /* Avec effets : panneau Posture */
   .cs-effet{width:min(100%,24rem);padding:.45rem .8rem;min-height:40px;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
@@ -660,6 +658,8 @@ header.top + main{margin-top:18px}
 /* Description permanente de la posture choisie, sous le sélecteur (I.3.4) */
 .posture-desc{margin:.5rem 0 0;font-size:.85rem;line-height:1.5;color:var(--muted)}
 .posture-desc .fx{margin-bottom:.3rem}
+/* Sélecteur de catalogue sur toute une ligne du formulaire, comme le sélecteur Posture dans son panneau */
+.form-grid .field.wide{grid-column:1/-1}
 @media (max-width:720px){
   .cs-champ,.cs-anneau,.cs-catalogue,.cs-effet{width:100%;font-size:16px}
 }

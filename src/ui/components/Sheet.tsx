@@ -129,8 +129,9 @@ function Rings() {
   );
 }
 
-function Field({ label, children }: { label: string; children: ReactNode }) {
-  return <label className="field"><span className="label">{label}</span>{children}</label>;
+/** `wide` : le champ prend toute la ligne de la grille (sélecteur de catalogue, annexe I.3). */
+function Field({ label, wide, children }: { label: string; wide?: boolean; children: ReactNode }) {
+  return <label className={wide ? "field wide" : "field"}><span className="label">{label}</span>{children}</label>;
 }
 
 function Identity() {
@@ -152,7 +153,7 @@ function Identity() {
         </Field>
         <Field label="Famille">{text(["family"], c.family)}</Field>
         <Field label="École (nom affiché)">{text(["school"], c.school, { maxLength: 120 })}</Field>
-        <Field label="Techniques d'école">
+        <Field label="Techniques d'école" wide>
           <RichSelect variant="catalogue" value={c.schoolId ?? ""} onChange={(v) => chooseSchool(set, v)}>
             <option value=""><span className="n">— Aucune (techniques libres)</span></option>
             {schoolsByClan().map((g) => (

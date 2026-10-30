@@ -60,7 +60,7 @@ for (const theme of ["light", "dark"] as const) {
     await checkFocusRing(page, select);
     await checkOpenMenu(page, select);
     await select.click();
-    // D8 : titres de clan, « Aucune » en tête, classe de l'école à droite ; liste au moins à la largeur du champ (I.8).
+    // D8 : titres de clan, « Aucune » en tête, classe de l'école à droite, liste à la largeur du champ, rien de tronqué.
     await expect(select.locator("legend", { hasText: "Crabe" })).toBeVisible();
     await expect(select.locator("option").first()).toContainText("Aucune");
     const hiruma = select.locator('option[value="hiruma-bushi"]');
@@ -71,14 +71,20 @@ for (const theme of ["light", "dark"] as const) {
     const field = (await select.boundingBox())!;
     const list = (await select.locator("option").first().boundingBox())!;
     // Options = largeur du menu − rembourrage (2 × 4 px) − bordures (2 × 1 px) ; nom et classe sans débordement.
-    expect(list.width).toBeGreaterThanOrEqual(field.width - 10);
+    expect(Math.abs(list.width - (field.width - 10))).toBeLessThanOrEqual(1);
     const option = (await hiruma.boundingBox())!;
     expect(meta.x + meta.width).toBeLessThanOrEqual(option.x + option.width);
+    const clipped = await select.locator("option .n, option .d").evaluateAll((els) => els.filter((e) => e.scrollWidth > e.clientWidth + 1).length);
+    expect(clipped).toBe(0);
     await page.screenshot({ path: `test-results/selecteurs/catalogue-${theme}.png` });
     await page.keyboard.press("Escape");
     // Champ fermé : nom seul (le résumé est masqué dans <selectedcontent>).
     await select.selectOption("hiruma-bushi");
     await expect(select.locator("selectedcontent .n")).toHaveText("École de bushi Hiruma");
+    // Champ fermé : nom entier sur une ligne, comme le sélecteur Posture.
+    const closed = await select.locator("selectedcontent .n").evaluate((e) => ({ clipped: e.scrollWidth > e.clientWidth + 1, height: e.getBoundingClientRect().height, line: parseFloat(getComputedStyle(e).lineHeight) }));
+    expect(closed.clipped).toBe(false);
+    expect(closed.height).toBeLessThan(closed.line * 1.5);
     await expect(select.locator("selectedcontent .d")).toBeHidden();
   });
 
