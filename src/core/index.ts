@@ -19,3 +19,4 @@ export { DAMAGE_MANEUVER_ID, DEFAULT_MANEUVERS, DISARM_MANEUVER_ID } from "../ru
 export type { ActionDef, ArmyStatus, CombatSub, Engagement, Situation, Stance } from "../rules/l5r4e";
 export * from "./spells";
 export * from "./insight";
+export * from "./grimoire";

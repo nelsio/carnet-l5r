@@ -106,6 +106,15 @@ describe("Contrastes (annexe I.1.11)", () => {
     expect(contrast(token("--warn", t), token("--warn-pale", t))).toBeGreaterThanOrEqual(4.5);
     expect(contrast(token("--ink", t), token("--warn-pale", t))).toBeGreaterThanOrEqual(4.5);
   });
+  it.each(THEMES)("lot 30 : %s : étiquette « Rempli depuis le grimoire » (ok sur ok-pale), état du grimoire sur surface-2 ≥ 4,5:1", (t) => {
+    expect(contrast(token("--ok", t), token("--ok-pale", t))).toBeGreaterThanOrEqual(4.5);
+    for (const fg of ["--ok", "--warn", "--danger", "--muted"]) {
+      expect(contrast(token(fg, t), token("--surface-2", t)), `${fg} / surface-2`).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+  it.each(THEMES)("lot 30 : %s : couleur des sorts universels (--ring-all) sur surface et surface-2 ≥ 3:1", (t) => {
+    for (const bg of ["--surface", "--surface-2"]) expect(contrast(token("--ring-all", t), token(bg, t)), bg).toBeGreaterThanOrEqual(3);
+  });
   it.each(THEMES)("N6 : %s : Anneaux face à --on-ring et à la surface ≥ 3:1", (t) => {
     for (const ring of ["earth", "water", "fire", "air", "void"]) {
       const color = token(`--ring-${ring}`, t);

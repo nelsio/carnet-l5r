@@ -12,6 +12,8 @@
   - **JetBrains Mono** : © The JetBrains Mono Project Authors.
 
   Textes des licences : [`src/ui/fonts/LICENSES.md`](../src/ui/fonts/LICENSES.md).
+- Lecture des fichiers du grimoire : **json5** 2.2.3, licence **MIT**.
+- Les caractéristiques des sorts proposées dans le Carnet viennent du **grimoire du portail de la campagne** (avec l'accord de son auteur) ; elles sont téléchargées par le joueur, pas incluses dans le Carnet.
 
 ## Crédits et remerciements
 

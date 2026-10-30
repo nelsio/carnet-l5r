@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carnet : sorts du grimoire</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Prototype : autocomplétion des sorts depuis le grimoire du portail.
+   Jetons du Carnet (annexe I.1). Mobile simulé en @container (appli : @media max-width:720px). */
+:root{
+  --p-bg:#f4f2ee;--p-ink:#222;--p-muted:#5f5d58;--p-line:#d6d2ca;--p-chip:#fff;--p-on:#222;--p-on-ink:#fff;
+  --f-display:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+  --f-body:"Zen Kaku Gothic New","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--p-bg:#161718;--p-ink:#e6e4df;--p-muted:#a9a7a2;--p-line:#3a3c40;--p-chip:#222427;--p-on:#e6e4df;--p-on-ink:#161718;color-scheme:dark}}
+:root[data-theme="dark"]{--p-bg:#161718;--p-ink:#e6e4df;--p-muted:#a9a7a2;--p-line:#3a3c40;--p-chip:#222427;--p-on:#e6e4df;--p-on-ink:#161718;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--p-bg);color:var(--p-ink);font:14px/1.5 var(--f-body);padding-block:24px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1120px;margin:0 auto}
+h1.p{font:800 22px/1.2 var(--f-display);margin:0 0 4px;text-wrap:balance}
+.lede{color:var(--p-muted);margin:0 0 18px;max-width:75ch}
+.controls{display:flex;flex-wrap:wrap;gap:14px 22px;margin-bottom:14px}
+.ctl{display:grid;gap:6px}
+.ctl>span{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--p-muted)}
+.seg{display:flex;flex-wrap:wrap;gap:4px}
+.seg button{border:1px solid var(--p-line);background:var(--p-chip);color:var(--p-ink);border-radius:999px;padding:6px 12px;font:inherit;font-weight:500;cursor:pointer;min-height:36px}
+.seg button[aria-pressed="true"]{background:var(--p-on);color:var(--p-on-ink);border-color:var(--p-on)}
+.legend{border:1px solid var(--p-line);border-radius:10px;padding:12px 14px;margin-bottom:16px;max-width:90ch}
+.legend ol{margin:6px 0 0;padding-left:20px}
+.stage{overflow-x:auto;padding-bottom:4px}
+.frame{margin:0 auto;border:1px solid var(--p-line);border-radius:10px;overflow:hidden}
+.frame.desk{width:1080px}
+.frame.mob{width:390px}
+
+/* ---- Appli ---- */
+.app{
+  --clan-l:#2f7a45;--clan-ink-l:#335b37;--clan-d:#7fcb93;--clan-ink-d:#96d1a2;
+  --bg:#ece6d8;--surface:#f7f3ea;--surface-2:#fdfbf6;--ink:#2a261f;
+  --muted:color-mix(in oklab,var(--ink) 70%,var(--surface));
+  --line:color-mix(in oklab,var(--ink) 18%,transparent);
+  --shadow:0 10px 28px rgb(60 45 20 / .18);--scrim:rgb(0 0 0 / .35);
+  --accent:var(--clan-l);--accent-ink:var(--clan-ink-l);
+  --accent-pale:color-mix(in oklab,var(--accent) 16%,var(--surface));
+  --on-accent:#ffffff;--warn:#8a5800;--ok:#276b2b;--danger:#b3261e;
+  --warn-pale:color-mix(in oklab,var(--warn) 12%,var(--surface));
+  --ok-pale:color-mix(in oklab,var(--ok) 14%,var(--surface));
+  --ring-air:#6a7f99;--ring-earth:#5e6d2c;--ring-fire:#a8382a;--ring-water:#245f8c;--ring-void:#5d4290;--ring-all:#7a6a3a;
+  --seal:#a8382a;--seal-ink:#f7f3ea;
+  color-scheme:light;container-type:inline-size;position:relative;background:var(--bg);color:var(--ink);font:15px/1.55 var(--f-body);min-height:760px
+}
+.app[data-theme="dark"]{
+  --bg:#26252a;--surface:#302f33;--surface-2:#3a393e;--ink:#e7e5e0;
+  --shadow:0 10px 28px rgb(0 0 0 / .45);--scrim:rgb(0 0 0 / .55);
+  --accent:var(--clan-d);--accent-ink:var(--clan-ink-d);--on-accent:var(--bg);
+  --warn:#e6bf55;--ok:#7fcb93;--danger:#f2867e;
+  --ring-air:#a9bbd2;--ring-earth:#9fb25a;--ring-fire:#e8735f;--ring-water:#6fb0e0;--ring-void:#a98be0;--ring-all:#cdb67a;
+  --seal:#b5402f;--seal-ink:#f3ece0;color-scheme:dark
+}
+.app .body{padding:0 24px 28px}
+.app h1,.app h2,.app h3{font-family:var(--f-display);margin:0;line-height:1.2;text-wrap:balance}
+.app button,.app input,.app select,.app textarea{font:inherit;color:inherit}
+.app :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.ext{width:13px;height:13px;flex:none;vertical-align:-1px}
+
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;padding-block:22px 14px;border-bottom:3px solid var(--accent)}
+.who{display:flex;align-items:center;gap:16px;min-width:0}
+.seal{flex:none;display:grid;place-items:center;width:64px;height:64px;border-radius:8px;background:var(--seal);color:var(--seal-ink);font:800 38px/1 var(--f-display);rotate:-3deg;box-shadow:inset 0 0 0 3px var(--seal),inset 0 0 0 5px var(--seal-ink)}
+.eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:4px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.eyebrow .brand{color:var(--muted)}
+.eyebrow .mon{color:var(--accent-ink);display:inline-flex;gap:6px;align-items:center}
+.eyebrow .mon::before{content:"";width:12px;height:12px;border-radius:50%;background:var(--accent)}
+.who h1{font-size:clamp(26px,5vw,38px);font-weight:800}
+.who .sub{color:var(--muted)}
+
+.block{margin-top:20px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px}
+.bhead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 12px;margin-bottom:12px}
+.bhead h2{font-size:20px;font-weight:800}
+.bhead .r{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.head-link{display:inline-flex;align-items:center;gap:5px;font-weight:700;font-size:13px;color:var(--accent-ink);text-underline-offset:3px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:8px;padding:9px 14px;font-weight:700;font-size:14px;cursor:pointer;min-height:44px;border:1px solid var(--line);background:var(--surface);color:var(--ink);text-decoration:none}
+.btn.sm{min-height:40px;padding:6px 12px;font-size:13px}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.on{background:var(--accent-pale);border-color:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent}
+.btn .ico{width:16px;height:16px;flex:none}
+.edit-badge{font:700 11px/1 var(--f-body);letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--accent);color:var(--accent-ink);background:var(--accent-pale);border-radius:999px;padding:4px 8px}
+
+/* Barre d'outils du bloc en édition */
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
+.gstate{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin-left:auto}
+.gstate .dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.gstate.ok .dot{background:var(--ok)}
+.gstate.err .dot{background:var(--danger)}
+.lnk{border:0;background:none;padding:0;font-weight:700;font-size:12px;color:var(--accent-ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:24px}
+
+/* Panneau grimoire */
+.gpanel{margin-top:12px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:14px;display:grid;gap:12px}
+.gp-h{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.gp-h h3{font-size:17px;font-weight:800;display:flex;align-items:center;gap:10px}
+.gp-h .kj{display:grid;place-items:center;width:32px;height:32px;border-radius:7px;background:var(--accent-pale);color:var(--accent-ink);font:800 17px/1 var(--f-display)}
+.x{display:grid;place-items:center;width:40px;height:40px;border:0;background:transparent;border-radius:8px;cursor:pointer;color:var(--muted)}
+.x:hover{background:var(--accent-pale)}
+.gate{display:grid;gap:10px;justify-items:start}
+.gate p{margin:0;max-width:62ch}
+.gate .fine{font-size:12px;color:var(--muted)}
+.note-err{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;background:var(--warn-pale);border:1px solid color-mix(in oklab,var(--warn) 45%,transparent);border-radius:8px;padding:10px 12px;font-size:14px}
+.note-err .k{font:800 18px/1 var(--f-display);color:var(--warn)}
+.spin{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--accent);animation:sp 0.8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.search{display:grid;gap:8px}
+.search label{font-size:12px;font-weight:700;color:var(--muted)}
+.in{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:9px 11px;min-height:42px}
+textarea.in{min-height:72px;resize:vertical}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 11px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;min-height:36px}
+.chip i{width:9px;height:9px;border-radius:50%;background:var(--rc)}
+.chip[aria-pressed="true"]{background:var(--accent-pale);border-color:var(--accent);color:var(--accent-ink)}
+.results{list-style:none;margin:0;padding:0;display:grid;gap:4px;max-height:320px;overflow:auto;border-top:1px solid var(--line);padding-top:8px}
+.res{display:grid;grid-template-columns:4px 1fr auto;gap:12px;align-items:center;padding:8px 10px;border-radius:8px;cursor:pointer;min-height:48px}
+.res:hover,.res[aria-selected="true"]{background:var(--accent-pale)}
+.res .bar{align-self:stretch;border-radius:2px;background:var(--rc)}
+.res .n{font-weight:700;font-size:14px;line-height:1.3}
+.res .n small{font-weight:400;color:var(--muted);font-size:12px}
+.res .m{font-size:12px;color:var(--muted)}
+.res .add{font-size:12px;font-weight:700;color:var(--accent-ink);white-space:nowrap}
+.res .have{font-size:12px;color:var(--muted);white-space:nowrap}
+.res[aria-disabled="true"]{cursor:default;opacity:.7}
+.res[aria-disabled="true"]:hover{background:transparent}
+.count{font-size:12px;color:var(--muted)}
+
+/* Éditeur de sort */
+.spells{display:grid;gap:12px}
+.sp{border:1px solid var(--line);border-left:4px solid var(--rc);border-radius:10px;background:var(--bg);padding:14px;display:grid;gap:12px}
+.sp.fresh{animation:fresh 1.6s ease-out}
+@keyframes fresh{from{box-shadow:0 0 0 3px var(--accent)}to{box-shadow:0 0 0 0 transparent}}
+.sp-top{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.from{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--ok);background:var(--ok-pale);border-radius:999px;padding:3px 9px}
+.grid{display:grid;grid-template-columns:2fr 1fr 110px;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.f{display:grid;gap:4px;min-width:0}
+.f>span{font-size:12px;font-weight:700;color:var(--muted)}
+.combo{position:relative}
+.combo .in{padding-right:40px}
+.combo .hint-ico{position:absolute;right:10px;top:50%;translate:0 -50%;width:18px;height:18px;color:var(--muted);pointer-events:none}
+.sugg{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:8;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);list-style:none;margin:0;padding:6px;max-height:280px;overflow:auto}
+.sugg .res{grid-template-columns:4px 1fr}
+.sugg .foot{font-size:12px;color:var(--muted);padding:6px 10px 2px;border-top:1px solid var(--line);margin-top:4px}
+.name-hint{font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.confirm{display:grid;gap:8px;background:var(--surface-2);border:1px solid var(--accent);border-radius:8px;padding:10px 12px}
+.confirm p{margin:0;font-size:14px}
+.confirm .row{display:flex;flex-wrap:wrap;gap:6px}
+.sp-foot{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.chk{display:inline-flex;gap:6px;align-items:center;min-height:40px}
+.spell-link{display:inline-grid;place-items:center;width:44px;height:44px;border-radius:8px;color:var(--accent-ink)}
+.spell-link:hover{background:var(--accent-pale)}
+.spell-link svg{width:18px;height:18px}
+.rm{margin-left:auto}
+.diff{font-size:12px;color:var(--muted);margin:0;padding-left:18px}
+
+.scrim{display:none}
+@container (max-width:720px){
+  .app .body{padding:0 16px 40px}
+  .seal{width:52px;height:52px;font-size:30px}
+  .who h1{font-size:26px}
+  .eyebrow{font-size:10px}
+  .grid,.grid3,.grid2{grid-template-columns:1fr}
+  .gstate{margin-left:0;width:100%}
+  .tools .btn{flex:1 1 auto}
+  .gpanel.sheet{position:absolute;left:0;right:0;bottom:0;z-index:10;border-radius:14px 14px 0 0;max-height:88%;overflow:auto;margin:0}
+  .gpanel.sheet::before{content:"";display:block;width:40px;height:4px;border-radius:2px;background:var(--line);margin:-4px auto 0}
+  .scrim.on{display:block;position:absolute;inset:0;background:var(--scrim);z-index:9}
+  .results{max-height:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<div class="wrap">
+  <h1 class="p">Carnet de Rokugan : sorts depuis le grimoire</h1>
+  <p class="lede">Prototype. Bloc « Rouleaux &amp; invocations » en édition. Les 162 sorts (universels et cinq éléments) sont ceux du grimoire du portail, sans leurs descriptions. Ici, le « chargement » est simulé.</p>
+
+  <div class="controls">
+    <div class="ctl"><span>Grimoire au départ</span><div class="seg" data-ctl="start">
+      <button type="button" data-v="none" aria-pressed="true">Jamais chargé</button>
+      <button type="button" data-v="cache" aria-pressed="false">Déjà en mémoire</button>
+      <button type="button" data-v="offline" aria-pressed="false">Hors ligne</button>
+    </div></div>
+    <div class="ctl"><span>Thème</span><div class="seg" data-ctl="theme">
+      <button type="button" data-v="light" aria-pressed="true">Clair</button>
+      <button type="button" data-v="dark" aria-pressed="false">Sombre</button>
+    </div></div>
+    <div class="ctl"><span>Largeur</span><div class="seg" data-ctl="width">
+      <button type="button" data-v="desk" aria-pressed="true">Bureau 1080</button>
+      <button type="button" data-v="mob" aria-pressed="false">Mobile 390</button>
+    </div></div>
+  </div>
+
+  <div class="legend">
+    <b>À essayer</b>
+    <ol>
+      <li><b>Ajouter depuis le grimoire</b> : chargement à la demande, puis recherche par nom avec filtre d'élément. Un clic ajoute le sort rempli.</li>
+      <li><b>Autocomplétion du nom</b> : dans « Frappe de jade » ou un nouveau sort (« + Sort »), tape quelques lettres (ex. « arm », « éteind »). Le choix remplit le sort ; s'il remplace des valeurs déjà saisies, le Carnet demande d'abord.</li>
+      <li>L'<b>effet</b> et <b>Mémorisé</b> ne sont jamais remplis. La <b>VD</b> l'est seulement quand le grimoire la fournit (champ <code>damage</code>, aucun sort ne l'a encore).</li>
+      <li>Un sort déjà noté apparaît « déjà noté » dans le panneau et ne peut pas être ajouté une seconde fois.</li>
+    </ol>
+  </div>
+
+  <div class="stage">
+    <div class="frame desk" id="frame"><div class="app" id="app" data-theme="light"></div></div>
+  </div>
+</div>
+<script>
+const GRIMOIRE_RAW = [{"id":"univ-sense","name":"Sentir les Kami (Sense)","element":"Universel","mastery":"Universel","keywords":["Divination"],"range":"Personnelle","area":"Rayon de 15 m autour du lanceur","duration":"Instantanée","raises":"Portée (+15 m par Raise), Détection d'un type précis"},{"id":"univ-commune","name":"Communier avec les Kami (Commune)","element":"Universel","mastery":"Universel","keywords":["Divination","Communication"],"range":"6 mètres","area":"Un esprit élémentaire local","duration":"Concentration","raises":"Question additionnelle (+1 par Raise), Clarté accrue"},{"id":"univ-summon","name":"Invoquer les Kami (Summon)","element":"Universel","mastery":"Universel","keywords":["Matérialisation"],"range":"6 mètres","area":"Une poignée de matière élémentaire","duration":"Permanente","raises":"Volume doublé par Raise, Matière spécifique (bois, fer, thé...)"},{"id":"air-1-blessed-wind","name":"Le Vent Bienveillant (Blessed Wind)","element":"Air","mastery":1,"keywords":["Défense"],"range":"Personnelle","area":"Rayon de 3 m autour du lanceur","duration":"Concentration","raises":"Spéciale (cibler autrui avec 3 Augmentations)"},{"id":"air-1-legacy-kaze","name":"L'Héritage de Kaze-no-Kami (Legacy of Kaze-no-Kami)","element":"Air","mastery":1,"keywords":["Artisanat"],"range":"Rang d'École × 15 km","area":"Un individu connu à portée","duration":"Spéciale","raises":"Zone (+1 individu), Portée (+15 km)"},{"id":"air-1-natures-touch","name":"Le Toucher de la Nature (Nature's Touch)","element":"Air","mastery":1,"keywords":[],"range":"3 mètres","area":"Une créature","duration":"Spéciale","raises":"Portée (+3 m)"},{"id":"air-1-tempest-air","name":"Tempête d'Air (Tempest of Air)","element":"Air","mastery":1,"keywords":["Tonnerre"],"range":"Personnelle","area":"Cône de 22,5 m de long sur 4,5 m de large à son extrémité","duration":"Instantanée","raises":"Zone (+1,5 m en largeur), Dégâts (+1g0), Portée (+1,5 m en longueur), Spéciale (+5 au ND d'Air contre le Renversement par Augmentation)"},{"id":"air-1-token-memory","name":"Jeton de Mémoire (Token of Memory)","element":"Air","mastery":1,"keywords":["Artisanat","Illusion"],"range":"3 mètres","area":"Un petit objet illusoire (0,03 m³ ou moins)","duration":"1 Heure","raises":"Zone (+0,03 m³ au volume), Durée (+1 heure)"},{"id":"air-1-seek-truth","name":"Chercher la Vérité (To Seek the Truth)","element":"Air","mastery":1,"keywords":[],"range":"Personnelle / Contact","area":"Un individu touché (peut être le lanceur)","duration":"5 Minutes","raises":"Durée (+1 minute)"},{"id":"air-1-way-deception","name":"La Voie de la Tromperie (Way of Deception)","element":"Air","mastery":1,"keywords":["Illusion"],"range":"6 mètres","area":"Un double illusoire du lanceur","duration":"Concentration + 5 minutes","raises":"Zone (+1 double par 2 Augmentations), Portée (+1,5 m), Spéciale (voir description)"},{"id":"air-1-yari-air","name":"Lance d'Air (Yari of Air)","element":"Air","mastery":1,"keywords":["Artisanat","Tonnerre"],"range":"Personnelle ou 6 m","area":"Une arme créée","duration":"5 Minutes","raises":"Dégâts (+1g0), Durée (+5 min), Portée (+1,5 m)"},{"id":"air-2-bentens-touch","name":"Le Toucher de Benten (Benten's Touch)","element":"Air","mastery":2,"keywords":[],"range":"Personnelle / Contact","area":"Un individu ciblé (peut être le lanceur)","duration":"1 Heure","raises":"Portée (passe à 1,5 m avec 1 Augmentation)"},{"id":"air-2-call-upon-wind","name":"Appel au Vent (Call Upon the Wind)","element":"Air","mastery":2,"keywords":["Voyage"],"range":"Personnelle ou 6 m","area":"Un individu ciblé (peut être le lanceur)","duration":"1 Minute","raises":"Durée (+1 min), Portée (+1,5 m)"},{"id":"air-2-hidden-visage","name":"Visage Dissimulé (Hidden Visage)","element":"Air","mastery":2,"keywords":["Illusion"],"range":"Personnelle","area":"Le lanceur","duration":"5 Minutes","raises":"Zone (cibler un tiers en ligne de vue avec 3 Augmentations), Durée (+5 min)"},{"id":"air-2-kamis-whisper","name":"Le Murmure des Kami (The Kami's Whisper)","element":"Air","mastery":2,"keywords":["Illusion"],"range":"15 mètres","area":"Rayon de 3 mètres","duration":"1 Round","raises":"Zone (+1,5 m de rayon), Durée (+1 round), Portée (+1,5 m)"},{"id":"air-2-mists-illusion","name":"Les Brumes de l'Illusion (Mists of Illusion)","element":"Air","mastery":2,"keywords":["Artisanat","Illusion"],"range":"6 mètres","area":"Rayon de 3 mètres","duration":"1 Minute","raises":"Zone (+1,5 m), Durée (+1 min), Portée (+1,5 m)"},{"id":"air-2-secrets-wind","name":"Secrets sur le Vent (Secrets on the Wind)","element":"Air","mastery":2,"keywords":[],"range":"15 km","area":"Rayon de 6 mètres","duration":"Concentration","raises":"Zone (+1,5 m de rayon), Portée (+7,5 km)"},{"id":"air-2-whispering-wind","name":"Vent Murmurant (Whispering Wind)","element":"Air","mastery":2,"keywords":["Divination"],"range":"6 mètres","area":"Un individu ciblé","duration":"Instantanée","raises":"Portée (+1,5 m)"},{"id":"air-2-wolfs-proposal","name":"La Proposition du Loup (Wolf's Proposal)","element":"Air","mastery":2,"keywords":["Illusion","Social"],"range":"Personnelle","area":"Le lanceur","duration":"10 Minutes","raises":"Durée (+5 min)"},{"id":"air-3-essence-air","name":"Essence d'Air (Essence of Air)","element":"Air","mastery":3,"keywords":["Défense"],"range":"Personnelle","area":"Le lanceur","duration":"5 Rounds","raises":"Durée (+1 round)"},{"id":"air-3-eye-shall-not-see","name":"L'Œil ne Verra Pas (The Eye Shall Not See)","element":"Air","mastery":3,"keywords":["Défense"],"range":"Personnelle ou Contact","area":"Le lanceur ou un individu ciblé","duration":"Concentration","raises":"Aucune"},{"id":"air-3-mask-wind","name":"Masque de Vent (Mask of Wind)","element":"Air","mastery":3,"keywords":["Illusion"],"range":"Personnelle","area":"Le lanceur","duration":"1 Heure","raises":"Zone (cibler un tiers avec 2 Augmentations), Durée (+10 min)"},{"id":"air-3-striking-storm","name":"Frapper la Tempête (Striking the Storm)","element":"Air","mastery":3,"keywords":["Défense"],"range":"Personnelle","area":"Le lanceur","duration":"3 Rounds","raises":"Durée (+1 round)"},{"id":"air-3-summon-fog","name":"Invoquer le Brouillard (Summon Fog)","element":"Air","mastery":3,"keywords":[],"range":"30 mètres","area":"Rayon de 30 mètres","duration":"10 Minutes","raises":"Zone (+15 m de rayon), Durée (+5 min)"},{"id":"air-3-summoning-gale","name":"Appel de la Bourrasque (Summoning the Gale)","element":"Air","mastery":3,"keywords":["Défense"],"range":"15 mètres","area":"Un individu ciblé (rayon de 9 m autour de lui)","duration":"Concentration","raises":"Portée (+1,5 m)"},{"id":"air-4-call-spirit","name":"Appel de l'Esprit (Call the Spirit)","element":"Air","mastery":4,"keywords":[],"range":"Spéciale","area":"Un esprit ciblé","duration":"5 Minutes","raises":"Durée (+1 minute)"},{"id":"air-4-false-realm","name":"Royaume Illusoire (False Realm)","element":"Air","mastery":4,"keywords":["Bataille","Illusion"],"range":"75 mètres","area":"Rayon de 30 mètres","duration":"1 Heure","raises":"Zone (+3 m de rayon), Durée (+10 min)"},{"id":"air-4-gift-wind","name":"Le Don du Vent (Gift of Wind)","element":"Air","mastery":4,"keywords":["Illusion"],"range":"Personnelle","area":"Le lanceur","duration":"5 Minutes","raises":"Durée (+1 minute)"},{"id":"air-4-know-mind","name":"Connaître l'Esprit (Know the Mind)","element":"Air","mastery":4,"keywords":[],"range":"3 mètres","area":"Un individu ciblé","duration":"3 Rounds","raises":"Durée (+1 round), Portée (+1,5 m)"},{"id":"air-4-netsuke-wind","name":"Netsuke de Vent (Netsuke of Wind)","element":"Air","mastery":4,"keywords":["Artisanat","Illusion"],"range":"Contact","area":"Un objet tenu en main","duration":"1 Heure","raises":"Durée (+10 min)"},{"id":"air-4-symbol-air","name":"Symbole d'Air (Symbol of Air)","element":"Air","mastery":4,"keywords":["Sceau"],"range":"Contact","area":"Spéciale (un passage, porte ou fenêtre)","duration":"Permanente","raises":"Aucune"},{"id":"air-5-cloud-mind","name":"Troubler l'Esprit (Cloud the Mind)","element":"Air","mastery":5,"keywords":[],"range":"Contact","area":"Un individu ciblé","duration":"Permanente","raises":"Spéciale (+1 jour de mémoire altérée par Augmentation)"},{"id":"air-5-draw-back-shadow","name":"Dissiper les Ombres (Draw Back the Shadow)","element":"Air","mastery":5,"keywords":[],"range":"30 mètres","area":"Rayon de 9 mètres","duration":"Instantanée","raises":"Zone (+1,5 m de rayon), Portée (+3 m)"},{"id":"air-5-echoes-breeze","name":"Échos sur la Brise (Echoes on the Breeze)","element":"Air","mastery":5,"keywords":[],"range":"Personnelle","area":"Un individu ciblé","duration":"Concentration","raises":"Aucune"},{"id":"air-5-slayers-knives","name":"Les Lames du Tueur (Slayer's Knives)","element":"Air","mastery":5,"keywords":["Tonnerre"],"range":"9 mètres","area":"Couloir d'air de 3 m de large","duration":"Instantanée","raises":"Zone (+1 m de largeur), Dégâts (+1g0 pour 3 Augmentations)"},{"id":"air-6-rise-air","name":"Éveil de l'Air (Rise, Air)","element":"Air","mastery":6,"keywords":[],"range":"9 mètres","area":"Un esprit invoqué","duration":"Concentration","raises":"Aucune"},{"id":"air-6-false-legion","name":"La Fausse Légion (The False Legion)","element":"Air","mastery":6,"keywords":["Bataille","Illusion"],"range":"Personnelle","area":"À moins de 30 m du lanceur","duration":"Concentration","raises":"Zone (+3 m), Spéciale (+5 silhouettes par Augmentation)"},{"id":"air-6-wrath-kaze","name":"La Colère de Kaze-no-Kami (Wrath of Kaze-no-Kami / Hurricane)","element":"Air","mastery":6,"keywords":["Tonnerre"],"range":"Personnelle","area":"Rayon de 1,5 km centré sur le lanceur","duration":"Concentration (max 1 heure)","raises":"Aucune"},{"id":"earth-1-armor-earth","name":"Armure de Terre (Armor of Earth)","element":"Terre","mastery":1,"keywords":["Bataille","Défense"],"range":"Personnelle","area":"Le lanceur","duration":"10 Rounds","raises":"Durée (+2 rounds par Augmentation)"},{"id":"earth-1-courage-thunders","name":"Courage des Sept Tonnerres (Courage of the Seven Thunders)","element":"Terre","mastery":1,"keywords":["Bataille"],"range":"9 mètres (30')","area":"Nombre de cibles égal au Rang d'École du shugenja","duration":"10 Minutes","raises":"Durée (+1 minute), Cibles (+1)"},{"id":"earth-1-stagnation","name":"Stagnation de la Terre (Earth's Stagnation)","element":"Terre","mastery":1,"keywords":[],"range":"15 mètres (50')","area":"Une cible","duration":"6 Rounds","raises":"Durée (+2 rounds), Portée (+3 m / +10'), Cibles (+1, max 4 cibles au total)"},{"id":"earth-1-earths-touch","name":"Le Toucher de la Terre (Earth's Touch)","element":"Terre","mastery":1,"keywords":["Défense"],"range":"Contact","area":"Une cible","duration":"1 Heure","raises":"Durée (+30 minutes), Cibles (+1 par 2 Augmentations, max 3 cibles au total)"},{"id":"earth-1-elemental-ward","name":"Garde Élémentaire (Elemental Ward)","element":"Terre","mastery":1,"keywords":["Sceau"],"range":"Contact","area":"Une cible","duration":"1 Heure","raises":"Durée (+30 minutes), Cibles (+1 par 2 Augmentations)"},{"id":"earth-1-jade-strike","name":"Frappe de Jade (Jade Strike)","element":"Terre","mastery":1,"keywords":["Jade","Tonnerre"],"range":"30 mètres (100')","area":"Une cible","duration":"Instantanée","raises":"Dégâts (+1g0), Portée (+3 m / +10'), Cibles (+1 cible, max 5 cibles au total)"},{"id":"earth-1-jurojins-balm","name":"Le Baume de Jurojin (Jurojin's Balm)","element":"Terre","mastery":1,"keywords":[],"range":"Contact","area":"Une cible","duration":"1 Heure","raises":"Durée (+30 minutes), Cibles (+1 par 2 Augmentations, max 5 cibles au total)"},{"id":"earth-1-tetsubo-earth","name":"Tetsubō de Terre (Tetsubo of Earth)","element":"Terre","mastery":1,"keywords":["Artisanat","Jade"],"range":"Personnelle ou 6 mètres (20')","area":"Une arme créée","duration":"5 Minutes","raises":"Dégâts (+1g0), Durée (+5 minutes), Portée (+1,5 m / +5')"},{"id":"earth-2-be-mountain","name":"Être la Montagne (Be the Mountain)","element":"Terre","mastery":2,"keywords":["Défense"],"range":"9 mètres (30')","area":"Une créature ciblée (allié volontaire)","duration":"4 Rounds","raises":"Durée (+1 round)"},{"id":"earth-2-earth-becomes-sky","name":"La Terre Devient Ciel (Earth Becomes Sky)","element":"Terre","mastery":2,"keywords":["Jade","Tonnerre"],"range":"30 mètres (100')","area":"Une créature ciblée","duration":"Instantanée","raises":"Dégâts (+1g0), Cibles (+1 créature), Spéciale (imprégner les rochers de Jade avec 2 Augmentations)"},{"id":"earth-2-embrace-kenro","name":"L'Étreinte de Kenro-Ji-Jin (Embrace of Kenro-Ji-Jin)","element":"Terre","mastery":2,"keywords":["Voyage"],"range":"Personnelle ou Contact","area":"Une créature ciblée","duration":"1 Heure","raises":"Durée (+30 minutes)"},{"id":"earth-2-force-will","name":"Force de Volonté (Force of Will)","element":"Terre","mastery":2,"keywords":["Bataille"],"range":"15 mètres (50')","area":"Une cible","duration":"2 Rounds","raises":"Durée (+1 round, max 4 rounds au total)"},{"id":"earth-2-grasp-earth","name":"L'Étreinte de la Terre (Grasp of Earth)","element":"Terre","mastery":2,"keywords":[],"range":"15 mètres (50')","area":"Une cible","duration":"5 Rounds","raises":"Durée (+1 round), Portée (+1,5 m / +5'), Cibles (+1 par 2 Augmentations)"},{"id":"earth-2-hands-clay","name":"Mains d'Argile (Hands of Clay)","element":"Terre","mastery":2,"keywords":["Voyage"],"range":"Personnelle","area":"Le lanceur","duration":"10 Minutes","raises":"Durée (+5 minutes)"},{"id":"earth-2-minor-binding","name":"Lien Mineur (Minor Binding)","element":"Terre","mastery":2,"keywords":["Sceau"],"range":"9 mètres (30')","area":"Une créature spirituelle ciblée","duration":"10 Minutes","raises":"Durée (+5 minutes), Portée (+3 m / +10')"},{"id":"earth-2-mountains-feet","name":"Les Pieds de la Montagne (The Mountain's Feet)","element":"Terre","mastery":2,"keywords":["Défense"],"range":"Personnelle ou 6 mètres (20')","area":"Une cible","duration":"1 Heure","raises":"Durée (+30 minutes), Cibles (+1 par 2 Augmentations)"},{"id":"earth-2-wholeness-world","name":"L'Intégrité du Monde (Wholeness of the World)","element":"Terre","mastery":2,"keywords":["Défense"],"range":"Personnelle ou 6 mètres (20')","area":"Une créature ciblée","duration":"10 Minutes","raises":"Durée (+1 minute), Portée (+1,5 m / +5'), Cibles (+1 par 2 Augmentations)"},{"id":"earth-3-bonds-ningendo","name":"Les Liens de Ningen-dō (Bonds of Ningen-Do)","element":"Terre","mastery":3,"keywords":["Sceau"],"range":"150 mètres (500')","area":"Une créature spirituelle ciblée","duration":"30 Jours","raises":"Durée (+1 jour), Portée (+3 m / +10'), Cibles (+1 par 2 Augmentations)"},{"id":"earth-3-earth-kami-blessing","name":"Bénédiction du Kami de Terre (Earth Kami's Blessing)","element":"Terre","mastery":3,"keywords":["Bataille"],"range":"Personnelle ou 6 mètres (20')","area":"Le lanceur ou une créature ciblée","duration":"10 Minutes","raises":"Durée (+1 minute)"},{"id":"earth-3-earths-protection","name":"Protection de la Terre (Earth's Protection)","element":"Terre","mastery":3,"keywords":["Défense","Sceau"],"range":"Personnelle","area":"Rayon de 3 mètres (10') autour du shugenja","duration":"Concentration","raises":"Zone (+1,5 m de rayon par 2 Augmentations, max 9 m / 30'), Dégâts absorbés (+1g1 supplémentaire pour 2 Augmentations)"},{"id":"earth-3-sharing-strength","name":"Partager la Force du Nombre (Sharing the Strength of Many)","element":"Terre","mastery":3,"keywords":[],"range":"9 mètres (30')","area":"1 à 6 personnes désignées à portée (peut inclure le lanceur)","duration":"5 Rounds","raises":"Durée (+1 round), Portée (+1,5 m / +5')"},{"id":"earth-3-strength-crow","name":"La Force du Corbeau (Strength of the Crow)","element":"Terre","mastery":3,"keywords":["Jade"],"range":"Contact","area":"Une cible (peut être le lanceur)","duration":"Nombre d'heures égal au Rang d'École du lanceur","raises":"Durée (+1 heure), Cibles (+1)"},{"id":"earth-3-wolfs-mercy","name":"La Miséricorde du Loup (The Wolf's Mercy)","element":"Terre","mastery":3,"keywords":[],"range":"15 mètres (50')","area":"Une créature ciblée","duration":"10 Rounds","raises":"Portée (+3 m / +10'), Cibles (+1)"},{"id":"earth-4-armor-emperor","name":"L'Armure de l'Empereur (Armor of the Emperor)","element":"Terre","mastery":4,"keywords":["Défense"],"range":"Personnelle","area":"Le lanceur","duration":"5 Rounds","raises":"Durée (+2 rounds)"},{"id":"earth-4-essence-earth","name":"Essence de Terre (Essence of Earth)","element":"Terre","mastery":4,"keywords":["Bataille"],"range":"Personnelle ou 6 mètres (20')","area":"Une créature ciblée (le lanceur ou autrui)","duration":"10 Rounds","raises":"Durée (+1 round), Portée (+1,5 m / +5'), Cibles (+1 par 2 Augmentations), Spéciale (+1 Rang de Terre par 2 Augmentations, max +3 Rangs)"},{"id":"earth-4-major-binding","name":"Lien Majeur (Major Binding)","element":"Terre","mastery":4,"keywords":["Sceau"],"range":"15 mètres (50')","area":"Une créature spirituelle ciblée","duration":"1 Heure","raises":"Durée (+30 minutes), Portée (+3 m / +10')"},{"id":"earth-4-symbol-earth","name":"Symbole de Terre (Symbol of Earth)","element":"Terre","mastery":4,"keywords":["Sceau"],"range":"Contact","area":"Spéciale (un passage, porte, fenêtre ou portail)","duration":"Permanente","raises":"Dégâts (+1g0)"},{"id":"earth-4-tomb-jade","name":"Le Tombeau de Jade (Tomb of Jade)","element":"Terre","mastery":4,"keywords":["Jade"],"range":"15 mètres (50')","area":"Une créature ciblée","duration":"Concentration","raises":"Portée (+3 m / +10'), Spéciale (+1g1 au jet opposé par Augmentation)"},{"id":"earth-4-wall-earth","name":"Mur de Terre (Wall of Earth)","element":"Terre","mastery":4,"keywords":["Défense"],"range":"30 mètres (100')","area":"Mur atteignant jusqu'à 3 m (10') de haut et 30 m (100') de long","duration":"10 Minutes","raises":"Dimensions (+30 cm en hauteur ou +3 m en longueur par Augmentation), Durée (+1 minute), Portée (+3 m / +10')"},{"id":"earth-5-kamis-strength","name":"La Force des Kami (The Kami's Strength)","element":"Terre","mastery":5,"keywords":["Bataille"],"range":"9 mètres (30')","area":"Une créature ciblée","duration":"5 Rounds","raises":"Durée (+1 round), Portée (+3 m / +10')"},{"id":"earth-5-kamis-will","name":"La Volonté des Kami (The Kami's Will)","element":"Terre","mastery":5,"keywords":["Défense"],"range":"9 mètres (30')","area":"Une créature ciblée","duration":"10 Rounds","raises":"Durée (+1 round), Portée (+3 m / +10')"},{"id":"earth-5-strike-roots","name":"Frapper aux Racines (Strike at the Roots)","element":"Terre","mastery":5,"keywords":[],"range":"15 mètres (50')","area":"Une créature ciblée","duration":"3 Rounds","raises":"Durée (+1 round), Portée (+3 m / +10'), Cibles (+1 par 2 Augmentations), Spéciale (+1g1 au jet opposé par Augmentation)"},{"id":"earth-6-essence-jade","name":"Essence de Jade (Essence of Jade)","element":"Terre","mastery":6,"keywords":["Défense","Jade"],"range":"9 mètres (30')","area":"Une créature ciblée","duration":"10 Rounds","raises":"Durée (+1 round), Portée (+1,5 m / +5'), Cibles (+1 par 2 Augmentations, max 3 cibles au total)"},{"id":"earth-6-power-earth-dragon","name":"Pouvoir du Dragon de la Terre (Power of the Earth Dragon)","element":"Terre","mastery":6,"keywords":["Défense"],"range":"15 mètres (50')","area":"Une créature ciblée","duration":"10 Minutes","raises":"Durée (+1 minute), Portée (+3 m / +10'), Cibles (+1), Spéciale (capacité d'absorption +10 Blessures par Augmentation)"},{"id":"earth-6-prison-earth","name":"Prison de Terre (Prison of Earth)","element":"Terre","mastery":6,"keywords":["Sceau"],"range":"9 mètres (30')","area":"Une créature ciblée","duration":"Permanente","raises":"Portée (+1,5 m / +5'), Spéciale (+1g1 au jet opposé par Augmentation)"},{"id":"earth-6-rise-earth","name":"Éveil de la Terre (Rise, Earth)","element":"Terre","mastery":6,"keywords":[],"range":"9 mètres (30')","area":"Un esprit invoqué","duration":"Concentration","raises":"Aucune"},{"id":"feu-1-biting-steel","name":"Morsure de l'Acier (Biting Steel)","element":"Feu","mastery":1,"keywords":["Artisanat"],"range":"Contact","area":"1 arme à lame en acier","duration":"1 Minute","raises":"Durée (+1 minute)"},{"id":"feu-1-burning-kiss-steel","name":"Baiser Brûlant de l'Acier (Burning Kiss of Steel)","element":"Feu","mastery":1,"keywords":["Bataille"],"range":"Contact","area":"Une arme de mêlée tenue en main par le lanceur","duration":"5 Minutes","raises":"Durée (+2 minutes)"},{"id":"feu-1-envious-flames","name":"Flammes Envieuses (Envious Flames)","element":"Feu","mastery":1,"keywords":[],"range":"9 mètres (30')","area":"Une cible","duration":"Instantanée","raises":"Aucune"},{"id":"feu-1-extinguish","name":"Éteindre (Extinguish)","element":"Feu","mastery":1,"keywords":[],"range":"Personnelle","area":"Rayon de 30 mètres (100')","duration":"Instantanée","raises":"Zone (+6 m / +20' de rayon)"},{"id":"feu-1-fires-purity","name":"Flammes de Pureté (Fires of Purity)","element":"Feu","mastery":1,"keywords":["Défense"],"range":"7,5 mètres (25')","area":"Une cible","duration":"1 Minute","raises":"Dégâts (+1g0 par tranche de 2 Augmentations)"},{"id":"feu-1-fires-cleanse","name":"Les Feux Purificateurs (The Fires That Cleanse)","element":"Feu","mastery":1,"keywords":[],"range":"Personnelle","area":"Rayon de 9 mètres (30')","duration":"Instantanée","raises":"Zone (+1,5 m / +5' de rayon par tranche de 2 Augmentations)"},{"id":"feu-1-fury-osano-wo","name":"La Fureur d'Osano-Wo (Fury of Osano-Wo)","element":"Feu","mastery":1,"keywords":["Tonnerre"],"range":"90 mètres (300')","area":"Une cible","duration":"Instantanée","raises":"Dégâts (+1g0 par tranche de 2 Augmentations)"},{"id":"feu-1-katana-fire","name":"Katana de Feu (Katana of Fire)","element":"Feu","mastery":1,"keywords":["Bataille","Artisanat"],"range":"Personnelle ou 6 mètres (20')","area":"Une arme créée","duration":"5 Minutes","raises":"Dégâts (+1g0), Durée (+5 min), Portée (+1,5 m / +5')"},{"id":"feu-1-never-alone","name":"Jamais Seul (Never Alone)","element":"Feu","mastery":1,"keywords":[],"range":"Contact","area":"Une cible","duration":"5 Rounds (Spéciale)","raises":"Cibles (+1 cible)"},{"id":"feu-1-raging-forge","name":"La Forge Furieuse (The Raging Forge)","element":"Feu","mastery":1,"keywords":["Artisanat"],"range":"Contact","area":"Une arme ou une armure","duration":"Instantanée","raises":"Aucune"},{"id":"feu-2-disrupt-aura","name":"Perturber l'Aura (Disrupt the Aura)","element":"Feu","mastery":2,"keywords":[],"range":"15 mètres (50')","area":"Une créature ou individu ciblé","duration":"24 Heures","raises":"Durée (+12 heures par Augmentation)"},{"id":"feu-2-enticing-dance-flame","name":"Danse Séduisante de la Flamme (Enticing Dance of the Flame)","element":"Feu","mastery":2,"keywords":[],"range":"15 mètres (50')","area":"Rayon de 6 mètres (20')","duration":"2 Rounds","raises":"Durée (+1 round)"},{"id":"feu-2-fires-from-within","name":"Les Feux Intérieurs (The Fires From Within)","element":"Feu","mastery":2,"keywords":[],"range":"30 mètres (100')","area":"Une cible","duration":"Instantanée","raises":"Cibles (+1 cible par tranche de 2 Augmentations)"},{"id":"feu-2-hurried-steps","name":"Pas Pressés (Hurried Steps)","element":"Feu","mastery":2,"keywords":[],"range":"Personnelle","area":"Le lanceur","duration":"2 Rounds (Spéciale)","raises":"Aucune"},{"id":"feu-2-mental-quickness","name":"Vivacité d'Esprit (Mental Quickness)","element":"Feu","mastery":2,"keywords":[],"range":"Contact","area":"Un objet","duration":"10 Minutes","raises":"Aucune"},{"id":"feu-2-relentless-heat","name":"Chaleur Implacable (Relentless Heat)","element":"Feu","mastery":2,"keywords":["Défense"],"range":"Contact","area":"Une armure","duration":"10 Rounds","raises":"Durée (+2 rounds)"},{"id":"feu-2-tail-fire-dragon","name":"Queue du Dragon de Feu (Tail of the Fire Dragon)","element":"Feu","mastery":2,"keywords":[],"range":"Personnelle","area":"Le lanceur","duration":"4 Rounds","raises":"Durée (+1 round)"},{"id":"feu-3-breath-fire-dragon","name":"Souffle du Dragon de Feu (Breath of the Fire Dragon)","element":"Feu","mastery":3,"keywords":[],"range":"Personnelle","area":"Souffle de 4,5 m de long sur 1,5 m de large (15' × 5')","duration":"4 Rounds","raises":"Aucune"},{"id":"feu-3-fiery-wrath","name":"Colère Enflammée (Fiery Wrath)","element":"Feu","mastery":3,"keywords":[],"range":"30 mètres (100')","area":"Une structure isolée ou une zone de 15 m × 15 m (50' × 50')","duration":"Instantanée","raises":"Aucune"},{"id":"feu-3-fist-osano-wo","name":"Le Poing d'Osano-Wo (The Fist of Osano-Wo)","element":"Feu","mastery":3,"keywords":["Tonnerre"],"range":"15 mètres (50')","area":"Rayon de 6 mètres (20')","duration":"1 Round","raises":"Zone (+3 m / +10' de rayon)"},{"id":"feu-3-haze-battle","name":"Brumes de Bataille (Haze of Battle)","element":"Feu","mastery":3,"keywords":["Bataille"],"range":"3 mètres (10')","area":"Une cible","duration":"5 Rounds (ou 1 heure hors combat)","raises":"Durée (+1 round)"},{"id":"feu-3-hungry-blade","name":"Lame Affamée (Hungry Blade)","element":"Feu","mastery":3,"keywords":["Artisanat"],"range":"15 mètres (50')","area":"Une arme","duration":"5 Rounds","raises":"Durée (+1 round)"},{"id":"feu-3-ravenous-swarms","name":"Essaims Dévorants (Ravenous Swarms)","element":"Feu","mastery":3,"keywords":[],"range":"9 mètres (30')","area":"Une cible","duration":"5 Rounds","raises":"Durée (+1 round)"},{"id":"feu-3-shining-light","name":"Lumière Éclatante (Shining Light)","element":"Feu","mastery":3,"keywords":["Défense"],"range":"9 mètres (30')","area":"Une armure","duration":"10 Rounds","raises":"Dégâts (+1g0 par tranche de 2 Augmentations), Durée (+2 rounds)"},{"id":"feu-4-death-flame","name":"Mort de la Flamme (Death of Flame)","element":"Feu","mastery":4,"keywords":[],"range":"30 mètres (100')","area":"Une cible","duration":"5 Rounds","raises":"Aucune"},{"id":"feu-4-defense-firestorm","name":"Défense de la Tempête de Feu (Defense of the Firestorm)","element":"Feu","mastery":4,"keywords":["Défense"],"range":"Contact","area":"Une armure","duration":"5 Rounds","raises":"Durée (+1 round)"},{"id":"feu-4-mending-forge","name":"La Forge Réparatrice (The Mending Forge)","element":"Feu","mastery":4,"keywords":["Artisanat"],"range":"Contact","area":"Un objet ciblé","duration":"Instantanée","raises":"Aucune"},{"id":"feu-4-symbol-fire","name":"Symbole de Feu (Symbol of Fire)","element":"Feu","mastery":4,"keywords":["Sceau"],"range":"30 mètres (100')","area":"Rayon de 3 mètres (10')","duration":"Permanente","raises":"Aucune"},{"id":"feu-4-wall-fire","name":"Mur de Feu (Wall of Fire)","element":"Feu","mastery":4,"keywords":[],"range":"30 mètres (100')","area":"Mur de 3 m de haut, 30 cm d'épaisseur et 7,5 m de long (10' × 1' × 25')","duration":"1 Heure","raises":"Zone (+1 segment de mêmes dimensions par Augmentation)"},{"id":"feu-5-destructive-wave","name":"Vague Destructrice (Destructive Wave)","element":"Feu","mastery":5,"keywords":[],"range":"Personnelle","area":"Rayon de 7,5 mètres (25')","duration":"Instantanée","raises":"Dégâts (+1k1 par tranche de 2 Augmentations)"},{"id":"feu-5-everburning-rage","name":"Rage Inextinguible (Everburning Rage)","element":"Feu","mastery":5,"keywords":[],"range":"7,5 mètres (25')","area":"Une cible","duration":"1 Round","raises":"Durée (+1 round), Cibles (+1 cible)"},{"id":"feu-5-follow-flame","name":"Poursuite de la Flamme (Follow the Flame)","element":"Feu","mastery":5,"keywords":[],"range":"Personnelle","area":"Spéciale","duration":"5 Rounds","raises":"Dégâts (+1k0 par Augmentation)"},{"id":"feu-5-wings-phoenix","name":"Les Ailes du Phénix (Wings of the Phoenix)","element":"Feu","mastery":5,"keywords":["Voyage"],"range":"Personnelle","area":"Le lanceur","duration":"10 Rounds","raises":"Aucune"},{"id":"feu-6-beam-inferno","name":"Rayon du Brasier (Beam of the Inferno)","element":"Feu","mastery":6,"keywords":[],"range":"60 mètres (200')","area":"Une cible","duration":"Instantanée","raises":"Aucune"},{"id":"feu-6-globe-everlasting-sun","name":"Globe du Soleil Éternel (Globe of the Everlasting Sun)","element":"Feu","mastery":6,"keywords":["Défense"],"range":"150 mètres (500')","area":"Rayon de 1,5 kilomètre (1 mile)","duration":"1 Jour","raises":"Aucune"},{"id":"feu-6-souls-blade","name":"La Lame de l'Âme (The Soul's Blade)","element":"Feu","mastery":6,"keywords":["Artisanat"],"range":"Contact","area":"Une arme","duration":"5 Rounds","raises":"Durée (+1 round par tranche de 3 Augmentations)"},{"id":"eau-1-path-inner-peace","name":"La Voie vers la Paix Intérieure (Path to Inner Peace)","element":"Eau","mastery":1,"keywords":["Guérison"],"range":"Contact","area":"Une créature vivante ciblée","duration":"Instantanée","raises":"Cibles (+1 individu par 2 Augmentations), Spéciale (+1g0 au jet de guérison par Augmentation)"},{"id":"eau-1-reflections-pan-ku","name":"Les Reflets de P'an Ku (Reflections of P'an Ku)","element":"Eau","mastery":1,"keywords":["Divination"],"range":"Contact","area":"Un miroir ou une surface réfléchissante","duration":"1 Heure","raises":"Durée (+1 heure par Augmentation)"},{"id":"eau-1-reversal-fortunes","name":"Renversement de Fortune (Reversal of Fortunes)","element":"Eau","mastery":1,"keywords":[],"range":"3 mètres","area":"Un individu ciblé","duration":"3 Rounds","raises":"Durée (+1 round), Portée (+1,5 m)"},{"id":"eau-1-sympathetic-energies","name":"Énergies Sympathiques (Sympathetic Energies)","element":"Eau","mastery":1,"keywords":[],"range":"Contact","area":"Un individu ciblé","duration":"10 Minutes","raises":"Durée (+5 minutes), Portée (passe à 1,5 m avec 1 Augmentation)"},{"id":"eau-1-rushing-wave","name":"La Vague Déferlante (The Rushing Wave)","element":"Eau","mastery":1,"keywords":["Voyage"],"range":"3 mètres","area":"Une créature ciblée","duration":"Instantanée","raises":"Portée (+1,5 m), Cibles (+1 individu par 2 Augmentations)"},{"id":"eau-2-bo-water","name":"Bō d'Eau (Bō of Water)","element":"Eau","mastery":2,"keywords":["Artisanat"],"range":"Personnelle ou 6 mètres","area":"Une arme créée","duration":"5 Minutes","raises":"Dégâts (+1g0), Durée (+5 min), Portée (+1,5 m)"},{"id":"eau-2-fog-green-net","name":"La Brume du Filet Vert (Fog of the Green Net)","element":"Eau","mastery":2,"keywords":[],"range":"9 mètres","area":"Rayon de 9 mètres autour du point ciblé","duration":"1 Heure","raises":"Zone (+3 m de rayon), Durée (+1 heure), Portée (+3 m)"},{"id":"eau-2-rejuvenating-vapors","name":"Vapeurs Régénératrices (Rejuvenating Vapors)","element":"Eau","mastery":2,"keywords":["Guérison"],"range":"Personnelle","area":"Rayon de 3 mètres autour du lanceur","duration":"Concentration","raises":"Zone (+1,5 m de rayon)"},{"id":"eau-2-wave-borne-speed","name":"Vitesse Portée par les Vagues (Wave-Borne Speed)","element":"Eau","mastery":2,"keywords":["Voyage"],"range":"Contact","area":"Un individu ciblé","duration":"10 Rounds","raises":"Durée (+2 rounds), Cibles (+1 individu par 2 Augmentations)"},{"id":"eau-2-wisdom-clarity","name":"Sagesse et Clarté (Wisdom and Clarity)","element":"Eau","mastery":2,"keywords":[],"range":"Contact","area":"Une créature ciblée","duration":"1 Heure","raises":"Durée (+1 heure), Cibles (+1 créature par 2 Augmentations)"},{"id":"eau-3-castle-water","name":"Château d'Eau (Castle of Water)","element":"Eau","mastery":3,"keywords":["Défense"],"range":"3 mètres","area":"Dôme protecteur d'un rayon de 3 mètres","duration":"5 Rounds","raises":"Zone (+1,5 m de rayon), Durée (+1 round), Portée (+1,5 m)"},{"id":"eau-3-flowing-river","name":"Rivière Fluide (Flowing River)","element":"Eau","mastery":3,"keywords":["Bataille"],"range":"Contact","area":"Une arme de mêlée","duration":"5 Rounds","raises":"Durée (+1 round)"},{"id":"eau-3-near-to-ice","name":"Proche de la Glace (Near to Ice)","element":"Eau","mastery":3,"keywords":["Défense"],"range":"Contact","area":"Un individu ciblé","duration":"10 Rounds","raises":"Durée (+2 rounds)"},{"id":"eau-3-silent-waters","name":"Eaux Silencieuses (Silent Waters)","element":"Eau","mastery":3,"keywords":["Défense"],"range":"Personnelle","area":"Le lanceur","duration":"Spéciale","raises":"Aucune"},{"id":"eau-3-walking-upon-waters","name":"Marcher sur les Eaux (Walking Upon the Waters)","element":"Eau","mastery":3,"keywords":["Voyage"],"range":"Contact","area":"Un individu ciblé","duration":"1 Heure","raises":"Durée (+1 heure), Cibles (+1 individu par 2 Augmentations)"},{"id":"eau-4-ebb-flow-battle","name":"Le Flux et Reflux du Combat (Ebb & Flow of Battle)","element":"Eau","mastery":4,"keywords":["Bataille"],"range":"Personnelle","area":"Tous les alliés désignés dans un rayon de 15 mètres autour du lanceur","duration":"5 Rounds","raises":"Durée (+1 round par 2 Augmentations)"},{"id":"eau-4-strike-flowing-waters","name":"La Frappe des Eaux Vives (Strike of the Flowing Waters)","element":"Eau","mastery":4,"keywords":[],"range":"3 mètres","area":"Un individu ciblé (peut être le lanceur)","duration":"1 Round","raises":"Durée (+1 round), Portée (+1,5 m)"},{"id":"eau-4-hands-tides","name":"Les Mains des Marées (Hands of the Tides)","element":"Eau","mastery":4,"keywords":[],"range":"30 mètres","area":"Un volume d'eau allant jusqu'à (Anneau d'Eau × 15 m³)","duration":"Concentration","raises":"Portée (+15 m), Volume (+5 m³ par Augmentation)"},{"id":"eau-4-symbol-water","name":"Symbole d'Eau (Symbol of Water)","element":"Eau","mastery":4,"keywords":["Sceau"],"range":"Contact","area":"Spéciale (une porte, fenêtre ou passage)","duration":"Permanente","raises":"Aucune"},{"id":"eau-5-power-ocean","name":"La Puissance de l'Océan (Power of the Ocean)","element":"Eau","mastery":5,"keywords":["Bataille"],"range":"Personnelle ou Contact","area":"Un individu ciblé","duration":"5 Rounds","raises":"Durée (+1 round)"},{"id":"eau-5-incline-willow","name":"Courber le Saule (Incline the Willow)","element":"Eau","mastery":5,"keywords":["Défense"],"range":"Personnelle","area":"Le lanceur","duration":"5 Rounds","raises":"Durée (+1 round)"},{"id":"eau-5-surge-water","name":"Poussée des Eaux (Surge of Water)","element":"Eau","mastery":5,"keywords":[],"range":"30 mètres","area":"Cône de 15 mètres de long sur 6 mètres de large à son extrémité","duration":"Instantanée","raises":"Dégâts (+1g0), Portée (+3 m)"},{"id":"eau-6-rise-water","name":"Éveil de l'Eau (Rise, Water)","element":"Eau","mastery":6,"keywords":[],"range":"9 mètres","area":"Un esprit majeur invoqué","duration":"Concentration","raises":"Aucune"},{"id":"eau-6-waters-sweet-clarity","name":"Douce Clarté de l'Eau (Water's Sweet Clarity)","element":"Eau","mastery":6,"keywords":["Guérison"],"range":"Contact","area":"Un individu ciblé","duration":"Instantanée","raises":"Aucune"},{"id":"eau-6-tsunami","name":"Le Tsunami (Tsunami)","element":"Eau","mastery":6,"keywords":["Bataille"],"range":"1,5 kilomètre (en présence d'une vaste étendue d'eau)","area":"Front de vague de 100 mètres de large","duration":"Instantanée","raises":"Aucune"},{"id":"void-1-boundless-sight","name":"Vue Sans Frontières (Boundless Sight)","element":"Vide","mastery":1,"keywords":[],"range":"80 kilomètres (50 miles)","area":"Le lanceur","duration":"4 Rounds","raises":"Durée (+1 round), Portée (+8 km / +5 miles)"},{"id":"void-1-drawing-void","name":"Puiser dans le Vide (Drawing the Void)","element":"Vide","mastery":1,"keywords":[],"range":"Personnelle","area":"Le lanceur","duration":"Instantanée","raises":"Spéciale (+1 point de Vide supplémentaire par tranche de 3 Augmentations)"},{"id":"void-1-flow-void","name":"Couler à travers le Vide (Flow Through the Void)","element":"Vide","mastery":1,"keywords":[],"range":"Contact","area":"Jusqu'à 0,03 m³ (1 pied cube) de matière élémentaire pure","duration":"Permanente","raises":"Zone (+0,03 m³ de matière par Augmentation)"},{"id":"void-1-see-through-lies","name":"Percer les Mensonges (See Through Lies)","element":"Vide","mastery":1,"keywords":[],"range":"7,5 mètres (25')","area":"Un individu ciblé","duration":"Instantanée","raises":"Portée (+1,5 m / +5'), Spéciale (+1 Avantage ou Désavantage supplémentaire découvert par Augmentation)"},{"id":"void-1-sense-void","name":"Sentir le Vide (Sense Void)","element":"Vide","mastery":1,"keywords":[],"range":"Personnelle","area":"Rayon de 7,5 mètres (25') autour du lanceur","duration":"Concentration","raises":"Aucune"},{"id":"void-1-touch-emptiness","name":"Toucher le Néant (Touch the Emptiness)","element":"Vide","mastery":1,"keywords":[],"range":"9 mètres (30')","area":"Un individu ciblé","duration":"Instantanée","raises":"Portée (+1,5 m / +5')"},{"id":"void-1-voids-caress","name":"La Caresse du Vide (The Void's Caress)","element":"Vide","mastery":1,"keywords":[],"range":"Contact","area":"Un individu ciblé","duration":"1 Minute","raises":"Durée (+1 minute)"},{"id":"void-2-altering-course","name":"Modifier le Cours (Altering the Course)","element":"Vide","mastery":2,"keywords":[],"range":"Personnelle","area":"Le lanceur","duration":"1 Minute","raises":"Durée (+1 minute)"},{"id":"void-2-drink-essence","name":"Boire à ton Essence (Drink of Your Essence)","element":"Vide","mastery":2,"keywords":[],"range":"9 mètres (30')","area":"Un individu ciblé","duration":"Instantanée","raises":"Portée (+1,5 m / +5')"},{"id":"void-2-empty-voice","name":"La Voix Vide (The Empty Voice)","element":"Vide","mastery":2,"keywords":[],"range":"Personnelle","area":"Le lanceur","duration":"5 Minutes","raises":"Aucune"},{"id":"void-2-false-whispers","name":"Faux Murmures (False Whispers)","element":"Vide","mastery":2,"keywords":[],"range":"9 mètres (30')","area":"Un individu ciblé","duration":"1 Minute","raises":"Durée (+1 minute), Portée (+1,5 m / +5')"},{"id":"void-2-reach-void","name":"Toucher à travers le Vide (Reach Through the Void)","element":"Vide","mastery":2,"keywords":[],"range":"15 mètres (50')","area":"Un objet pesant jusqu'à 2,5 kg (5 livres)","duration":"Instantanée","raises":"Poids admissible (+0,5 kg / +1 livre par tranche de 2 Augmentations), Portée (+1,5 m / +5')"},{"id":"void-2-severed-stream","name":"Coupé du Flux (Severed from the Stream)","element":"Vide","mastery":2,"keywords":[],"range":"7,5 mètres (25')","area":"Un individu ciblé","duration":"5 Rounds","raises":"Durée (+1 round), Portée (+1,5 m / +5')"},{"id":"void-3-echoes-void","name":"Échos dans le Vide (Echoes in the Void)","element":"Vide","mastery":3,"keywords":[],"range":"7,5 mètres (25')","area":"Un individu ciblé","duration":"Concentration","raises":"Portée (+1,5 m / +5')"},{"id":"void-3-kharmic-intent","name":"Intention Karmique (Kharmic Intent)","element":"Vide","mastery":3,"keywords":[],"range":"6 mètres (20')","area":"Un individu consentant","duration":"10 Minutes","raises":"Durée (+1 minute), Portée (+1,5 m / +5')"},{"id":"void-3-moment-clarity","name":"Instant de Clarté (Moment of Clarity)","element":"Vide","mastery":3,"keywords":[],"range":"Personnelle","area":"Le lanceur","duration":"2 Rounds","raises":"Durée (+1 round)"},{"id":"void-3-read-essence","name":"Lire l'Essence (Read the Essence)","element":"Vide","mastery":3,"keywords":["Divination"],"range":"Personnelle","area":"Un objet ciblé","duration":"Instantanée (Spéciale)","raises":"Aucune"},{"id":"void-3-void-release","name":"Libération du Vide (Void Release)","element":"Vide","mastery":3,"keywords":[],"range":"7,5 mètres (25')","area":"Un individu ciblé","duration":"Instantanée","raises":"Portée (+1,5 m / +5')"},{"id":"void-4-balance-elements","name":"Équilibre des Éléments (Balance of Elements)","element":"Vide","mastery":4,"keywords":[],"range":"Contact","area":"Un individu ciblé (peut être le lanceur)","duration":"5 Rounds en combat / 5 Minutes hors combat","raises":"Durée (+1 round en combat / +1 minute hors combat), Soins (+1g1 Blessures par tranche de 2 Augmentations)"},{"id":"void-4-draw-closed-veil","name":"Tirer le Voile (Draw Closed the Veil)","element":"Vide","mastery":4,"keywords":[],"range":"15 mètres (50')","area":"Un esprit ciblé","duration":"Instantanée","raises":"Portée (+1,5 m / +5'), Cibles (+1 esprit par Augmentation)"},{"id":"void-4-fill-emptiness","name":"Remplir de Néant (Fill with Emptiness)","element":"Vide","mastery":4,"keywords":[],"range":"Contact","area":"Un individu ciblé","duration":"Instantanée","raises":"Portée (passe à 3 m / 10' avec 3 Augmentations)"},{"id":"void-4-void-strike","name":"Frappe du Vide (Void Strike)","element":"Vide","mastery":4,"keywords":[],"range":"15 mètres (50')","area":"Un individu ciblé","duration":"Instantanée","raises":"Portée (+1,5 m / +5'), Dégâts (+1g0 par tranche de 2 Augmentations)"},{"id":"void-5-divide-soul","name":"Diviser l'Âme (Divide the Soul)","element":"Vide","mastery":5,"keywords":[],"range":"Personnelle","area":"Le lanceur","duration":"1 Minute","raises":"Durée (+1 minute)"},{"id":"void-5-reforge","name":"Reforger (Reforge)","element":"Vide","mastery":5,"keywords":[],"range":"Contact","area":"Un objet ciblé","duration":"Permanente","raises":"Aucune"},{"id":"void-5-unbound-essence","name":"Essence Déliée (Unbound Essence)","element":"Vide","mastery":5,"keywords":[],"range":"7,5 mètres (25')","area":"Un individu ciblé","duration":"1 Heure","raises":"Durée (+1 heure), Portée (+1,5 m / +5')"},{"id":"void-6-ring-void","name":"L'Anneau du Vide (Ring of the Void)","element":"Vide","mastery":6,"keywords":[],"range":"Personnelle","area":"Le lanceur","duration":"Concentration (Rituel d'une heure d'incantation)","raises":"Temps d'incantation (-5 minutes par Augmentation)"},{"id":"void-6-unmake-world","name":"Défaire le Monde (Unmake the World)","element":"Vide","mastery":6,"keywords":[],"range":"15 mètres (50')","area":"Une créature, individu ou objet ciblé","duration":"Instantanée","raises":"Portée (+3 m / +10')"}];
+const GRIM_URL = "https://vincenzorpg.github.io/L5R/grimoire.html";
+const EL = { all:{l:"Universel",g:"universel",c:"--ring-all"}, air:{l:"Air",g:"air",c:"--ring-air"}, earth:{l:"Terre",g:"terre",c:"--ring-earth"}, fire:{l:"Feu",g:"feu",c:"--ring-fire"}, water:{l:"Eau",g:"eau",c:"--ring-water"}, void:{l:"Vide",g:"vide",c:"--ring-void"} };
+const FROM_GRIM_EL = { universel:"all", air:"air", terre:"earth", feu:"fire", eau:"water", vide:"void" };
+const norm = s => (s||"").toString().normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().trim();
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const frName = n => n.replace(/\s*\([^)]*\)\s*$/,"").trim();
+const enName = n => (n.match(/\(([^)]*)\)\s*$/)||[])[1] || "";
+const splitRaises = r => (!r || /^aucune?$/i.test(r.trim())) ? [] : r.split(/,\s*(?![^()]*\))/).map(s=>s.trim()).filter(Boolean);
+const spellUrl = (name, el) => name.trim() ? `${GRIM_URL}?q=${encodeURIComponent(name.trim())}&el=${EL[el].g}` : GRIM_URL;
+
+/* Conversion d'un sort du grimoire vers un sort du Carnet (hors effet, VD, mémorisé). */
+function toCarnet(g){
+  return {
+    name: frName(g.name),
+    element: FROM_GRIM_EL[norm(g.element)],
+    mastery: norm(g.mastery) === "universel" ? 1 : Math.min(6, Math.max(1, parseInt(g.mastery,10) || 1)),
+    keywords: (g.keywords||[]).slice(0,8),
+    range: g.range || "", area: g.area || "", duration: g.duration || "",
+    raises: splitRaises(g.raises).join("\n"),
+    damage: /^\s*\d+\s*[gk]\s*\d+\s*$/i.test(g.damage || "") ? g.damage.replace(/\s+/g,"").replace(/k/i,"g") : "",
+  };
+}
+const CATALOG = GRIMOIRE_RAW.filter(g => FROM_GRIM_EL[norm(g.element)]).map(g => ({ ...g, c: toCarnet(g), key: norm(g.name) }));
+
+let uid = 3;
+const state = {
+  start:"none", theme:"light", width:"desk",
+  grim:{ status:"none", at:null },
+  panel:{ open:false, q:"", el:"tous", active:0, added:"" },
+  spells:[
+    { id:"s1", name:"Sentir", element:"all", mastery:1, keywords:[], range:"", area:"", duration:"", raises:"", effect:"Perçoit les kami présents autour de soi.", damage:"", memorized:false },
+    { id:"s2", name:"Frappe de jade", element:"earth", mastery:1, keywords:["Jade","Tonnerre"], range:"30 m", area:"", duration:"Instantanée", raises:"", effect:"Dégâts de jade contre une créature souillée.", damage:"2g2", memorized:true },
+  ],
+  combo:{ id:null, active:0 },
+  confirm:null,
+  fresh:null,
+};
+
+const ICO = {
+  ext:'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3H3.5A.5.5 0 0 0 3 3.5v9a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5V10M9 3h4v4M13 3 7.5 8.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  scroll:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h11a2 2 0 0 1 0 4H7M7 4a2 2 0 0 0 0 4v10a2 2 0 0 0 2 2h9V8M11 12h4M11 15.5h4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  search:'<svg class="hint-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m15 15 5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  x:'<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+};
+
+function search(q, el, limit){
+  const nq = norm(q);
+  let r = CATALOG.filter(g => (el === "tous" || g.c.element === el) && (!nq || g.key.includes(nq)));
+  if (nq) r.sort((a,b) => (frName(a.key).startsWith(nq)?0:1) - (frName(b.key).startsWith(nq)?0:1) || a.c.mastery-b.c.mastery || a.key.localeCompare(b.key));
+  else r.sort((a,b) => Object.keys(EL).indexOf(a.c.element)-Object.keys(EL).indexOf(b.c.element) || a.c.mastery-b.c.mastery || a.key.localeCompare(b.key));
+  return limit ? r.slice(0,limit) : r;
+}
+const has = g => state.spells.some(s => norm(s.name) === norm(g.c.name));
+
+function resItem(g, i, active, ctx){
+  const meta = `${EL[g.c.element].l} · Maîtrise ${g.c.mastery} · ND ${5+5*g.c.mastery}${g.keywords.length?` · ${esc(g.keywords.join(", "))}`:""}`;
+  const right = ctx === "panel" ? (has(g) ? `<span class="have">déjà noté</span>` : `<span class="add">+ Ajouter</span>`) : "";
+  return `<li class="res" role="option" id="${ctx}-opt-${i}" data-gid="${esc(g.id)}" aria-selected="${i===active}"${ctx==="panel"&&has(g)?' aria-disabled="true"':""} style="--rc:var(${EL[g.c.element].c})">
+    <span class="bar" aria-hidden="true"></span>
+    <span><span class="n">${esc(g.c.name)} <small>${esc(enName(g.name))}</small></span><span class="m" style="display:block">${meta}</span></span>${right}</li>`;
+}
+
+function gstate(){
+  const g = state.grim;
+  if (g.status === "ready") return `<span class="gstate ok" role="status"><span class="dot"></span>Grimoire du ${g.at} · ${CATALOG.length} sorts · <button type="button" class="lnk" data-act="load">Actualiser</button></span>`;
+  if (g.status === "loading") return `<span class="gstate" role="status"><span class="spin" aria-hidden="true"></span>Chargement du grimoire…</span>`;
+  if (g.status === "error") return `<span class="gstate err" role="status"><span class="dot"></span>Grimoire injoignable · <button type="button" class="lnk" data-act="load">Réessayer</button></span>`;
+  return `<span class="gstate" role="status"><span class="dot"></span>Grimoire non chargé</span>`;
+}
+
+function panelHTML(){
+  const g = state.grim, p = state.panel, mob = state.width === "mob";
+  let inner;
+  if (g.status === "none") inner = `<div class="gate">
+      <p>Pour proposer les sorts, le Carnet télécharge la liste du <b>grimoire de la campagne</b> (environ 110 Ko). Rien n'est envoyé, ta fiche reste dans ce navigateur.</p>
+      <button type="button" class="btn pri" data-act="load">Charger le grimoire</button>
+      <span class="fine">La liste est gardée dans ce navigateur : elle reste disponible hors ligne. « Actualiser » la recharge.</span></div>`;
+  else if (g.status === "loading") inner = `<div class="gate"><p style="display:flex;gap:10px;align-items:center"><span class="spin" aria-hidden="true"></span>Chargement du grimoire…</p></div>`;
+  else if (g.status === "error") inner = `<div class="note-err" role="alert"><span class="k" aria-hidden="true">待</span><div><b>Le grimoire ne répond pas.</b> Vérifie ta connexion, puis réessaie. Tu peux toujours saisir le sort à la main avec « + Sort ».<div style="margin-top:8px"><button type="button" class="btn sm" data-act="load">Réessayer</button></div></div></div>`;
+  else {
+    const res = search(p.q, p.el);
+    inner = `<div class="search">
+      <label for="gq">Nom du sort</label>
+      <input id="gq" class="in" type="search" autocomplete="off" placeholder="ex. armure, éteindre, jade" value="${esc(p.q)}" role="combobox" aria-expanded="true" aria-controls="gres" aria-activedescendant="panel-opt-${p.active}">
+      <div class="chips" role="group" aria-label="Élément">${[["tous","Tous",null],...Object.entries(EL).map(([k,v])=>[k,k==="all"?"Universels":v.l,v.c])].map(([k,l,c])=>`<button type="button" class="chip" data-el="${k}" aria-pressed="${p.el===k}"${c?` style="--rc:var(${c})"`:""}>${c?"<i></i>":""}${l}</button>`).join("")}</div>
+      <div class="count" id="gcount" aria-live="polite">${res.length} sort${res.length>1?"s":""}${p.added?` · Ajouté : <b>${esc(p.added)}</b>`:""}</div>
+      <ul class="results" id="gres" role="listbox" aria-label="Sorts du grimoire">${res.map((r,i)=>resItem(r,i,p.active,"panel")).join("")}</ul>
+    </div>`;
+  }
+  return `${mob?`<div class="scrim on" data-act="close-panel"></div>`:""}<section class="gpanel${mob?" sheet":""}" aria-label="Ajouter depuis le grimoire">
+    <div class="gp-h"><h3><span class="kj" aria-hidden="true">巻</span>Ajouter depuis le grimoire</h3><button type="button" class="x" data-act="close-panel" aria-label="Fermer">${ICO.x}</button></div>
+    ${inner}</section>`;
+}
+
+function spellHTML(s){
+  const ready = state.grim.status === "ready";
+  const conf = state.confirm && state.confirm.id === s.id ? state.confirm : null;
+  const nameField = `<label class="f"><span>Nom</span>
+      <div class="combo">
+        <input class="in" data-f="name" data-sid="${s.id}" value="${esc(s.name)}" autocomplete="off" ${ready?`role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="sugg-${s.id}" placeholder="Tape pour chercher dans le grimoire"`:""}>
+        ${ready?ICO.search:""}
+        <ul class="sugg" id="sugg-${s.id}" role="listbox" hidden></ul>
+      </div></label>`;
+  const hint = ready ? "" : `<div class="name-hint">Autocomplétion depuis le grimoire : <button type="button" class="lnk" data-act="load">${state.grim.status==="error"?"réessayer":"charger le grimoire"}</button></div>`;
+  return `<article class="sp${state.fresh===s.id?" fresh":""}" data-sid="${s.id}" style="--rc:var(${EL[s.element].c})">
+    ${s.fromGrim?`<div class="sp-top"><span class="from">✓ Rempli depuis le grimoire</span><span class="muted" style="font-size:12px">Résume l'effet ; ajoute la VD si le sort en a une.</span></div>`:""}
+    ${conf?confirmHTML(s,conf):""}
+    <div class="grid">${nameField}
+      <label class="f"><span>Élément</span><select class="in" data-f="element" data-sid="${s.id}">${Object.entries(EL).map(([k,v])=>`<option value="${k}"${k===s.element?" selected":""}>${k==="all"?"Universel":v.l}</option>`).join("")}</select></label>
+      <label class="f"><span>Maîtrise</span><input class="in mono" type="number" min="1" max="6" data-f="mastery" data-sid="${s.id}" value="${s.mastery}"></label>
+    </div>
+    ${hint}
+    <div class="grid3">
+      <label class="f"><span>Portée</span><input class="in" data-f="range" data-sid="${s.id}" value="${esc(s.range)}"></label>
+      <label class="f"><span>Zone</span><input class="in" data-f="area" data-sid="${s.id}" value="${esc(s.area)}"></label>
+      <label class="f"><span>Durée</span><input class="in" data-f="duration" data-sid="${s.id}" value="${esc(s.duration)}"></label>
+    </div>
+    <div class="grid2">
+      <label class="f"><span>Mots-clés</span><input class="in" data-f="keywords" data-sid="${s.id}" value="${esc(s.keywords.join(", "))}" placeholder="séparés par des virgules"></label>
+      <label class="f"><span>VD (facultatif)</span><input class="in mono" data-f="damage" data-sid="${s.id}" value="${esc(s.damage)}" placeholder="2g2"></label>
+    </div>
+    <div class="grid2">
+      <label class="f"><span>Augmentations (une par ligne)</span><textarea class="in" data-f="raises" data-sid="${s.id}">${esc(s.raises)}</textarea></label>
+      <label class="f"><span>Effet (résumé)</span><textarea class="in" data-f="effect" data-sid="${s.id}" placeholder="Résume l'effet en une ligne">${esc(s.effect)}</textarea></label>
+    </div>
+    <div class="sp-foot">
+      <label class="chk"><input type="checkbox" data-f="memorized" data-sid="${s.id}"${s.memorized?" checked":""}> Mémorisé <span class="muted">· ${s.mastery} XP</span></label>
+      ${s.name.trim()?`<a class="spell-link" href="${spellUrl(s.name,s.element)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(s.name)} dans le grimoire (nouvel onglet)">${ICO.ext}</a>`:""}
+      <button type="button" class="btn sm ghost rm" data-act="remove" data-sid="${s.id}">Retirer</button>
+    </div>
+  </article>`;
+}
+
+const LABELS = { element:"Élément", mastery:"Maîtrise", keywords:"Mots-clés", range:"Portée", area:"Zone", duration:"Durée", raises:"Augmentations" };
+function conflicts(s, c){
+  const out = [];
+  for (const k of ["range","area","duration","raises"]) if (s[k].trim() && s[k].trim() !== c[k].trim()) out.push(k);
+  if (s.keywords.length && norm(s.keywords.join(",")) !== norm(c.keywords.join(","))) out.push("keywords");
+  return out;
+}
+function confirmHTML(s, conf){
+  const g = CATALOG.find(x => x.id === conf.gid);
+  const show = v => Array.isArray(v) ? v.join(", ") : String(v).replace(/\n/g," · ");
+  return `<div class="confirm" role="alertdialog" aria-label="Remplacer les valeurs saisies ?">
+    <p><b>« ${esc(g.c.name)} »</b> : des valeurs déjà saisies seraient remplacées.</p>
+    <ul class="diff">${conf.keys.map(k=>`<li>${LABELS[k]} : « ${esc(show(s[k]))} » → « ${esc(show(g.c[k])) || "vide"} »</li>`).join("")}</ul>
+    <div class="row">
+      <button type="button" class="btn sm pri" data-act="fill-all">Remplacer</button>
+      <button type="button" class="btn sm" data-act="fill-empty">Compléter les vides</button>
+      <button type="button" class="btn sm ghost" data-act="fill-cancel">Annuler</button>
+    </div></div>`;
+}
+
+function render(){
+  const app = document.getElementById("app");
+  app.dataset.theme = state.theme;
+  document.getElementById("frame").className = "frame " + state.width;
+  const missingUniv = ["Sentir","Communier","Invoquer"].filter(n => !state.spells.some(s => norm(s.name).startsWith(norm(n))));
+  app.innerHTML = `<div class="body">
+    <header class="top"><div class="who"><span class="seal" aria-hidden="true">帳</span><div>
+      <div class="eyebrow"><span class="brand">Carnet de Rokugan</span><span class="mon">Clan du Dragon</span></div>
+      <h1>Tamori Ayane</h1><div class="sub">École de shugenja Tamori · Rang 1</div></div></div></header>
+    <section class="block" aria-labelledby="bh">
+      <div class="bhead"><h2 id="bh">Rouleaux &amp; invocations</h2><div class="r">
+        <a class="head-link" href="${GRIM_URL}" target="_blank" rel="noopener noreferrer">Grimoire <span class="ext">${ICO.ext}</span></a>
+        <span class="edit-badge">Édition</span></div></div>
+      <div class="spells">${state.spells.map(spellHTML).join("")}</div>
+      <div class="tools">
+        <button type="button" class="btn sm" data-act="add-blank">+ Sort</button>
+        <button type="button" class="btn sm${state.panel.open?" on":" pri"}" data-act="toggle-panel" aria-expanded="${state.panel.open}">${ICO.scroll}Ajouter depuis le grimoire</button>
+        ${missingUniv.length?`<button type="button" class="btn sm" data-act="add-univ">Ajouter les sorts universels</button>`:""}
+        ${gstate()}
+      </div>
+      ${state.panel.open ? panelHTML() : ""}
+      <p class="muted" style="font-size:12px;margin:12px 0 0">Chaque lien ouvre le grimoire sur ce sort, filtré par son élément.</p>
+    </section></div>`;
+  if (state.fresh) setTimeout(()=>{ state.fresh = null; }, 50);
+}
+
+/* ---- Actions ---- */
+function load(){
+  state.grim.status = "loading"; render();
+  setTimeout(() => {
+    if (state.start === "offline") state.grim.status = "error";
+    else { state.grim.status = "ready"; state.grim.at = new Date().toLocaleDateString("fr-FR"); }
+    render();
+    if (state.panel.open && state.grim.status === "ready") document.getElementById("gq")?.focus();
+  }, 900);
+}
+function newSpellFrom(g){ return { id:"s"+(uid++), ...g.c, effect:"", memorized:false, fromGrim:true }; }
+function addFromPanel(gid){
+  const g = CATALOG.find(x => x.id === gid); if (!g || has(g)) return;
+  const s = newSpellFrom(g); state.spells.push(s); state.fresh = s.id;
+  state.panel.added = g.c.name;
+  if (state.width === "mob") state.panel.open = false;
+  render();
+  if (state.width === "mob") document.querySelector(`.sp[data-sid="${s.id}"]`)?.scrollIntoView({block:"center"});
+  else document.getElementById("gq")?.focus();
+}
+function apply(sid, gid, mode){
+  const s = state.spells.find(x => x.id === sid), g = CATALOG.find(x => x.id === gid);
+  for (const k of ["name","element","mastery"]) s[k] = g.c[k];
+  for (const k of ["range","area","duration","raises"]) if (mode === "all" || !s[k].trim()) s[k] = g.c[k];
+  if (g.c.damage && (mode === "all" || !s.damage.trim())) s.damage = g.c.damage;
+  if (mode === "all" || !s.keywords.length) s.keywords = [...g.c.keywords];
+  s.fromGrim = true; state.fresh = s.id; state.confirm = null; state.combo.id = null;
+  render();
+}
+function pick(sid, gid){
+  const s = state.spells.find(x => x.id === sid), g = CATALOG.find(x => x.id === gid);
+  const keys = conflicts(s, g.c);
+  if (keys.length) { state.confirm = { id:sid, gid, keys }; state.combo.id = null; render(); document.querySelector(".confirm .btn.pri")?.focus(); }
+  else apply(sid, gid, "all");
+}
+
+/* ---- Autocomplétion du nom ---- */
+function updateSugg(input){
+  const sid = input.dataset.sid, ul = document.getElementById("sugg-"+sid);
+  if (!ul) return;
+  const q = input.value;
+  const res = norm(q).length >= 2 ? search(q, "tous", 8) : [];
+  if (!res.length) { ul.hidden = true; input.setAttribute("aria-expanded","false"); state.combo.id = null; return; }
+  state.combo = { id:sid, active: Math.min(state.combo.id===sid?state.combo.active:0, res.length-1), res };
+  ul.innerHTML = res.map((g,i)=>resItem(g,i,state.combo.active,"c"+sid)).join("") + `<li class="foot" role="presentation">Entrée ou clic : remplit le sort (sauf effet, VD, mémorisé)</li>`;
+  ul.hidden = false; input.setAttribute("aria-expanded","true");
+  input.setAttribute("aria-activedescendant", `c${sid}-opt-${state.combo.active}`);
+}
+function hideSugg(){ document.querySelectorAll(".sugg").forEach(u=>u.hidden=true); document.querySelectorAll('[role="combobox"][data-f="name"]').forEach(i=>i.setAttribute("aria-expanded","false")); state.combo.id=null; }
+
+function updatePanelResults(){
+  const p = state.panel, res = search(p.q, p.el);
+  p.active = Math.min(p.active, Math.max(0,res.length-1));
+  document.getElementById("gres").innerHTML = res.map((r,i)=>resItem(r,i,p.active,"panel")).join("");
+  document.getElementById("gcount").innerHTML = `${res.length} sort${res.length>1?"s":""}${p.added?` · Ajouté : <b>${esc(p.added)}</b>`:""}`;
+  document.getElementById("gq").setAttribute("aria-activedescendant", `panel-opt-${p.active}`);
+}
+
+document.addEventListener("input", e => {
+  const t = e.target;
+  if (t.id === "gq") { state.panel.q = t.value; state.panel.active = 0; updatePanelResults(); return; }
+  const sid = t.dataset?.sid, f = t.dataset?.f; if (!sid || !f) return;
+  const s = state.spells.find(x => x.id === sid);
+  if (f === "keywords") s.keywords = t.value.split(",").map(x=>x.trim()).filter(Boolean);
+  else if (f === "mastery") s.mastery = Math.min(6, Math.max(1, +t.value || 1));
+  else if (f === "memorized") s.memorized = t.checked;
+  else s[f] = t.value;
+  if (f === "name") { s.fromGrim = false; if (state.grim.status === "ready") updateSugg(t); }
+});
+document.addEventListener("change", e => {
+  const t = e.target; if (t.dataset?.f === "element" || t.dataset?.f === "memorized") { const s = state.spells.find(x=>x.id===t.dataset.sid); if (t.dataset.f==="element") s.element=t.value; else s.memorized=t.checked; render(); }
+});
+document.addEventListener("keydown", e => {
+  const t = e.target;
+  if (t.id === "gq") {
+    const n = document.querySelectorAll("#gres .res").length;
+    if (e.key === "ArrowDown") { e.preventDefault(); state.panel.active = Math.min(n-1, state.panel.active+1); updatePanelResults(); document.getElementById("panel-opt-"+state.panel.active)?.scrollIntoView({block:"nearest"}); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); state.panel.active = Math.max(0, state.panel.active-1); updatePanelResults(); document.getElementById("panel-opt-"+state.panel.active)?.scrollIntoView({block:"nearest"}); }
+    else if (e.key === "Enter") { e.preventDefault(); const li = document.getElementById("panel-opt-"+state.panel.active); if (li) addFromPanel(li.dataset.gid); }
+    else if (e.key === "Escape") { state.panel.open = false; render(); document.querySelector('[data-act="toggle-panel"]')?.focus(); }
+    return;
+  }
+  if (t.dataset?.f === "name" && state.combo.id === t.dataset.sid) {
+    const n = state.combo.res.length;
+    if (e.key === "ArrowDown") { e.preventDefault(); state.combo.active = Math.min(n-1, state.combo.active+1); updateSugg(t); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); state.combo.active = Math.max(0, state.combo.active-1); updateSugg(t); }
+    else if (e.key === "Enter") { e.preventDefault(); pick(t.dataset.sid, state.combo.res[state.combo.active].id); }
+    else if (e.key === "Escape") { e.preventDefault(); hideSugg(); }
+  }
+});
+document.addEventListener("mousedown", e => { if (e.target.closest(".sugg .res")) e.preventDefault(); });
+document.addEventListener("focusout", e => { if (e.target.dataset?.f === "name") setTimeout(() => { if (!document.activeElement?.closest?.(".combo")) hideSugg(); }, 120); });
+
+document.addEventListener("click", e => {
+  const seg = e.target.closest(".seg button");
+  if (seg) {
+    const k = seg.parentElement.dataset.ctl; state[k] = seg.dataset.v;
+    seg.parentElement.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === seg));
+    if (k === "start") { state.grim = state.start === "cache" ? { status:"ready", at:"28/10/2026" } : { status:"none", at:null }; state.confirm = null; }
+    render(); return;
+  }
+  const sug = e.target.closest(".sugg .res");
+  if (sug) { pick(sug.closest(".sugg").id.slice(6), sug.dataset.gid); return; }
+  const pr = e.target.closest("#gres .res");
+  if (pr) { addFromPanel(pr.dataset.gid); return; }
+  const chip = e.target.closest(".chip");
+  if (chip) { state.panel.el = chip.dataset.el; state.panel.active = 0; document.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed", c===chip)); updatePanelResults(); return; }
+  const a = e.target.closest("[data-act]"); if (!a) return;
+  const act = a.dataset.act;
+  if (act === "load") load();
+  else if (act === "toggle-panel") { state.panel.open = !state.panel.open; state.panel.added = ""; render(); if (state.panel.open) (document.getElementById("gq") || document.querySelector('.gpanel [data-act="load"]'))?.focus(); }
+  else if (act === "close-panel") { state.panel.open = false; render(); }
+  else if (act === "add-blank") { const s = { id:"s"+(uid++), name:"", element:"earth", mastery:1, keywords:[], range:"", area:"", duration:"", raises:"", effect:"", damage:"", memorized:false }; state.spells.push(s); render(); document.querySelector(`input[data-sid="${s.id}"][data-f="name"]`)?.focus(); }
+  else if (act === "add-univ") {
+    for (const n of ["Sentir","Communier","Invoquer"]) if (!state.spells.some(s => norm(s.name).startsWith(norm(n)))) {
+      const g = state.grim.status === "ready" ? CATALOG.find(x => x.c.element === "all" && norm(x.c.name).startsWith(norm(n))) : null;
+      state.spells.push(g ? newSpellFrom(g) : { id:"s"+(uid++), name:n, element:"all", mastery:1, keywords:[], range:"", area:"", duration:"", raises:"", effect:"", damage:"", memorized:false });
+    }
+    render();
+  }
+  else if (act === "remove") { state.spells = state.spells.filter(s => s.id !== a.dataset.sid); render(); }
+  else if (act === "fill-all") apply(state.confirm.id, state.confirm.gid, "all");
+  else if (act === "fill-empty") apply(state.confirm.id, state.confirm.gid, "empty");
+  else if (act === "fill-cancel") { state.confirm = null; render(); }
+});
+render();
+</script>
+
+</html>

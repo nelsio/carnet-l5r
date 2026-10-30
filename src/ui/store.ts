@@ -10,7 +10,7 @@ import {
   type Engagement, type RollResult, type Situation, type Stance,
 } from "@carnet/core";
 import { FEINT_MANEUVER_ID, WOUND_MULTIPLIERS, WOUND_NEXT_MULTIPLIER, type Terrain } from "../rules/l5r4e";
-import type { LibraryEntry } from "../storage";
+import type { GrimoireCache, LibraryEntry } from "../storage";
 import { DEFAULT_ROLL_OPTIONS, effectiveManeuvers, isRollable, isUnskilled, SPELL_ROLL_RESET, toPoolAction, type RollOptions } from "./rolls";
 
 export type Theme = "auto" | "light" | "dark";
@@ -636,12 +636,24 @@ export interface PendingImport {
   onApplied?: () => void;
 }
 
+/** Grimoire du portail (lot 30, annexe N.4) : catalogue de sorts chargé à la demande. */
+export interface GrimoireApi {
+  status: "none" | "loading" | "ready" | "error";
+  /** Dernier catalogue chargé (gardé si une actualisation échoue). */
+  cache?: GrimoireCache;
+  /** « Actualiser » a échoué : l'ancien catalogue est gardé. */
+  refreshFailed: boolean;
+  /** Charge ou actualise ; seul appel réseau du Carnet, toujours sur un clic. */
+  load(): Promise<void>;
+}
+
 export interface Store {
   state: AppState;
   dispatch: Dispatch<AppAction>;
   /** Tirage d'un d10 (1..10), injectable pour les tests. */
   rng: () => number;
   library: LibraryApi;
+  grimoire: GrimoireApi;
   /** Ouvre la fenêtre d'import pour un fichier choisi ou déposé. */
   startImport(file: File): void;
 }

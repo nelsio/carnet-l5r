@@ -19,6 +19,7 @@
   --ok-pale:color-mix(in oklab,var(--ok) 14%,var(--surface));
   --warn-pale:color-mix(in oklab,var(--warn) 12%,var(--surface));
   --ring-earth:#5e6d2c; --ring-water:#245f8c; --ring-fire:#a8382a; --ring-air:#6a7f99; --ring-void:#5d4290;
+  --ring-all:#7a6a3a;
   --on-ring:#ffffff;
   --seal:#a8382a; --seal-ink:#f7f3ea;
   --f-display:"Shippori Mincho B1","Hiragino Mincho ProN","Times New Roman",serif;
@@ -37,6 +38,7 @@
   --on-accent:var(--bg);
   --danger:#f2867e; --ok:#7fcb93; --warn:#e6bf55;
   --ring-earth:#9fb25a; --ring-water:#6fb0e0; --ring-fire:#e8735f; --ring-air:#a9bbd2; --ring-void:#a98be0;
+  --ring-all:#cdb67a;
   --on-ring:var(--bg);
   --seal:#b5402f; --seal-ink:#f3ece0;
 }}
@@ -49,6 +51,7 @@
   --on-accent:var(--bg);
   --danger:#f2867e; --ok:#7fcb93; --warn:#e6bf55;
   --ring-earth:#9fb25a; --ring-water:#6fb0e0; --ring-fire:#e8735f; --ring-air:#a9bbd2; --ring-void:#a98be0;
+  --ring-all:#cdb67a;
   --on-ring:var(--bg);
   --seal:#b5402f; --seal-ink:#f3ece0;
 }
@@ -822,4 +825,66 @@ a.mon .ext{margin-left:0}
   /* Liens sous le nom, tous visibles ; le padding bas du body garde le pied au-dessus de la barre d'onglets */
   .appfoot{font-size:12px;gap:2px 12px}
   .appfoot nav{margin-left:0;width:100%}
+}
+/* ---------- v2.22.0 : sorts depuis le grimoire du portail (annexe N.5) ---------- */
+.spell-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.spell-tools .btn{display:inline-flex;align-items:center;gap:6px}
+.spell-tools .btn .ico{width:16px;height:16px;flex:none}
+.btn.on{background:var(--accent-pale);border-color:var(--accent);color:var(--accent-ink)}
+.gstate{display:inline-flex;align-items:center;gap:6px;margin-left:auto;font-size:12px;color:var(--muted)}
+.gstate .dot{width:8px;height:8px;flex:none;border-radius:50%;background:var(--muted)}
+.gstate.ok .dot{background:var(--ok)}
+.gstate.warn .dot{background:var(--warn)}
+.gstate.err .dot{background:var(--danger)}
+.gstate .linkbtn{font-weight:700;color:var(--accent-ink);text-underline-offset:3px}
+.spin{width:16px;height:16px;flex:none;border-radius:50%;border:2px solid var(--line);border-top-color:var(--accent);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.gpanel{display:grid;gap:12px;margin-top:12px;padding:14px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow)}
+.gpanel .grip,.g-scrim{display:none}
+.gp-h{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.gp-h h3{display:flex;align-items:center;gap:10px;margin:0;font:800 17px/1.2 var(--f-display)}
+.gp-h .kj{display:grid;place-items:center;width:32px;height:32px;border-radius:7px;background:var(--accent-pale);color:var(--accent-ink);font:800 17px/1 var(--f-display)}
+.gp-x{display:grid;place-items:center;width:40px;height:40px;border:0;border-radius:8px;background:transparent;color:var(--muted)}
+.gp-x:hover{background:var(--accent-pale)}
+.ggate{display:grid;gap:10px;justify-items:start}
+.ggate p{margin:0;max-width:62ch}
+.ggate .fine{font-size:12px;color:var(--muted)}
+.gload{display:flex;align-items:center;gap:10px;margin:0}
+.gnote{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;padding:10px 12px;border-radius:8px;background:var(--warn-pale);border:1px solid color-mix(in oklab,var(--warn) 45%,transparent)}
+.gnote .k{font:800 18px/1 var(--f-display);color:var(--warn)}
+.gnote .btn{margin-top:8px}
+.gsearch{display:grid;gap:8px}
+.gsearch label{font-size:12px;font-weight:700;color:var(--muted)}
+.gsearch .in{min-height:42px;padding:9px 11px;background:var(--surface)}
+.gchips{display:flex;flex-wrap:wrap;gap:6px}
+.gchip{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:6px 11px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--muted);font-size:13px;font-weight:700}
+.gchip i{width:9px;height:9px;border-radius:50%;background:var(--rc)}
+.gchip[aria-pressed="true"]{background:var(--accent-pale);border-color:var(--accent);color:var(--accent-ink)}
+.gcount{font-size:12px;color:var(--muted)}
+.gresults{display:grid;gap:4px;max-height:320px;overflow:auto;overscroll-behavior:contain;list-style:none;margin:0;padding:8px 0 0;border-top:1px solid var(--line)}
+.gres{display:grid;grid-template-columns:4px minmax(0,1fr) auto;gap:12px;align-items:center;min-height:48px;padding:8px 10px;border-radius:8px;cursor:pointer}
+.gres:hover,.gres[aria-selected="true"]{background:var(--accent-pale)}
+.gres[aria-disabled="true"]{cursor:default;opacity:.7}
+.gres[aria-disabled="true"]:hover{background:transparent}
+.gres .bar{align-self:stretch;border-radius:2px;background:var(--rc)}
+.gr-txt{display:grid;min-width:0}
+.gres .n{font-weight:700;font-size:14px;line-height:1.3}
+.gres .n small{font-weight:400;font-size:12px;color:var(--muted)}
+.gres .m{font-size:12px;color:var(--muted)}
+.gres .add{font-size:12px;font-weight:700;color:var(--accent-ink);white-space:nowrap}
+.gres .have{font-size:12px;color:var(--muted);white-space:nowrap}
+.sp-top{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;font-size:12px}
+.sp-top .from{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;background:var(--ok-pale);color:var(--ok);font-weight:700}
+.spelledit.fresh{animation:fresh 1.6s ease-out}
+@keyframes fresh{from{box-shadow:0 0 0 3px var(--accent)}to{box-shadow:0 0 0 0 transparent}}
+@media (max-width:720px){
+  .gstate{width:100%;margin-left:0}
+  .spell-tools .btn{flex:1 1 auto;justify-content:center}
+  .g-scrim{display:block;position:fixed;inset:0;z-index:30;background:var(--scrim)}
+  .gpanel{position:fixed;left:0;right:0;bottom:0;z-index:31;max-height:88vh;overflow-y:auto;overscroll-behavior:contain;margin:0;
+    border-radius:16px 16px 0 0;border:0;border-top:1px solid var(--line);
+    padding:0 max(14px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(14px,env(safe-area-inset-left,0px));
+    animation:sheetIn .2s ease-out}
+  .gpanel .grip{display:block;width:44px;height:5px;border-radius:3px;background:var(--line);margin:8px auto 0}
+  .gresults{max-height:none}
 }

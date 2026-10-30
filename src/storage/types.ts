@@ -52,9 +52,16 @@ export function mergePrefs(current: Prefs, patch: Partial<Prefs>): Prefs {
   return Object.fromEntries(Object.entries({ ...current, ...patch }).filter(([, v]) => v !== undefined)) as Prefs;
 }
 
+/** Cache brut du grimoire (lot 30) : relu et revalidé par `readGrimoireCache`. */
+export interface GrimoireCacheStore {
+  get(): Promise<unknown>;
+  set(cache: unknown): Promise<void>;
+}
+
 export interface Storage {
   library: LibraryStore;
   prefs: PrefsStore;
+  grimoire: GrimoireCacheStore;
   /** IndexedDB indisponible : tout vit en mémoire et sera perdu en fermant l'onglet. */
   degraded: boolean;
 }

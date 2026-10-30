@@ -1,5 +1,5 @@
 import { LinkedLibrary } from "./linkedLibrary";
-import { mergePrefs, type LibraryEntry, type LibraryStore, type Prefs, type PrefsStore, type SaveReport, type Storage } from "./types";
+import { mergePrefs, type GrimoireCacheStore, type LibraryEntry, type LibraryStore, type Prefs, type PrefsStore, type SaveReport, type Storage } from "./types";
 
 /** Copie profonde, sauf la poignée du fichier lié, gardée telle quelle. */
 export function cloneEntry(e: LibraryEntry): LibraryEntry {
@@ -38,6 +38,17 @@ export class MemoryPrefs implements PrefsStore {
   }
 }
 
+/** Grimoire en mémoire pour la session (mode dégradé, tests). */
+export class MemoryGrimoireCache implements GrimoireCacheStore {
+  private cache: unknown;
+  async get(): Promise<unknown> {
+    return this.cache;
+  }
+  async set(cache: unknown): Promise<void> {
+    this.cache = structuredClone(cache);
+  }
+}
+
 export function memoryStorage(degraded = false): Storage {
-  return { library: new LinkedLibrary(new MemoryLibrary()), prefs: new MemoryPrefs(), degraded };
+  return { library: new LinkedLibrary(new MemoryLibrary()), prefs: new MemoryPrefs(), grimoire: new MemoryGrimoireCache(), degraded };
 }

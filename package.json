@@ -1,6 +1,6 @@
 {
   "name": "carnet-l5r",
-  "version": "2.21.4",
+  "version": "2.22.0",
   "private": true,
   "description": "Carnet de Rokugan : compagnon de campagne pour L5R 4e édition",
   "license": "MIT",
@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "idb": "^8.0.4",
+    "json5": "2.2.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "zod": "^4.6.7"
