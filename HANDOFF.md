@@ -6,11 +6,11 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document.
 
-**État au 30/10/2026 :** version **v2.20.1**, lots 1 à 23 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
+**État au 30/10/2026 :** version **v2.20.2**, lots 1 à 24 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
 
-**Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie), F (lot 13 : shugenja et Magie), G (lot 14 : nom de l'outil dans l'en-tête), H (lots 15 et 16 : dépôt GitHub et correctifs), I (lots 17 à 19 : couleurs, Anneaux, sélecteurs), J (lot 20 : correctifs et retouches), K (lot 21 : points d'Insight), L (lots 22 et 23 : liens vers le portail de campagne).
+**Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie), F (lot 13 : shugenja et Magie), G (lot 14 : nom de l'outil dans l'en-tête), H (lots 15 et 16 : dépôt GitHub et correctifs), I (lots 17 à 19 : couleurs, Anneaux, sélecteurs), J (lot 20 : correctifs et retouches), K (lot 21 : points d'Insight), L (lots 22 et 23 : liens vers le portail de campagne), M (lots 24 et 25 : README allégé, liens vers le guide et le dépôt).
 
-**Prochain lot (30/10/2026) :** à définir (§11, point 24). Les lots 22 et 23 (annexe L, liens vers le portail de campagne) sont livrés ; la localisation est reportée.
+**Prochain lot (30/10/2026) :** lot 25 (annexe M.3, v2.21.0) : liens vers le guide et le dépôt dans l'application. Le lot 24 (v2.20.2 : README court avec captures, guide dans `docs/GUIDE.md`, crédits dans `docs/CREDITS.md`) est livré ; la localisation est reportée.
 
 ---
 
@@ -62,7 +62,9 @@ carnet-l5r/
 ├─ reference/     # prototype.html, exemple-personnage.json, ecoles-bushi.json, perso-test-*.json (ne pas modifier)
 ├─ public/fonts/  # polices embarquées dans le build
 ├─ .github/workflows/  # ci.yml, pages.yml, release.yml
-├─ README.md      # guide joueur (§9.3)
+├─ docs/          # GUIDE.md (guide joueur, §9.3), CREDITS.md (licences et crédits), img/ (captures du README)
+├─ scripts/       # screenshots.mjs : captures du README (npm run screenshots, hors CI)
+├─ README.md      # vitrine : présentation, captures, démarrage (§9.3)
 └─ HANDOFF.md
 ```
 Dans les tests fournis, `@carnet/core` est un alias de `src/core` (à déclarer dans `vite.config.ts` et `tsconfig.json`).
@@ -381,7 +383,7 @@ interface LibraryStore {
 
 - Reconnaissance du clan sans accents ni casse ; les noms anglais sont acceptés (crab, crane, unicorn, mantis, phoenix, spider).
 - Les couleurs des Anneaux sont fixes.
-- Polices : Shippori Mincho B1 (titres), Zen Kaku Gothic New (texte), JetBrains Mono (chiffres), embarquées en `woff2` (licence OFL, à citer dans le README).
+- Polices : Shippori Mincho B1 (titres), Zen Kaku Gothic New (texte), JetBrains Mono (chiffres), embarquées en `woff2` (licence OFL, citées dans `docs/CREDITS.md`).
 
 ---
 
@@ -448,7 +450,12 @@ Depuis un fichier (bouton ou glisser-déposer). Trois destinations :
 - Toute évolution du format de fiche incrémente `schemaVersion` et ajoute une migration testée.
 - Une ancienne fiche s'ouvre toujours dans une version plus récente de l'outil.
 
-### 9.3 README (guide joueur, en français)
+### 9.3 README et guide joueur (en français)
+Depuis v2.20.2 (annexe M.1), le guide joueur est **`docs/GUIDE.md`**. Le **README** reste une vitrine : présentation, captures, démarrage, développement. Les licences et crédits sont dans `docs/CREDITS.md`.
+
+Règle pour chaque lot : **mettre à jour `docs/GUIDE.md`**. Ne toucher au README que si une fonction listée dans « Ce que fait le Carnet » change ; relancer `npm run build && npm run screenshots` (hors CI) et committer `docs/img/` si un écran capturé change visiblement.
+
+Contenu du guide :
 1. **Utiliser en ligne** : l'adresse GitHub Pages. Les fiches restent dans ton navigateur, rien n'est envoyé.
 2. **Utiliser hors-ligne** : télécharger `carnet-l5r.html` depuis la dernière release et l'ouvrir dans le navigateur.
 3. **Sauvegarder et partager** :
@@ -456,7 +463,7 @@ Depuis un fichier (bouton ou glisser-déposer). Trois destinations :
    - sur Chrome ou Edge, la lier à un fichier du dossier Drive synchronisé.
 4. **Pour le MJ** : importer les JSON des joueurs en mode Consultation.
 5. **Changer d'appareil** : exporter, puis importer en « Nouvelle fiche ».
-6. Licences des polices et mention « L5R est une marque de son éditeur ; outil de fan non officiel ».
+6. Licences des polices et mention « L5R est une marque de son éditeur ; outil de fan non officiel » : dans `docs/CREDITS.md`, résumées en une ligne dans le README.
 
 ---
 
@@ -580,7 +587,9 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 22. **v2.19.0 — portail de campagne : menu et Bibliothèque** (**livrée**, écarts en L.6) : annexe L.1 à L.5. Adresses dans `src/rules/portal.ts`, bouton et menu **Ressources** (panneau bas sur mobile), Bibliothèque vide (Forge ou fiche vierge, cartes de modèles) et avec fiches (« Un nouveau personnage ? ») → cas O1 à O11.
 23. **v2.20.0 — portail de campagne : Fiche et Aide de jeu** (**livrée**, écarts en L.10) : annexe L.7 à L.9. Clan de l'en-tête en lien, liens de sort vers le grimoire, encadré de liens de l'Aide de jeu (Combat, Cour) → cas O12 à O17.
    - **v2.20.1** (patch, L.11) : options de la Bibliothèque vide alignées (étapes et boutons sur les mêmes lignes, cases de même taille) → O7 renforcé.
-24. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts (fichier personnel importable, pas dans le dépôt), compteurs « N fois par séance » (D-g).
+24. **v2.20.2 — README allégé** (**livrée**, écarts en M.2) : annexe M.1. README court (≈ 540 mots, trois captures en thème sombre), mode d'emploi dans `docs/GUIDE.md`, licences et crédits dans `docs/CREDITS.md`, script `npm run screenshots` (hors CI).
+25. **v2.21.0 — liens vers le guide et le dépôt** : annexe M.3. Section « Le Carnet » du menu Ressources, pied de page sur tous les écrans, lien « Lire le guide » dans la Bibliothèque vide.
+26. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts (fichier personnel importable, pas dans le dépôt), compteurs « N fois par séance » (D-g).
 
 ---
 
@@ -2519,3 +2528,81 @@ Retour de Nelson le 30/10/2026 : sur bureau, la description de « Fiche vierge �
 - `.start-opts` partage ses lignes avec les deux options (`grid-template-rows: subgrid`, trois lignes : en-tête, étapes, bouton ; deux pour la carte compacte de L.4). En-têtes, étapes et boutons sont alignés, et les six cases ont la même hauteur.
 - Sur une colonne (≤ 720 px), chaque option garde ses propres lignes, comme avant.
 - O7 (Playwright, bureau) vérifie en plus : options de même hauteur, six cases d'étapes au même niveau et de même hauteur, boutons alignés.
+
+## Annexe M — Lots 24 et 25 : README allégé, liens vers le guide et le dépôt (v2.20.2, v2.21.0)
+
+Statut : reçu le 30/10/2026. Lot 24 **livré** (v2.20.2, écarts en M.2) ; lot 25 à faire. Base `main` au commit `58b4a19` (v2.20.1). Source : `handoff-readme-liens.md` (30/10/2026), intitulé « lot 1 » et « lot 2 » : renuméroté **lots 24 et 25**. Fichiers de référence déjà en place : `README.md` (nouveau README, tel quel), `docs/GUIDE.md`, `docs/CREDITS.md`, `scripts/screenshots.mjs` (testé sur le build v2.20.1). Prototype du lot 25 : `reference/prototype-liens.html` (éléments nouveaux entourés en pointillés rouges). En cas d'écart, le prototype fait foi pour le rendu, cette annexe pour le comportement.
+
+Une PR et une version par lot, dans cet ordre (le lot 25 pointe vers `docs/GUIDE.md`, créé par le lot 24).
+
+### M.1 Lot 24 : README court, guide et crédits dans `docs/` (v2.20.2)
+
+L'ancien README faisait environ 4 000 mots : c'était un mode d'emploi complet. Il devient une page d'accueil courte (≈ 540 mots) avec trois captures en thème sombre ; le mode d'emploi passe dans `docs/GUIDE.md`.
+
+1. `README.md` : remplacé par la référence.
+2. `docs/GUIDE.md` : ancien README § 1 à 11, sans les marqueurs de version « (v2.x) » ni la phrase sur le réglage `× 3` à `× 5` masqué. Ancres internes inchangées.
+3. `docs/CREDITS.md` : ancien README § 12 et 13 (licences, polices, crédits), chemins relatifs corrigés (`../LICENSE`, `../src/ui/fonts/LICENSES.md`).
+4. Captures, reproductibles :
+   - `scripts/screenshots.mjs` et le script npm `"screenshots": "node scripts/screenshots.mjs"` ;
+   - `sharp` en devDependency (`0.33.5`, version testée) ;
+   - `npm run build && npm run screenshots`, puis committer `docs/img/fiche.png`, `docs/img/combat.png`, `docs/img/mobile.png` (≈ 350 Ko au total) ;
+   - données : modèles intégrés uniquement (Kakita Haruto, Tamori Ayane). Thème sombre partout ;
+   - le script n'entre **pas** dans la CI : on le relance à la main quand l'interface change visiblement.
+5. Renvois au README :
+   - §9.3 : le guide joueur est `docs/GUIDE.md`. Le README reste une vitrine : présentation, captures, démarrage. Règle pour les lots suivants : **chaque lot met à jour `docs/GUIDE.md`**. Il ne touche au README que si une fonction listée dans « Ce que fait le Carnet » change, et relance les captures si l'écran capturé change ;
+   - ligne des polices (« à citer dans le README ») → `docs/CREDITS.md` ;
+   - `CONTRIBUTING.md` : aucun lien vers une ancre de l'ancien README (`README.md#…`) ; les rediriger vers `docs/GUIDE.md#…`.
+6. `CHANGELOG.md` : entrée v2.20.2, « Documentation : README raccourci avec captures, guide détaillé dans docs/GUIDE.md, crédits dans docs/CREDITS.md ».
+
+**Tests**
+- `npm run lint` passe, script compris.
+- Tous les liens relatifs des trois fichiers résolvent (vérification manuelle ou `markdown-link-check` en local, sans l'ajouter au projet).
+- Rendu GitHub de la PR : les trois images s'affichent, le triptyque mobile a ses espaces transparents.
+- Aucune modification de `src/`.
+
+### M.2 Écarts de mise en œuvre (lot 24)
+
+- **`CONTRIBUTING.md` inchangé** : son seul lien vers une ancre du README (`README.md#développement`) vise la section Développement, restée dans le nouveau README. Le renvoi à la procédure « Publier une version » reste juste (paragraphe de cette section).
+- **Arborescence (§2)** : ajout de `docs/` et `scripts/` ; le README y devient la vitrine.
+- **`sharp`** : `^0.33.5` (même convention `^` que les autres devDependencies). Son script d'installation n'est qu'une vérification : les binaires viennent des paquets `@img/sharp-*`.
+- **Captures** : générées sur le build v2.20.2, ≈ 370 Ko au total (fiche 92 Ko, combat 97 Ko, mobile 182 Ko).
+
+### M.3 Lot 25 : liens vers le guide et le dépôt dans l'application (v2.21.0)
+
+**Adresses** (une seule constante, par ex. `src/ui/links.ts`, à côté des adresses du portail) :
+
+```ts
+const REPO = "https://github.com/nelsio/carnet-l5r";
+export const CARNET_LINKS = {
+  guide: `${REPO}/blob/main/docs/GUIDE.md`,
+  releases: `${REPO}/releases`,
+  bug: `${REPO}/issues/new`,
+  code: REPO,
+};
+```
+
+1. **Menu Ressources** (torii) : nouvelle section en dernier, titre « Le Carnet » suivi de la version (`v2.21.0`, lue dans la constante de version existante, pas de doublon). Quatre entrées au format des autres, avec un kanji sur fond sceau (`--seal` / `--seal-ink`) pour les distinguer des liens du portail :
+   - 帳 **Guide d'utilisation** · « Import, fiches, lanceur de dés » → `guide`
+   - 新 **Nouveautés** · « Ce qui a changé à chaque version » → `releases`
+   - 報 **Signaler un problème** · « Formulaire GitHub (compte requis) » → `bug`
+   - 源 **Page du projet** · « Présentation, captures, code source » → `code` (la page du dépôt affiche le README : pas de lien README séparé)
+
+   Pied du menu : « Liens externes : s'ouvrent dans un nouvel onglet. »
+2. **Pied de page** sur tous les écrans (Bibliothèque, Fiche, Aide de jeu, Statistiques), après le contenu :
+   - à gauche : mini-sceau 帳, « Carnet de Rokugan », puis `v2.21.0` (lien → `releases`, souligné en pointillés, chiffres tabulaires) ;
+   - à droite : Guide · Signaler un bug · Projet ;
+   - **mobile (≤ 720 px)** : les liens passent sous le nom (les trois restent visibles), et le pied de page reste au-dessus de la barre d'onglets du bas (pas de chevauchement).
+3. **Bibliothèque vide** : sous les deux options de départ, une ligne « Première visite ? Lire le guide » → `guide`.
+4. Tous ces liens suivent les règles communes de L.0 : `target="_blank" rel="noopener noreferrer"`, icône de lien externe existante. Le Carnet ne fait toujours **aucun appel réseau** de lui-même.
+5. `docs/GUIDE.md`, section « Portail de la campagne » : une phrase sur la section « Le Carnet » du menu et le pied de page.
+6. `CHANGELOG.md` : entrée v2.21.0.
+
+**Tests**
+- Unitaires : `CARNET_LINKS` contient exactement les quatre adresses ci-dessus.
+- E2E (`portal.spec.ts` ou nouveau `carnet-links.spec.ts`) :
+  - le menu Ressources affiche la section « Le Carnet » avec la version de `package.json` et les quatre liens (bonnes `href`, `target="_blank"`, `rel` complet) ;
+  - le pied de page est présent sur les quatre écrans ; sur mobile 390 px, pas de défilement horizontal, les trois liens visibles, pied de page non recouvert par la barre d'onglets ;
+  - Bibliothèque vide : lien « Lire le guide » présent ;
+  - le test « aucune requête réseau » du smoke reste vert.
+- Thèmes clair et sombre : contraste des liens du pied de page et du badge de version (tests de couleurs existants).
+- Si les captures du README changent visiblement (pied de page visible sur la capture bureau), relancer `npm run screenshots` et committer les images.
