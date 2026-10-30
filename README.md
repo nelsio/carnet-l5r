@@ -73,7 +73,7 @@ En **Escarmouche**, de haut en bas :
 
 1. **Initiative** : à lancer au début du combat, elle affiche ensuite ton score (avec `+10` au round qui suit le Centre, et `+10` par point de Vide dépensé pour l'escarmouche).
 2. **Nouveau round** : efface le Vide en armure et la Défense totale ; **garde l'initiative et les compteurs**.
-3. **Posture** : Attaque, Assaut, Défense, Défense totale, Centre ; le **ND d'armure** se met à jour. Dessous : la case **Monté** (pas d'Assaut à cheval sans Équitation 3) et **Je garde un allié** (ton ND d'armure `−5`, le sien `+10`).
+3. **Posture** : un menu Attaque, Assaut, Défense, Défense totale, Centre, où chaque posture montre ses effets et sa description ; celle de la posture choisie reste affichée dessous et le **ND d'armure** se met à jour. Dessous : la case **Monté** (pas d'Assaut à cheval sans Équitation 3) et **Je garde un allié** (ton ND d'armure `−5`, le sien `+10`).
 4. **Dépenser du Vide** : `+1g1` au jet, `+10` au ND d'armure, compétence jouée au rang 1, capacité payée en Vide, `+10` à l'Initiative ou échange d'Initiative.
 5. Les **attaques** de chaque arme, avec leurs **dégâts** juste dessous (`└`). Une action que ta posture interdit (attaque en Défense, tir en Assaut, tout sauf l'Initiative en Centre) est **grisée** avec la raison, et reste jouable par **Lancer quand même**.
 
@@ -90,7 +90,7 @@ En **Bataille**, il n'y a pas d'initiative ; le panneau **Bataille de masse** (v
 
 **Nouveau round** efface le jet et garde ton engagement.
 
-Les boutons **« i »** affichent ou masquent le détail des postures, des dépenses de Vide, du déplacement, de la bataille de masse et des rappels d'école.
+Les boutons **« i »** affichent ou masquent le détail des dépenses de Vide, du déplacement, de la bataille de masse et des rappels d'école.
 
 ## 5. Le lanceur : vrais dés ou dés de l'outil
 

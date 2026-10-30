@@ -220,7 +220,7 @@ function ArmorEditor({ tn }: { tn: number }) {
   const techAuto = armorEffects(c, contextOf(ui)).filter((e) => e.kind === "armor" && e.mode === "auto" && !e.stack);
   return (
     <div className="armedit" role="group" aria-label="Armure">
-      <ArmorFields />
+      <ArmorFields variant="ligne" />
       <p className="hint" style={{ gridColumn: "1/-1", margin: 0 }}>
         ND d'armure = 5 × Réflexes {c.traits.reflexes} + 5 + bonus {c.armor.bonus}{tn !== armorBase(c) ? " ± posture, Vide et bonus" : ""} = <b className="mono">{tn}</b>.
         {" "}La réduction se retire de chaque jet de dégâts reçu.

@@ -14,6 +14,7 @@ import {
   selectedKeys, targetBaseTN, toPoolAction, uiRollStance, type RollOptions,
 } from "../rolls";
 import { selectedAction, useCharacter, useStore, type RollRecord } from "../store";
+import { RichSelect, RingOption } from "./RichSelect";
 import { NumberField } from "./fields";
 
 /** Point de rupture mobile (HANDOFF §7), identique à styles.css. */
@@ -193,13 +194,10 @@ export function Roller() {
         {emphasisOffered && emphases.length > 0 && (
           <label className="field">
             <span className="label">Spécialisation · relance les 1</span>
-            <select
-              className="in" value={opts.emphasisName}
-              onChange={(e) => set({ emphasisName: e.target.value, emphasis: e.target.value !== "" })}
-            >
+            <RichSelect variant="ligne" value={opts.emphasisName} onChange={(v) => set({ emphasisName: v, emphasis: v !== "" })}>
               <option value="">Aucune</option>
               {emphases.map((e) => <option key={e} value={e}>{e}</option>)}
-            </select>
+            </RichSelect>
           </label>
         )}
         {emphasisOffered && !emphases.length && (
@@ -512,9 +510,9 @@ function SpellPanel({ action: a, spell }: { action: ActionDef; spell: Spell }) {
       {spell.element === "all" && (
         <label className="field" style={{ maxWidth: 260 }}>
           <span className="label">Élément (sort universel)</span>
-          <select className="in" value={cast.element} onChange={(e) => set({ spellElement: e.target.value as SpellRing, spellRing: null })}>
-            {SPELL_RINGS.map((r) => <option key={r} value={r}>{ELEMENT_LABELS[r]}</option>)}
-          </select>
+          <RichSelect variant="anneau" value={cast.element} onChange={(v) => set({ spellElement: v as SpellRing, spellRing: null })}>
+            {SPELL_RINGS.map((r) => <RingOption key={r} ring={r} />)}
+          </RichSelect>
         </label>
       )}
       {sc?.ringSwap && (
@@ -529,9 +527,9 @@ function SpellPanel({ action: a, spell }: { action: ActionDef; spell: Spell }) {
           {opts.spellRing && (
             <label className="field" style={{ maxWidth: 260, marginLeft: 24 }}>
               <span className="label">Anneau du jet</span>
-              <select className="in" value={opts.spellRing} onChange={(e) => set({ spellRing: e.target.value as SpellRing })}>
-                {otherRings.map((r) => <option key={r} value={r}>{ELEMENT_LABELS[r]}</option>)}
-              </select>
+              <RichSelect variant="anneau" value={opts.spellRing} onChange={(v) => set({ spellRing: v as SpellRing })}>
+                {otherRings.map((r) => <RingOption key={r} ring={r} />)}
+              </RichSelect>
             </label>
           )}
         </div>
@@ -611,9 +609,9 @@ function TnField({ action: a, opts, set }: { action: ActionDef; opts: RollOption
       }
       return (
         <label className="field"><span className="label">ND de base</span>
-          <select className="in mono" value={opts.tn} onChange={(e) => set({ tn: Number(e.target.value) })}>
+          <RichSelect variant="ligne" className="mono" value={opts.tn} onChange={(v) => set({ tn: Number(v) })}>
             {TN_SCALE.map((t) => <option key={t.tn} value={t.tn}>{t.tn} · {t.label}</option>)}
-          </select>
+          </RichSelect>
         </label>
       );
   }
@@ -682,9 +680,9 @@ function ManeuverPicker({ effects }: { effects: readonly ActiveEffect[] }) {
       {(sel.called ?? 0) > 0 && list.some((m) => m.id === "called") && (
         <label className="field" style={{ marginTop: 6, maxWidth: 260 }}>
           <span className="label">Coup ciblé · zone</span>
-          <select className="in" value={state.ui.opts.calledZone} onChange={(e) => setOpt({ calledZone: e.target.value as CalledZone })}>
+          <RichSelect variant="ligne" value={state.ui.opts.calledZone} onChange={(v) => setOpt({ calledZone: v as CalledZone })}>
             {CALLED_ZONES.map((z) => <option key={z.id} value={z.id}>{z.label} · {z.cost} augm.</option>)}
-          </select>
+          </RichSelect>
         </label>
       )}
       {(sel.knockdown ?? 0) > 0 && list.some((m) => m.id === "knockdown") && (

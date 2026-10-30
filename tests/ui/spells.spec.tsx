@@ -103,7 +103,8 @@ describe("Rouleaux & invocations (F.5)", () => {
     expect(screen.getByTestId("affinity")).toHaveTextContent("Affinité à choisir (bloc Identité)");
     expect(screen.getByTestId("affinity")).toHaveTextContent("Sans déficience");
     const affinity = screen.getByRole("combobox", { name: "Affinité (shugenja)" });
-    expect([...affinity.querySelectorAll("option")].map((o) => o.textContent)).toEqual(["— à choisir", "Air", "Terre", "Feu", "Eau", "Vide"]);
+    // Sélecteur Anneau (annexe I.3.3) : nom de l'Anneau dans `.n`, kanji et Traits à côté.
+    expect([...affinity.querySelectorAll("option")].map((o) => o.querySelector(".n")?.textContent)).toEqual(["— à choisir", "Air", "Terre", "Feu", "Eau", "Vide"]);
     fireEvent.change(affinity, { target: { value: "void" } });
     expect(screen.getByTestId("affinity")).toHaveTextContent("Affinité Vide");
     await vi.waitFor(async () => expect((await storage.library.get("perso"))?.character.affinity).toBe("void"));

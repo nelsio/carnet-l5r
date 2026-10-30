@@ -12,6 +12,7 @@ import { useCharacter, useStore, type BlockId, type ListKey } from "../store";
 import { ArmorFields } from "./ArmorCatalog";
 import { FileActions } from "./FileActions";
 import { Modifiers } from "./Modifiers";
+import { RichSelect, RingOption } from "./RichSelect";
 import { ListField, NumberField, TextListField } from "./fields";
 
 const CLAN_SUGGESTIONS = ["Crabe", "Grue", "Dragon", "Licorne", "Lion", "Mante", "Phénix", "Scorpion", "Araignée", "Impérial"];
@@ -152,21 +153,26 @@ function Identity() {
         <Field label="Famille">{text(["family"], c.family)}</Field>
         <Field label="École (nom affiché)">{text(["school"], c.school, { maxLength: 120 })}</Field>
         <Field label="Techniques d'école">
-          <select className="in" value={c.schoolId ?? ""} onChange={(e) => chooseSchool(set, e.target.value)}>
-            <option value="">— Aucune (techniques libres)</option>
+          <RichSelect variant="catalogue" value={c.schoolId ?? ""} onChange={(v) => chooseSchool(set, v)}>
+            <option value=""><span className="n">— Aucune (techniques libres)</span></option>
             {schoolsByClan().map((g) => (
               <optgroup key={g.clan} label={g.clan}>
-                {g.schools.map((sc) => <option key={sc.id} value={sc.id}>{sc.name}</option>)}
+                <legend>{g.clan}</legend>
+                {g.schools.map((sc) => (
+                  <option key={sc.id} value={sc.id}>
+                    <span className="n">{sc.name}</span><span className="m">{sc.class}</span><span className="d">R1 : {sc.ranks[0]?.name}</span>
+                  </option>
+                ))}
               </optgroup>
             ))}
-          </select>
+          </RichSelect>
         </Field>
         {spellcastingOf(c)?.affinity === "choice" && (
           <Field label="Affinité (shugenja)">
-            <select className="in" value={c.affinity ?? ""} onChange={(e) => set(["affinity"], e.target.value || undefined)}>
-              <option value="">— à choisir</option>
-              {SPELL_RINGS.map((r) => <option key={r} value={r}>{ELEMENT_LABELS[r]}</option>)}
-            </select>
+            <RichSelect variant="anneau" value={c.affinity ?? ""} onChange={(v) => set(["affinity"], v || undefined)}>
+              <RingOption value="" label="— à choisir" />
+              {SPELL_RINGS.map((r) => <RingOption key={r} ring={r} />)}
+            </RichSelect>
           </Field>
         )}
         <Field label="Rang d'école">
@@ -284,9 +290,9 @@ function Skills() {
                   <td><input className="in" type="text" aria-label="Nom de la compétence" value={s.name} maxLength={80} onChange={(e) => set(["skills", i, "name"], e.target.value)} /></td>
                   <td style={{ width: 70 }}><NumberField aria-label={`Rang de ${s.name}`} min={0} max={10} value={s.rank} onChange={(n) => set(["skills", i, "rank"], n)} /></td>
                   <td style={{ width: 140 }}>
-                    <select className="in" aria-label={`Trait de ${s.name}`} value={s.trait} onChange={(e) => set(["skills", i, "trait"], e.target.value)}>
+                    <RichSelect variant="champ" aria-label={`Trait de ${s.name}`} value={s.trait} onChange={(v) => set(["skills", i, "trait"], v)}>
                       {ROLL_TRAITS.map((t) => <option key={t} value={t}>{TRAIT_LABELS[t]}</option>)}
-                    </select>
+                    </RichSelect>
                   </td>
                   <td><ListField aria-label={`Spécialisations de ${s.name}`} placeholder="ex. Fouille, Remarquer" value={s.emphases} onChange={(v) => set(["skills", i, "emphases"], v)} /></td>
                   <td><RemoveButton list="skills" index={i} name={s.name} /></td>
@@ -531,9 +537,10 @@ function Spells() {
               <div className="form-grid">
                 <Field label="Nom"><input className="in" type="text" value={s.name} maxLength={120} onChange={(e) => set(["spells", i, "name"], e.target.value)} /></Field>
                 <Field label="Élément">
-                  <select className="in" value={s.element} onChange={(e) => set(["spells", i, "element"], e.target.value)}>
-                    {(["all", ...SPELL_ELEMENTS.filter((x) => x !== "all")] as const).map((x) => <option key={x} value={x}>{ELEMENT_LABELS[x]}</option>)}
-                  </select>
+                  <RichSelect variant="anneau" value={s.element} onChange={(v) => set(["spells", i, "element"], v)}>
+                    <RingOption value="all" label={ELEMENT_LABELS.all} />
+                    {SPELL_ELEMENTS.filter((x) => x !== "all").map((x) => <RingOption key={x} ring={x} />)}
+                  </RichSelect>
                 </Field>
                 <Field label="Maîtrise"><NumberField min={1} max={6} value={s.mastery} onChange={(n) => set(["spells", i, "mastery"], n)} /></Field>
                 <Field label="VD (dégâts)">

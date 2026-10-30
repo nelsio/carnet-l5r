@@ -2,9 +2,13 @@ import { catalogArmor } from "@carnet/core";
 import { ARMOR_CATALOG } from "../../rules/l5r4e";
 import { useCharacter, useStore } from "../store";
 import { NumberField } from "./fields";
+import { RichSelect, type SelectVariant } from "./RichSelect";
 
-/** Liste « Armure du livre » (annexe E.5) : remplit nom, bonus et réduction, modifiables ensuite. */
-export function ArmorCatalogSelect() {
+/**
+ * Liste « Armure du livre » (annexe E.5) : remplit nom, bonus et réduction, modifiables ensuite.
+ * Champ dans la fiche, en ligne dans l'éditeur de la barre d'état (annexe I.3.2).
+ */
+export function ArmorCatalogSelect({ variant = "champ" }: { variant?: SelectVariant }) {
   const { dispatch } = useStore();
   const c = useCharacter();
   const choose = (id: string) => {
@@ -17,14 +21,14 @@ export function ArmorCatalogSelect() {
   };
   return (
     <label className="field"><span className="label">Armure du livre</span>
-      <select className="in" value={c.armor.catalogId ?? ""} onChange={(e) => choose(e.target.value)}>
+      <RichSelect variant={variant} value={c.armor.catalogId ?? ""} onChange={choose}>
         <option value="">Personnalisée</option>
         {ARMOR_CATALOG.map((a) => (
           <option key={a.id} value={a.id}>
             {a.name} (ND +{a.bonus}{a.bonusMounted !== undefined ? `, +${a.bonusMounted} à cheval` : ""} · réd. {a.reduction})
           </option>
         ))}
-      </select>
+      </RichSelect>
     </label>
   );
 }
@@ -33,7 +37,7 @@ export function ArmorCatalogSelect() {
  * Liste du livre, nom, bonus au ND et Réduction : bloc Armure de la fiche et éditeur de la barre d'état (annexe E.18).
  * Modifier ensuite le bonus ou la Réduction en fait une armure personnalisée (`catalogId` retiré, E.14).
  */
-export function ArmorFields() {
+export function ArmorFields({ variant }: { variant?: SelectVariant }) {
   const { dispatch } = useStore();
   const c = useCharacter();
   const setName = (name: string) => dispatch({ type: "set", path: ["armor", "name"], value: name });
@@ -43,7 +47,7 @@ export function ArmorFields() {
   };
   return (
     <>
-      <div className="armcat"><ArmorCatalogSelect /></div>
+      <div className="armcat"><ArmorCatalogSelect variant={variant} /></div>
       <label className="field"><span className="label">Nom</span>
         <input className="in" type="text" maxLength={80} value={c.armor.name} onChange={(e) => setName(e.target.value)} />
       </label>

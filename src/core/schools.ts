@@ -333,6 +333,11 @@ export function stackEffects(c: Character): ActiveEffect[] {
   return activeEffects(c).filter((e) => "stack" in e && !!e.stack);
 }
 
+/** Effets réservés à une posture (Hiruma R1 et R2 en Attaque) : étiquettes du sélecteur Posture (annexe I.3.4). */
+export function stanceEffects(c: Character, stance: Stance): ActiveEffect[] {
+  return activeEffects(c).filter((e) => "when" in e && !!e.when?.stance?.includes(stance));
+}
+
 export function schoolReduction(c: Character): number {
   return activeEffects(c).reduce((s, e) => s + (e.kind === "reduction" ? resolveValue(e.value, c) : 0), 0);
 }

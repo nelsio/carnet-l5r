@@ -22,7 +22,7 @@ export type BlockId = "rings" | "identity" | "skills" | "weapons" | "armor" | "t
 /** Bloc ouvert à la création d'une fiche : le nom en premier. */
 export const NEW_CHARACTER_BLOCK: BlockId = "identity";
 /** Panneaux de l'aide de jeu dotés d'un bouton « i » (HANDOFF §6.2). */
-export type InfoPanel = "stance" | "void" | "move" | "reminders" | "battle";
+export type InfoPanel = "void" | "move" | "reminders" | "battle";
 type Path = readonly (string | number)[];
 
 export interface RollRecord {

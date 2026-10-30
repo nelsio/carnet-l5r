@@ -252,11 +252,17 @@ async function touchArea(el: Locator) {
   expect(hits, await el.getAttribute("aria-label") ?? "").toEqual([true, true, true, true]);
 }
 
-test("M10 : boutons « i » touchables sur 40 × 40 px ; Posture et Vide tiennent sur un écran, détails fermés", async ({ page }) => {
+// Lot 19 (annexe I.3.7) : le panneau Posture n'a plus de « i », il tient sur un écran avec sa description.
+test("M10 : boutons « i » touchables sur 40 × 40 px ; Vide tient sur un écran détails fermés, Posture avec sa description", async ({ page }) => {
   await tab(page, "Aide de jeu").click();
   await page.getByRole("group", { name: "Situation" }).getByRole("button", { name: "Combat", exact: true }).click();
   const vp = page.viewportSize()!;
-  for (const name of ["Posture", "Dépenser du Vide"]) {
+  const stance = page.getByRole("combobox", { name: "Posture" });
+  await stance.evaluate((e) => e.scrollIntoView({ block: "center" }));
+  await expect(page.getByTestId("posture-desc")).toBeVisible();
+  const stancePanel = (await stance.locator("xpath=ancestor::div[contains(@class,'panel')][1]").boundingBox())!;
+  expect(stancePanel.height, "Posture").toBeLessThan(vp.height);
+  for (const name of ["Dépenser du Vide"]) {
     const info = page.getByRole("button", { name: `Afficher le détail : ${name}` });
     await info.evaluate((e) => e.scrollIntoView({ block: "center" }));
     await touchArea(info);
@@ -281,7 +287,7 @@ async function roundOnTwoLines(page: Page) {
   expect(height / lineHeight).toBeLessThanOrEqual(2.1);
   const initiative = (await page.getByTestId("initiative").boundingBox())!;
   const round = (await page.getByRole("button", { name: "Nouveau round" }).boundingBox())!;
-  const stance = (await page.getByRole("group", { name: "Posture" }).boundingBox())!;
+  const stance = (await page.getByRole("combobox", { name: "Posture" }).boundingBox())!;
   expect(round.y).toBeGreaterThan(initiative.y);
   expect(stance.y).toBeGreaterThan(round.y);
   await noHorizontalScroll(page, "Combat");
@@ -546,5 +552,37 @@ test.describe("M19 (E36) à 360 px de large", () => {
     await page.locator("button.act").filter({ hasText: "Lancer · Frappe de jade" }).click();
     await expect(page.getByTestId("spell-panel")).toBeVisible();
     await noHorizontalScroll(page, "lanceur de sort");
+  });
+});
+
+/**
+ * D9 (annexe I.3.7) : sélecteurs à 360 px. Champ en 16 px (pas de zoom), sans défilement horizontal ;
+ * avec `base-select` (Chromium, « Pixel 7 ») : options d'au moins 40 px, menu dans l'écran. WebKit (« iPhone 13 ») : liste native.
+ */
+test.describe("D9 : sélecteurs à 360 px de large", () => {
+  test.use({ viewport: { width: 360, height: 740 } });
+  test("Posture : 16 px, options ≥ 40 px, menu dans l'écran", async ({ page }) => {
+    await tab(page, "Aide de jeu").click();
+    await page.getByRole("group", { name: "Situation" }).getByRole("button", { name: "Combat", exact: true }).click();
+    const stance = page.getByRole("combobox", { name: "Posture" });
+    expect(await stance.evaluate((e) => parseFloat(getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(16);
+    await noHorizontalScroll(page, "Combat, sélecteur Posture");
+    if (!(await page.evaluate(() => CSS.supports("appearance", "base-select")))) return;
+    await stance.click();
+    await expect(stance.locator("option").first()).toBeVisible();
+    const vp = page.viewportSize()!;
+    for (const option of await stance.locator("option").all()) {
+      const box = (await option.boundingBox())!;
+      expect(box.height).toBeGreaterThanOrEqual(40);
+      expect(box.x).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width).toBeLessThanOrEqual(vp.width + 0.5);
+    }
+    await noHorizontalScroll(page, "Combat, liste Posture ouverte");
+  });
+  test("Techniques d'école : 16 px, sans défilement horizontal", async ({ page }) => {
+    await page.getByRole("button", { name: "Edit : Identité & réputation" }).click();
+    const school = page.getByRole("combobox", { name: "Techniques d'école" });
+    expect(await school.evaluate((e) => parseFloat(getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(16);
+    await noHorizontalScroll(page, "Identité, Techniques d'école");
   });
 });

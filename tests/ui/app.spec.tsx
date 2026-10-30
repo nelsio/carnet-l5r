@@ -4,6 +4,7 @@ import type { Character } from "@carnet/core";
 import { memoryStorage, type LibraryEntry } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
+import { chooseStance, currentStance, stanceSelect } from "../helpers/stance";
 import { clickWounds, woundsField } from "../helpers/wounds";
 
 const base = () => structuredClone(kakita) as Character;
@@ -156,7 +157,7 @@ describe("Aide de jeu", () => {
     const cards = screen.getAllByRole("button").filter((b) => b.classList.contains("act"));
     expect(cards[0]).toHaveTextContent("Initiative");
     expect(screen.getByTestId("armor-tn")).toHaveTextContent("20");
-    click("Assaut");
+    chooseStance("Assaut");
     expect(screen.getByTestId("armor-tn")).toHaveTextContent("10");
     fireEvent.click(cards[0]!);
     showDice();
@@ -172,7 +173,7 @@ describe("Aide de jeu", () => {
     click("Combat");
     const round = screen.getByRole("button", { name: "Nouveau round" });
     const initiative = screen.getByTestId("initiative");
-    const stance = screen.getByRole("group", { name: "Posture" });
+    const stance = stanceSelect();
     const follows = (a: Node, b: Node) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
     expect(follows(initiative, round)).toBe(true);
     expect(follows(round, stance)).toBe(true);
@@ -220,27 +221,29 @@ describe("Aide de jeu", () => {
     expect(within(die).getByText("9+4")).toBeInTheDocument();
   });
 
-  it("E12 : un « i » par panneau déplie toutes ses descriptions, sans rien sélectionner", async () => {
+  it("E12 : un « i » par panneau (Vide, Déplacement) déplie toutes ses descriptions, sans rien sélectionner", async () => {
     await renderApp();
     goToAid();
     click("Combat");
-    const stance = () => screen.getByRole("button", { name: "Afficher le détail : Posture" });
-    expect(screen.queryByText("Posture normale.")).toBeNull();
     expect(screen.queryByText("Jusqu'au prochain round.")).toBeNull();
-    expect(stance()).toHaveAttribute("aria-expanded", "false");
-    fireEvent.click(stance());
-    expect(screen.getByText("Posture normale.")).toBeInTheDocument();
-    expect(screen.getByText("+2g1 à l'attaque, −10 au ND d'armure.")).toBeInTheDocument();
-    expect(screen.queryByText("Jusqu'au prochain round.")).toBeNull();
-    expect(screen.getByRole("button", { name: "Masquer le détail : Posture" })).toHaveAttribute("aria-expanded", "true");
-    expect(within(screen.getByRole("group", { name: "Posture" })).getByRole("button", { name: /^Attaque/ })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByTestId("armor-tn")).toHaveTextContent("20");
+    expect(screen.getByRole("button", { name: "Afficher le détail : Dépenser du Vide" })).toHaveAttribute("aria-expanded", "false");
     click("Afficher le détail : Dépenser du Vide");
     expect(screen.getByText("Jusqu'au prochain round.")).toBeInTheDocument();
+    expect(screen.getByText("Dépensé au prochain jet lancé.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Masquer le détail : Dépenser du Vide" })).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("button", { name: /^\+10 ND d'armure/ })).toHaveAttribute("aria-pressed", "false");
+    expect(currentStance()).toBe("Attaque");
+    expect(screen.getByTestId("armor-tn")).toHaveTextContent("20");
     expect(screen.getByText("Points de Vide 2/2")).toBeInTheDocument();
-    click("Masquer le détail : Posture");
-    expect(screen.queryByText("Posture normale.")).toBeNull();
+    // Le « i » de Déplacement reste fermé, puis s'ouvre sans toucher au Vide.
+    click("Déplacement");
+    expect(screen.queryByText(/^3,0 m/)).toBeNull();
+    click("Afficher le détail : Se déplacer en combat");
+    expect(screen.getByText(/^3,0 m/)).toBeInTheDocument();
+    click("Combat");
     expect(screen.getByText("Jusqu'au prochain round.")).toBeInTheDocument();
+    click("Masquer le détail : Dépenser du Vide");
+    expect(screen.queryByText("Jusqu'au prochain round.")).toBeNull();
   });
 
   it("E13 : dégâts au katana : options sur une ligne, règle d'explosion, puis maîtrise", async () => {
@@ -364,7 +367,7 @@ describe("Aide de jeu", () => {
     click("Lancer 4g3");
     // 3 dés gardés à 5 = 15 → +8 au ND d'armure, moitié arrondie au supérieur (20 + 8)
     expect(screen.getByTestId("armor-tn")).toHaveTextContent("28");
-    expect(screen.getByRole("button", { name: "Défense totale" })).toHaveAttribute("aria-pressed", "true");
+    expect(currentStance()).toBe("Défense totale");
   });
 
   it("Duel : pas de posture, Frappe puis dégâts rattachés", async () => {
@@ -372,7 +375,7 @@ describe("Aide de jeu", () => {
     goToAid();
     click("Combat");
     click("Duel iaijutsu");
-    expect(screen.queryByRole("group", { name: "Posture" })).toBeNull();
+    expect(screen.queryByRole("combobox", { name: "Posture" })).toBeNull();
     click(/^1 · Évaluation/);
     expect(screen.getByTestId("final-tn")).toHaveTextContent("20");
   });

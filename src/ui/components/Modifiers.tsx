@@ -4,6 +4,7 @@ import {
   MODIFIER_SOURCE_LABELS, MODIFIER_TARGET_LABELS, MODIFIER_TEMPLATES, NAMED_MODIFIERS, STANCES, TRAIT_LABELS, type ModifierTemplate,
 } from "../../rules/l5r4e";
 import { useCharacter, useStore } from "../store";
+import { RichSelect } from "./RichSelect";
 import { NumberField } from "./fields";
 
 const CATALOG: readonly ModifierTemplate[] = [...NAMED_MODIFIERS, ...MODIFIER_TEMPLATES];
@@ -77,14 +78,14 @@ function ModifierEditor({ m, index: i, set }: { m: Modifier; index: number; set:
       </div>
       <div className="form-grid">
         <label className="field"><span className="label">Source</span>
-          <select className="in" value={m.source} onChange={(e) => set(i, { source: e.target.value as Modifier["source"] })}>
+          <RichSelect variant="champ" value={m.source} onChange={(v) => set(i, { source: v as Modifier["source"] })}>
             {Object.entries(MODIFIER_SOURCE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-          </select>
+          </RichSelect>
         </label>
         <label className="field"><span className="label">S'applique à</span>
-          <select className="in" value={m.appliesTo} onChange={(e) => set(i, { appliesTo: e.target.value as Modifier["appliesTo"] })}>
+          <RichSelect variant="champ" value={m.appliesTo} onChange={(v) => set(i, { appliesTo: v as Modifier["appliesTo"] })}>
             {Object.entries(MODIFIER_TARGET_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-          </select>
+          </RichSelect>
         </label>
         {m.appliesTo === "skill" && (
           <label className="field"><span className="label">Compétence</span>
@@ -94,10 +95,10 @@ function ModifierEditor({ m, index: i, set }: { m: Modifier; index: number; set:
         )}
         {m.appliesTo === "trait" && (
           <label className="field"><span className="label">Trait</span>
-            <select className="in" value={m.trait ?? ""} onChange={(e) => set(i, { trait: e.target.value as Modifier["trait"] })}>
+            <RichSelect variant="champ" value={m.trait ?? ""} onChange={(v) => set(i, { trait: v as Modifier["trait"] })}>
               <option value="" disabled>Choisir…</option>
               {ROLL_TRAITS.map((t) => <option key={t} value={t}>{TRAIT_LABELS[t]}</option>)}
-            </select>
+            </RichSelect>
           </label>
         )}
         {m.appliesTo !== "armor" && m.appliesTo !== "wounds" && (
@@ -124,17 +125,17 @@ function ModifierEditor({ m, index: i, set }: { m: Modifier; index: number; set:
         </label>
         {m.appliesTo !== "wounds" && (
           <label className="field"><span className="label">Posture requise</span>
-            <select className="in" value={m.stance ?? ""} onChange={(e) => set(i, { stance: (e.target.value || undefined) as Modifier["stance"] })}>
+            <RichSelect variant="champ" value={m.stance ?? ""} onChange={(v) => set(i, { stance: (v || undefined) as Modifier["stance"] })}>
               <option value="">Toutes</option>
               {STANCES.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
-            </select>
+            </RichSelect>
           </label>
         )}
         <label className="field"><span className="label">Application</span>
-          <select className="in" value={m.mode} onChange={(e) => set(i, { mode: e.target.value as Modifier["mode"] })}>
+          <RichSelect variant="champ" value={m.mode} onChange={(v) => set(i, { mode: v as Modifier["mode"] })}>
             <option value="always">D'office</option>
             <option value="optional">Au choix (situationnel)</option>
-          </select>
+          </RichSelect>
         </label>
       </div>
       <label className="field"><span className="label">Condition, précision</span>
@@ -159,11 +160,11 @@ function AddModifier() {
   };
   return (
     <div className="file-actions" style={{ marginTop: 8 }}>
-      <select className="in" style={{ width: "auto", flex: "1 1 220px" }} aria-label="Modèle de bonus" value={choice} onChange={(e) => setChoice(e.target.value)}>
+      <RichSelect variant="champ" style={{ width: "auto", flex: "1 1 220px" }} aria-label="Modèle de bonus" value={choice} onChange={setChoice}>
         <option value="">Bonus libre</option>
         {NAMED_MODIFIERS.length > 0 && <optgroup label="Catalogue (livre de base 4e, à vérifier)">{NAMED_MODIFIERS.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}</optgroup>}
         <optgroup label="Modèles">{MODIFIER_TEMPLATES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}</optgroup>
-      </select>
+      </RichSelect>
       <button type="button" className="btn sm" onClick={add}>+ Bonus</button>
     </div>
   );

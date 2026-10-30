@@ -5,6 +5,7 @@ import { migrate, type Character } from "@carnet/core";
 import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
+import { chooseStance } from "../helpers/stance";
 
 const base = () => structuredClone(kakita) as Character;
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
@@ -59,10 +60,10 @@ describe("Techniques d'école : parcours E16 à E19", () => {
     click("Ajouter : Touches au corps à corps");
     expect(screen.getByRole("button", { name: "Ajouter : Touches au corps à corps" })).toBeDisabled();
     expect(screen.getByTestId("armor-tn")).toHaveTextContent("30");
-    click("Assaut");
+    chooseStance("Assaut");
     expect(screen.getByTestId("armor-tn")).toHaveTextContent("10");
     // Les compteurs restent jusqu'à la remise à zéro, pas au « Nouveau round ».
-    click("Attaque");
+    chooseStance("Attaque");
     click("Nouveau round");
     expect(screen.getByTestId("armor-tn")).toHaveTextContent("30");
     click(/compteurs à zéro/);
@@ -72,7 +73,7 @@ describe("Techniques d'école : parcours E16 à E19", () => {
   it("E18 : Kakita 2, attaque en Centre → étiquette Kakita R1 ; case « Initiative plus basse » décochée, remise à zéro", async () => {
     await mount({ schoolId: "kakita-bushi", insightRank: 2 });
     skirmish();
-    click("Centre");
+    chooseStance("Centre");
     // En Centre, la carte est grisée (annexe E.3 F2) : « Lancer quand même ».
     click("Lancer quand même : Attaque · Katana");
     // « + Rang d'école au total » : +2 au rang 2 (annexe C.1).
