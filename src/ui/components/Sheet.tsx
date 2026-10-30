@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 import {
   activeEffects, affinityOf, armorSheet, insightPoints, suggestedInsightRank, attackTrait, catalogGap, catalogWeapon, createSpell, dailyHealing, deficiencyOf, isShugenja, reminderText, computePool, defaultModifiers, isRanged, formatDR, parseDR, parseWeaponKeywords, rings, ROLL_TRAITS, schoolOf,
   findSchool, schoolRankOf, schoolsByClan, sortSpells, SPELL_ELEMENTS, SPELL_RINGS, spellcastingOf, spellRaises, spellTn, suggestSchool, techniqueCategories, vocabularyChanges, weaponKeywords,
-  type ArmorPart, type Character, type PoolAction, type RollTrait, type TraitKey, type VocabularyChange,
+  type ArmorPart, type Character, type PoolAction, type RollTrait, type SpellElement, type TraitKey, type VocabularyChange,
 } from "@carnet/core";
 import { WEAPON_KEYWORD_LABELS } from "../../rules/ecoles";
 import { ELEMENT_LABELS, RINGS, SPELL_KEYWORDS, TRAIT_LABELS, UNIVERSAL_SPELLS, type RingKey } from "../../rules/l5r4e";
@@ -610,7 +610,7 @@ function Spells() {
                   <input type="checkbox" checked={s.memorized} onChange={(e) => set(["spells", i, "memorized"], e.target.checked)} />
                   {" "}Mémorisé <span className="muted">· {s.mastery} XP</span>
                 </label>
-                <SpellLink name={s.name} />
+                <SpellLink name={s.name} element={s.element} />
                 <RemoveButton list="spells" index={i} name={s.name} />
               </div>
             </div>
@@ -656,7 +656,7 @@ function Spells() {
               {raises.length > 0 && <div className="sp4"><span className="label">Augm.</span> {raises.join(" · ")}</div>}
               {s.effect && <div className="prose sp5">{s.effect}</div>}
               </div>
-              <SpellLink name={s.name} />
+              <SpellLink name={s.name} element={s.element} />
             </div>
           );
         })}
@@ -671,14 +671,14 @@ function GrimoireLink() {
   return <ExternalLink href={PORTAL.grimoire} className="head-link" label="Grimoire (nouvel onglet)">Grimoire</ExternalLink>;
 }
 
-/** Sort dans le grimoire du portail, recherche par nom ; rien pour un sort sans nom (annexe L.7). */
-function SpellLink({ name }: { name: string }) {
+/** Sort dans le grimoire du portail, recherche par nom filtrée par élément ; rien pour un sort sans nom (annexe L.7). */
+function SpellLink({ name, element }: { name: string; element: SpellElement }) {
   if (!name.trim()) return null;
-  return <ExternalLink href={spellUrl(name)} className="spell-link" label={`${name.trim()} dans le grimoire (nouvel onglet)`} />;
+  return <ExternalLink href={spellUrl(name, element)} className="spell-link" label={`${name.trim()} dans le grimoire (nouvel onglet)`} />;
 }
 
 function GrimoireNote() {
-  return <p className="hint grimoire-note">Chaque lien ouvre le grimoire avec le nom du sort en recherche.</p>;
+  return <p className="hint grimoire-note">Chaque lien ouvre le grimoire sur ce sort, filtré par son élément.</p>;
 }
 
 /** « Affinité Terre · Déficience Air » sous l'école de shugenja (annexe F.5), à la couleur de l'Anneau. */

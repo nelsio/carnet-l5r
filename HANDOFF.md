@@ -6,7 +6,7 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document.
 
-**État au 30/10/2026 :** version **v2.21.2** (correctifs v2.21.1 Safari et v2.21.2 Forge en attente, L.12), lots 1 à 25 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
+**État au 30/10/2026 :** version **v2.21.4** (correctifs v2.21.1 Safari, v2.21.2 Forge en attente, L.12, v2.21.3 `sharp`, M.5, et v2.21.4 liens de sort filtrés par élément, L.13), lots 1 à 29 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
 
 **Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie), F (lot 13 : shugenja et Magie), G (lot 14 : nom de l'outil dans l'en-tête), H (lots 15 et 16 : dépôt GitHub et correctifs), I (lots 17 à 19 : couleurs, Anneaux, sélecteurs), J (lot 20 : correctifs et retouches), K (lot 21 : points d'Insight), L (lots 22 et 23 : liens vers le portail de campagne), M (lots 24 et 25 : README allégé, liens vers le guide et le dépôt).
 
@@ -591,6 +591,8 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 25. **v2.21.0 — liens vers le guide et le dépôt** (**livrée**, écarts en M.4) : annexe M.3. Section « Le Carnet » du menu Ressources, pied de page sur tous les écrans, lien « Lire le guide » dans la Bibliothèque vide.
    - **v2.21.1** (patch) : menus déroulants lisibles sous Safari (repli liste native).
    - **v2.21.2** (patch, L.12) : Forge en attente de compatibilité JSON. Fiche vierge proposée en premier, pastille « JSON pas encore compatible », interrupteur `FORGE_JSON_OK`.
+   - **v2.21.3** (lot 28, M.5) : `sharp` 0.35.5 (alertes Dependabot), outil de captures seulement.
+   - **v2.21.4** (lot 29, L.13) : liens des sorts filtrés par élément dans le grimoire (`&el=`, `GRIMOIRE_ELEMENT`).
 26. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts (fichier personnel importable, pas dans le dépôt), compteurs « N fois par séance » (D-g).
 
 ---
@@ -2386,7 +2388,7 @@ Le Carnet renvoie vers le **portail de la campagne** du MJ (site statique sur Gi
 
 ### L.1 Configuration : `src/rules/portal.ts` (lot 22)
 
-Un seul module porte toutes les adresses, pour qu'un changement d'URL du portail ne touche qu'un fichier : `PORTAL_BASE`, `PORTAL` (`home`, `forge`, `grimoire`, `combat`, `bushido`, `etiquette`), `clanUrl(clanId)` et `spellUrl(name)`.
+Un seul module porte toutes les adresses, pour qu'un changement d'URL du portail ne touche qu'un fichier : `PORTAL_BASE`, `PORTAL` (`home`, `forge`, `grimoire`, `combat`, `bushido`, `etiquette`), `clanUrl(clanId)` et `spellUrl(name, element?)` (élément ajouté au lot 29, L.13).
 
 Constante de configuration **`FORGE_JSON_OK`** (lot 27, L.12), `false` à ce jour. La passer à `true` quand les critères d'acceptation de `issues/issue-export-carnet-rokugan.md` (portail) sont validés, c'est-à-dire quand l'export JSON de la Forge s'importe sans erreur dans le Carnet ; retirer alors les phrases marquées `<!-- FORGE_JSON_OK -->` dans `docs/GUIDE.md`.
 
@@ -2457,7 +2459,7 @@ Remplace le contenu de l'accueil vide. Deux blocs, puis une ligne.
 | ID | Cas | Attendu |
 |---|---|---|
 | O1 | `clanUrl` pour les 11 clans | 8 adresses `clans/<slug>.html` ; `null` pour Araignée, Impériales, non reconnu |
-| O2 | `spellUrl("Frappe de jade")`, `spellUrl("  ")` | `…grimoire.html?q=Frappe%20de%20jade` ; `…grimoire.html` |
+| O2 | `spellUrl("Frappe de jade")`, `spellUrl("  ")` ; avec élément (lot 29, L.13) : `spellUrl("Frappe de jade", "earth")`, `spellUrl("  Sentir ", "all")`, `spellUrl("  ", "fire")` | `…grimoire.html?q=Frappe%20de%20jade` ; `…grimoire.html` ; `…?q=Frappe%20de%20jade&el=terre`, `…?q=Sentir&el=universel`, `…grimoire.html` |
 | O3 | Tout lien externe rendu (menu, Bibliothèque) | `target="_blank"`, `rel` contient `noopener` et `noreferrer`, icône externe présente |
 | O4 | Menu Ressources, fiche Crabe ouverte | 7 entrées dont « Clan du Crabe » → `clans/crabe.html` ; fiche Araignée : 6 entrées |
 | O5 | Menu Ressources au clavier | Entrée/Espace ouvre, focus sur la 1re entrée, flèches, Échap ferme et rend le focus |
@@ -2487,8 +2489,8 @@ Remplace le contenu de l'accueil vide. Deux blocs, puis une ligne.
 
 **Bloc Sorts** (shugenja, annexe F) :
 - Dans le titre du bloc, à droite : lien « Grimoire » + icône externe → `PORTAL.grimoire`.
-- Sur chaque ligne de sort, bouton-lien icône seule (zone 44 × 44 px, icône externe 18 px, `--accent-ink`, survol `--accent-pale`) → `spellUrl(nom du sort)`, `aria-label` « <nom> dans le grimoire (nouvel onglet) ».
-- Note sous la liste (`--muted`, 12 px) : « Chaque lien ouvre le grimoire avec le nom du sort en recherche. »
+- Sur chaque ligne de sort, bouton-lien icône seule (zone 44 × 44 px, icône externe 18 px, `--accent-ink`, survol `--accent-pale`) → `spellUrl(nom du sort, élément)`, soit `grimoire.html?q=<nom>&el=<élément>` depuis le lot 29 (L.13), `aria-label` « <nom> dans le grimoire (nouvel onglet) ».
+- Note sous la liste (`--muted`, 12 px) : « Chaque lien ouvre le grimoire sur ce sort, filtré par son élément. » (lot 29 ; avant : « … avec le nom du sort en recherche. »)
 - En édition, les liens restent ; ils ne remplacent aucun contrôle existant.
 
 ### L.8 Aide de jeu (lot 23, v2.20.0)
@@ -2542,6 +2544,23 @@ L'export JSON de la Forge ne s'importe pas encore dans le Carnet (demande ouvert
 - **Grille** : les options pleines partagent quatre lignes (en-tête, encadré, étapes, bouton). La ligne de l'encadré est vide côté Fiche vierge : étapes et boutons restent alignés (L.11).
 - `--warn-pale` passe de 14 % à 12 % de `--warn` : à 14 %, `--warn` sur `--warn-pale` faisait 4,47:1 en clair.
 - **Tests** : `tests/core.portal.spec.ts` (constante à `false`), `tests/ui/portal.spec.tsx` (ordre, pastille, encadré, menu), `tests/ui/forge-ok.spec.tsx` (constante simulée à `true` par `vi.mock` : le build livré ne permet pas de la changer dans Playwright), `tests/e2e/portal.spec.ts` (ordre bureau et 390 px, pastille dans la carte et dans le menu, sans défilement horizontal), `tests/colors.spec.ts` (contraste ≥ 4,5:1 dans les deux thèmes).
+
+### L.13 Lot 29 : liens des sorts filtrés par élément (v2.21.4)
+
+Source : `handoff-liens-sorts.md` (30/10/2026), intitulé « lot 28, v2.21.3 » : renuméroté **lot 29, v2.21.4** (le lot 28 est la mise à jour de `sharp`, M.5). Pas de changement de format de fiche ni de changement visuel.
+
+La recherche du grimoire porte aussi sur la description des sorts : le nom seul donne parfois plusieurs résultats (« Sentir » : 3, « Invoquer » : 2). Le grimoire lit le paramètre `el` (vérifié sur la version du 30/10/2026) ; avec lui, chaque sort n'a plus qu'un résultat.
+
+- **`spellUrl(name, element?)`** → `grimoire.html?q=<nom encodé>&el=<élément>` ; sans élément, le lien d'avant ; nom vide → `PORTAL.grimoire`. `encodeURIComponent` est gardé (espaces en `%20`). Un `el` inconnu du grimoire y est ignoré : le lien retombe sur la recherche par nom.
+- **`GRIMOIRE_ELEMENT`** (`src/rules/portal.ts`), valeur du filtre « Élément / Voie » du grimoire :
+
+| Élément du Carnet | `air` | `earth` | `fire` | `water` | `void` | `all` |
+|---|---|---|---|---|---|---|
+| `el=` | `air` | `terre` | `feu` | `eau` | `vide` | `universel` |
+
+- **Pas de paramètre `rang`** : la maîtrise du Carnet ne correspond pas toujours à celle du grimoire (universels en maîtrise 1 dans le Carnet, rang 0 dans le grimoire : 0 résultat). **Pas d'ancre `#sort-<id>`** : le nom est libre et le Carnet ne connaît pas l'identifiant du grimoire.
+- **Fiche** : `SpellLink` reçoit l'élément, en lecture et en édition ; en édition, le lien suit les champs Nom et Élément. Le lien « Grimoire » du titre du bloc ne change pas. Note : « Chaque lien ouvre le grimoire sur ce sort, filtré par son élément. »
+- **Tests** : `tests/core.portal.spec.ts` (O2 avec élément, `GRIMOIRE_ELEMENT` couvre `SPELL_ELEMENTS`) ; `tests/ui/portal-sheet.spec.tsx` (O13 : adresses avec `el` et nouvelle note ; élément Terre → Feu en édition → `el=feu` ; O17 : mêmes adresses en consultation). Le test « aucune requête réseau » reste vert ; aucune capture de `docs/img/` à refaire.
 
 ## Annexe M — Lots 24 et 25 : README allégé, liens vers le guide et le dépôt (v2.20.2, v2.21.0)
 

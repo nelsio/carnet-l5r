@@ -59,7 +59,7 @@ La **Forge** est une création guidée : elle calcule l'XP, les traits et les bo
 <!-- FORGE_JSON_OK : quand la constante passe à true, remplacer la phrase suivante par « Elle exporte un JSON compatible avec le Carnet : importe-le ici avec Importer un JSON. » -->
 Son export JSON **ne s'importe pas encore** dans le Carnet (la pastille « JSON pas encore compatible » le rappelle) : en attendant, crée une **fiche vierge** et recopie-y ton personnage.
 
-D'autres liens mènent au portail : le **nom du clan**, au-dessus du nom du personnage, ouvre la page du clan ; dans **Rouleaux & invocations**, **Grimoire** ouvre le grimoire et l'icône de chaque sort le cherche par son nom ; dans l'**aide de jeu**, un encadré propose le **Mémento de combat** en Combat, **Étiquette & coutumes** et **Bushido & honneur** en Cour.
+D'autres liens mènent au portail : le **nom du clan**, au-dessus du nom du personnage, ouvre la page du clan ; dans **Rouleaux & invocations**, **Grimoire** ouvre le grimoire et l'icône de chaque sort le cherche par son nom et son élément ; dans l'**aide de jeu**, un encadré propose le **Mémento de combat** en Combat, **Étiquette & coutumes** et **Bushido & honneur** en Cour.
 
 Le même menu se termine par la section **Le Carnet**, avec le numéro de version : ce **guide**, les **nouveautés** de chaque version, un formulaire pour **signaler un problème** (compte GitHub requis) et la **page du projet**. Ces liens sont aussi en **pied de page** de chaque écran, et la Bibliothèque vide propose **Lire le guide** dès la première visite.
 
