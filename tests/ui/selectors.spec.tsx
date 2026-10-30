@@ -1,6 +1,6 @@
 /** Lot 19, v2.16.0 (HANDOFF annexe I.3.7) : sélecteurs stylés et panneau Posture, cas D3 à D8 (structure DOM). */
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { migrate, type Character } from "@carnet/core";
 import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
@@ -139,5 +139,40 @@ describe("Variantes riches (annexe I.3.3)", () => {
     const source = screen.getByRole("combobox", { name: "Source" });
     expect(source).toHaveClass("in", "cs", "cs-champ");
     expect(source.querySelector("button")).toBeNull();
+  });
+});
+
+describe("Lot 26 : repli liste native (Safari, Firefox, annexe I.3.6)", () => {
+  afterEach(() => vi.restoreAllMocks());
+  const native = () => vi.spyOn(CSS, "supports").mockReturnValue(false);
+
+  it("Techniques d'école : libellés « Nom · classe », sans <button> ni <legend>, groupes conservés", async () => {
+    native();
+    await mount();
+    click("Edit : Identité & réputation");
+    const select = screen.getByRole("combobox", { name: "Techniques d'école" });
+    expect(select.querySelector("button, legend, span")).toBeNull();
+    const crab = within(select).getByRole("group", { name: "Crabe" });
+    expect(crab.querySelector('option[value="hiruma-bushi"]')?.textContent).toBe("École de bushi Hiruma · Bushi");
+    expect(select.querySelector("option")?.textContent).toBe("— Aucune (techniques libres)");
+  });
+
+  it("Anneau : « kanji Nom », sans description collée", async () => {
+    native();
+    await mount({ ...base(), schoolId: "isawa-shugenja" });
+    click("Edit : Identité & réputation");
+    const select = screen.getByRole("combobox", { name: "Affinité (shugenja)" });
+    const rings = [...select.querySelectorAll("option")].filter((o) => o.value);
+    expect(rings.map((o) => o.textContent)).toEqual(["風 Air", "土 Terre", "火 Feu", "水 Eau", "空 Vide"]);
+  });
+
+  it("Posture : nom seul dans la liste, description toujours visible sous le sélecteur", async () => {
+    native();
+    await mount();
+    skirmish();
+    expect(stanceOption("Assaut").textContent).toBe("Assaut");
+    chooseStance("Assaut");
+    expect(currentStance()).toBe("Assaut");
+    expect(stanceSelect().querySelector("span")).toBeNull();
   });
 });

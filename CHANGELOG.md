@@ -6,6 +6,12 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.21.1] - 2026-10-30
+
+### Corrigé
+- Safari (et Firefox) : les menus déroulants riches (Techniques d'école, Anneau, Posture, Vide, Bonus de jet) affichaient tout le contenu des options collé bout à bout. En liste native, chaque option montre maintenant un libellé simple : nom, puis classe pour les écoles, kanji puis nom pour les Anneaux. La description de la posture et du Vide reste affichée sous le sélecteur.
+- Safari : le champ fermé des sélecteurs perd l'habillage système et s'aligne sur les autres champs (hauteur 40 px, fond, chevron aux couleurs du thème).
+
 ## [2.21.0] - 2026-10-30
 
 ### Ajouté
