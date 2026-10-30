@@ -213,7 +213,7 @@ Créé en 1995 chez **Alderac Entertainment Group (AEG)** par John Zinser, Dave 
 - EDGE Studio : https://www.edge-studio.net
 - Asmodee : https://www.asmodee.com
 
-*Legend of the Five Rings*, *La Légende des Cinq Anneaux*, Rokugan, les noms de clans et les autres éléments de l'univers sont des marques de leurs propriétaires respectifs. Ce projet ne reproduit aucun texte des livres. Si vous aimez cet univers, soutenez ses créateurs en achetant les ouvrages officiels.
+*Legend of the Five Rings*, *La Légende des Cinq Anneaux*, Rokugan, les noms de clans et les autres éléments de l'univers sont des marques de leurs propriétaires respectifs. Ce projet ne reproduit aucun texte des livres. Si tu aimes cet univers, soutiens ses créateurs en achetant les ouvrages officiels.
 
 ---
 
