@@ -31,7 +31,7 @@
     { "name": "Investigation", "rank": 1, "trait": "perception", "emphases": ["Remarquer"] }
   ],
   "weapons": [
-    { "name": "Tanto", "skill": "Kenjutsu", "dr": "1g1", "keywords": ["petite"] }
+    { "name": "Tanto", "skill": "Couteaux", "dr": "1g1", "keywords": ["petite"] }
   ],
   "techniques": [],
   "maneuvers": [],
