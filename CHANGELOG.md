@@ -6,6 +6,15 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.21.0] - 2026-10-30
+
+### Ajouté
+- Menu **Ressources** : section « Le Carnet » avec la version et quatre liens vers le dépôt : guide d'utilisation, nouveautés, signaler un problème, page du projet.
+- Pied de page sur tous les écrans : nom, version (lien vers les nouveautés), puis Guide, Signaler un bug et Projet. Sur mobile, les liens passent sous le nom, au-dessus de la barre d'onglets.
+- Bibliothèque vide : lien « Première visite ? Lire le guide » sous les deux options de départ.
+
+Simples liens ouverts dans un nouvel onglet : le Carnet ne fait toujours aucune requête réseau.
+
 ## [2.20.2] - 2026-10-30
 
 ### Modifié
@@ -222,7 +231,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.20.2...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.21.0...HEAD
+[2.21.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.21.0
 [2.20.2]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.20.2
 [2.20.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.20.1
 [2.20.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.20.0

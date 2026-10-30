@@ -5,6 +5,7 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Character } from "@carnet/core";
+import { CARNET_LINKS } from "../../src/rules/links";
 import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
@@ -31,7 +32,7 @@ const showLibrary = () => fireEvent.click(screen.getByRole("button", { name: "Ca
 function expectExternal(a: Element) {
   expect(a).toHaveAttribute("target", "_blank");
   expect(a.getAttribute("rel")?.split(" ")).toEqual(expect.arrayContaining(["noopener", "noreferrer"]));
-  expect(a.getAttribute("href")!.startsWith(PORTAL)).toBe(true);
+  expect([PORTAL, CARNET_LINKS.code].some((base) => a.getAttribute("href")!.startsWith(base))).toBe(true);
   expect(a.querySelector("svg.ext")).not.toBeNull();
 }
 
@@ -48,38 +49,38 @@ describe("O4 : menu Ressources", () => {
     expect(labels.at(-2)).toMatch(/^Thème/);
   });
 
-  it("fiche Crabe : 7 entrées dont la page du clan", async () => {
+  it("fiche Crabe : 7 entrées du portail dont la page du clan, puis les 4 du Carnet", async () => {
     await renderApp(base({ clan: "Crabe" }));
     const menu = openMenu();
     expect(resources()).toHaveAttribute("aria-expanded", "true");
     const items = within(menu).getAllByRole("menuitem");
-    expect(items).toHaveLength(7);
+    expect(items).toHaveLength(11);
     const clan = within(menu).getByRole("menuitem", { name: /^Clan du Crabe/ });
     expect(clan).toHaveAttribute("href", `${PORTAL}clans/crabe.html`);
     expect(clan).toHaveTextContent("土");
     expect(items.map((a) => a.getAttribute("href"))).toEqual([
       `${PORTAL}index.html`, `${PORTAL}clans/crabe.html`, `${PORTAL}createcharacter.html`, `${PORTAL}grimoire.html`,
-      `${PORTAL}aides/combat-memento.html`, `${PORTAL}aides/bushido-honneur.html`, `${PORTAL}aides/etiquette-coutumes.html`,
+      `${PORTAL}aides/combat-memento.html`, `${PORTAL}aides/bushido-honneur.html`, `${PORTAL}aides/etiquette-coutumes.html`, ...Object.values(CARNET_LINKS),
     ]);
-    expect(within(menu).getAllByRole("group").map((g) => g.getAttribute("aria-label"))).toEqual(["Campagne", "Créer", "Références"]);
-    expect(menu).toHaveTextContent("Site de la campagne. S'ouvre dans un nouvel onglet.");
+    expect(within(menu).getAllByRole("group").map((g) => g.getAttribute("aria-label"))).toEqual(["Campagne", "Créer", "Références", "Le Carnet"]);
+    expect(menu).toHaveTextContent("Liens externes : s'ouvrent dans un nouvel onglet.");
   });
 
-  it("fiche Araignée : 6 entrées, pas de page de clan", async () => {
+  it("fiche Araignée : 10 entrées, pas de page de clan", async () => {
     await renderApp(base({ clan: "Araignée" }));
-    expect(within(openMenu()).getAllByRole("menuitem")).toHaveLength(6);
+    expect(within(openMenu()).getAllByRole("menuitem")).toHaveLength(10);
   });
 
-  it("Bibliothèque vide : présent, 6 entrées", async () => {
+  it("Bibliothèque vide : présent, 10 entrées", async () => {
     await renderApp(null);
-    expect(within(openMenu()).getAllByRole("menuitem")).toHaveLength(6);
+    expect(within(openMenu()).getAllByRole("menuitem")).toHaveLength(10);
   });
 
   it("Bibliothèque avec fiches : présent, sans page de clan", async () => {
     await renderApp(base({ clan: "Crabe" }));
     showLibrary();
     await screen.findByRole("heading", { name: "Bibliothèque" });
-    expect(within(openMenu()).getAllByRole("menuitem")).toHaveLength(6);
+    expect(within(openMenu()).getAllByRole("menuitem")).toHaveLength(10);
   });
 
   it("O3 : chaque entrée est un lien externe", async () => {
@@ -104,7 +105,7 @@ describe("O4 : menu Ressources", () => {
     await storage.library.put({ id: "r", character: base({ clan: "Crabe" }), mode: "readonly", updatedAt: "2026-10-30T10:00:00.000Z" });
     render(<App storage={storage} rng={() => 5} />);
     await screen.findByText("Consultation");
-    expect(within(openMenu()).getAllByRole("menuitem")).toHaveLength(7);
+    expect(within(openMenu()).getAllByRole("menuitem")).toHaveLength(11);
   });
 });
 

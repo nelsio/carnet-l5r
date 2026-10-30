@@ -25,7 +25,7 @@ test("O10 : aucune requête vers le portail au chargement ni à l'ouverture du m
   await page.getByRole("button", { name: "Utiliser le modèle Bushi" }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Kakita Haruto" })).toBeVisible();
   await resources(page).click();
-  await expect(menu(page).getByRole("menuitem")).toHaveCount(7);
+  await expect(menu(page).getByRole("menuitem")).toHaveCount(11);
   await page.waitForLoadState("networkidle");
   expect(portal).toEqual([]);
 });
