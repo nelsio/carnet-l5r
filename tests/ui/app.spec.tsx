@@ -18,7 +18,7 @@ async function renderApp(character: Character | null = base(), rng = always(5), 
     await storage.library.put({ id: "kakita", character, mode, updatedAt: "2026-10-18T10:00:00.000Z" });
   }
   const view = render(<App storage={storage} rng={rng} />);
-  await screen.findByText(/^Carnet de Rokugan v/);
+  await screen.findByRole("contentinfo");
   await (character ? screen.findByRole("heading", { level: 1, name: new RegExp(character.name.slice(0, 5)) }) : screen.findByRole("button", { name: "Nouvelle fiche vierge" }));
   return { ...view, storage };
 }
@@ -36,7 +36,7 @@ beforeEach(() => {
 describe("Socle", () => {
   it("affiche la version en pied de page", async () => {
     await renderApp(null);
-    expect(screen.getByText(`Carnet de Rokugan v${__APP_VERSION__}`)).toBeInTheDocument();
+    expect(within(screen.getByRole("contentinfo")).getByRole("link", { name: /^Version / })).toHaveTextContent(`v${__APP_VERSION__}`);
   });
   it("sans fiche : crée un personnage et passe en modification", async () => {
     await renderApp(null);

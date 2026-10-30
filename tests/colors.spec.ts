@@ -1,5 +1,5 @@
 /**
- * Couleurs (annexe I.1.11) : contrastes N1 à N6 et N12 sur les valeurs de la feuille de style et des clans,
+ * Couleurs (annexe I.1.11) : contrastes N1 à N6, N12 et V8 (pied de page, annexe M.3) sur les valeurs de la feuille de style et des clans,
  * lint N8 des couleurs littérales. Pas de navigateur : contraste WCAG et mélange oklab calculés ici.
  */
 import { readdirSync, readFileSync } from "node:fs";
@@ -111,6 +111,12 @@ describe("Contrastes (annexe I.1.11)", () => {
   });
   it.each(ALL_CLANS)("N12 : %s : texte sur fond d'accent plein ≥ 4,5:1, deux thèmes (P-I1)", (_label, c) => {
     for (const t of THEMES) expect(contrast(token("--on-accent", t, c), token("--accent-fill", t, c)), t).toBeGreaterThanOrEqual(4.5);
+  });
+  it.each(ALL_CLANS)("V8 : %s : badge de version du pied de page (accent-ink sur fond) ≥ 4,5:1, deux thèmes (annexe M.3)", (_label, c) => {
+    for (const t of THEMES) expect(contrast(token("--accent-ink", t, c), token("--bg", t, c)), t).toBeGreaterThanOrEqual(4.5);
+  });
+  it.each(THEMES)("V8 : %s : kanji du sceau (pied de page, section « Le Carnet ») ≥ 4,5:1", (t) => {
+    expect(contrast(token("--seal-ink", t), token("--seal", t))).toBeGreaterThanOrEqual(4.5);
   });
   it("N7 (données) : l'accent du Scorpion n'est pas la couleur de danger", () => {
     const scorpion = CLANS.find((c) => c.id === "scorpion")!;

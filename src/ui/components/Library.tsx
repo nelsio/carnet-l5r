@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { clanAccent, schoolRankOf, serializeCharacter } from "@carnet/core";
 import { EXAMPLES, type Example } from "../../rules/example";
+import { CARNET_LINKS } from "../../rules/links";
 import { PORTAL } from "../../rules/portal";
 import { downloadText } from "../download";
 import type { LibraryEntry } from "../../storage";
@@ -37,6 +38,7 @@ export function Library() {
               <button type="button" className="btn accent" onClick={() => void library.create()}>Nouvelle fiche vierge</button>
             </StartOption>
           </div>
+          <p className="guide-hint">Première visite ? <ExternalLink href={CARNET_LINKS.guide}>Lire le guide</ExternalLink></p>
         </section>
         <section className="templates" aria-labelledby="templates-title">
           <h2 id="templates-title">Modèles de personnage</h2>

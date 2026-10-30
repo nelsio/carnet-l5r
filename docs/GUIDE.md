@@ -59,6 +59,8 @@ La **Forge** est une création guidée : elle calcule l'XP, les traits et les bo
 
 D'autres liens mènent au portail : le **nom du clan**, au-dessus du nom du personnage, ouvre la page du clan ; dans **Rouleaux & invocations**, **Grimoire** ouvre le grimoire et l'icône de chaque sort le cherche par son nom ; dans l'**aide de jeu**, un encadré propose le **Mémento de combat** en Combat, **Étiquette & coutumes** et **Bushido & honneur** en Cour.
 
+Le même menu se termine par la section **Le Carnet**, avec le numéro de version : ce **guide**, les **nouveautés** de chaque version, un formulaire pour **signaler un problème** (compte GitHub requis) et la **page du projet**. Ces liens sont aussi en **pied de page** de chaque écran, et la Bibliothèque vide propose **Lire le guide** dès la première visite.
+
 ## 4. Jouer avec l'aide de jeu
 
 L'onglet **Aide de jeu** (dans la barre du bas sur mobile) propose les jets de chaque situation :

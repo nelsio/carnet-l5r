@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { clanAccent } from "@carnet/core";
+import { CARNET_LINKS } from "../../rules/links";
 import { clanUrl, PORTAL, PORTAL_CLAN_KANJI } from "../../rules/portal";
 import { useStore } from "../store";
 import { ExtIcon } from "./ExternalLink";
@@ -12,6 +13,13 @@ const REFERENCES: Entry[] = [
   { href: PORTAL.combat, kanji: "刀", title: "Mémento de combat", desc: "Postures, duel Iaijutsu" },
   { href: PORTAL.bushido, kanji: "義", title: "Bushido & honneur", desc: "Vertus et barème d'honneur" },
   { href: PORTAL.etiquette, kanji: "茶", title: "Étiquette & coutumes", desc: "Castes, cadeaux, thé" },
+];
+/** Liens vers le dépôt du Carnet (annexe M.3), kanji sur fond sceau. */
+const CARNET: Entry[] = [
+  { href: CARNET_LINKS.guide, kanji: "帳", title: "Guide d'utilisation", desc: "Import, fiches, lanceur de dés" },
+  { href: CARNET_LINKS.releases, kanji: "新", title: "Nouveautés", desc: "Ce qui a changé à chaque version" },
+  { href: CARNET_LINKS.bug, kanji: "報", title: "Signaler un problème", desc: "Formulaire GitHub (compte requis)" },
+  { href: CARNET_LINKS.code, kanji: "源", title: "Page du projet", desc: "Présentation, captures, code source" },
 ];
 
 /**
@@ -71,9 +79,9 @@ export function ResourcesMenu() {
     }
   };
 
-  const group = (title: string, entries: Entry[]) => (
-    <div role="group" aria-label={title}>
-      <div className="res-group" aria-hidden="true">{title}</div>
+  const group = (title: string, entries: Entry[], extra?: { className: string; version: string }) => (
+    <div role="group" aria-label={title} className={extra?.className}>
+      <div className="res-group" aria-hidden="true">{title}{extra && <span className="v">v{extra.version}</span>}</div>
       {entries.map((x) => (
         <a key={x.href} role="menuitem" href={x.href} target="_blank" rel="noopener noreferrer"
           aria-label={`${x.title} : ${x.desc} (nouvel onglet)`} onClick={() => close()}>
@@ -104,7 +112,8 @@ export function ResourcesMenu() {
             {group("Campagne", campaign)}
             {group("Créer", CREATE)}
             {group("Références", REFERENCES)}
-            <p className="res-foot">Site de la campagne. S'ouvre dans un nouvel onglet.</p>
+            {group("Le Carnet", CARNET, { className: "res-carnet", version: __APP_VERSION__ })}
+            <p className="res-foot">Liens externes : s'ouvrent dans un nouvel onglet.</p>
           </div>
         </>
       )}

@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useReducer, useState, type DragEvent } from "react";
 import type { Storage } from "../storage";
 import { Aid } from "./components/Aid";
+import { AppFooter } from "./components/AppFooter";
 import { Header } from "./components/Header";
 import { ImportDialog } from "./components/ImportDialog";
 import { Library } from "./components/Library";
@@ -59,11 +60,10 @@ export function App({ storage, rng = d10, ...libraryOptions }: AppProps) {
           (max = Anneau de Vide), la pénalité de blessure s'ajoute au ND. Les procédures de duel et de bataille de masse sont résumées :
           vérifie le détail dans ton livre de base.
         </p>
-        <footer className="version">
-          {c && state.mode === "edit" && api.saveStatus === "saved" && !api.degraded && <span className="saved">Enregistré dans ce navigateur · </span>}
-          {api.saveStatus === "error" && <span className="save-error" role="alert">Échec de l'enregistrement dans ce navigateur · </span>}
-          Carnet de Rokugan v{__APP_VERSION__}
-        </footer>
+        <AppFooter status={<>
+          {c && state.mode === "edit" && api.saveStatus === "saved" && !api.degraded && <span className="saved">Enregistré dans ce navigateur</span>}
+          {api.saveStatus === "error" && <span className="save-error" role="alert">Échec de l'enregistrement dans ce navigateur</span>}
+        </>} />
         {pending && <ImportDialog pending={pending} onClose={() => setPending(null)} />}
       </div>
     </StoreContext.Provider>
