@@ -97,6 +97,15 @@ test.describe("O7 : Bibliothèque vide", () => {
     const [a, b] = [(await opts.nth(0).boundingBox())!, (await opts.nth(1).boundingBox())!];
     expect(Math.round(a.width)).toBe(Math.round(b.width));
     expect(Math.round(a.y)).toBe(Math.round(b.y));
+    expect(Math.round(a.height)).toBe(Math.round(b.height));
+    // Description plus longue d'un côté : étapes et boutons restent alignés, cases de même taille (v2.20.1).
+    const boxes = async (sel: string) => Promise.all((await page.locator(`.start ${sel}`).all()).map(async (x) => (await x.boundingBox())!));
+    const steps = await boxes(".steps li");
+    expect(steps).toHaveLength(6);
+    expect(new Set(steps.map((s) => Math.round(s.y))).size).toBe(1);
+    expect(new Set(steps.map((s) => Math.round(s.height))).size).toBe(1);
+    const acts = await boxes(".start-opt-act");
+    expect(Math.round(acts[0]!.y)).toBe(Math.round(acts[1]!.y));
     const cards = await page.locator(".tplc").all();
     const tops = await Promise.all(cards.map(async (c) => Math.round((await c.boundingBox())!.y)));
     expect(new Set(tops).size).toBe(1);

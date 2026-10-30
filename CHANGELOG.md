@@ -6,6 +6,11 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.20.1] - 2026-10-30
+
+### Corrigé
+- Bibliothèque vide : les deux options (Forger sur le portail, Fiche vierge) alignent leurs étapes et leurs boutons ; les six cases d'étapes ont la même taille, même quand une description passe sur deux lignes.
+
 ## [2.20.0] - 2026-10-30
 
 ### Ajouté
@@ -212,7 +217,8 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.20.0...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.20.1...HEAD
+[2.20.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.20.1
 [2.20.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.20.0
 [2.19.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.19.0
 [2.18.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.18.0
