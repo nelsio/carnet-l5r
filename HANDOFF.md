@@ -19,7 +19,7 @@ Fait foi :
 ### Décisions validées
 | Sujet | Décision |
 |---|---|
-| Forme | **Un seul fichier HTML autonome** (JS, CSS et polices inline). Aucun serveur, aucun compte. Aucune requête **automatique**. Une seule exception, **déclenchée par le joueur** : le chargement de la liste des sorts du grimoire du portail (bouton « Charger le grimoire » ou « Actualiser », annexe N). Rien n'est envoyé : lecture seule, sans cookie ni référent. Sans grimoire chargé, on saisit les sorts à la main ; le Carnet marche toujours hors ligne et en `file://`. Sur l'adresse GitHub Pages seulement, un service worker de même origine met le Carnet en cache pour l'usage hors ligne (annexe O.3). Il ne contacte aucun autre site. |
+| Forme | **Un seul fichier HTML autonome** (JS, CSS et polices inline). Aucun serveur, aucun compte. Le fichier ne fait aucune requête **automatique**. Une seule exception, **déclenchée par le joueur** : le chargement de la liste des sorts du grimoire du portail (bouton « Charger le grimoire » ou « Actualiser », annexe N). Rien n'est envoyé : lecture seule, sans cookie ni référent. Sans grimoire chargé, on saisit les sorts à la main ; le Carnet marche toujours hors ligne et en `file://`. Sur l'adresse GitHub Pages seulement, un service worker de même origine met le Carnet en cache pour l'usage hors ligne (annexe O.3). Il ne contacte aucun autre site. Sur cette même adresse seulement, `pages.yml` ajoute le compteur de visites GoatCounter (annexe O.5, P13) : à l'ouverture, une requête automatique transmet l'adresse de la page, le référent, le navigateur, la langue et la taille d'écran, sans cookie et sans aucune donnée de fiche, nom du personnage compris. Compteur bloqué ou indisponible, le Carnet marche à l'identique. |
 | Distribution | Dépôt **GitHub** : la page est servie par **GitHub Pages**, et le fichier `carnet-l5r.html` est joint à chaque release. Le même fichier marche en ligne et ouvert en local (`file://`). |
 | Stockage | Les fiches vivent dans le **navigateur** (IndexedDB). On les échange et on les sauvegarde en **fichiers JSON**, rangés où l'on veut (le Google Drive de la campagne, par exemple). |
 | Fichier lié | Sur Chrome et Edge desktop, une fiche peut être **liée à un fichier JSON** : chaque modification y est enregistrée automatiquement (utile avec un dossier Drive synchronisé sur le PC). Ailleurs, on passe par import et export. |
@@ -443,7 +443,7 @@ Depuis un fichier (bouton ou glisser-déposer). Trois destinations :
 | Workflow | Déclencheur | Étapes |
 |---|---|---|
 | `ci.yml` | push, pull request | install → lint → `tsc --noEmit` → Vitest → build → Playwright |
-| `pages.yml` | push sur `main` | build → publication de `dist/carnet-l5r.html` comme `index.html` sur GitHub Pages ; publie aussi `og.png` (aperçu de lien, annexe O.1) et lance `scripts/pages-pwa.mjs` (manifeste et service worker, annexe O.3) |
+| `pages.yml` | push sur `main` | build → publication de `dist/carnet-l5r.html` comme `index.html` sur GitHub Pages ; publie aussi `og.png` (aperçu de lien, annexe O.1) et lance `scripts/pages-pwa.mjs` (manifeste et service worker, annexe O.3) puis `scripts/pages-compteur.mjs` (compteur de visites, annexe O.5) |
 | `release.yml` | tag `v*` | build → release GitHub avec `carnet-l5r.html` en pièce jointe et notes générées |
 
 ### 9.2 Versionnement
@@ -457,7 +457,7 @@ Depuis v2.20.2 (annexe M.1), le guide joueur est **`docs/GUIDE.md`**. Le **READM
 Règle pour chaque lot : **mettre à jour `docs/GUIDE.md`**. Ne toucher au README que si une fonction listée dans « Ce que fait le Carnet » change ; relancer `npm run build && npm run screenshots` (hors CI) et committer `docs/img/` si un écran capturé change visiblement.
 
 Contenu du guide :
-1. **Utiliser en ligne** : l'adresse GitHub Pages. Les fiches restent dans ton navigateur, rien n'est envoyé.
+1. **Utiliser en ligne** : l'adresse GitHub Pages. Les fiches restent dans ton navigateur et ne sont jamais envoyées ; seule la visite est comptée (annexe O.5).
 2. **Utiliser hors-ligne** : télécharger `carnet-l5r.html` depuis la dernière release et l'ouvrir dans le navigateur.
 3. **Sauvegarder et partager** :
    - exporter sa fiche en JSON et la ranger dans le dossier Drive de la campagne ;
@@ -599,7 +599,8 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 28. **v2.23.1 — aperçu de lien** (**livrée**, écarts en O.1 bis) : annexe O.1. Balises description et Open Graph, image `og.png` 1200 × 630 publiée par `pages.yml` → cas W1 à W4.
 29. ~~**v2.23.2 — portail sans « campagne »**~~ (**mis de côté le 31/10/2026**, P11) : annexe O.2. Le portail se présente lui-même comme « Portail de campagne » : les libellés actuels restent. La **v2.23.2** (31/10/2026) affiche à la place le nom du portail dans le menu Ressources : « L'Empire d'Émeraude », sous-titre « Portail de campagne · Clans, règles, aides de jeu » (P11).
 30. **v2.24.0 — installable et hors ligne** (**livrée**, écarts en O.3 bis ; P12) : annexe O.3. Manifeste et service worker ajoutés au déploiement Pages seulement → cas W6 à W11.
-31. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
+31. **v2.24.1 — mesure de fréquentation** (**livrée**, écarts en O.5 bis ; P13) : annexe O.5. Compteur GoatCounter ajouté au déploiement Pages seulement, titre fixe, script épinglé → cas W12 à W18.
+32. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
 
 ---
 
@@ -621,7 +622,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 | P10 | **Vérifié** : catalogue d'armes corrigé (annexe E.2 C8) et catalogue d'armures ajouté (E.5). | Annexe E |
 | P11 | **Tranché le 31/10/2026** : le site de Vincenzo a pour titre « L'EMPIRE D'ÉMERAUDE » et se présente lui-même comme « Portail de campagne », on garde ce libellé pour le moment. Lot 33 (annexe O.2) mis de côté. v2.23.2 : l'entrée du menu Ressources prend le nom du site, « L'Empire d'Émeraude », sous-titre « Portail de campagne · Clans, règles, aides de jeu ». | Décision retenue ; à rouvrir si le portail change de présentation |
 | P12 | **Tranché le 31/10/2026, accepté** : service worker sur GitHub Pages (lot 34, annexe O.3). Exception au principe « aucune requête automatique » : le navigateur charge `sw.js` et le manifeste, même origine, rien n'est envoyé. | Décision retenue |
-| P13 | **Mesure de fréquentation (GoatCounter)** sur l'adresse GitHub Pages (`handoff-tracking.md`, 31/10/2026) : exception au §1 (requête automatique vers un autre site, envoie l'adresse, le référent, le navigateur et la taille d'écran). Si accepté : lot à part, script injecté par `pages.yml` seulement (le fichier de release et le smoke « aucune requête réseau » ne changent pas), §1, README, guide et `og:description` corrigés là où ils disent « rien n'est envoyé », note de confidentialité au tutoiement. | Pas de mesure de fréquentation |
+| P13 | **Tranché le 31/10/2026 : accepté.** Mesure de fréquentation (GoatCounter) sur l'adresse GitHub Pages (`handoff-tracking.md`), exception au §1 : requête automatique vers un autre site, script injecté par `pages.yml` seulement (lot 35, annexe O.5). Le fichier de release et le smoke « aucune requête réseau » ne changent pas. | Décision retenue |
 
 ---
 
@@ -1548,7 +1549,7 @@ Statut : lot 15 **livré** (écarts en H.11), lot 16 **livré** (écarts en H.12
 | `.editorconfig` | UTF-8, LF, indentation 2 espaces, retour à la ligne final ; `*.md` sans suppression des espaces de fin. |
 
 ### H.2 `CONTRIBUTING.md` (plan)
-1. **Esprit du projet** : outil de fan, un seul fichier HTML, aucune requête réseau, rien n'est envoyé. Toute contribution respecte ces contraintes.
+1. **Esprit du projet** : outil de fan, un seul fichier HTML, aucune requête automatique, aucune donnée de fiche envoyée. Toute contribution respecte ces contraintes.
 2. **Signaler un bug ou une règle** : passer par les modèles d'issue.
 3. **Proposer une évolution** : ouvrir une issue avant de coder. Les évolutions importantes passent par une annexe de `HANDOFF.md` (spécification avant code).
 4. **Développer** : renvoi à la section Développement du README (Node 24, commandes). Ne pas dupliquer les commandes.
@@ -2976,9 +2977,9 @@ Le lien vers le grimoire du sort (lot 29, L.13) suit immédiatement le nouveau n
 
 ---
 
-## Annexe O — Lots 32 à 34 : diffusion (v2.23.1, v2.23.2, v2.24.0)
+## Annexe O — Lots 32 à 35 : diffusion (v2.23.1, v2.23.2, v2.24.0, v2.24.1)
 
-Statut : reçu le 31/10/2026. Base `main` au commit `ee359dd` (v2.23.0). Source : `handoff-diffusion.md` (31/10/2026). Une PR et une version par lot, dans l'ordre. Le lot 32 ne dépend de rien. Le lot 33 attend **P11**, le lot 34 attend **P12** : sans réponse, ne pas les commencer. P13 (mesure de fréquentation, `handoff-tracking.md`) est ajouté au §12 en même temps : non planifié tant qu'il n'est pas tranché.
+Statut : reçu le 31/10/2026. Base `main` au commit `ee359dd` (v2.23.0). Source : `handoff-diffusion.md` (31/10/2026). Une PR et une version par lot, dans l'ordre. Le lot 32 ne dépend de rien. Le lot 33 attend **P11**, le lot 34 attend **P12** : sans réponse, ne pas les commencer. P13 (mesure de fréquentation, `handoff-tracking.md`) est ajouté au §12 en même temps ; tranché le 31/10/2026 : lot 35, annexe O.5.
 
 ### O.0 Constat
 
@@ -3163,4 +3164,37 @@ Objectif : un joueur ouvre l'adresse une fois, l'ajoute à son écran d'accueil,
 |---|---|---|
 | P11 | **Portail présenté comme ressource commune** (lot 33). Nom affiché (« Portail L5R » ?) et ligne de crédit à valider avec Vincenzo : son site devient une ressource pour des groupes inconnus (liens, et lecture du grimoire sur clic, ≈ 110 Ko par joueur). | Lot 33 non commencé |
 | P12 | **Service worker sur GitHub Pages** (lot 34) : exception au principe « aucune requête automatique » (le navigateur charge `sw.js` et le manifeste, même origine, rien n'est envoyé). | Lot 34 non commencé ; le fichier de release reste la seule solution hors ligne |
-| P13 | **Mesure de fréquentation (GoatCounter)** sur l'adresse GitHub Pages (`handoff-tracking.md`, 31/10/2026) : exception au §1 (requête automatique vers un autre site, envoie l'adresse, le référent, le navigateur et la taille d'écran). Si accepté : lot à part, script injecté par `pages.yml` seulement (le fichier de release et le smoke « aucune requête réseau » ne changent pas), §1, README, guide et `og:description` corrigés là où ils disent « rien n'est envoyé », note de confidentialité au tutoiement. | Pas de mesure de fréquentation |
+| P13 | **Tranché le 31/10/2026 : accepté.** Mesure de fréquentation (GoatCounter) sur l'adresse GitHub Pages (`handoff-tracking.md`), exception au §1 : requête automatique vers un autre site, script injecté par `pages.yml` seulement (lot 35, annexe O.5). Le fichier de release et le smoke « aucune requête réseau » ne changent pas. | Décision retenue |
+
+### O.5 Lot 35 : mesure de fréquentation (v2.24.1)
+
+Source : `handoff-tracking.md`, P13 accepté le 31/10/2026. Tableau de bord : `https://carnet-l5r.goatcounter.com` (compte de Nelson).
+
+1. **`scripts/pages-compteur.mjs`** : ajoute le script GoatCounter et son `<noscript>` avant le dernier `</body>` du dossier publié. `pages.yml` le lance après `pages-pwa.mjs`. Le build et le fichier de release ne changent pas. Le code du site n'apparaît qu'à un endroit (constante `COUNT`).
+2. **Titre fixe** : `data-goatcounter-settings='{"title":"Carnet de Rokugan"}'`. Sans ce réglage, `count.js` envoie `document.title`, qui porte le nom du personnage (annexe G.3).
+3. **Script épinglé** : `count.v5.js` avec `integrity` (empreinte publiée par GoatCounter) et `crossorigin="anonymous"`. Ce script tourne sur la même origine que les fiches : un fichier modifié est refusé par le navigateur et la visite n'est simplement pas comptée.
+4. **Textes** : §1, README (section « Confidentialité », avant « En savoir plus »), guide §1, `CONTRIBUTING.md`, `docs/CREDITS.md`, `meta description` de `index.html`. Le `CHANGELOG` des versions passées et les mentions propres au grimoire (« Rien n'est envoyé », sur le clic « Charger ») ne changent pas.
+
+**Hors périmètre** : événements (jets, import), cookies, `localStorage` ajouté, bannière. `count.js` lit `localStorage.skipgc` et ne l'écrit que si on ouvre l'adresse avec `#toggle-goatcounter` : c'est le moyen d'exclure ses propres visites.
+
+**Tests**
+
+| Cas | Vérifie |
+|---|---|
+| W12 | `tests/compteur.spec.ts` : injection avant le dernier `</body>`, titre fixe, script épinglé, empreinte égale à celle de `tests/fixtures/goatcounter/count.v5.js` |
+| W13 | Le script échoue sans `</body>`, sans rien publier |
+| W14 | `tests/e2e/compteur.spec.ts` : le build ne contient ni `goatcounter` ni `gc.zgo.at` ; le smoke « aucune requête réseau » n'a pas changé |
+| W15 | Le dossier publié, servi à sa vraie adresse par `page.route`, avec le vrai script : une visite est comptée, le titre envoyé reste fixe alors qu'une fiche est ouverte, et aucun paramètre inattendu ne part |
+| W16 | Compteur bloqué (uBlock) : aucune erreur, le Carnet marche à l'identique |
+| W17 | Script modifié : refusé par le navigateur, rien n'est compté, le Carnet marche à l'identique |
+| W18 | Après déploiement, manuel : requête `…goatcounter.com/count` en 200 ou 204, visite visible sur le tableau de bord, rendu mobile inchangé, aucune fiche ni aucun nom dans les données reçues |
+
+#### O.5 bis Écarts de mise en œuvre (lot 35)
+
+- **`handoff-tracking.md` non suivi à la lettre**, P13 prime : script injecté par `pages.yml` et non écrit dans `index.html`, sinon le fichier de release et le smoke changeraient. Critère 7 du handoff (`index.html` et `README.md` seuls modifiés) remplacé par la liste de l'étape 4. Critère 1 (`count.js` chargé en local) sans objet : le compteur n'existe que sur l'adresse publiée. Branche et commit suivent la convention des lots.
+- **Snippet modifié** : titre fixe (étape 2), `count.v5.js` et intégrité au lieu de `//gc.zgo.at/count.js` (étape 3), `https:` explicite. Si GoatCounter change `count.v5.js`, le comptage s'arrête sans gêner le Carnet : l'empreinte est à reprendre sur sa page de versions, et W12 avec la copie de test.
+- **Note de confidentialité** : complétée d'après `count.v5.js` et la page de confidentialité de GoatCounter (langue, pays déduit de l'adresse IP, qui n'est pas conservée). « Sans revente de données » et « sans identification personnelle » retirés : le Carnet ne peut pas le garantir par son code. P13 ne citait pas la langue ni l'adresse IP.
+- **P13 citait `og:description`** : elle dit déjà « tes fiches restent dans ton navigateur », toujours vrai. La balise corrigée est `meta description`. `CONTRIBUTING.md` et H.2 ajoutés à la liste.
+- **Hors ligne** : le service worker laisse passer les autres origines (W9). Sans réseau, le script ne se charge pas, la visite n'est pas comptée et le Carnet n'est pas gêné (W16).
+- **`CHANGELOG`** : lien `[2.24.0]` manquant ajouté avec celui de la v2.24.1.
+- **W18** : à faire après déploiement.

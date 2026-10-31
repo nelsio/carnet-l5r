@@ -13,6 +13,7 @@
 
   Textes des licences : [`src/ui/fonts/LICENSES.md`](../src/ui/fonts/LICENSES.md).
 - Lecture des fichiers du grimoire : **json5** 2.2.3, licence **MIT**.
+- Compteur de visites de l'adresse web : **GoatCounter** (`count.v5.js`), licence **ISC**. Chargé par le navigateur sur l'adresse GitHub Pages seulement, pas inclus dans le Carnet ; une copie sert aux tests (`tests/fixtures/goatcounter/`).
 - Les caractéristiques des sorts proposées dans le Carnet viennent du **grimoire du portail de la campagne** (avec l'accord de son auteur) ; elles sont téléchargées par le joueur, pas incluses dans le Carnet.
 
 ## Crédits et remerciements

@@ -31,6 +31,8 @@ jobs:
       - run: cp docs/img/og.png site/og.png
       # Manifeste et service worker, sur l'adresse Pages seulement (annexe O.3).
       - run: node scripts/pages-pwa.mjs
+      # Compteur de visites, sur l'adresse Pages seulement (annexe O.5).
+      - run: node scripts/pages-compteur.mjs
       - uses: actions/upload-pages-artifact@v5
         with:
           path: site
