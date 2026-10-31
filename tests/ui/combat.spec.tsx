@@ -1,4 +1,4 @@
-/** Lot 12, v2.3.0 (HANDOFF annexe E.3) : parcours de combat complet dans l'aide de jeu. */
+/** Lot 12, v2.3.0 (HANDOFF annexe E.3) : parcours de combat complet dans l'Assistant L5R. */
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import type { Character } from "@carnet/core";
@@ -8,6 +8,7 @@ import kakita from "../fixtures/kakita-v1.json";
 import { chooseStance, currentStance, stanceOption } from "../helpers/stance";
 import { openWounds, woundsField } from "../helpers/wounds";
 import { spendVoid } from "../helpers/void";
+import { VIEW } from "../helpers/views";
 
 const base = () => structuredClone(kakita) as Character;
 const always = (v: number) => () => v;
@@ -22,7 +23,7 @@ async function renderApp(character: Character = base(), rng = always(5)) {
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
 const roller = () => within(screen.getByRole("dialog", { name: "Lanceur de dés" }));
 const toCombat = (sub?: string) => {
-  click("Aide de jeu");
+  click(VIEW.aid);
   click("Combat");
   if (sub) click(sub);
 };
@@ -166,7 +167,7 @@ describe("Vide, Feinte, Garde, encaissement (F3 à F6)", () => {
 describe("Jets et duel (F7 à F12)", () => {
   it("F7 : opposition avec 2 augmentations → « Bats l'adversaire d'au moins 10 », verdict avec le total adverse", async () => {
     await renderApp(base(), always(9));
-    click("Aide de jeu");
+    click(VIEW.aid);
     click("Cour");
     click(/^Convaincre, manipuler/);
     fireEvent.change(roller().getByRole("spinbutton", { name: "Augmentations" }), { target: { value: "2" } });

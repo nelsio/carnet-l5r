@@ -3,6 +3,7 @@ import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 import { openWounds, woundsButton } from "./wounds";
+import { VIEW } from "../helpers/views";
 
 const targets = [
   { id: "E1", label: "en file://, réseau coupé", url: pathToFileURL(resolve("dist/carnet-l5r.html")).href, offline: true },
@@ -96,7 +97,7 @@ test.describe("Préférences et armure après rechargement (file://)", () => {
     await page.goto(url);
     await page.getByRole("button", { name: "Nouvelle fiche vierge" }).click();
     await page.getByRole("button", { name: "Terminer" }).click();
-    await page.getByRole("button", { name: "Aide de jeu" }).click();
+    await page.getByRole("button", { name: VIEW.aid }).click();
     for (const s of ["Enquête", "Déplacement", "Combat"]) {
       await page.getByRole("group", { name: "Situation" }).getByRole("button", { name: s, exact: true }).click();
       await page.locator("button.act").first().click();

@@ -49,10 +49,10 @@ export function spellUrl(name: string, element?: SpellElement): string {
   return `${PORTAL.grimoire}?q=${encodeURIComponent(q)}${el}`;
 }
 
-/** Lien de l'encadré de l'Aide de jeu (annexe L.8). */
+/** Lien de l'encadré de l'Assistant L5R (annexe L.8). */
 export interface PortalLink { url: string; title: string; desc: string }
 
-/** Liens vers le portail par situation de l'Aide de jeu ; une situation sans lien n'a pas d'encadré (annexe L.8). */
+/** Liens vers le portail par situation de l'Assistant L5R ; une situation sans lien n'a pas d'encadré (annexe L.8). */
 export const SITUATION_LINKS: Readonly<Record<Situation, readonly PortalLink[]>> = {
   investigation: [],
   court: [

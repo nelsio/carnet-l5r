@@ -15,7 +15,7 @@ Un seul fichier HTML, **sans serveur ni compte** : tes fiches restent dans ton n
 ## Ce que fait le Carnet
 
 - **Fiche complète** : anneaux, compétences, armes, armure, techniques d'école, sorts. Les réserves (`5g3`…) se recalculent à chaque changement.
-- **Aide de jeu** par situation : Enquête, Cour, Déplacement, Combat (escarmouche, duel iaijutsu, bataille de masse) et Magie.
+- **Assistant L5R** par situation : Enquête, Cour, Déplacement, Combat (escarmouche, duel iaijutsu, bataille de masse) et Magie.
 - **Lanceur** : il lance les dés pour toi, ou t'indique comment lancer tes vrais dés. Chance de réussite contre le ND, augmentations, manœuvres, Vide.
 - **40 écoles** (bushi, courtisans, shugenja) et les maîtrises de compétence appliquées d'office.
 - **Suivi en partie** : blessures, points de Vide, emplacements de sorts, nouvelle journée.
@@ -23,13 +23,13 @@ Un seul fichier HTML, **sans serveur ni compte** : tes fiches restent dans ton n
 
 ![Escarmouche : attaques et dégâts à gauche, lanceur avec manœuvres et résultat à droite](docs/img/combat.png)
 
-![Sur mobile : fiche, aide de jeu Magie et lanceur d'un sort](docs/img/mobile.png)
+![Sur mobile : fiche, Assistant L5R en Magie et lanceur d'un sort](docs/img/mobile.png)
 
 ## Démarrer
 
 1. Ouvre **https://nelsio.github.io/carnet-l5r/**.
 2. Crée ta fiche : **Nouvelle fiche vierge**, un **modèle** (Bushi, Shugenja, Courtisan), ou un JSON exporté de la [Forge du portail](https://vincenzorpg.github.io/L5R/createcharacter.html).
-3. Joue : onglet **Aide de jeu**, choisis la situation, touche une action.
+3. Joue : onglet **Assistant L5R**, choisis la situation, touche une action.
 
 Pour jouer **hors ligne**, **installe le Carnet** depuis ton navigateur (voir le [guide](docs/GUIDE.md#installer-sur-ton-téléphone-ou-ton-ordinateur)) ou télécharge `carnet-l5r.html` depuis la [dernière release](https://github.com/nelsio/carnet-l5r/releases/latest) et ouvre-le dans ton navigateur.
 

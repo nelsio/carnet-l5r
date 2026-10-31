@@ -6,6 +6,7 @@
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { expect, test, type Locator, type Page } from "@playwright/test";
+import { VIEW } from "../helpers/views";
 
 const pageUrl = pathToFileURL(resolve("dist/carnet-l5r.html")).href;
 
@@ -122,7 +123,7 @@ for (const theme of ["light", "dark"] as const) {
   test(`D1 : Posture (avec effets) et Trait (champ), ${theme}`, async ({ page }) => {
     await create(page, theme);
     await page.getByRole("button", { name: "Terminer : Identité & réputation" }).click();
-    await page.getByRole("button", { name: "Aide de jeu" }).click();
+    await page.getByRole("button", { name: VIEW.aid }).click();
     await page.getByRole("button", { name: "Combat", exact: true }).click();
     const stance = page.getByRole("combobox", { name: "Posture" });
     // Nouveau personnage, Réflexes 2 : ND d'armure 15 en Attaque, 5 en Assaut.

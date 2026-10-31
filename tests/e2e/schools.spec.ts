@@ -2,6 +2,7 @@
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
+import { VIEW } from "../helpers/views";
 
 const pageUrl = pathToFileURL(resolve("dist/carnet-l5r.html")).href;
 const kakitaPath = resolve("tests/fixtures/kakita-v1.json");
@@ -26,7 +27,7 @@ async function chooseSchool(page: Page, school: string, insight: string) {
 }
 
 async function skirmish(page: Page) {
-  await page.getByRole("button", { name: "Aide de jeu" }).click();
+  await page.getByRole("button", { name: VIEW.aid }).click();
   await page.getByRole("button", { name: "Combat", exact: true }).click();
 }
 
@@ -96,7 +97,7 @@ async function importCourtier(page: Page) {
 }
 
 async function court(page: Page) {
-  await page.getByRole("button", { name: "Aide de jeu" }).click();
+  await page.getByRole("button", { name: VIEW.aid }).click();
   await page.getByRole("button", { name: "Cour", exact: true }).click();
 }
 

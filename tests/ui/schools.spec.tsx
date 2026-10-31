@@ -7,6 +7,7 @@ import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
 import { chooseStance } from "../helpers/stance";
 import { chooseVoid, voidPanel } from "../helpers/void";
+import { VIEW } from "../helpers/views";
 
 const base = () => structuredClone(kakita) as Character;
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
@@ -22,7 +23,7 @@ async function mount(patch: Partial<Character> = {}, rng = () => 5) {
 }
 
 function skirmish() {
-  click("Aide de jeu");
+  click(VIEW.aid);
   click("Combat");
 }
 
@@ -162,7 +163,7 @@ const courtSkills = (): Partial<Character> => ({
 });
 
 function court() {
-  click("Aide de jeu");
+  click(VIEW.aid);
   click("Cour");
 }
 
@@ -232,7 +233,7 @@ describe("Techniques des courtisans et de Shosuro : parcours E20 à E23", () => 
 
   it("Shosuro Infiltré 2 : case « Cible qui ne te voit pas », augmentations non limitées", async () => {
     await mount({ schoolId: "shosuro-infiltre", insightRank: 2 });
-    click("Aide de jeu");
+    click(VIEW.aid);
     click("Combat");
     click(/^Attaque · Katana/);
     fireEvent.click(roller().getByRole("checkbox", { name: /Cible qui ne te voit pas/ }));

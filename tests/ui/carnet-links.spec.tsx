@@ -10,6 +10,7 @@ import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import pkg from "../../package.json";
 import kakita from "../fixtures/kakita-v1.json";
+import { VIEW } from "../helpers/views";
 
 const REPO = "https://github.com/nelsio/carnet-l5r";
 
@@ -84,11 +85,11 @@ describe("V3 : pied de page", () => {
     expectFooter();
   });
 
-  it("Fiche, Aide de jeu, Statistiques et Bibliothèque avec fiches", async () => {
+  it("Fiche, Assistant L5R, Statistiques et Bibliothèque avec fiches", async () => {
     await renderApp();
     await screen.findByRole("heading", { level: 1, name: /Kakita/ });
     expectFooter();
-    for (const view of ["Aide de jeu", "Statistiques"]) {
+    for (const view of [VIEW.aid, "Statistiques"]) {
       fireEvent.click(screen.getByRole("button", { name: view }));
       expectFooter();
     }

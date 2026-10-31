@@ -6,6 +6,7 @@
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
+import { VIEW } from "../helpers/views";
 
 const pageUrl = pathToFileURL(resolve("dist/carnet-l5r.html")).href;
 
@@ -174,13 +175,13 @@ test.describe("Lot 27 : Forge pas encore compatible", () => {
   });
 });
 
-test.describe("O16 : Aide de jeu à 390 px (lot 23, annexe L.8)", () => {
+test.describe("O16 : Assistant L5R à 390 px (lot 23, annexe L.8)", () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
   test("encadré sous les actions ; onglets de situation sur une ligne", async ({ page }) => {
     await page.goto(pageUrl);
     await page.getByRole("button", { name: "Utiliser le modèle Shugenja" }).click();
-    await page.getByRole("group", { name: "Vue" }).getByRole("button", { name: "Aide de jeu" }).click();
+    await page.getByRole("group", { name: "Vue" }).getByRole("button", { name: VIEW.aid }).click();
     const sit = page.getByRole("group", { name: "Situation" });
     for (const name of ["Combat", "Cour"]) {
       await sit.getByRole("button", { name }).click();
@@ -202,7 +203,7 @@ test("O15 : encadré à droite des actions sur bureau", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto(pageUrl);
   await page.getByRole("button", { name: "Utiliser le modèle Bushi" }).click();
-  await page.getByRole("group", { name: "Vue" }).getByRole("button", { name: "Aide de jeu" }).click();
+  await page.getByRole("group", { name: "Vue" }).getByRole("button", { name: VIEW.aid }).click();
   await page.getByRole("group", { name: "Situation" }).getByRole("button", { name: "Cour" }).click();
   const actions = (await page.locator(".aid .actions").boundingBox())!;
   const b = (await page.getByRole("complementary", { name: "Liens vers le portail" }).boundingBox())!;

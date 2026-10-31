@@ -29,8 +29,9 @@ const shots = {};
 // Bureau : fiche, puis escarmouche avec un jet lancé.
 const d = await open(1280, 720);
 await d.getByRole("button", { name: "Utiliser" }).first().click(); await settle(d);
+await d.evaluate(() => window.scrollTo(0, 0)); await settle(d);
 shots.fiche = await d.screenshot();
-await tab(d, "Aide de jeu").click();
+await tab(d, "Assistant L5R").click();
 await situation(d, "Combat").click();
 await d.getByRole("button", { name: "Escarmouche", exact: true }).click();
 await d.getByRole("button", { name: /Attaque · Katana/ }).first().click(); await settle(d);
@@ -38,12 +39,12 @@ await d.getByRole("button", { name: /^Lancer/ }).last().click(); await settle(d)
 await d.getByRole("button", { name: /Attaque · Katana/ }).first().evaluate((e) => e.scrollIntoView({ block: "center" })); await settle(d);
 shots.combat = await d.screenshot();
 
-// Mobile : fiche, aide de jeu Magie, lanceur d'un sort.
+// Mobile : fiche, Assistant L5R en Magie, lanceur d'un sort.
 const m = await open(390, 844);
 await m.getByRole("button", { name: "Utiliser" }).nth(1).click(); await settle(m);
 await m.evaluate(() => window.scrollTo(0, 0)); await settle(m);
 const phones = [await m.screenshot()];
-await tab(m, "Aide de jeu").click();
+await tab(m, "Assistant L5R").click();
 await situation(m, "Magie").click(); await settle(m);
 phones.push(await m.screenshot());
 await m.getByRole("button", { name: /Lancer · Frappe de jade/ }).click(); await settle(m);

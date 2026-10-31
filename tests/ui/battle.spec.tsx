@@ -1,4 +1,4 @@
-/** Lot 12, v2.7.0 (HANDOFF annexe E.8) : panneau Bataille de masse de l'aide de jeu. Kakita : Eau 2, Bataille 1. */
+/** Lot 12, v2.7.0 (HANDOFF annexe E.8) : panneau Bataille de masse de l'Assistant L5R. Kakita : Eau 2, Bataille 1. */
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import type { Character } from "@carnet/core";
@@ -6,6 +6,7 @@ import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
 import { woundsField } from "../helpers/wounds";
+import { VIEW } from "../helpers/views";
 
 const base = () => structuredClone(kakita) as Character;
 
@@ -17,7 +18,7 @@ async function renderApp(character: Character = base(), mode: "edit" | "readonly
 }
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
 const toBattle = () => {
-  click("Aide de jeu");
+  click(VIEW.aid);
   click("Combat");
   click("Bataille");
 };
@@ -29,7 +30,7 @@ const outcome = () => panel().getByTestId("battle-outcome");
 describe("Bataille de masse (E.8)", () => {
   it("panneau en Bataille seulement, plus de carte « Niveau d'engagement »", async () => {
     await renderApp();
-    click("Aide de jeu");
+    click(VIEW.aid);
     click("Combat");
     expect(screen.queryByRole("group", { name: "Bataille de masse" })).not.toBeInTheDocument();
     click("Bataille");

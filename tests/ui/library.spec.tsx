@@ -7,6 +7,7 @@ import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
 import { clickWounds } from "../helpers/wounds";
 import { spendVoid } from "../helpers/void";
+import { VIEW } from "../helpers/views";
 
 const base = () => structuredClone(kakita) as Character;
 const entry = (id: string, patch: Partial<LibraryEntry> = {}): LibraryEntry => ({
@@ -187,7 +188,7 @@ describe("Fiche en consultation", () => {
 
   it("le lanceur reste utilisable mais ne dépense rien", async () => {
     const { s } = await readonly();
-    click("Aide de jeu");
+    click(VIEW.aid);
     click(/^Remarquer un détail/);
     fireEvent.click(screen.getByRole("checkbox", { name: /Dépenser 1 point de Vide \(\+1g1\)/ }));
     click("Lancer 4g3");

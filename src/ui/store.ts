@@ -21,7 +21,7 @@ export type ListKey = "skills" | "weapons" | "techniques" | "maneuvers" | "modif
 export type BlockId = "rings" | "identity" | "skills" | "weapons" | "armor" | "techniques" | "magic" | "modifiers" | "notes";
 /** Bloc ouvert à la création d'une fiche : le nom en premier. */
 export const NEW_CHARACTER_BLOCK: BlockId = "identity";
-/** Panneaux de l'aide de jeu dotés d'un bouton « i » (HANDOFF §6.2). */
+/** Panneaux de l'Assistant L5R dotés d'un bouton « i » (HANDOFF §6.2). */
 export type InfoPanel = "move" | "reminders" | "battle";
 /** Option du panneau « Dépenser du Vide » (annexe J.6) ; Initiative et Échanger en escarmouche seulement. */
 export type VoidChoice = "roll" | "armor" | "skill" | "ability" | "initiative" | "swap";
@@ -280,7 +280,7 @@ export function setIn<T>(obj: T, path: Path, value: unknown): T {
   return copy as T;
 }
 
-/** Actions de la situation courante de l'aide de jeu. */
+/** Actions de la situation courante de l'Assistant L5R. */
 export function currentActions(c: Character, ui: Pick<UiState, "situation" | "sub">): ActionDef[] {
   return buildActions(c, ui.situation, ui.situation === "combat" ? ui.sub : undefined);
 }

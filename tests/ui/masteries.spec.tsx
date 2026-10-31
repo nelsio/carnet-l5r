@@ -5,6 +5,7 @@ import type { Character } from "@carnet/core";
 import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
+import { VIEW } from "../helpers/views";
 
 const base = () => structuredClone(kakita) as Character;
 const rank = (c: Character, name: string, r: number) => {
@@ -22,7 +23,7 @@ async function renderApp(character: Character = base()) {
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
 const roller = () => within(screen.getByRole("dialog", { name: "Lanceur de dés" }));
 const toCombat = () => {
-  click("Aide de jeu");
+  click(VIEW.aid);
   click("Combat");
 };
 
@@ -54,7 +55,7 @@ describe("Maîtrises au lanceur (annexe E.4)", () => {
 
   it("Athlétisme 3 : terrain modéré sans pénalité, note de maîtrise", async () => {
     await renderApp(rank(base(), "Athlétisme", 3));
-    click("Aide de jeu");
+    click(VIEW.aid);
     click("Déplacement");
     fireEvent.click(within(screen.getByRole("group", { name: "Terrain" })).getByRole("button", { name: "Modéré" }));
     expect(screen.getByTestId("move-water")).toHaveTextContent(/^Anneau d'Eau 2$/);

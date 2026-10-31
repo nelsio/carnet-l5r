@@ -2,6 +2,7 @@
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
+import { VIEW } from "../helpers/views";
 
 const pageUrl = pathToFileURL(resolve("dist/carnet-l5r.html")).href;
 
@@ -23,7 +24,7 @@ async function kenjutsu7(page: Page) {
 
 test("Q19 : Min, Moy., Max et Réussite de même hauteur, texte centré (± 1 px) ; « 9+ » garde le style .tag", async ({ page }) => {
   await kenjutsu7(page);
-  await page.getByRole("button", { name: "Aide de jeu" }).click();
+  await page.getByRole("button", { name: VIEW.aid }).click();
   await page.getByRole("group", { name: "Situation" }).getByRole("button", { name: "Combat", exact: true }).click();
   await page.locator("button.act").filter({ hasText: /^Attaque · Katana/ }).click();
   await page.getByRole("spinbutton", { name: "ND d'armure cible" }).fill("10");

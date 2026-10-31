@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
+import { VIEW } from "../helpers/views";
 
 const pageUrl = pathToFileURL(resolve("dist/carnet-l5r.html")).href;
 const kakitaPath = resolve("tests/fixtures/kakita-v1.json");
@@ -53,7 +54,7 @@ test("E4 : import en « Consultation » : badge, lecture seule, jet possible san
   await expect(page.getByRole("button", { name: /^Edit : / })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Point de Vide 1" })).toBeDisabled();
 
-  await page.getByRole("button", { name: "Aide de jeu" }).click();
+  await page.getByRole("button", { name: VIEW.aid }).click();
   await page.locator("button.act").filter({ hasText: "Remarquer un détail" }).click();
   await page.getByRole("checkbox", { name: /Dépenser 1 point de Vide \(\+1g1\)/ }).check();
   await page.getByRole("button", { name: "Lancer 4g3" }).click();
@@ -83,7 +84,7 @@ test("E5 : fusion ajoutant Kyujutsu et un arc : aperçu, puis tir sur Réflexes 
   await dialog(page).getByRole("button", { name: "Appliquer" }).click();
   await expect(dialog(page)).toBeHidden();
 
-  await page.getByRole("button", { name: "Aide de jeu" }).click();
+  await page.getByRole("button", { name: VIEW.aid }).click();
   await page.getByRole("button", { name: "Combat", exact: true }).click();
   // Kyujutsu 1 + Réflexes 3 = 4g3 ; force de l'arc 3 plafonnée par la Force 2 (C11) + 2g2 = 4g2.
   await expect(page.locator("button.act").filter({ hasText: "Tir · Yumi" }).locator(".p")).toHaveText("4g3");

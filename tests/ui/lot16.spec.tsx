@@ -5,6 +5,7 @@ import { CharacterSchema, type Character } from "@carnet/core";
 import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import perso from "../../reference/perso-test-shugenja.json";
+import { VIEW } from "../helpers/views";
 
 const DICE_K = /\b\d+k\d+\b/;
 
@@ -27,13 +28,13 @@ const situation = (name: string) => fireEvent.click(within(screen.getByRole("gro
 const body = () => document.body.textContent ?? "";
 
 describe("Notation des dés (H.5)", () => {
-  it("K2 : aucune VD en « k » dans la Fiche, l'Aide de jeu, les Statistiques et le lanceur", async () => {
+  it("K2 : aucune VD en « k » dans la Fiche, l'Assistant L5R, les Statistiques et le lanceur", async () => {
     await renderApp(kuni());
     expect(body()).not.toMatch(DICE_K);
     expect(body()).toContain("VD 3g3");
     expect(body()).toContain("VD 2g2");
 
-    click("Aide de jeu");
+    click(VIEW.aid);
     situation("Combat");
     expect(body()).not.toMatch(DICE_K);
     fireEvent.click(screen.getAllByRole("button", { name: /^Dégâts · Katana/ })[0]!);

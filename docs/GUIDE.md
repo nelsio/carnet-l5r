@@ -5,7 +5,7 @@
 1. [Utiliser en ligne](#1-utiliser-en-ligne)
 2. [Utiliser hors ligne](#2-utiliser-hors-ligne)
 3. [Créer et remplir ta fiche](#3-créer-et-remplir-ta-fiche)
-4. [Jouer avec l'aide de jeu](#4-jouer-avec-laide-de-jeu)
+4. [Jouer avec l'Assistant L5R](#4-jouer-avec-lassistant-l5r)
 5. [Le lanceur : vrais dés ou dés de l'outil](#5-le-lanceur--vrais-dés-ou-dés-de-loutil)
 6. [Statistiques](#6-statistiques)
 7. [Techniques d'école](#7-techniques-décole)
@@ -78,13 +78,13 @@ La **Forge** est une création guidée : elle calcule l'XP, les traits et les bo
 <!-- FORGE_JSON_OK : quand la constante passe à true, remplacer la phrase suivante par « Elle exporte un JSON compatible avec le Carnet : importe-le ici avec Importer un JSON. » -->
 Son export JSON **ne s'importe pas encore** dans le Carnet (la pastille « JSON pas encore compatible » le rappelle) : en attendant, crée une **fiche vierge** et recopie-y ton personnage.
 
-D'autres liens mènent au portail : le **nom du clan**, au-dessus du nom du personnage, ouvre la page du clan ; dans **Rouleaux & invocations**, **Grimoire** ouvre le grimoire et l'icône de chaque sort le cherche par son nom et son élément ; dans l'**aide de jeu**, un encadré propose le **Mémento de combat** en Combat, **Étiquette & coutumes** et **Bushido & honneur** en Cour.
+D'autres liens mènent au portail : le **nom du clan**, au-dessus du nom du personnage, ouvre la page du clan ; dans **Rouleaux & invocations**, **Grimoire** ouvre le grimoire et l'icône de chaque sort le cherche par son nom et son élément ; dans l'**Assistant L5R**, un encadré propose le **Mémento de combat** en Combat, **Étiquette & coutumes** et **Bushido & honneur** en Cour.
 
 Le même menu se termine par la section **Le Carnet**, avec le numéro de version : ce **guide**, les **nouveautés** de chaque version, un formulaire pour **signaler un problème** (compte GitHub requis) et la **page du projet**. Ces liens sont aussi en **pied de page** de chaque écran, et la Bibliothèque vide propose **Lire le guide** dès la première visite.
 
-## 4. Jouer avec l'aide de jeu
+## 4. Jouer avec l'Assistant L5R
 
-L'onglet **Aide de jeu** (dans la barre du bas sur mobile) propose les jets de chaque situation :
+L'onglet **Assistant L5R** (**Assistant** dans la barre du bas sur mobile) propose les jets de chaque situation :
 
 | Situation | Contenu |
 |---|---|
@@ -138,7 +138,7 @@ La ligne **Emplacement** dit quel emplacement le sort prendra : `Feu 2/3`, `libr
 
 ## 6. Statistiques
 
-La page **Statistiques**, à côté de **Fiche** et **Aide de jeu** (dans la barre du bas sur mobile), donne pour **tous tes jets** la réserve, le minimum, la moyenne, le maximum et la **chance de réussite** contre un ND de `10` à `40`.
+La page **Statistiques**, à côté de **Fiche** et **Assistant L5R** (dans la barre du bas sur mobile), donne pour **tous tes jets** la réserve, le minimum, la moyenne, le maximum et la **chance de réussite** contre un ND de `10` à `40`.
 
 - Trois cases : **Avec un point de Vide (+1g1)**, **Spécialisations appliquées**, **Pénalité de blessure actuelle**.
 - Un shugenja y trouve aussi une ligne par sort (`Sort · Frappe de jade (Terre)`), et ses dégâts.
@@ -159,7 +159,7 @@ Pour un shugenja, le bloc Techniques d'école affiche sous l'école son **affini
 
 Comment elles s'appliquent :
 
-- les techniques de ton rang comptent **d'elles-mêmes** dans les réserves de la fiche, de l'aide de jeu et des statistiques (posture de référence : Attaque) ;
+- les techniques de ton rang comptent **d'elles-mêmes** dans les réserves de la fiche, de l'Assistant L5R et des statistiques (posture de référence : Attaque) ;
 - les techniques **situationnelles** se cochent dans le lanceur (**Techniques à cocher**) ou dans le panneau **Posture** (cases de ND d'armure, compteurs de touches, case **Monté**) ;
 - les techniques sans effet chiffré apparaissent dans le panneau **Rappels d'école**, en Combat comme à la Cour ;
 - les techniques qui agissent **sur les autres** sont rappelées avec leur valeur, sur la fiche et sous la réserve des jets sociaux (« `+10` au ND de qui te ment ») ;

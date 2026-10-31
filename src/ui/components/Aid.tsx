@@ -18,7 +18,7 @@ import { EffectTags, RichSelect } from "./RichSelect";
 import { Roller } from "./Roller";
 import { TakeDamage } from "./StatusBar";
 
-/** Situations de l'aide de jeu : « Magie » pour un shugenja seulement (annexe F.5). */
+/** Situations de l'Assistant L5R : « Magie » pour un shugenja seulement (annexe F.5). */
 const aidSituations = (shugenja: boolean): readonly { id: AidSituation; label: string }[] =>
   SITUATIONS.filter((s) => s.id !== "magic" || shugenja);
 

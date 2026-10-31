@@ -1,7 +1,7 @@
 import { fireEvent, screen, within } from "@testing-library/react";
 import type { VoidChoice } from "../../src/ui/store";
 
-/** Panneau « Dépenser du Vide » de l'aide de jeu (annexe J.6). */
+/** Panneau « Dépenser du Vide » de l'Assistant L5R (annexe J.6). */
 export const voidPanel = () => within(screen.getByRole("group", { name: "Dépenser du Vide" }));
 
 /** Choisit une option du menu (sans rien dépenser). */

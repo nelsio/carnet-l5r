@@ -308,7 +308,7 @@ export type CombatSub = "skirmish" | "duel" | "battle";
 export type ActionTN = number | "target" | "opposed" | "assessment" | null;
 export type ActionKind = "skill" | "trait" | "damage" | "initiative" | "move" | "info" | "spell" | "spellDamage";
 
-/** Forme d'une action de l'aide de jeu (HANDOFF §4.7). */
+/** Forme d'une action de l'Assistant L5R (HANDOFF §4.7). */
 export interface ActionDef {
   id: string;
   situation: Situation;

@@ -5,6 +5,7 @@ import type { Character } from "@carnet/core";
 import { memoryStorage, type LibraryEntry } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
+import { VIEW } from "../helpers/views";
 
 const base = () => structuredClone(kakita) as Character;
 const always = (v: number) => () => v;
@@ -20,7 +21,7 @@ const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("butto
 const roller = () => within(screen.getByRole("dialog", { name: "Lanceur de dés" }));
 const block = (id: string) => within(screen.getByTestId(`block-${id}`));
 const toCombat = () => {
-  click("Aide de jeu");
+  click(VIEW.aid);
   click("Combat");
 };
 
@@ -198,7 +199,7 @@ describe("Lanceur : correctifs de règles (annexe E.2)", () => {
 
   it("L8 : terrain modéré puis difficile, Eau 2 → distances de l'Anneau 1", async () => {
     await renderApp();
-    click("Aide de jeu");
+    click(VIEW.aid);
     click("Déplacement");
     const terrain = within(screen.getByRole("group", { name: "Terrain" }));
     expect(terrain.getByRole("button", { name: "Normal" })).toHaveAttribute("aria-pressed", "true");
