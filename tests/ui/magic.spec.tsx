@@ -6,6 +6,7 @@ import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import perso from "../../reference/perso-test-shugenja.json";
 import kakita from "../fixtures/kakita-v1.json";
+import { VIEW } from "../helpers/views";
 
 const kuni = (patch: Partial<Character> = {}): Character => ({ ...CharacterSchema.parse(structuredClone(perso)), ...patch });
 
@@ -20,7 +21,7 @@ const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("butto
 const roller = () => within(screen.getByRole("dialog", { name: "Lanceur de dés" }));
 const situations = () => within(screen.getByRole("group", { name: "Situation" }));
 const toMagic = () => {
-  click("Aide de jeu");
+  click(VIEW.aid);
   fireEvent.click(situations().getByRole("button", { name: "Magie" }));
 };
 const card = (label: string) => screen.getAllByRole("button", { name: new RegExp(`^${label}`) })[0]!;
@@ -28,7 +29,7 @@ const card = (label: string) => screen.getAllByRole("button", { name: new RegExp
 describe("Situation « Magie » (F.5)", () => {
   it("onglet réservé aux shugenja : 5 situations pour un Kuni, 4 pour un bushi", async () => {
     await renderApp(structuredClone(kakita) as Character);
-    click("Aide de jeu");
+    click(VIEW.aid);
     expect(situations().queryByRole("button", { name: "Magie" })).toBeNull();
   });
 

@@ -6,6 +6,7 @@ import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
 import { chooseStance, currentStance, stanceSelect } from "../helpers/stance";
 import { clickWounds, woundsField } from "../helpers/wounds";
+import { VIEW } from "../helpers/views";
 
 const base = () => structuredClone(kakita) as Character;
 const always = (v: number) => () => v;
@@ -24,7 +25,7 @@ async function renderApp(character: Character | null = base(), rng = always(5), 
 }
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
 /** Le lanceur de dés est affiché par défaut (annexe J.7) : bouton « Lancer » présent. */
-const goToAid = () => click("Aide de jeu");
+const goToAid = () => click(VIEW.aid);
 const roller = () => within(screen.getByRole("dialog", { name: "Lanceur de dés" }));
 const chance = () => Number(screen.getByTestId("chance").textContent?.replace(/\D/g, ""));
 
@@ -136,7 +137,7 @@ describe("Fiche", () => {
   });
 });
 
-describe("Aide de jeu", () => {
+describe("Assistant L5R", () => {
   it("Déplacement : encart en tête, en pieds et en mètres", async () => {
     await renderApp();
     goToAid();
@@ -462,10 +463,10 @@ describe("Aide de jeu", () => {
     expect(pctAt20()).toBeGreaterThan(before);
   });
 
-  it("Statistiques : page à part dans la navigation (Fiche, Aide de jeu, Statistiques), plus une situation", async () => {
+  it("Statistiques : page à part dans la navigation (Fiche, Assistant L5R, Statistiques), plus une situation", async () => {
     await renderApp();
     const nav = within(screen.getByRole("group", { name: "Vue" }));
-    expect(nav.getAllByRole("button").map((b) => b.textContent)).toEqual(["Fiche", "Aide de jeu", "Statistiques"]);
+    expect(nav.getAllByRole("button").map((b) => b.textContent)).toEqual(["Fiche", VIEW.aid, "Statistiques"]);
     fireEvent.click(nav.getByRole("button", { name: "Statistiques" }));
     expect(nav.getByRole("button", { name: "Statistiques" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("heading", { name: "Statistiques de tes jets" })).toBeInTheDocument();

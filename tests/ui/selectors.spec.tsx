@@ -7,6 +7,7 @@ import { App } from "../../src/ui/App";
 import perso from "../../reference/perso-test-ecoles.json";
 import kakita from "../fixtures/kakita-v1.json";
 import { chooseStance, currentStance, stanceOption, stanceSelect } from "../helpers/stance";
+import { VIEW } from "../helpers/views";
 
 const base = () => structuredClone(kakita) as Character;
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
@@ -20,7 +21,7 @@ async function mount(character: Character = base(), rng = () => 5) {
 }
 
 function skirmish() {
-  click("Aide de jeu");
+  click(VIEW.aid);
   click("Combat");
 }
 

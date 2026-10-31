@@ -71,7 +71,9 @@ export function Header() {
         {c && (
           <div className="tabs" role="group" aria-label="Vue">
             <button type="button" aria-pressed={ui.view === "sheet"} onClick={() => dispatch({ type: "view", view: "sheet" })}>Fiche</button>
-            <button type="button" aria-pressed={ui.view === "aid"} onClick={() => dispatch({ type: "view", view: "aid" })}>Aide de jeu</button>
+            <button type="button" aria-label="Assistant L5R" aria-pressed={ui.view === "aid"} onClick={() => dispatch({ type: "view", view: "aid" })}>
+              Assistant<span className="tab-suffix"> L5R</span>
+            </button>
             <button type="button" aria-pressed={ui.view === "stats"} onClick={() => dispatch({ type: "view", view: "stats" })}>Statistiques</button>
           </div>
         )}

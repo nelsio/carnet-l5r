@@ -6,6 +6,7 @@ import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
+import { VIEW } from "../helpers/views";
 
 const pageUrl = pathToFileURL(resolve("dist/carnet-l5r.html")).href;
 const { version } = JSON.parse(readFileSync(resolve("package.json"), "utf8")) as { version: string };
@@ -34,7 +35,7 @@ test("V5 : section « Le Carnet » du menu Ressources, version de package.json, 
   }
 });
 
-test("V6 : pied de page sur la Bibliothèque, la Fiche, l'Aide de jeu et les Statistiques", async ({ page }) => {
+test("V6 : pied de page sur la Bibliothèque, la Fiche, l'Assistant L5R et les Statistiques", async ({ page }) => {
   await page.goto(pageUrl);
   const check = async () => {
     await expect(footer(page).getByRole("link", { name: `Version ${version} : nouveautés (nouvel onglet)` })).toHaveAttribute("href", `${REPO}/releases`);
@@ -44,7 +45,7 @@ test("V6 : pied de page sur la Bibliothèque, la Fiche, l'Aide de jeu et les Sta
   await expect(page.getByRole("link", { name: "Lire le guide" })).toHaveAttribute("href", `${REPO}/blob/main/docs/GUIDE.md`);
   await useTemplate(page);
   await check();
-  for (const view of ["Aide de jeu", "Statistiques"]) {
+  for (const view of [VIEW.aid, "Statistiques"]) {
     await page.getByRole("button", { name: view, exact: true }).click();
     await check();
   }

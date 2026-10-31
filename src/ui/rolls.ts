@@ -1,4 +1,4 @@
-/** Passerelle entre les actions de l'aide de jeu et le moteur de règles. */
+/** Passerelle entre les actions de l'Assistant L5R et le moteur de règles. */
 import {
   applicableModifiers, armorModifierBonus, armorTN, assessmentTN, computePool, concentrationTn, createSpell, DEFAULT_MANEUVERS, findSkill, ignoresWoundPenalty,
   maneuverFreeRaises, maneuverRaises, modifiersOf, modifierTN, schoolContext, targetNumber, targetTnModifier, woundState,
@@ -147,7 +147,7 @@ export interface CombatUi {
   centerLastRound: boolean;
   schoolArmor: Record<string, boolean>;
   stacks: Record<string, number>;
-  /** « Je garde un allié » (F5), facultatif hors aide de jeu. */
+  /** « Je garde un allié » (F5), facultatif hors Assistant L5R. */
   guard?: boolean;
 }
 

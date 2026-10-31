@@ -3,6 +3,7 @@ import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { openWounds, woundsButton, woundsTile } from "./wounds";
+import { VIEW } from "../helpers/views";
 
 const pageUrl = pathToFileURL(resolve("dist/carnet-l5r.html")).href;
 
@@ -27,13 +28,13 @@ async function editAllBlocks(page: Page) {
   while (await edit.count()) await edit.first().click();
 }
 
-const tab = (page: Page, name: "Fiche" | "Aide de jeu" | "Statistiques") => page.getByRole("group", { name: "Vue" }).getByRole("button", { name });
+const tab = (page: Page, name: "Fiche" | typeof VIEW.aid | "Statistiques") => page.getByRole("group", { name: "Vue" }).getByRole("button", { name });
 /** Le panneau fermé est masqué : on le cible par sa classe pour vérifier son état. */
 const panel = (page: Page) => page.locator(".roller");
 const rollButton = (page: Page) => panel(page).getByRole("button", { name: /^Lancer/ });
 
 async function openAction(page: Page, situation: string, action: RegExp, sub?: string) {
-  await tab(page, "Aide de jeu").click();
+  await tab(page, VIEW.aid).click();
   await page.getByRole("group", { name: "Situation" }).getByRole("button", { name: situation, exact: true }).click();
   if (sub) await page.getByRole("button", { name: sub, exact: true }).click();
   await page.locator("button.act").filter({ hasText: action }).first().click();
@@ -68,7 +69,7 @@ test("M1 : aucune vue ne défile horizontalement", async ({ page }) => {
   await noHorizontalScroll(page, "Fiche");
   await editAllBlocks(page);
   await noHorizontalScroll(page, "Fiche en modification");
-  await tab(page, "Aide de jeu").click();
+  await tab(page, VIEW.aid).click();
   for (const s of ["Enquête", "Cour", "Déplacement", "Combat"]) {
     await page.getByRole("group", { name: "Situation" }).getByRole("button", { name: s, exact: true }).click();
     await noHorizontalScroll(page, s);
@@ -99,9 +100,9 @@ test("M1 : aucune vue ne défile horizontalement", async ({ page }) => {
   await inViewport(page, page.getByRole("dialog").getByRole("button", { name: "Appliquer" }));
 });
 
-test("M2 : la barre de navigation est fixe en bas, sur Fiche, Aide de jeu et Statistiques", async ({ page }) => {
+test("M2 : la barre de navigation est fixe en bas, sur Fiche, Assistant L5R et Statistiques", async ({ page }) => {
   const vp = page.viewportSize()!;
-  for (const view of ["Fiche", "Aide de jeu", "Statistiques"] as const) {
+  for (const view of ["Fiche", VIEW.aid, "Statistiques"] as const) {
     await tab(page, view).click();
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     const nav = page.getByRole("group", { name: "Vue" });
@@ -139,7 +140,7 @@ test("M3 (E26) : un appui sur le résumé ouvre le détail, une ligne par niveau
 });
 
 test("M4 : choisir une action ouvre le panneau ; « Lancer » est visible sans défiler", async ({ page }) => {
-  await tab(page, "Aide de jeu").click();
+  await tab(page, VIEW.aid).click();
   await expect(panel(page)).not.toHaveClass(/open/);
   await openAction(page, "Combat", /Attaque · Katana/, "Escarmouche");
   await expect(rollButton(page)).toBeVisible();
@@ -202,7 +203,7 @@ test("M8 : cibles tactiles d'au moins 40 × 40 px (−/+, pastilles, onglets)", 
     page.getByRole("button", { name: "Point de Vide 1" }),
     page.getByRole("button", { name: "Point de Vide 2" }),
     tab(page, "Fiche"),
-    tab(page, "Aide de jeu"),
+    tab(page, VIEW.aid),
     tab(page, "Statistiques"),
   ];
   for (const t of targets) {
@@ -252,7 +253,7 @@ async function touchArea(el: Locator) {
 
 // Lot 19 (annexe I.3.7) : le panneau Posture n'a plus de « i » ; lot 20 (annexe J.6) : le panneau Vide non plus.
 test("M10 : Vide et Posture tiennent sur un écran avec leur description ; menu Vide de 40 px", async ({ page }) => {
-  await tab(page, "Aide de jeu").click();
+  await tab(page, VIEW.aid).click();
   await page.getByRole("group", { name: "Situation" }).getByRole("button", { name: "Combat", exact: true }).click();
   const vp = page.viewportSize()!;
   const stance = page.getByRole("combobox", { name: "Posture" });
@@ -331,7 +332,7 @@ test("Q1 : Armes en Edit, une carte par arme ; Nom, Compétence, VD lisibles en 
 
 /** « Nouveau round » : entre l'initiative et la posture ; sa description tient sur 2 lignes au plus. */
 async function roundOnTwoLines(page: Page) {
-  await tab(page, "Aide de jeu").click();
+  await tab(page, VIEW.aid).click();
   await page.getByRole("group", { name: "Situation" }).getByRole("button", { name: "Combat", exact: true }).click();
   const desc = page.getByTestId("round-desc");
   const { height, lineHeight } = await desc.evaluate((el) => ({
@@ -358,7 +359,7 @@ test.describe("M12 à 360 px de large", () => {
 
 /** Les onglets de situation tiennent sur une ligne, sans défilement ni texte tronqué, en zones de 40 px. */
 async function situationsFit(page: Page, labels = ["Enquête", "Cour", "Déplacement", "Combat"]) {
-  await tab(page, "Aide de jeu").click();
+  await tab(page, VIEW.aid).click();
   const group = page.getByRole("group", { name: "Situation" });
   await expect(group.getByRole("button")).toHaveText(labels);
   const report = await group.evaluate((g) => {
@@ -455,7 +456,7 @@ test.describe("M14 à 360 px de large", () => {
 
 /** Bataille de masse (annexe E.8) : panneau rempli (jet, résultat, dés de blessures) sans défilement ni texte tronqué. */
 async function battleFits(page: Page) {
-  await tab(page, "Aide de jeu").click();
+  await tab(page, VIEW.aid).click();
   await page.getByRole("group", { name: "Situation" }).getByRole("button", { name: "Combat", exact: true }).click();
   await page.getByRole("button", { name: "Bataille", exact: true }).click();
   const battle = page.getByRole("group", { name: "Bataille de masse" });
@@ -620,7 +621,7 @@ test.describe("M19 (E36) à 360 px de large", () => {
 test.describe("D9 : sélecteurs à 360 px de large", () => {
   test.use({ viewport: { width: 360, height: 740 } });
   test("Posture : 16 px, options ≥ 40 px, menu dans l'écran", async ({ page }) => {
-    await tab(page, "Aide de jeu").click();
+    await tab(page, VIEW.aid).click();
     await page.getByRole("group", { name: "Situation" }).getByRole("button", { name: "Combat", exact: true }).click();
     const stance = page.getByRole("combobox", { name: "Posture" });
     expect(await stance.evaluate((e) => parseFloat(getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(16);
@@ -643,4 +644,23 @@ test.describe("D9 : sélecteurs à 360 px de large", () => {
     expect(await school.evaluate((e) => parseFloat(getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(16);
     await noHorizontalScroll(page, "Identité, Techniques d'école");
   });
+});
+
+test.describe("A2 : onglet « Assistant » sur une ligne (v2.25.0)", () => {
+  for (const width of [390, 360]) {
+    test(`${width} px : libellé court, nom accessible complet`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 740 });
+      const aid = tab(page, VIEW.aid);
+      await expect(aid).toHaveAccessibleName(VIEW.aid);
+      await expect(aid).toHaveText("Assistant", { useInnerText: true });
+      expect((await aid.boundingBox())!.height).toBe((await tab(page, "Fiche").boundingBox())!.height);
+      // La grille étire les trois boutons à la même hauteur : on compte aussi les lignes du texte.
+      const lines = await aid.evaluate((el) => {
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        return new Set([...range.getClientRects()].map((r) => r.top)).size;
+      });
+      expect(lines).toBe(1);
+    });
+  }
 });

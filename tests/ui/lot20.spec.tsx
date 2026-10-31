@@ -6,6 +6,7 @@ import { EXAMPLES } from "../../src/rules/example";
 import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
+import { VIEW } from "../helpers/views";
 
 const base = () => structuredClone(kakita) as Character;
 
@@ -74,7 +75,7 @@ describe("Identité et Techniques (J.2, J.3)", () => {
 describe("Shugenja en escarmouche (J.8)", () => {
   it("Q14 : Initiative, titre « Sorts », sorts, titre « Attaques », armes, actions fixes", async () => {
     await renderApp(EXAMPLES.find((x) => x.id === "shugenja")!.build());
-    click("Aide de jeu");
+    click(VIEW.aid);
     click("Combat");
     const actions = screen.getByText("Sorts", { selector: "h3" }).closest(".actions")!;
     const items = [...actions.children].map((el) => (el.tagName === "H3" ? `# ${el.textContent}` : el.querySelector(".t")?.textContent ?? ""));
@@ -88,7 +89,7 @@ describe("Shugenja en escarmouche (J.8)", () => {
 
   it("Q15 : bushi, aucun titre de groupe en escarmouche", async () => {
     await renderApp();
-    click("Aide de jeu");
+    click(VIEW.aid);
     click("Combat");
     expect(screen.queryByText("Attaques", { selector: "h3" })).toBeNull();
     expect(screen.queryByText("Sorts", { selector: "h3" })).toBeNull();

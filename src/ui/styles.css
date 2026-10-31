@@ -206,7 +206,7 @@ textarea.in{min-height:80px;resize:vertical}
 .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
 .x{border:0;background:transparent;color:var(--danger);font-weight:700;font-size:18px;line-height:1;padding:2px 6px}
 
-/* Aide de jeu */
+/* Assistant L5R */
 .sit{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
 .sit button{border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:7px;font-weight:700}
 .sit button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -295,6 +295,7 @@ div.man button{border:0;background:var(--surface);width:24px;height:24px;border-
     padding:6px max(12px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
   .tabs button{padding:12px 4px;border-radius:8px;font-size:15px}
   .tabs button[aria-pressed="true"]{background:var(--accent-pale);color:var(--ink);box-shadow:none}
+  .tabs .tab-suffix{display:none}
   /* En-tête : boutons ronds de 40 px, icône seule ; le texte reste pour les lecteurs d'écran */
   .theme-btn{position:relative;width:40px;height:40px;padding:0;justify-content:center;border-radius:50%}
   .theme-btn .txt{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -779,7 +780,7 @@ a.btn .ext{margin-left:8px}
   .tplc .btn,.start-opt .btn{min-height:44px}
 }
 
-/* ---------- Portail de la campagne dans la Fiche et l'Aide de jeu (annexe L.7, L.8, v2.20.0) ---------- */
+/* ---------- Portail de la campagne dans la Fiche et l'Assistant L5R (annexe L.7, L.8, v2.20.0) ---------- */
 /* Clan de l'en-tête en lien vers sa page */
 a.mon{border-radius:4px}
 a.mon:hover{text-decoration:underline}
@@ -793,7 +794,7 @@ a.mon .ext{margin-left:0}
 .spell-link .ext{width:18px;height:18px;margin:0}
 .spellfoot .spell-link{margin:0 4px 0 auto}
 .grimoire-note{font-size:12px}
-/* Aide de jeu : encadré de liens, sans titre, au-dessus du lanceur */
+/* Assistant L5R : encadré de liens, sans titre, au-dessus du lanceur */
 .aid-side{display:grid;gap:12px;align-content:start;min-width:0}
 .portal-links{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:2px 14px}
 .portal-links a{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line);min-height:44px;text-decoration:none}

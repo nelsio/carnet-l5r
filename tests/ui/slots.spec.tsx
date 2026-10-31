@@ -7,6 +7,7 @@ import { App } from "../../src/ui/App";
 import perso from "../../reference/perso-test-shugenja.json";
 import kakita from "../fixtures/kakita-v1.json";
 import { chooseStance } from "../helpers/stance";
+import { VIEW } from "../helpers/views";
 
 const kuni = (patch: Partial<Character> = {}): Character => ({ ...CharacterSchema.parse(structuredClone(perso)), ...patch });
 
@@ -21,7 +22,7 @@ const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("butto
 const roller = () => within(screen.getByRole("dialog", { name: "Lanceur de dés" }));
 const slot = (k: string) => screen.getByTestId(`slot-${k}`);
 const toMagic = () => {
-  click("Aide de jeu");
+  click(VIEW.aid);
   fireEvent.click(within(screen.getByRole("group", { name: "Situation" })).getByRole("button", { name: "Magie" }));
 };
 const card = (label: string) => screen.getAllByRole("button", { name: new RegExp(`^${label}`) })[0]!;
@@ -132,7 +133,7 @@ describe("Emplacements au lancer (F.5)", () => {
 describe("Sorts en escarmouche et Rester concentré (F.5)", () => {
   it("G16 : groupe « Sorts » ; Assaut et Défense totale grisent les sorts, Défense non", async () => {
     await renderApp(kuni());
-    click("Aide de jeu");
+    click(VIEW.aid);
     click("Combat");
     expect(screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent)).toContain("Sorts");
     expect(card("Lancer · Frappe de jade")).toHaveTextContent("5g3");
@@ -150,7 +151,7 @@ describe("Sorts en escarmouche et Rester concentré (F.5)", () => {
 
   it("G17 : au round après le Centre, le bonus de Centre vaut pour un jet de sort : 6g4 +2", async () => {
     await renderApp(kuni());
-    click("Aide de jeu");
+    click(VIEW.aid);
     click("Combat");
     chooseStance("Centre");
     click("Nouveau round");

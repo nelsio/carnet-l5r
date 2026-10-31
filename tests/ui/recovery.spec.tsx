@@ -5,6 +5,7 @@ import type { Character } from "@carnet/core";
 import { memoryStorage, type Storage } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
+import { VIEW } from "../helpers/views";
 
 const base = (patch: Partial<Character> = {}) => ({ ...(structuredClone(kakita) as Character), ...patch });
 
@@ -60,7 +61,7 @@ describe("Nouvelle journée", () => {
 
   it("remet l'initiative à zéro", async () => {
     await renderApp();
-    click("Aide de jeu");
+    click(VIEW.aid);
     click("Combat");
     fireEvent.click(screen.getByRole("button", { name: /^Initiative/ }));
     fireEvent.click(roller().getByRole("button", { name: /^Lancer/ }));
@@ -68,7 +69,7 @@ describe("Nouvelle journée", () => {
     click("Fiche");
     click("Nouvelle journée…");
     click("Confirmer la nouvelle journée");
-    click("Aide de jeu");
+    click(VIEW.aid);
     click("Combat");
     expect(screen.getByTestId("initiative")).toHaveTextContent("g");
   });
@@ -82,7 +83,7 @@ describe("Nouvelle journée", () => {
 describe("Méditation (Enquête, groupe Repos)", () => {
   it("action « Méditer » sous le titre Repos, ND 20 ; « Réussi » rend 1 point de Vide (L18)", async () => {
     await renderApp(base({ voidPoints: 0 }));
-    click("Aide de jeu");
+    click(VIEW.aid);
     expect(screen.getByRole("heading", { level: 3, name: "Repos" })).toBeInTheDocument();
     click(/^Méditer \(récupérer du Vide\)/);
     expect(roller().getByTestId("final-tn")).toHaveTextContent(/^20$/);
@@ -96,7 +97,7 @@ describe("Méditation (Enquête, groupe Repos)", () => {
     const c = base({ voidPoints: 0 });
     c.skills.push({ name: "Méditation", rank: 3, trait: "void", emphases: [] });
     await renderApp(c);
-    click("Aide de jeu");
+    click(VIEW.aid);
     click(/^Méditer/);
     fireEvent.click(roller().getByRole("button", { name: "Réussi : +2 points de Vide" }));
     expect(screen.getByText("Points de Vide 2/2")).toBeInTheDocument();
@@ -104,7 +105,7 @@ describe("Méditation (Enquête, groupe Repos)", () => {
 
   it("en consultation : bouton masqué (annexe H.7 X6)", async () => {
     await renderApp(base({ voidPoints: 0 }), "readonly");
-    click("Aide de jeu");
+    click(VIEW.aid);
     click(/^Méditer/);
     expect(roller().getByText("Vide 0/2.")).toBeInTheDocument();
     expect(roller().queryByRole("button", { name: /^Réussi/ })).toBeNull();

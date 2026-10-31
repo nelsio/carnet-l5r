@@ -1,6 +1,6 @@
 /**
- * Lot 23, v2.20.0 (HANDOFF annexe L.7, L.8) : liens vers le portail dans la Fiche et l'Aide de jeu, cas O12 à O15 et O17.
- * O16 (Aide de jeu à 390 px) : tests/e2e/portal.spec.ts.
+ * Lot 23, v2.20.0 (HANDOFF annexe L.7, L.8) : liens vers le portail dans la Fiche et l'Assistant L5R, cas O12 à O15 et O17.
+ * O16 (Assistant L5R à 390 px) : tests/e2e/portal.spec.ts.
  * Lot 29, v2.21.4 : liens de sort filtrés par élément (`&el=`).
  */
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
@@ -10,6 +10,7 @@ import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
 import tamori from "../../reference/exemple-shugenja.json";
+import { VIEW } from "../helpers/views";
 
 const PORTAL = "https://vincenzorpg.github.io/L5R/";
 const bushi = (patch: Partial<Character> = {}) => ({ ...(structuredClone(kakita) as Character), ...patch });
@@ -97,10 +98,10 @@ describe("O14 : fiche bushi", () => {
   });
 });
 
-describe("O15 : encadré de l'Aide de jeu", () => {
+describe("O15 : encadré de l'Assistant L5R", () => {
   it("Combat : 1 lien ; Cour : 2 liens ; sans titre ; autre situation : pas d'encadré", async () => {
     await renderApp(bushi());
-    view("Aide de jeu");
+    view(VIEW.aid);
     situation("Combat");
     let box = linksBox()!;
     expect(within(box).getAllByRole("link")).toHaveLength(1);
@@ -134,7 +135,7 @@ describe("O17 : consultation", () => {
     expect(block.getAllByRole("link")).toHaveLength(3);
     expect(block.getByRole("link", { name: "Sentir dans le grimoire (nouvel onglet)" })).toHaveAttribute("href", `${PORTAL}grimoire.html?q=Sentir&el=universel`);
     expect(block.getByRole("link", { name: "Frappe de jade dans le grimoire (nouvel onglet)" })).toHaveAttribute("href", `${PORTAL}grimoire.html?q=Frappe%20de%20jade&el=terre`);
-    view("Aide de jeu");
+    view(VIEW.aid);
     situation("Cour");
     expect(within(linksBox()!).getAllByRole("link")).toHaveLength(2);
     for (const a of screen.getAllByRole("link")) expect(a).not.toHaveAttribute("aria-disabled");

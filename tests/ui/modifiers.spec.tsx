@@ -6,6 +6,7 @@ import { memoryStorage, type LibraryEntry } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
 import { woundsField } from "../helpers/wounds";
+import { VIEW } from "../helpers/views";
 
 const base = () => structuredClone(kakita) as Character;
 const mod = (patch: Partial<Modifier>): Modifier => ({
@@ -70,7 +71,7 @@ describe("Lanceur", () => {
 
   it("bonus d'office coché, situationnel décoché ; chaque case change la réserve ; remis à zéro au choix d'une action", async () => {
     await mount([grue, chance]);
-    click("Aide de jeu");
+    click(VIEW.aid);
     click("Combat");
     click(/^Attaque · Katana/);
     expect(screen.getByTestId("pool")).toHaveTextContent("6g3");
@@ -89,14 +90,14 @@ describe("Lanceur", () => {
 
   it("ne propose que les bonus qui concernent le jet", async () => {
     await mount([grue]);
-    click("Aide de jeu");
+    click(VIEW.aid);
     click(/^Remarquer un détail/);
     expect(roller().queryByText("Bonus de jet")).toBeNull();
   });
 
   it("augmentations gratuites et bonus fixe comptés au jet", async () => {
     await mount([mod({ name: "Enquêteur", appliesTo: "skill", skill: "Investigation", flat: 3, freeRaises: 1 })]);
-    click("Aide de jeu");
+    click(VIEW.aid);
     click(/^Remarquer un détail/);
     expect(roller().getByText("Augm. gratuites (+1 bonus)")).toBeInTheDocument();
     expect(roller().getByText("Investigation 1 + Perception 2 · +3 au total")).toBeInTheDocument();
@@ -111,7 +112,7 @@ describe("Lanceur", () => {
   it("ND d'armure : bonus d'office compté, bonus situationnel à cocher dans la posture", async () => {
     await mount([mod({ id: "a1", name: "Kata", appliesTo: "armor", flat: 5 }), mod({ id: "a2", name: "Esquive", appliesTo: "armor", flat: 3, mode: "optional" })]);
     expect(screen.getByTestId("armor-tn")).toHaveTextContent("25");
-    click("Aide de jeu");
+    click(VIEW.aid);
     click("Combat");
     fireEvent.click(screen.getByRole("checkbox", { name: /Esquive/ }));
     expect(screen.getByTestId("armor-tn")).toHaveTextContent("28");
@@ -121,7 +122,7 @@ describe("Lanceur", () => {
 
   it("Statistiques : les bonus d'office sont compris", async () => {
     await mount([grue]);
-    click("Aide de jeu");
+    click(VIEW.aid);
     click("Statistiques");
     const row = screen.getAllByRole("row").find((r) => r.textContent?.startsWith("Kenjutsu"))!;
     expect(row).toHaveTextContent("6g3");
@@ -131,7 +132,7 @@ describe("Lanceur", () => {
     const { container } = await mount([grue, chance], "readonly");
     expect(screen.getByText("Voie de la Grue")).toBeInTheDocument();
     expect(container.querySelectorAll("input, textarea, select")).toHaveLength(0);
-    click("Aide de jeu");
+    click(VIEW.aid);
     click("Combat");
     click(/^Attaque · Katana/);
     fireEvent.click(roller().getByRole("checkbox", { name: /Bien-né/ }));
@@ -166,7 +167,7 @@ describe("Modèles par source, sans catalogue (annexe J.4)", () => {
     expect(name).toHaveAttribute("placeholder", "Nom du désavantage");
     click("Terminer : Bonus de jet");
     await waitFor(async () => expect((await storage.library.get("a"))?.character.modifiers?.[0]).toMatchObject({ name: "", source: "disadvantage", appliesTo: "social", tn: 5 }), { timeout: 1500 });
-    click("Aide de jeu");
+    click(VIEW.aid);
     click(/^Garder contenance/);
     expect(screen.getByTestId("final-tn")).toHaveTextContent("20");
     expect(roller().getByText(/= 15 \+ 5 bonus/)).toBeInTheDocument();

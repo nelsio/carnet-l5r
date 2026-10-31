@@ -1,6 +1,7 @@
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { expect, test } from "@playwright/test";
+import { VIEW } from "../helpers/views";
 
 const pageUrl = pathToFileURL(resolve("dist/carnet-l5r.html")).href;
 
@@ -13,7 +14,7 @@ test("le build unique s'ouvre en file:// sans aucune requête réseau, polices c
   await page.getByRole("button", { name: "Nouvelle fiche vierge" }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Nouveau samouraï" })).toBeVisible();
   await page.getByRole("button", { name: "Terminer" }).click();
-  await page.getByRole("button", { name: "Aide de jeu" }).click();
+  await page.getByRole("button", { name: VIEW.aid }).click();
   await page.getByRole("button", { name: "Combat", exact: true }).click();
   await page.getByRole("button", { name: /^Lancer/ }).click();
   await expect(page.locator(".die").first()).toBeVisible();
@@ -26,4 +27,13 @@ test("le build unique s'ouvre en file:// sans aucune requête réseau, polices c
   });
   expect(fonts).toEqual([true, true, true]);
   expect(external).toEqual([]);
+});
+
+test("A1 : à 1280 px, l'onglet affiche « Assistant L5R »", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto(pageUrl);
+  await page.getByRole("button", { name: "Nouvelle fiche vierge" }).click();
+  const aid = page.getByRole("group", { name: "Vue" }).getByRole("button", { name: VIEW.aid });
+  await expect(aid).toHaveAccessibleName(VIEW.aid);
+  await expect(aid).toHaveText(VIEW.aid, { useInnerText: true });
 });
