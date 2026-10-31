@@ -596,7 +596,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 26. **v2.22.0 — sorts depuis le grimoire** (**livrée**, écarts en N.7) : annexe N.1 à N.6. Lecture à la demande des 6 fichiers de sorts du portail (JSON5, sans exécution), cache IndexedDB, panneau « Ajouter depuis le grimoire », universels remplis → cas GR1 à GR22.
 27. **v2.23.0 — autocomplétion du nom d'un sort** (**livrée**, écarts en N.10) : annexe N.8 et N.9. Champ Nom en combobox quand le grimoire est prêt, remplissage du sort, confirmation avant de remplacer des valeurs saisies → cas GR23 à GR32.
 28. **v2.23.1 — aperçu de lien** (**livrée**, écarts en O.1 bis) : annexe O.1. Balises description et Open Graph, image `og.png` 1200 × 630 publiée par `pages.yml` → cas W1 à W4.
-29. **v2.23.2 — portail sans « campagne »** (attend P11) : annexe O.2. Libellés du portail neutres, guide et crédits → cas W5.
+29. ~~**v2.23.2 — portail sans « campagne »**~~ (**mis de côté le 31/10/2026**, P11) : annexe O.2. Le portail se présente lui-même comme « Portail de campagne » : les libellés actuels restent. La **v2.23.2** (31/10/2026) affiche à la place le nom du portail dans le menu Ressources : « L'Empire d'Émeraude », sous-titre « Portail de campagne · Clans, règles, aides de jeu » (P11).
 30. **v2.24.0 — installable et hors ligne** (attend P12) : annexe O.3. Manifeste et service worker ajoutés au déploiement Pages seulement → cas W6 à W11.
 31. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
 
@@ -618,7 +618,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 | P8 | **Tranché le 20/10/2026** : règle des dix dés, un dé lancé impair en trop alors que les gardés sont sous 10 est **perdu** (11k4 → 10k4). | Décision retenue |
 | P9 | « Rang d'Honneur » utilisé comme bonus (Matsu, Akodo, Utaku, Daidoji) : arrondi à l'inférieur (6,5 → 6) | Arrondi à l'inférieur |
 | P10 | **Vérifié** : catalogue d'armes corrigé (annexe E.2 C8) et catalogue d'armures ajouté (E.5). | Annexe E |
-| P11 | **Portail présenté comme ressource commune** (lot 33). Nom affiché (« Portail L5R » ?) et ligne de crédit à valider avec Vincenzo : son site devient une ressource pour des groupes inconnus (liens, et lecture du grimoire sur clic, ≈ 110 Ko par joueur). | Lot 33 non commencé |
+| P11 | **Tranché le 31/10/2026** : le site de Vincenzo a pour titre « L'EMPIRE D'ÉMERAUDE » et se présente lui-même comme « Portail de campagne », on garde ce libellé pour le moment. Lot 33 (annexe O.2) mis de côté. v2.23.2 : l'entrée du menu Ressources prend le nom du site, « L'Empire d'Émeraude », sous-titre « Portail de campagne · Clans, règles, aides de jeu ». | Décision retenue ; à rouvrir si le portail change de présentation |
 | P12 | **Service worker sur GitHub Pages** (lot 34) : exception au principe « aucune requête automatique » (le navigateur charge `sw.js` et le manifeste, même origine, rien n'est envoyé). | Lot 34 non commencé ; le fichier de release reste la seule solution hors ligne |
 | P13 | **Mesure de fréquentation (GoatCounter)** sur l'adresse GitHub Pages (`handoff-tracking.md`, 31/10/2026) : exception au §1 (requête automatique vers un autre site, envoie l'adresse, le référent, le navigateur et la taille d'écran). Si accepté : lot à part, script injecté par `pages.yml` seulement (le fichier de release et le smoke « aucune requête réseau » ne changent pas), §1, README, guide et `og:description` corrigés là où ils disent « rien n'est envoyé », note de confidentialité au tutoiement. | Pas de mesure de fréquentation |
 
@@ -3052,7 +3052,9 @@ Puis dans **Settings → General → Social preview** : téléverser `docs/img/o
 - **W2** : dimensions lues dans l'en-tête PNG (`tests/og.spec.ts`), sans charger `sharp` dans Vitest. W1 lit `index.html` (les balises passent telles quelles dans le build).
 - **W4** : à faire après déploiement (Sharing Debugger ou Discord). Réglages du dépôt (description, sujets, Social preview) : hors PR, à faire par Nelson.
 
-### O.2 Lot 33 : portail sans « campagne » (v2.23.2) — attend P11
+### O.2 Lot 33 : portail sans « campagne » (v2.23.2) — mis de côté
+
+**Mis de côté le 31/10/2026 (P11)** : le portail se présente lui-même comme « Portail de campagne », les libellés actuels restent. Spécification conservée ci-dessous si le point est rouvert.
 
 Le portail de Vincenzo sert de ressource commune, pas de site du MJ de chaque groupe. Le mot « campagne » reste là où il désigne **la campagne du joueur** (« Notes de campagne », « Compagnon de campagne »).
 

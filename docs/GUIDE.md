@@ -55,7 +55,7 @@ Les fiches enregistrées hors ligne restent **propres à ce fichier, sur cet app
 
 ### Portail de la campagne
 
-Le bouton **Ressources** (icône de torii, en haut, sur tous les écrans) ouvre les liens vers le **site de la campagne** du MJ : le portail, la page de ton clan (si une fiche est ouverte), la **Forge de personnage**, le **Grimoire**, le **Mémento de combat**, **Bushido & honneur** et **Étiquette & coutumes**. Chaque lien s'ouvre dans un **nouvel onglet** ; le Carnet ne contacte jamais ce site de lui-même et marche toujours hors ligne. Seule exception, quand tu la demandes : **Charger le grimoire** (Rouleaux & invocations) lit la liste des sorts.
+Le bouton **Ressources** (icône de torii, en haut, sur tous les écrans) ouvre les liens vers le **site de la campagne** du MJ : le portail **L'Empire d'Émeraude**, la page de ton clan (si une fiche est ouverte), la **Forge de personnage**, le **Grimoire**, le **Mémento de combat**, **Bushido & honneur** et **Étiquette & coutumes**. Chaque lien s'ouvre dans un **nouvel onglet** ; le Carnet ne contacte jamais ce site de lui-même et marche toujours hors ligne. Seule exception, quand tu la demandes : **Charger le grimoire** (Rouleaux & invocations) lit la liste des sorts.
 
 La **Forge** est une création guidée : elle calcule l'XP, les traits et les bonus d'école.
 <!-- FORGE_JSON_OK : quand la constante passe à true, remplacer la phrase suivante par « Elle exporte un JSON compatible avec le Carnet : importe-le ici avec Importer un JSON. » -->

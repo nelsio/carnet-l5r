@@ -6,6 +6,11 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.23.2] - 2026-10-31
+
+### Modifié
+- Menu Ressources : le portail apparaît sous son nom, **L'Empire d'Émeraude** (« Portail de campagne · Clans, règles, aides de jeu »).
+
 ## [2.23.1] - 2026-10-31
 
 ### Modifié
@@ -276,7 +281,8 @@ Simples liens ouverts dans un nouvel onglet : le Carnet ne fait toujours aucune 
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.23.1...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.23.2...HEAD
+[2.23.2]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.23.2
 [2.23.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.23.1
 [2.23.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.23.0
 [2.22.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.22.0
