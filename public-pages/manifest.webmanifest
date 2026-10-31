@@ -1,0 +1,16 @@
+{
+  "name": "Carnet de Rokugan",
+  "short_name": "Carnet",
+  "description": "Compagnon de jeu L5R 4e : fiche et jets Roll & Keep.",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#26252a",
+  "theme_color": "#26252a",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

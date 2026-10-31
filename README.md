@@ -31,7 +31,7 @@ Un seul fichier HTML, **sans serveur ni compte** : rien n'est envoyé sur intern
 2. Crée ta fiche : **Nouvelle fiche vierge**, un **modèle** (Bushi, Shugenja, Courtisan), ou un JSON exporté de la [Forge du portail](https://vincenzorpg.github.io/L5R/createcharacter.html).
 3. Joue : onglet **Aide de jeu**, choisis la situation, touche une action.
 
-Pour jouer **hors ligne**, télécharge `carnet-l5r.html` depuis la [dernière release](https://github.com/nelsio/carnet-l5r/releases/latest) et ouvre-le dans ton navigateur.
+Pour jouer **hors ligne**, **installe le Carnet** depuis ton navigateur (voir le [guide](docs/GUIDE.md#installer-sur-ton-téléphone-ou-ton-ordinateur)) ou télécharge `carnet-l5r.html` depuis la [dernière release](https://github.com/nelsio/carnet-l5r/releases/latest) et ouvre-le dans ton navigateur.
 
 > **Pense à exporter ta fiche** (bloc **Fichier** → **Exporter la fiche**) : c'est ta sauvegarde, et le moyen de changer d'appareil ou de la partager avec le MJ. Sur Chrome et Edge, **Lier à un fichier** l'enregistre en continu, par exemple dans le dossier Drive de la campagne.
 

@@ -19,7 +19,7 @@ Fait foi :
 ### Décisions validées
 | Sujet | Décision |
 |---|---|
-| Forme | **Un seul fichier HTML autonome** (JS, CSS et polices inline). Aucun serveur, aucun compte. Aucune requête **automatique**. Une seule exception, **déclenchée par le joueur** : le chargement de la liste des sorts du grimoire du portail (bouton « Charger le grimoire » ou « Actualiser », annexe N). Rien n'est envoyé : lecture seule, sans cookie ni référent. Sans grimoire chargé, on saisit les sorts à la main ; le Carnet marche toujours hors ligne et en `file://`. |
+| Forme | **Un seul fichier HTML autonome** (JS, CSS et polices inline). Aucun serveur, aucun compte. Aucune requête **automatique**. Une seule exception, **déclenchée par le joueur** : le chargement de la liste des sorts du grimoire du portail (bouton « Charger le grimoire » ou « Actualiser », annexe N). Rien n'est envoyé : lecture seule, sans cookie ni référent. Sans grimoire chargé, on saisit les sorts à la main ; le Carnet marche toujours hors ligne et en `file://`. Sur l'adresse GitHub Pages seulement, un service worker de même origine met le Carnet en cache pour l'usage hors ligne (annexe O.3). Il ne contacte aucun autre site. |
 | Distribution | Dépôt **GitHub** : la page est servie par **GitHub Pages**, et le fichier `carnet-l5r.html` est joint à chaque release. Le même fichier marche en ligne et ouvert en local (`file://`). |
 | Stockage | Les fiches vivent dans le **navigateur** (IndexedDB). On les échange et on les sauvegarde en **fichiers JSON**, rangés où l'on veut (le Google Drive de la campagne, par exemple). |
 | Fichier lié | Sur Chrome et Edge desktop, une fiche peut être **liée à un fichier JSON** : chaque modification y est enregistrée automatiquement (utile avec un dossier Drive synchronisé sur le PC). Ailleurs, on passe par import et export. |
@@ -61,9 +61,10 @@ carnet-l5r/
 │  └─ e2e/                    # Playwright
 ├─ reference/     # prototype.html, exemple-personnage.json, ecoles-bushi.json, perso-test-*.json (ne pas modifier)
 ├─ public/fonts/  # polices embarquées dans le build
+├─ public-pages/  # manifeste, service worker et icônes, ajoutés à l'adresse GitHub Pages seulement (annexe O.3)
 ├─ .github/workflows/  # ci.yml, pages.yml, release.yml
 ├─ docs/          # GUIDE.md (guide joueur, §9.3), CREDITS.md (licences et crédits), img/ (captures du README)
-├─ scripts/       # screenshots.mjs : captures du README (npm run screenshots, hors CI)
+├─ scripts/       # screenshots.mjs : captures du README (npm run screenshots, hors CI) ; pages-pwa.mjs (pages.yml) ; pwa-icons.mjs (npm run pwa-icons, hors CI)
 ├─ README.md      # vitrine : présentation, captures, démarrage (§9.3)
 └─ HANDOFF.md
 ```
@@ -442,7 +443,7 @@ Depuis un fichier (bouton ou glisser-déposer). Trois destinations :
 | Workflow | Déclencheur | Étapes |
 |---|---|---|
 | `ci.yml` | push, pull request | install → lint → `tsc --noEmit` → Vitest → build → Playwright |
-| `pages.yml` | push sur `main` | build → publication de `dist/carnet-l5r.html` comme `index.html` sur GitHub Pages ; publie aussi `og.png` (aperçu de lien, annexe O.1) |
+| `pages.yml` | push sur `main` | build → publication de `dist/carnet-l5r.html` comme `index.html` sur GitHub Pages ; publie aussi `og.png` (aperçu de lien, annexe O.1) et lance `scripts/pages-pwa.mjs` (manifeste et service worker, annexe O.3) |
 | `release.yml` | tag `v*` | build → release GitHub avec `carnet-l5r.html` en pièce jointe et notes générées |
 
 ### 9.2 Versionnement
@@ -597,7 +598,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 27. **v2.23.0 — autocomplétion du nom d'un sort** (**livrée**, écarts en N.10) : annexe N.8 et N.9. Champ Nom en combobox quand le grimoire est prêt, remplissage du sort, confirmation avant de remplacer des valeurs saisies → cas GR23 à GR32.
 28. **v2.23.1 — aperçu de lien** (**livrée**, écarts en O.1 bis) : annexe O.1. Balises description et Open Graph, image `og.png` 1200 × 630 publiée par `pages.yml` → cas W1 à W4.
 29. ~~**v2.23.2 — portail sans « campagne »**~~ (**mis de côté le 31/10/2026**, P11) : annexe O.2. Le portail se présente lui-même comme « Portail de campagne » : les libellés actuels restent. La **v2.23.2** (31/10/2026) affiche à la place le nom du portail dans le menu Ressources : « L'Empire d'Émeraude », sous-titre « Portail de campagne · Clans, règles, aides de jeu » (P11).
-30. **v2.24.0 — installable et hors ligne** (attend P12) : annexe O.3. Manifeste et service worker ajoutés au déploiement Pages seulement → cas W6 à W11.
+30. **v2.24.0 — installable et hors ligne** (**livrée**, écarts en O.3 bis ; P12) : annexe O.3. Manifeste et service worker ajoutés au déploiement Pages seulement → cas W6 à W11.
 31. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
 
 ---
@@ -619,7 +620,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 | P9 | « Rang d'Honneur » utilisé comme bonus (Matsu, Akodo, Utaku, Daidoji) : arrondi à l'inférieur (6,5 → 6) | Arrondi à l'inférieur |
 | P10 | **Vérifié** : catalogue d'armes corrigé (annexe E.2 C8) et catalogue d'armures ajouté (E.5). | Annexe E |
 | P11 | **Tranché le 31/10/2026** : le site de Vincenzo a pour titre « L'EMPIRE D'ÉMERAUDE » et se présente lui-même comme « Portail de campagne », on garde ce libellé pour le moment. Lot 33 (annexe O.2) mis de côté. v2.23.2 : l'entrée du menu Ressources prend le nom du site, « L'Empire d'Émeraude », sous-titre « Portail de campagne · Clans, règles, aides de jeu ». | Décision retenue ; à rouvrir si le portail change de présentation |
-| P12 | **Service worker sur GitHub Pages** (lot 34) : exception au principe « aucune requête automatique » (le navigateur charge `sw.js` et le manifeste, même origine, rien n'est envoyé). | Lot 34 non commencé ; le fichier de release reste la seule solution hors ligne |
+| P12 | **Tranché le 31/10/2026, accepté** : service worker sur GitHub Pages (lot 34, annexe O.3). Exception au principe « aucune requête automatique » : le navigateur charge `sw.js` et le manifeste, même origine, rien n'est envoyé. | Décision retenue |
 | P13 | **Mesure de fréquentation (GoatCounter)** sur l'adresse GitHub Pages (`handoff-tracking.md`, 31/10/2026) : exception au §1 (requête automatique vers un autre site, envoie l'adresse, le référent, le navigateur et la taille d'écran). Si accepté : lot à part, script injecté par `pages.yml` seulement (le fichier de release et le smoke « aucune requête réseau » ne changent pas), §1, README, guide et `og:description` corrigés là où ils disent « rien n'est envoyé », note de confidentialité au tutoiement. | Pas de mesure de fréquentation |
 
 ---
@@ -3085,7 +3086,7 @@ Le portail de Vincenzo sert de ressource commune, pas de site du MJ de chaque gr
 - Les liens internes du guide et du README résolvent tous (vérification locale, comme en M.1).
 - Captures du README : inchangées (aucun de ces textes n'y apparaît).
 
-### O.3 Lot 34 : installable et hors ligne depuis l'adresse web (v2.24.0) — attend P12
+### O.3 Lot 34 : installable et hors ligne depuis l'adresse web (v2.24.0)
 
 Objectif : un joueur ouvre l'adresse une fois, l'ajoute à son écran d'accueil, et le Carnet s'ouvre ensuite **sans réseau**. Le fichier de release et l'usage en `file://` ne changent pas.
 
@@ -3146,6 +3147,15 @@ Objectif : un joueur ouvre l'adresse une fois, l'ajoute à son écran d'accueil,
 | W9 | Même serveur : une requête vers `vincenzorpg.github.io` (chargement du grimoire simulé par `page.route`) n'est pas servie par le service worker |
 | W10 | Smoke « aucune requête réseau » sur `dist/carnet-l5r.html` en `file://` : toujours vert, sans modification (le build ne contient ni manifeste ni service worker) |
 | W11 | Manuel, après déploiement : installation sur Android (Chrome) et iPhone (Safari), ouverture en mode avion, puis mise à jour visible après le déploiement suivant |
+
+#### O.3 bis Écarts de mise en œuvre (lot 34)
+
+- **Service worker** : `skipWaiting` et `clients.claim` ajoutés, pour que la nouvelle version remplace l'ancienne sans attendre la fermeture de tous les onglets. La réponse d'une navigation réussie remplace la copie en cache : sans cela, le hors ligne resterait figé sur la version de l'installation. Seules les requêtes `GET` sont traitées.
+- **Icône maskable** : sceau à 62 % du côté, pas 80 %. La zone sûre est un cercle de 80 % de diamètre : à 80 % du côté, les coins du cadre seraient coupés.
+- **`scripts/pages-pwa.mjs`** : dossier en argument (`site` par défaut), pour W6 et W8. La garde accepte `localhost` (W8).
+- **W8** : le serveur est démarré par `tests/e2e/pwa.spec.ts` sous `/carnet-l5r/`, comme Pages, sans dépendance. Il coupe aussi ses connexions pendant les étapes hors ligne, en plus de `setOffline`. Cas ajouté : une nouvelle version arrive avec du réseau et remplace la copie hors ligne. **W9** : `page.route` intercepte les six fichiers et `fromServiceWorker()` est faux. **W10** : le smoke n'a pas changé ; `tests/e2e/pwa.spec.ts` vérifie en plus que le build ne contient ni manifeste ni enregistrement.
+- **Guide** : avertissement ajouté, sur iPhone et iPad l'application installée garde ses fiches à part de Safari. À confirmer pendant W11.
+- **W11** : à faire après déploiement.
 
 ### O.4 Points ouverts à ajouter au §12
 
