@@ -40,7 +40,7 @@ export function ResourcesMenu() {
   const c = state.character;
   const clan = c ? clanAccent(c.clan) : null;
   const clanHref = clanUrl(clan?.id ?? null);
-  const campaign: Entry[] = [{ href: PORTAL.home, kanji: "帝", title: "Portail de la campagne", desc: "Clans, règles, aides de jeu" }];
+  const campaign: Entry[] = [{ href: PORTAL.home, kanji: "帝", title: "L'Empire d'Émeraude", desc: "Portail de campagne · Clans, règles, aides de jeu" }];
   if (clan?.id && clan.label && clanHref) {
     campaign.push({ href: clanHref, kanji: PORTAL_CLAN_KANJI[clan.id], title: clan.label, desc: "Histoire, familles et serments" });
   }

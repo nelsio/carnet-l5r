@@ -58,6 +58,8 @@ describe("O4 : menu Ressources", () => {
     const clan = within(menu).getByRole("menuitem", { name: /^Clan du Crabe/ });
     expect(clan).toHaveAttribute("href", `${PORTAL}clans/crabe.html`);
     expect(clan).toHaveTextContent("土");
+    expect(items[0]).toHaveTextContent("L'Empire d'Émeraude");
+    expect(items[0]).toHaveTextContent("Portail de campagne · Clans, règles, aides de jeu");
     expect(items.map((a) => a.getAttribute("href"))).toEqual([
       `${PORTAL}index.html`, `${PORTAL}clans/crabe.html`, `${PORTAL}createcharacter.html`, `${PORTAL}grimoire.html`,
       `${PORTAL}aides/combat-memento.html`, `${PORTAL}aides/bushido-honneur.html`, `${PORTAL}aides/etiquette-coutumes.html`, ...Object.values(CARNET_LINKS),
