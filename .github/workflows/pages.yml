@@ -27,6 +27,8 @@ jobs:
       - run: npm run build
       # Le fichier unique est servi comme page d'accueil (HANDOFF §9.1).
       - run: mkdir site && cp dist/carnet-l5r.html site/index.html
+      # Image de l'aperçu de lien (annexe O.1), hors du fichier unique.
+      - run: cp docs/img/og.png site/og.png
       - uses: actions/upload-pages-artifact@v5
         with:
           path: site
