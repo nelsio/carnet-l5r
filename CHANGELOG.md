@@ -6,6 +6,11 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.23.1] - 2026-10-31
+
+### Modifié
+- Aperçu du lien (titre, description, image) quand on partage l'adresse du Carnet.
+
 ## [2.23.0] - 2026-10-31
 
 ### Ajouté
@@ -271,7 +276,8 @@ Simples liens ouverts dans un nouvel onglet : le Carnet ne fait toujours aucune 
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.23.0...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.23.1...HEAD
+[2.23.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.23.1
 [2.23.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.23.0
 [2.22.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.22.0
 [2.21.4]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.21.4
