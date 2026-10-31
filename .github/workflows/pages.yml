@@ -29,6 +29,8 @@ jobs:
       - run: mkdir site && cp dist/carnet-l5r.html site/index.html
       # Image de l'aperçu de lien (annexe O.1), hors du fichier unique.
       - run: cp docs/img/og.png site/og.png
+      # Manifeste et service worker, sur l'adresse Pages seulement (annexe O.3).
+      - run: node scripts/pages-pwa.mjs
       - uses: actions/upload-pages-artifact@v5
         with:
           path: site

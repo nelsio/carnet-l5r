@@ -6,6 +6,11 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.24.0] - 2026-10-31
+
+### Ajouté
+- Le Carnet s'installe comme une application et s'ouvre hors ligne depuis son adresse web.
+
 ## [2.23.2] - 2026-10-31
 
 ### Modifié

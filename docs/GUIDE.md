@@ -26,6 +26,21 @@ Tes fiches sont **enregistrées automatiquement** dans le navigateur de cet appa
 
 ## 2. Utiliser hors ligne
 
+### Installer sur ton téléphone ou ton ordinateur
+
+Ouvre l'adresse du Carnet une première fois avec du réseau, puis :
+
+- **Chrome, Edge, Android** : menu du navigateur → **Installer l'application** ;
+- **iPhone, iPad (Safari)** : **Partager** → **Sur l'écran d'accueil**.
+
+Le Carnet s'ouvre ensuite **sans connexion**, et se met à jour tout seul dès qu'il y a du réseau.
+
+> Sur **iPhone et iPad**, l'application installée garde ses fiches à part de Safari : exporte-les depuis Safari, puis importe-les dans l'application (voir [§ 9](#9-sauvegarder-et-partager)).
+
+### Télécharger le fichier
+
+L'autre solution, sans rien installer :
+
 1. Télécharge `carnet-l5r.html` depuis la [dernière release](https://github.com/nelsio/carnet-l5r/releases/latest).
 2. Ouvre-le dans ton navigateur (double-clic). Il fonctionne **sans connexion**.
 
