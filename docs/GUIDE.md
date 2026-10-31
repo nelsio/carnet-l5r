@@ -20,9 +20,11 @@ Licences, polices et crédits : [CREDITS.md](CREDITS.md).
 
 Ouvre **https://nelsio.github.io/carnet-l5r/**.
 
-Tes fiches sont **enregistrées automatiquement** dans le navigateur de cet appareil, à chaque modification. Rien n'est envoyé : ni le MJ ni personne d'autre ne les voit tant que tu ne les **exportes** pas (voir [§ 9](#9-sauvegarder-et-partager)).
+Tes fiches sont **enregistrées automatiquement** dans le navigateur de cet appareil, à chaque modification. Elles ne sont jamais envoyées : ni le MJ ni personne d'autre ne les voit tant que tu ne les **exportes** pas (voir [§ 9](#9-sauvegarder-et-partager)).
 
 > Si le navigateur refuse le stockage (navigation privée stricte, par exemple), une **bannière** te prévient : **exporte ta fiche avant de fermer**, sinon elle sera perdue.
+
+L'adresse web compte les visites avec [GoatCounter](https://www.goatcounter.com), sans cookie : à chaque ouverture, il reçoit l'adresse de la page, le site d'où tu viens, ton navigateur, ta langue et la taille de ton écran. Ton adresse IP sert à déduire ton pays et n'est pas conservée. Le nom de tes personnages ne part jamais. Si un bloqueur de publicité l'arrête, le Carnet marche à l'identique, et le fichier `carnet-l5r.html` ne compte rien.
 
 ## 2. Utiliser hors ligne
 

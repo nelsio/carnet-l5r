@@ -10,7 +10,7 @@ Compagnon de campagne pour les joueurs de **La Légende des Cinq Anneaux, 4e éd
 
 ![Fiche de Kakita Haruto : anneaux, traits, barre d'état des blessures et du Vide](docs/img/fiche.png)
 
-Un seul fichier HTML, **sans serveur ni compte** : rien n'est envoyé sur internet, tes fiches restent dans ton navigateur.
+Un seul fichier HTML, **sans serveur ni compte** : tes fiches restent dans ton navigateur et ne sont jamais envoyées ([confidentialité](#confidentialité)).
 
 ## Ce que fait le Carnet
 
@@ -36,6 +36,10 @@ Pour jouer **hors ligne**, **installe le Carnet** depuis ton navigateur (voir le
 > **Pense à exporter ta fiche** (bloc **Fichier** → **Exporter la fiche**) : c'est ta sauvegarde, et le moyen de changer d'appareil ou de la partager avec le MJ. Sur Chrome et Edge, **Lier à un fichier** l'enregistre en continu, par exemple dans le dossier Drive de la campagne.
 
 **MJ** : importe les fiches des joueurs en **Consultation**, en lecture seule. Détails dans le [guide](docs/GUIDE.md#11-pour-le-mj).
+
+## Confidentialité
+
+L'adresse web compte les visites avec [GoatCounter](https://www.goatcounter.com), sans cookie : à chaque ouverture, il reçoit l'adresse de la page, le site d'où tu viens, ton navigateur, ta langue et la taille de ton écran. Ton adresse IP sert à déduire ton pays et n'est pas conservée. **Tes fiches et le nom de tes personnages ne sont jamais envoyés.** Le fichier `carnet-l5r.html` ne compte rien.
 
 ## En savoir plus
 
