@@ -27,10 +27,10 @@ jobs:
       - run: npm run build
       # Le fichier unique est servi comme page d'accueil (HANDOFF §9.1).
       - run: mkdir site && cp dist/carnet-l5r.html site/index.html
-      # Image de l'aperçu de lien (annexe O.1), hors du fichier unique.
-      - run: cp docs/img/og.png site/og.png
-      # Manifeste et service worker, sur l'adresse Pages seulement (annexe O.3).
+      # Manifeste, service worker, sitemap et image de partage, sur l'adresse Pages seulement (annexes O.3 et P).
       - run: node scripts/pages-pwa.mjs
+      # Présentation lisible sans JavaScript, sur l'adresse Pages seulement (annexe P).
+      - run: node scripts/pages-seo.mjs
       # Compteur de visites, sur l'adresse Pages seulement (annexe O.5).
       - run: node scripts/pages-compteur.mjs
       - uses: actions/upload-pages-artifact@v5

@@ -4,7 +4,7 @@
 [![Dernière release](https://img.shields.io/github/v/release/nelsio/carnet-l5r)](https://github.com/nelsio/carnet-l5r/releases/latest)
 [![Licence MIT](https://img.shields.io/github/license/nelsio/carnet-l5r)](LICENSE)
 
-Compagnon de campagne pour les joueurs de **La Légende des Cinq Anneaux, 4e édition** : ta fiche de personnage, et les jets Roll & Keep prêts à lancer selon la situation.
+Compagnon de campagne gratuit et sans compte pour les joueurs de **La Légende des Cinq Anneaux (L5R), 4e édition** : ta fiche de personnage, et un assistant de jets Roll & Keep prêts à lancer selon la situation, sur ordinateur comme sur mobile.
 
 **▶ [Ouvrir le Carnet](https://nelsio.github.io/carnet-l5r/)** · [Guide d'utilisation](docs/GUIDE.md) · [Nouveautés](https://github.com/nelsio/carnet-l5r/releases)
 

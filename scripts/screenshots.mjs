@@ -1,4 +1,4 @@
-// Captures du README et image d'aperçu de lien og.png (thème sombre). Usage : npm run build && npm run screenshots
+// Captures du README (thème sombre). Usage : npm run build && npm run screenshots
 // Données : modèles intégrés (Kakita Haruto, Tamori Ayane), aucune fiche personnelle.
 // Navigateur : celui de Playwright ; CHROMIUM_PATH pour en imposer un autre.
 import { chromium } from "playwright";
@@ -50,11 +50,6 @@ phones.push(await m.screenshot());
 await m.getByRole("button", { name: /Lancer · Frappe de jade/ }).click(); await settle(m);
 phones.push(await m.screenshot());
 
-// Aperçu de lien (annexe O.1) : 1200 × 630 exactement, à l'échelle 1, haut de la fiche de Kakita Haruto.
-const o = await open(1200, 630, 1);
-await o.getByRole("button", { name: "Utiliser" }).first().click(); await settle(o);
-await o.evaluate(() => window.scrollTo(0, 0)); await settle(o);
-const og = await o.screenshot();
 await browser.close();
 
 const png = (img) => img.png({ palette: true, quality: 90, compressionLevel: 9 });
@@ -67,5 +62,4 @@ const strip = await sharp({ create: { width: w * 3 + gap * 2, height: h, channel
   .composite(phones.map((input, i) => ({ input, left: i * (w + gap), top: 0 })))
   .png().toBuffer();
 await png(sharp(strip).resize({ width: 1600 })).toFile(`${out}/mobile.png`);
-await png(sharp(og)).toFile(`${out}/og.png`);
-console.log("Captures écrites dans docs/img/ : fiche.png, combat.png, mobile.png, og.png");
+console.log("Captures écrites dans docs/img/ : fiche.png, combat.png, mobile.png");
