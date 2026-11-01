@@ -23,7 +23,7 @@ async function useTemplate(page: Page) {
 test("V5 : section « Le Carnet » du menu Ressources, version de package.json, quatre liens externes", async ({ page }) => {
   await page.goto(pageUrl);
   await page.getByRole("button", { name: "Ressources" }).click();
-  const carnet = page.getByRole("menu", { name: "Ressources de la campagne" }).getByRole("group", { name: "Le Carnet" });
+  const carnet = page.getByRole("menu", { name: "Ressources L5R" }).getByRole("group", { name: "Le Carnet" });
   await expect(carnet).toContainText(`v${version}`);
   const items = carnet.getByRole("menuitem");
   await expect(items).toHaveCount(4);

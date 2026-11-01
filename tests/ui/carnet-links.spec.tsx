@@ -44,7 +44,7 @@ describe("V2 : section « Le Carnet » du menu Ressources", () => {
   it("en dernier, avec la version de package.json et quatre liens sur fond sceau", async () => {
     await renderApp();
     fireEvent.click(screen.getByRole("button", { name: "Ressources" }));
-    const menu = screen.getByRole("menu", { name: "Ressources de la campagne" });
+    const menu = screen.getByRole("menu", { name: "Ressources L5R" });
     const groups = within(menu).getAllByRole("group");
     const carnet = groups.at(-1)!;
     expect(carnet).toHaveAttribute("aria-label", "Le Carnet");

@@ -38,7 +38,7 @@ export function Header() {
               <div className="eyebrow">
                 <span className="brand">{APP_NAME}</span>
                 {clan && <><span className="sep" aria-hidden="true" />{clan.label && clanHref ? (
-                  // Page du clan sur le portail de la campagne (annexe L.7).
+                  // Page du clan sur le portail (annexe L.7).
                   <ExternalLink href={clanHref} className="mon" label={`${clan.label} : page du clan sur le portail (nouvel onglet)`}>{clan.label}</ExternalLink>
                 ) : <div className="mon">{clan.label ?? `Clan ${c.clan}`}</div>}</>}
               </div>

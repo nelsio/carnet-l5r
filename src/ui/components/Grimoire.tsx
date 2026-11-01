@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { normalize, sameSpell, searchGrimoire, spellTn, type GrimoireDiff, type GrimoireFillField, type GrimoireSpell, type Spell, type SpellElement } from "@carnet/core";
 import { ELEMENT_LABELS } from "../../rules/l5r4e";
-import { GRIMOIRE_FILES } from "../../rules/portal";
+import { GRIMOIRE_FILES, PORTAL_NAME_OF } from "../../rules/portal";
 import { useStore } from "../store";
 
 const ELEMENT_CHIPS: readonly [SpellElement | "all-elements", string][] = [
@@ -335,7 +335,7 @@ export function GrimoirePanel({ spells, onAdd, onClose }: PanelProps) {
   } else {
     content = (
       <div className="ggate">
-        <p>Pour proposer les sorts, le Carnet télécharge la liste du <b>grimoire de la campagne</b> (environ 110 Ko). Rien n'est envoyé, ta fiche reste dans ce navigateur.</p>
+        <p>Pour proposer les sorts, le Carnet télécharge la liste du <b>grimoire {PORTAL_NAME_OF}</b> (environ 110 Ko). Rien n'est envoyé, ta fiche reste dans ce navigateur.</p>
         <button ref={loadButton} type="button" className="btn accent" onClick={() => void load()}>Charger le grimoire</button>
         <span className="fine">La liste est gardée dans ce navigateur : elle reste disponible hors ligne. « Actualiser » la recharge.</span>
       </div>

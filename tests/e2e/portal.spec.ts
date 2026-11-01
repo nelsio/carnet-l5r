@@ -11,7 +11,7 @@ import { VIEW } from "../helpers/views";
 const pageUrl = pathToFileURL(resolve("dist/carnet-l5r.html")).href;
 
 const resources = (page: Page) => page.getByRole("button", { name: "Ressources" });
-const menu = (page: Page) => page.getByRole("menu", { name: "Ressources de la campagne" });
+const menu = (page: Page) => page.getByRole("menu", { name: "Ressources L5R" });
 
 test("O10 : aucune requête vers le portail au chargement ni à l'ouverture du menu", async ({ page }) => {
   const portal: string[] = [];

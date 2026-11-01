@@ -693,7 +693,7 @@ header.top + main{margin-top:18px}
   .cs-champ,.cs-anneau,.cs-catalogue,.cs-effet{width:100%;font-size:16px}
 }
 
-/* ---------- Portail de la campagne (annexe L, v2.19.0) : liens externes, menu Ressources, Bibliothèque ---------- */
+/* ---------- Portail (annexe L, v2.19.0) : liens externes, menu Ressources, Bibliothèque ---------- */
 a{color:var(--accent-ink);text-decoration:none;text-underline-offset:3px}
 a:hover{text-decoration:underline}
 .ext{width:13px;height:13px;flex:none;vertical-align:-1px;margin-left:5px}
@@ -780,7 +780,7 @@ a.btn .ext{margin-left:8px}
   .tplc .btn,.start-opt .btn{min-height:44px}
 }
 
-/* ---------- Portail de la campagne dans la Fiche et l'Assistant L5R (annexe L.7, L.8, v2.20.0) ---------- */
+/* ---------- Portail dans la Fiche et l'Assistant L5R (annexe L.7, L.8, v2.20.0) ---------- */
 /* Clan de l'en-tête en lien vers sa page */
 a.mon{border-radius:4px}
 a.mon:hover{text-decoration:underline}

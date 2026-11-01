@@ -6,6 +6,7 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Character } from "@carnet/core";
 import { CARNET_LINKS } from "../../src/rules/links";
+import { PORTAL_NAME } from "../../src/rules/portal";
 import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
@@ -24,7 +25,7 @@ async function renderApp(character: Character | null = base()) {
 const resources = () => screen.getByRole("button", { name: "Ressources" });
 function openMenu() {
   fireEvent.click(resources());
-  return screen.getByRole("menu", { name: "Ressources de la campagne" });
+  return screen.getByRole("menu", { name: "Ressources L5R" });
 }
 const showLibrary = () => fireEvent.click(screen.getByRole("button", { name: "Carnet de Rokugan — ouvrir la bibliothèque" }));
 
@@ -37,6 +38,23 @@ function expectExternal(a: Element) {
 }
 
 afterEach(() => vi.restoreAllMocks());
+
+describe("W5 : le portail n'est plus présenté comme le site de la campagne", () => {
+  const expectNeutral = (text: string | null) => {
+    expect(text).not.toMatch(/de la campagne|Portail L5R/);
+    expect(text).toContain(PORTAL_NAME);
+  };
+
+  it("Bibliothèque vide", async () => {
+    await renderApp(null);
+    expectNeutral(document.body.textContent);
+  });
+
+  it("menu Ressources", async () => {
+    await renderApp();
+    expectNeutral(openMenu().textContent);
+  });
+});
 
 describe("O4 : menu Ressources", () => {
   it("bouton après Thème, fermé par défaut", async () => {
@@ -58,13 +76,13 @@ describe("O4 : menu Ressources", () => {
     const clan = within(menu).getByRole("menuitem", { name: /^Clan du Crabe/ });
     expect(clan).toHaveAttribute("href", `${PORTAL}clans/crabe.html`);
     expect(clan).toHaveTextContent("土");
-    expect(items[0]).toHaveTextContent("L'Empire d'Émeraude");
-    expect(items[0]).toHaveTextContent("Portail de campagne · Clans, règles, aides de jeu");
+    expect(items[0]).toHaveTextContent(PORTAL_NAME);
+    expect(items[0]).toHaveTextContent("Clans, règles, aides de jeu");
     expect(items.map((a) => a.getAttribute("href"))).toEqual([
       `${PORTAL}index.html`, `${PORTAL}clans/crabe.html`, `${PORTAL}createcharacter.html`, `${PORTAL}grimoire.html`,
       `${PORTAL}aides/combat-memento.html`, `${PORTAL}aides/bushido-honneur.html`, `${PORTAL}aides/etiquette-coutumes.html`, ...Object.values(CARNET_LINKS),
     ]);
-    expect(within(menu).getAllByRole("group").map((g) => g.getAttribute("aria-label"))).toEqual(["Campagne", "Créer", "Références", "Le Carnet"]);
+    expect(within(menu).getAllByRole("group").map((g) => g.getAttribute("aria-label"))).toEqual([PORTAL_NAME, "Créer", "Références", "Le Carnet"]);
     expect(menu).toHaveTextContent("Liens externes : s'ouvrent dans un nouvel onglet.");
   });
 
@@ -155,7 +173,7 @@ describe("O7 : Bibliothèque vide", () => {
     expect(forge).toHaveClass("btn");
     expect(forge).not.toHaveClass("accent");
     expectExternal(forge);
-    const discover = screen.getByRole("link", { name: "Découvrir la campagne" });
+    const discover = screen.getByRole("link", { name: `Découvrir le jeu sur ${PORTAL_NAME}` });
     expect(discover).toHaveAttribute("href", `${PORTAL}index.html`);
     expectExternal(discover);
   });

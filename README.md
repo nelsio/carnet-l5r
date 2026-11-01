@@ -33,7 +33,7 @@ Un seul fichier HTML, **sans serveur ni compte** : tes fiches restent dans ton n
 
 Pour jouer **hors ligne**, **installe le Carnet** depuis ton navigateur (voir le [guide](docs/GUIDE.md#installer-sur-ton-téléphone-ou-ton-ordinateur)) ou télécharge `carnet-l5r.html` depuis la [dernière release](https://github.com/nelsio/carnet-l5r/releases/latest) et ouvre-le dans ton navigateur.
 
-> **Pense à exporter ta fiche** (bloc **Fichier** → **Exporter la fiche**) : c'est ta sauvegarde, et le moyen de changer d'appareil ou de la partager avec le MJ. Sur Chrome et Edge, **Lier à un fichier** l'enregistre en continu, par exemple dans le dossier Drive de la campagne.
+> **Pense à exporter ta fiche** (bloc **Fichier** → **Exporter la fiche**) : c'est ta sauvegarde, et le moyen de changer d'appareil ou de la partager avec le MJ. Sur Chrome et Edge, **Lier à un fichier** l'enregistre en continu, par exemple dans le dossier partagé de ton groupe.
 
 **MJ** : importe les fiches des joueurs en **Consultation**, en lecture seule. Détails dans le [guide](docs/GUIDE.md#11-pour-le-mj).
 

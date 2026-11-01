@@ -274,7 +274,7 @@ export const DUEL_WEAPON_PATTERN = /katana|wakizashi|ken|sabre/i;
 export const DUEL_ASSESSMENT = { base: 10, perRank: 5 } as const;
 
 /** Clans : clés normalisées (sans accents ni casse) et couleurs d'accent ; `ink*` : même teinte pour le texte (annexe I.1.4) ;
- * `portalSlug` : page du clan sur le portail de la campagne (annexe L.1), absent si le portail n'en a pas. */
+ * `portalSlug` : page du clan sur le portail (annexe L.1), absent si le portail n'en a pas. */
 export interface ClanInfo { id: string; label: string; light: string; inkLight: string; dark: string; inkDark: string; portalSlug?: string }
 export const CLANS: readonly ClanInfo[] = [
   { id: "crabe", label: "Clan du Crabe", light: "#3d5a73", inkLight: "#374754", dark: "#8fb0cc", inkDark: "#a1bbd0", portalSlug: "crabe" },

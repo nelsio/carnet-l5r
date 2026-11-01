@@ -10,7 +10,7 @@ export function ExtIcon() {
 }
 
 /**
- * Lien vers le portail de la campagne : nouvel onglet, sans référent, icône externe après le libellé.
+ * Lien vers le portail : nouvel onglet, sans référent, icône externe après le libellé.
  * `label` remplace le nom accessible quand le texte visible ne dit pas qu'un onglet s'ouvre (icône seule, nom de clan).
  */
 export function ExternalLink({ href, className, label, children, onClick }: {

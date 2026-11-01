@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { clanAccent } from "@carnet/core";
 import { CARNET_LINKS } from "../../rules/links";
-import { clanUrl, FORGE_JSON_OK, PORTAL, PORTAL_CLAN_KANJI } from "../../rules/portal";
+import { clanUrl, FORGE_JSON_OK, PORTAL, PORTAL_CLAN_KANJI, PORTAL_NAME } from "../../rules/portal";
 import { useStore } from "../store";
 import { ExtIcon } from "./ExternalLink";
 import { ForgePending } from "./ForgePending";
@@ -27,7 +27,7 @@ const CARNET: Entry[] = [
 ];
 
 /**
- * Bouton « Ressources » et son menu de liens vers le portail de la campagne (annexe L.2).
+ * Bouton « Ressources » et son menu de liens vers le portail (annexes L.2 et O.2).
  * Bureau : menu déroulant sous le bouton ; mobile : panneau glissant depuis le bas, avec voile.
  */
 export function ResourcesMenu() {
@@ -40,9 +40,9 @@ export function ResourcesMenu() {
   const c = state.character;
   const clan = c ? clanAccent(c.clan) : null;
   const clanHref = clanUrl(clan?.id ?? null);
-  const campaign: Entry[] = [{ href: PORTAL.home, kanji: "帝", title: "L'Empire d'Émeraude", desc: "Portail de campagne · Clans, règles, aides de jeu" }];
+  const portal: Entry[] = [{ href: PORTAL.home, kanji: "帝", title: PORTAL_NAME, desc: "Clans, règles, aides de jeu" }];
   if (clan?.id && clan.label && clanHref) {
-    campaign.push({ href: clanHref, kanji: PORTAL_CLAN_KANJI[clan.id], title: clan.label, desc: "Histoire, familles et serments" });
+    portal.push({ href: clanHref, kanji: PORTAL_CLAN_KANJI[clan.id], title: clan.label, desc: "Histoire, familles et serments" });
   }
 
   const close = (focusButton = false) => {
@@ -111,9 +111,9 @@ export function ResourcesMenu() {
       {open && (
         <>
           <div className="res-scrim" data-testid="res-scrim" onClick={() => close()} />
-          <div ref={menu} id="res-menu" className="res-menu" role="menu" aria-label="Ressources de la campagne" onKeyDown={onKeyDown}>
+          <div ref={menu} id="res-menu" className="res-menu" role="menu" aria-label="Ressources L5R" onKeyDown={onKeyDown}>
             <span className="grip" aria-hidden="true" />
-            {group("Campagne", campaign)}
+            {group(PORTAL_NAME, portal)}
             {group("Créer", CREATE)}
             {group("Références", REFERENCES)}
             {group("Le Carnet", CARNET, { className: "res-carnet", version: __APP_VERSION__ })}

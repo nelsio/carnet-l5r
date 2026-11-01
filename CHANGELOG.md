@@ -6,6 +6,11 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.25.1] - 2026-11-01
+
+### Modifié
+- Le portail s'appelle désormais **Les chroniques de Rokugan** et n'est plus présenté comme le site de ta campagne.
+
 ## [2.25.0] - 2026-10-31
 
 ### Modifié
@@ -296,7 +301,8 @@ Simples liens ouverts dans un nouvel onglet : le Carnet ne fait toujours aucune 
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.25.0...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.25.1...HEAD
+[2.25.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.25.1
 [2.25.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.25.0
 [2.24.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.24.1
 [2.24.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.24.0
