@@ -45,7 +45,7 @@ export function FileActions() {
         </p>
       )}
       <p className="hint">
-        L'export télécharge un fichier JSON à ranger où tu veux (le dossier Drive de la campagne, par exemple).
+        L'export télécharge un fichier JSON à ranger où tu veux, par exemple le dossier partagé de ton groupe (Drive, Dropbox…).
         {!readonly && " L'import peut aussi fusionner un fichier dans cette fiche, avec un aperçu avant d'appliquer. Tu peux aussi déposer un fichier sur la page."}
         {!readonly && file.supported && file.state === "none" && " Lier à un fichier enregistre chaque modification dans ce fichier : pratique avec un dossier Drive synchronisé sur ton ordinateur."}
       </p>

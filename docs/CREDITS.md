@@ -14,7 +14,8 @@
   Textes des licences : [`src/ui/fonts/LICENSES.md`](../src/ui/fonts/LICENSES.md).
 - Lecture des fichiers du grimoire : **json5** 2.2.3, licence **MIT**.
 - Compteur de visites de l'adresse web : **GoatCounter** (`count.v5.js`), licence **ISC**. Chargé par le navigateur sur l'adresse GitHub Pages seulement, pas inclus dans le Carnet ; une copie sert aux tests (`tests/fixtures/goatcounter/`).
-- Les caractéristiques des sorts proposées dans le Carnet viennent du **grimoire du portail de la campagne** (avec l'accord de son auteur) ; elles sont téléchargées par le joueur, pas incluses dans le Carnet.
+- Les caractéristiques des sorts proposées dans le Carnet viennent du **grimoire des Chroniques de Rokugan** (avec l'accord de son auteur) ; elles sont téléchargées par le joueur, pas incluses dans le Carnet.
+- Les chroniques de Rokugan : [vincenzorpg.github.io/L5R](https://vincenzorpg.github.io/L5R/), site de fan de Vincenzo, utilisé pour les liens et la lecture du grimoire.
 
 ## Crédits et remerciements
 

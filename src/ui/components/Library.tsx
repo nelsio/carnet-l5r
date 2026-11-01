@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 import { clanAccent, schoolRankOf, serializeCharacter } from "@carnet/core";
 import { EXAMPLES, type Example } from "../../rules/example";
 import { CARNET_LINKS } from "../../rules/links";
-import { FORGE_JSON_OK, PORTAL } from "../../rules/portal";
+import { FORGE_JSON_OK, PORTAL, PORTAL_NAME } from "../../rules/portal";
 import { downloadText } from "../download";
 import type { LibraryEntry } from "../../storage";
 import { useStore } from "../store";
@@ -53,7 +53,7 @@ export function Library() {
             {EXAMPLES.map((x) => <TemplateCard key={x.id} example={x} />)}
           </div>
         </section>
-        <p className="discover">Nouveau à Rokugan ? <ExternalLink href={PORTAL.home}>Découvrir la campagne</ExternalLink></p>
+        <p className="discover">Nouveau à Rokugan ? <ExternalLink href={PORTAL.home}>Découvrir le jeu sur {PORTAL_NAME}</ExternalLink></p>
       </div>
     );
   }

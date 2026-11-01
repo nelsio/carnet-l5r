@@ -597,10 +597,11 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 26. **v2.22.0 — sorts depuis le grimoire** (**livrée**, écarts en N.7) : annexe N.1 à N.6. Lecture à la demande des 6 fichiers de sorts du portail (JSON5, sans exécution), cache IndexedDB, panneau « Ajouter depuis le grimoire », universels remplis → cas GR1 à GR22.
 27. **v2.23.0 — autocomplétion du nom d'un sort** (**livrée**, écarts en N.10) : annexe N.8 et N.9. Champ Nom en combobox quand le grimoire est prêt, remplissage du sort, confirmation avant de remplacer des valeurs saisies → cas GR23 à GR32.
 28. **v2.23.1 — aperçu de lien** (**livrée**, écarts en O.1 bis) : annexe O.1. Balises description et Open Graph, image `og.png` 1200 × 630 publiée par `pages.yml` → cas W1 à W4.
-29. ~~**v2.23.2 — portail sans « campagne »**~~ (**mis de côté le 31/10/2026**, P11) : annexe O.2. Le portail se présente lui-même comme « Portail de campagne » : les libellés actuels restent. La **v2.23.2** (31/10/2026) affiche à la place le nom du portail dans le menu Ressources : « L'Empire d'Émeraude », sous-titre « Portail de campagne · Clans, règles, aides de jeu » (P11).
+29. **v2.23.2 — nom du portail dans le menu Ressources** (**livrée**, remplacée par le point 32 ; P11) : l'entrée du menu a pris le nom alors affiché par le site, « L'Empire d'Émeraude ». Le lot 33 (annexe O.2) avait été mis de côté.
 30. **v2.24.0 — installable et hors ligne** (**livrée**, écarts en O.3 bis ; P12) : annexe O.3. Manifeste et service worker ajoutés au déploiement Pages seulement → cas W6 à W11.
 31. **v2.24.1 — mesure de fréquentation** (**livrée**, écarts en O.5 bis ; P13) : annexe O.5. Compteur GoatCounter ajouté au déploiement Pages seulement, titre fixe, script épinglé → cas W12 à W18.
-32. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
+32. **v2.25.1 — portail « Les chroniques de Rokugan »** (**livrée**, écarts en O.2 bis ; P11) : annexe O.2, lot 37 (ancien lot 33). Libellés du portail renommés et neutres (`PORTAL_NAME`), guide et crédits → cas W5.
+33. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
 
 ---
 
@@ -620,7 +621,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 | P8 | **Tranché le 20/10/2026** : règle des dix dés, un dé lancé impair en trop alors que les gardés sont sous 10 est **perdu** (11k4 → 10k4). | Décision retenue |
 | P9 | « Rang d'Honneur » utilisé comme bonus (Matsu, Akodo, Utaku, Daidoji) : arrondi à l'inférieur (6,5 → 6) | Arrondi à l'inférieur |
 | P10 | **Vérifié** : catalogue d'armes corrigé (annexe E.2 C8) et catalogue d'armures ajouté (E.5). | Annexe E |
-| P11 | **Tranché le 31/10/2026** : le site de Vincenzo a pour titre « L'EMPIRE D'ÉMERAUDE » et se présente lui-même comme « Portail de campagne », on garde ce libellé pour le moment. Lot 33 (annexe O.2) mis de côté. v2.23.2 : l'entrée du menu Ressources prend le nom du site, « L'Empire d'Émeraude », sous-titre « Portail de campagne · Clans, règles, aides de jeu ». | Décision retenue ; à rouvrir si le portail change de présentation |
+| P11 | **Tranché le 01/11/2026** (remplace la décision du 31/10) : le site s'appelle désormais « Les chroniques de Rokugan », il sert de ressource commune et non de site du MJ de chaque groupe. Lot 33 repris en lot 37 (v2.25.1, annexe O.2), crédit tel qu'en O.2 §4. | Décision retenue |
 | P12 | **Tranché le 31/10/2026, accepté** : service worker sur GitHub Pages (lot 34, annexe O.3). Exception au principe « aucune requête automatique » : le navigateur charge `sw.js` et le manifeste, même origine, rien n'est envoyé. | Décision retenue |
 | P13 | **Tranché le 31/10/2026 : accepté.** Mesure de fréquentation (GoatCounter) sur l'adresse GitHub Pages (`handoff-tracking.md`), exception au §1 : requête automatique vers un autre site, script injecté par `pages.yml` seulement (lot 35, annexe O.5). Le fichier de release et le smoke « aucune requête réseau » ne changent pas. | Décision retenue |
 
@@ -2977,7 +2978,7 @@ Le lien vers le grimoire du sort (lot 29, L.13) suit immédiatement le nouveau n
 
 ---
 
-## Annexe O — Lots 32 à 35 : diffusion (v2.23.1, v2.23.2, v2.24.0, v2.24.1)
+## Annexe O — Lots 32 à 37 : diffusion (v2.23.1, v2.23.2, v2.24.0, v2.24.1, v2.25.1)
 
 Statut : reçu le 31/10/2026. Base `main` au commit `ee359dd` (v2.23.0). Source : `handoff-diffusion.md` (31/10/2026). Une PR et une version par lot, dans l'ordre. Le lot 32 ne dépend de rien. Le lot 33 attend **P11**, le lot 34 attend **P12** : sans réponse, ne pas les commencer. P13 (mesure de fréquentation, `handoff-tracking.md`) est ajouté au §12 en même temps ; tranché le 31/10/2026 : lot 35, annexe O.5.
 
@@ -3054,9 +3055,9 @@ Puis dans **Settings → General → Social preview** : téléverser `docs/img/o
 - **W2** : dimensions lues dans l'en-tête PNG (`tests/og.spec.ts`), sans charger `sharp` dans Vitest. W1 lit `index.html` (les balises passent telles quelles dans le build).
 - **W4** : à faire après déploiement (Sharing Debugger ou Discord). Réglages du dépôt (description, sujets, Social preview) : hors PR, à faire par Nelson.
 
-### O.2 Lot 33 : portail sans « campagne » (v2.23.2) — mis de côté
+### O.2 Lot 37 (ancien lot 33) : portail sans « campagne » (v2.25.1)
 
-**Mis de côté le 31/10/2026 (P11)** : le portail se présente lui-même comme « Portail de campagne », les libellés actuels restent. Spécification conservée ci-dessous si le point est rouvert.
+**Repris le 01/11/2026 (P11)** : voir O.2 bis, qui fait foi pour le nom et les libellés. La v2.23.2 a servi au menu Ressources.
 
 Le portail de Vincenzo sert de ressource commune, pas de site du MJ de chaque groupe. Le mot « campagne » reste là où il désigne **la campagne du joueur** (« Notes de campagne », « Compagnon de campagne »).
 
@@ -3086,6 +3087,17 @@ Le portail de Vincenzo sert de ressource commune, pas de site du MJ de chaque gr
 - W5 : aucun texte affiché par l'application ne contient « de la campagne » (test UI : rendu de la Bibliothèque vide, du menu Ressources et du panneau grimoire, recherche sur `textContent`). « Notes de campagne » et « Compagnon de campagne » restent autorisés.
 - Les liens internes du guide et du README résolvent tous (vérification locale, comme en M.1).
 - Captures du README : inchangées (aucun de ces textes n'y apparaît).
+
+#### O.2 bis Écarts de mise en œuvre (lot 37)
+
+Source : `handoff-diffusion.md`, mis à jour le 01/11/2026.
+
+- **Numéros** : le handoff prévoyait lot 33 et v2.23.2, déjà prise par le menu Ressources. Le lot 36 étant livré, ce lot devient le 37, en v2.25.1.
+- **Nom** : `PORTAL_NAME` et `PORTAL_NAME_OF` (`src/rules/portal.ts`), celui-ci pour « grimoire des Chroniques de Rokugan ». Le handoff impose « chroniques » en minuscule ; le site écrit « Les Chroniques de Rokugan ».
+- **Menu Ressources** : le titre de l'entrée est `PORTAL_NAME`, sous-titre « Clans, règles, aides de jeu ». Le libellé de départ était celui de la v2.23.2 (« L'Empire d'Émeraude », « Portail de campagne · … »), pas celui du tableau O.2.
+- **Guide** : l'ancienne phrase « site de la campagne du MJ : le portail L'Empire d'Émeraude » devient « ce portail : la page d'accueil », avec la phrase d'en-tête demandée. Le mot « portail » reste utilisé comme nom commun (« Forger sur le portail »).
+- **`CREDITS.md`** : l'origine des données de sorts nomme aussi le grimoire des Chroniques de Rokugan.
+- **W5** : Bibliothèque vide et menu dans `tests/ui/portal.spec.tsx`, panneau du grimoire dans `tests/ui/grimoire.spec.tsx`.
 
 ### O.3 Lot 34 : installable et hors ligne depuis l'adresse web (v2.24.0)
 
@@ -3162,7 +3174,7 @@ Objectif : un joueur ouvre l'adresse une fois, l'ajoute à son écran d'accueil,
 
 | # | Point | Défaut si non tranché |
 |---|---|---|
-| P11 | **Portail présenté comme ressource commune** (lot 33). Nom affiché (« Portail L5R » ?) et ligne de crédit à valider avec Vincenzo : son site devient une ressource pour des groupes inconnus (liens, et lecture du grimoire sur clic, ≈ 110 Ko par joueur). | Lot 33 non commencé |
+| P11 | **Tranché le 01/11/2026** (remplace la décision du 31/10) : le site s'appelle désormais « Les chroniques de Rokugan », il sert de ressource commune et non de site du MJ de chaque groupe. Lot 33 repris en lot 37 (v2.25.1, annexe O.2), crédit tel qu'en O.2 §4. | Décision retenue |
 | P12 | **Service worker sur GitHub Pages** (lot 34) : exception au principe « aucune requête automatique » (le navigateur charge `sw.js` et le manifeste, même origine, rien n'est envoyé). | Lot 34 non commencé ; le fichier de release reste la seule solution hors ligne |
 | P13 | **Tranché le 31/10/2026 : accepté.** Mesure de fréquentation (GoatCounter) sur l'adresse GitHub Pages (`handoff-tracking.md`), exception au §1 : requête automatique vers un autre site, script injecté par `pages.yml` seulement (lot 35, annexe O.5). Le fichier de release et le smoke « aucune requête réseau » ne changent pas. | Décision retenue |
 

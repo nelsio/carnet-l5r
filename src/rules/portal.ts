@@ -1,11 +1,16 @@
 /**
- * Adresses du portail de la campagne (site statique du MJ, annexe L.1).
+ * Nom et adresses du portail, Les chroniques de Rokugan (site de fan statique, annexes L.1 et O.2).
  * Un seul module pour toutes les adresses : un changement d'URL du portail ne touche que ce fichier.
  * Ce sont de simples liens. Seule exception, déclenchée par le joueur : la lecture des sorts du grimoire
  * (GRIMOIRE_FILES, lot 30, annexe N.1).
  */
 import type { SpellElement } from "../core/schema";
 import { CLANS, type Situation } from "./l5r4e";
+
+/** Nom affiché du portail, à écrire exactement ainsi (P11). */
+export const PORTAL_NAME = "Les chroniques de Rokugan";
+/** Le même nom après « de » (contraction). */
+export const PORTAL_NAME_OF = "des Chroniques de Rokugan";
 
 export const PORTAL_BASE = "https://vincenzorpg.github.io/L5R/";
 

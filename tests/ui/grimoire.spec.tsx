@@ -54,7 +54,7 @@ describe("GR15 : ouvrir, charger, chercher, ajouter", () => {
     fireEvent.click(toggle());
     expect(toggle()).toHaveAttribute("aria-expanded", "true");
     expect(toggle()).toHaveClass("on");
-    expect(panel().getByText(/environ 110 Ko/)).toBeInTheDocument();
+    expect(panel().getByText(/environ 110 Ko/)).toHaveTextContent("grimoire des Chroniques de Rokugan");
     expect(spy).not.toHaveBeenCalled();
 
     fireEvent.click(panel().getByRole("button", { name: "Charger le grimoire" }));
