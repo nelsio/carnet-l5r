@@ -71,6 +71,6 @@ describe("Titre d'onglet (G.3)", () => {
     expect(document.title).toBe("Kakita Ryoku · Carnet de Rokugan");
     fireEvent.click(screen.getByRole("button", { name: SEAL }));
     await screen.findByRole("heading", { name: "Bibliothèque" });
-    expect(document.title).toBe("Carnet de Rokugan");
+    expect(document.title).toBe("Carnet de Rokugan – Fiche de personnage et assistant de jets L5R 4e édition");
   });
 });

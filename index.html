@@ -13,20 +13,37 @@
         if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
       } catch (e) {}
     </script>
-    <title>Carnet de Rokugan</title>
-    <!-- Aperçu du lien partagé (annexe O.1) : lu par les robots de Discord, WhatsApp…, jamais chargé par le navigateur -->
-    <meta name="description" content="Fiche de personnage et jets Roll & Keep pour La Légende des Cinq Anneaux, 4e édition. Gratuit, sans compte, tes fiches restent dans ton navigateur." />
+    <title>Carnet de Rokugan – Fiche de personnage et assistant de jets L5R 4e édition</title>
+    <!-- Référencement et aperçu du lien partagé (annexes O.1 et P) : lus par les robots, jamais chargés par le navigateur -->
+    <meta name="description" content="Outil gratuit pour joueurs de La Légende des Cinq Anneaux (L5R 4e édition) : fiche de personnage, assistant de jets de dés, import/export JSON. Fonctionne sur mobile." />
+    <link rel="canonical" href="https://nelsio.github.io/carnet-l5r/" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Carnet de Rokugan" />
-    <meta property="og:title" content="Carnet de Rokugan · compagnon L5R 4e" />
-    <meta property="og:description" content="Ta fiche de personnage et les jets Roll & Keep prêts à lancer selon la situation. Gratuit, sans compte, tes fiches restent dans ton navigateur." />
+    <meta property="og:title" content="Carnet de Rokugan – L5R 4e édition" />
+    <meta property="og:description" content="Fiche de personnage et assistant de jets pour La Légende des Cinq Anneaux, 4e édition." />
     <meta property="og:url" content="https://nelsio.github.io/carnet-l5r/" />
-    <meta property="og:image" content="https://nelsio.github.io/carnet-l5r/og.png" />
+    <meta property="og:image" content="https://nelsio.github.io/carnet-l5r/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Fiche de personnage du Carnet de Rokugan en thème sombre" />
+    <meta property="og:image:alt" content="Carnet de Rokugan : fiche de personnage et assistant de jets pour L5R 4e édition" />
     <meta property="og:locale" content="fr_FR" />
     <meta name="twitter:card" content="summary_large_image" />
+    <!-- Vérification Google Search Console : Nelson remplacera la valeur -->
+    <!-- <meta name="google-site-verification" content="A_REMPLACER" /> -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Carnet de Rokugan",
+        "url": "https://nelsio.github.io/carnet-l5r/",
+        "description": "Fiche de personnage et assistant de jets pour La Légende des Cinq Anneaux, 4e édition.",
+        "applicationCategory": "GameApplication",
+        "operatingSystem": "Web",
+        "inLanguage": "fr",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" }
+      }
+    </script>
     <link rel="icon" href="/src/ui/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/src/ui/apple-touch-icon.png" />
   </head>

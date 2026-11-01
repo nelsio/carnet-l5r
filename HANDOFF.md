@@ -8,7 +8,7 @@ Fait foi :
 
 **État au 31/10/2026 :** version **v2.23.0** (sorts depuis le grimoire du portail et autocomplétion de leur nom, annexe N ; correctifs v2.21.1 Safari, v2.21.2 Forge en attente, L.12, v2.21.3 `sharp`, M.5, et v2.21.4 liens de sort filtrés par élément, L.13), lots 1 à 31 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
 
-**Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie), F (lot 13 : shugenja et Magie), G (lot 14 : nom de l'outil dans l'en-tête), H (lots 15 et 16 : dépôt GitHub et correctifs), I (lots 17 à 19 : couleurs, Anneaux, sélecteurs), J (lot 20 : correctifs et retouches), K (lot 21 : points d'Insight), L (lots 22 et 23 : liens vers le portail de campagne), M (lots 24 et 25 : README allégé, liens vers le guide et le dépôt), N (lots 30 et 31 : sorts depuis le grimoire du portail).
+**Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie), F (lot 13 : shugenja et Magie), G (lot 14 : nom de l'outil dans l'en-tête), H (lots 15 et 16 : dépôt GitHub et correctifs), I (lots 17 à 19 : couleurs, Anneaux, sélecteurs), J (lot 20 : correctifs et retouches), K (lot 21 : points d'Insight), L (lots 22 et 23 : liens vers le portail de campagne), M (lots 24 et 25 : README allégé, liens vers le guide et le dépôt), N (lots 30 et 31 : sorts depuis le grimoire du portail), O (lots 32 à 37 : diffusion), P (lot 38 : référencement).
 
 **Prochain lot (30/10/2026) :** à définir (§11, point 26). Les lots 24 et 25 (annexe M : README allégé, liens vers le guide et le dépôt) sont livrés ; la localisation est reportée.
 
@@ -443,7 +443,7 @@ Depuis un fichier (bouton ou glisser-déposer). Trois destinations :
 | Workflow | Déclencheur | Étapes |
 |---|---|---|
 | `ci.yml` | push, pull request | install → lint → `tsc --noEmit` → Vitest → build → Playwright |
-| `pages.yml` | push sur `main` | build → publication de `dist/carnet-l5r.html` comme `index.html` sur GitHub Pages ; publie aussi `og.png` (aperçu de lien, annexe O.1) et lance `scripts/pages-pwa.mjs` (manifeste et service worker, annexe O.3) puis `scripts/pages-compteur.mjs` (compteur de visites, annexe O.5) |
+| `pages.yml` | push sur `main` | build → publication de `dist/carnet-l5r.html` comme `index.html` sur GitHub Pages ; lance `scripts/pages-pwa.mjs` (manifeste, service worker, sitemap et image de partage, annexes O.3 et P), `scripts/pages-seo.mjs` (présentation statique, annexe P) puis `scripts/pages-compteur.mjs` (compteur de visites, annexe O.5) |
 | `release.yml` | tag `v*` | build → release GitHub avec `carnet-l5r.html` en pièce jointe et notes générées |
 
 ### 9.2 Versionnement
@@ -601,7 +601,8 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 30. **v2.24.0 — installable et hors ligne** (**livrée**, écarts en O.3 bis ; P12) : annexe O.3. Manifeste et service worker ajoutés au déploiement Pages seulement → cas W6 à W11.
 31. **v2.24.1 — mesure de fréquentation** (**livrée**, écarts en O.5 bis ; P13) : annexe O.5. Compteur GoatCounter ajouté au déploiement Pages seulement, titre fixe, script épinglé → cas W12 à W18.
 32. **v2.25.1 — portail « Les chroniques de Rokugan »** (**livrée**, écarts en O.2 bis ; P11) : annexe O.2, lot 37 (ancien lot 33). Libellés du portail renommés et neutres (`PORTAL_NAME`), guide et crédits → cas W5.
-33. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
+33. **v2.25.2 — référencement** (**livrée**, écarts en P.2) : annexe P, lot 38. Balises, JSON-LD, sitemap, `og-image.png` et présentation statique sur l'adresse Pages.
+34. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
 
 ---
 
@@ -3210,3 +3211,31 @@ Source : `handoff-tracking.md`, P13 accepté le 31/10/2026. Tableau de bord : `h
 - **Hors ligne** : le service worker laisse passer les autres origines (W9). Sans réseau, le script ne se charge pas, la visite n'est pas comptée et le Carnet n'est pas gêné (W16).
 - **`CHANGELOG`** : lien `[2.24.0]` manquant ajouté avec celui de la v2.24.1.
 - **W18** : à faire après déploiement.
+
+---
+
+## Annexe P — Lot 38 : référencement (v2.25.2)
+
+Source : `handoff-seo-carnet-l5r.md`, reçu le 01/11/2026. Objectif : rendre le Carnet indexable et partageable, sans changer son fonctionnement.
+
+### P.1 Livré
+
+- **`index.html`** : titre, description, adresse canonique, Open Graph, JSON-LD `WebApplication`, balise `google-site-verification` commentée (à décommenter par Nelson, puis pousser). Ces balises passent dans le fichier de release sans y déclencher de requête.
+- **`scripts/pages-seo.mjs`**, lancé par `pages.yml` après `pages-pwa.mjs` : ajoute la présentation statique juste après `<div id="root"></div>`, et échoue si cette balise est absente.
+- **`public-pages/sitemap.xml`** et **`public-pages/og-image.png`**, copiés par `pages-pwa.mjs`. `lastmod` se met à jour à la main.
+- **`assets/og-image.svg`**, source de l'image ; `npm run og-image` la rend avec les polices du Carnet, PNG committé.
+- **Tests** : `tests/og.spec.ts` (balises, JSON-LD, sitemap, image), `tests/seo.spec.ts` (présentation).
+
+### P.2 Écarts avec le handoff
+
+- **Présentation injectée au déploiement**, pas écrite dans `index.html` : le fichier de release et les E2E ne changent pas, comme pour les lots 34 et 35. Le texte reste du HTML statique, lisible avec `curl`. Il est placé après `#root`, pas dedans : React remplace le contenu de `#root`, le texte aurait disparu de la page rendue par Google.
+- **Titre sans fiche ouverte** : `Header.tsx` remettait « Carnet de Rokugan » au chargement, ce qui aurait annulé le titre de `index.html`. Sans fiche, l'onglet prend maintenant le titre complet (`HOME_TITLE`). Seule retouche de l'application ; avec une fiche, le titre ne change pas (G.3).
+- **`og-image.png` remplace `og.png`** (O.1) : une seule image, publiée à l'adresse demandée. `docs/img/og.png` et sa capture dans `scripts/screenshots.mjs` sont retirés. Le Social preview du dépôt, s'il a été téléversé, reste à refaire avec le nouveau fichier.
+- **Site compagnon** : le handoff disait « créateur de personnage compatible ». Le mot est retiré tant que `FORGE_JSON_OK` vaut false. Le lien porte le nom `PORTAL_NAME`.
+- **`og:description` et `meta description`** : celles du handoff remplacent celles d'O.1. La mention « tes fiches restent dans ton navigateur » reste dans la présentation.
+- **« Aucun script de tracking »** : vaut pour ce lot, GoatCounter (P13) reste en place.
+- **`manifest.webmanifest`** : vérifié, déjà cohérent, inchangé.
+
+### P.3 Après déploiement (Nelson)
+
+Critères à vérifier en ligne : `curl` sur « Cinq Anneaux », `sitemap.xml` et `og-image.png` en 200, JSON-LD sur validator.schema.org, aperçu Discord. Puis Search Console, Bing, sujets du dépôt et lien retour depuis le portail, comme listés dans le handoff.

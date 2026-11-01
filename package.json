@@ -1,6 +1,6 @@
 {
   "name": "carnet-l5r",
-  "version": "2.25.1",
+  "version": "2.25.2",
   "private": true,
   "description": "Carnet de Rokugan : compagnon de campagne pour L5R 4e édition",
   "license": "MIT",
@@ -21,7 +21,8 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "screenshots": "node scripts/screenshots.mjs",
-    "pwa-icons": "node scripts/pwa-icons.mjs"
+    "pwa-icons": "node scripts/pwa-icons.mjs",
+    "og-image": "node scripts/og-image.mjs"
   },
   "dependencies": {
     "idb": "^8.0.4",

@@ -819,6 +819,10 @@ a.mon .ext{margin-left:0}
 .appfoot nav a{display:inline-flex;align-items:center;color:var(--muted);min-height:32px}
 .appfoot nav a:hover{color:var(--accent-ink)}
 .appfoot nav .ext{margin-left:4px}
+/* Présentation statique sous l'application, ajoutée sur l'adresse Pages seulement (annexe P) */
+.presentation{max-width:1080px;margin:12px auto 0;padding-top:12px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+.presentation h1{margin:0 0 4px;font:800 15px/1.3 var(--f-display);color:var(--ink)}
+.presentation p{margin:0}
 /* Bibliothèque vide : lien vers le guide sous les deux options */
 .start > .guide-hint{margin:14px 0 0;font-size:14px;color:var(--muted)}
 .start > .guide-hint a{font-weight:700}

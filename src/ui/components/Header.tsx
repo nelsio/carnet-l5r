@@ -16,10 +16,10 @@ export function Header() {
   // Sous le nom : école affichée et rang d'école, plus de famille (annexe E.19 S8).
   const sub = c ? [c.school.trim(), `Rang\u00a0${schoolRankOf(c)}`].filter(Boolean).join(" · ") : "";
 
-  // Titre d'onglet : nom du personnage, puis l'outil (annexe G.3).
+  // Titre d'onglet : nom du personnage, puis l'outil (annexe G.3) ; sans fiche, le titre référencé de index.html (annexe P).
   const name = c?.name.trim();
   useEffect(() => {
-    document.title = name ? `${name} · ${APP_NAME}` : APP_NAME;
+    document.title = name ? `${name} · ${APP_NAME}` : HOME_TITLE;
   }, [name]);
 
   return (
@@ -83,6 +83,7 @@ export function Header() {
 }
 
 const APP_NAME = "Carnet de Rokugan";
+const HOME_TITLE = `${APP_NAME} – Fiche de personnage et assistant de jets L5R 4e édition`;
 
 const ICONS = {
   library: <path d="M4 4h4v16H4zM10 4h4v16h-4zM16.2 5.2l3.8-1 3 15.6-3.8 1z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />,
