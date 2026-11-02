@@ -36,11 +36,11 @@ function paste(dialog: HTMLElement, text: string) {
 afterEach(() => vi.restoreAllMocks());
 
 describe("Points d'entrée", () => {
-  it("Bibliothèque vide : troisième façon de commencer, étapes Photographier · Demander · Coller", async () => {
+  it("Bibliothèque vide : première façon de commencer (lot 43), étapes Photographier · Demander · Coller", async () => {
     await mount();
     const start = screen.getByRole("region", { name: "Pas encore de personnage ?" });
     expect(start).toHaveTextContent("Trois façons de commencer.");
-    const photo = within(start).getAllByRole("article")[2]!;
+    const photo = within(start).getAllByRole("article")[0]!;
     expect(within(photo).getByRole("heading")).toHaveTextContent("Depuis une fiche papier");
     expect(within(photo).getAllByRole("listitem").map((li) => li.querySelector(".step-s")?.textContent)).toEqual(["Photographier", "Demander", "Coller"]);
     const button = within(photo).getByRole("button", { name: "Depuis une photo…" });
@@ -49,11 +49,11 @@ describe("Points d'entrée", () => {
     expect(screen.getByRole("dialog", { name: TITLE })).toBeInTheDocument();
   });
 
-  it("Bibliothèque avec fiches : troisième carte compacte, kanji 写", async () => {
+  it("Bibliothèque avec fiches : première carte compacte (lot 43), kanji 写", async () => {
     await mount([entry()]);
     fireEvent.click(screen.getByRole("button", { name: "Carnet de Rokugan — ouvrir la bibliothèque" }));
     const newchar = await screen.findByRole("region", { name: "Un nouveau personnage ?" });
-    const photo = within(newchar).getAllByRole("article")[2]!;
+    const photo = within(newchar).getAllByRole("article")[0]!;
     expect(photo).toHaveClass("start-opt", "compact");
     expect(photo).toHaveTextContent("写");
     expect(photo).toHaveTextContent("Photos de ta fiche, lues par l'IA de ton choix, puis vérifiées ici.");

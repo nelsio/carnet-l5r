@@ -751,9 +751,10 @@ a.btn .ext{margin-left:8px}
 .start-opt-h p{margin:2px 0 0;font-size:14px}
 .start-opt-act{justify-self:start}
 .opt-k{display:grid;place-items:center;width:40px;height:40px;border-radius:8px;background:var(--accent-pale);color:var(--accent-ink);font:800 20px/1 var(--f-display)}
-.steps{list-style:none;margin:14px 0 16px;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.steps li{display:grid;gap:4px;align-content:start;padding:12px;border-radius:8px;background:var(--surface);border:1px solid var(--line)}
-.steps .step-n{font:800 18px/1 var(--f-display);color:var(--accent-ink)}
+/* Étapes empilées à toutes les largeurs (lot 43) : numéro à gauche, intitulé et description à droite */
+.steps{list-style:none;margin:14px 0 16px;padding:0;display:grid;grid-template-columns:1fr;gap:6px}
+.steps li{display:grid;grid-template-columns:24px 1fr;column-gap:10px;row-gap:0;align-content:start;padding:8px 12px;border-radius:8px;background:var(--surface);border:1px solid var(--line)}
+.steps .step-n{grid-row:span 2;align-self:center;font:800 18px/1 var(--f-display);color:var(--accent-ink)}
 .steps .step-s{font-weight:700;font-size:14px;hyphens:auto;overflow-wrap:break-word}
 .steps .step-x{font-size:12px;color:var(--muted)}
 /* Forge pas encore compatible (lot 27) : carte en pointillés, pastille, encadré 待, étape à venir */
@@ -799,9 +800,6 @@ a.btn .ext{margin-left:8px}
   /* Une colonne : chaque option garde ses propres lignes (espacées par leur marge du bas) */
   .start-opt{grid-row:auto;grid-template-rows:auto auto 1fr auto}
   .start-opt.compact{grid-template-rows:auto auto}
-  .steps{grid-template-columns:1fr}
-  .steps li{grid-template-columns:24px 1fr;column-gap:10px}
-  .steps .step-n{grid-row:span 2}
   .tplc .btn,.start-opt .btn{min-height:44px}
 }
 

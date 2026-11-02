@@ -25,11 +25,11 @@ export function Library() {
           <p className="muted">Trois façons de commencer. Tu as déjà un fichier du Carnet ? <ImportButton label="Importer un JSON" className="linkbtn" /></p>
           <div className="start-opts">
             <StartOption
-              kanji="筆" title="Fiche vierge"
-              desc="Saisie directe dans le Carnet, depuis une fiche papier ou un personnage créé ailleurs."
-              steps={[["Créer", "Nom, clan, école et Rang"], ["Remplir", "Anneaux, compétences, techniques"], ["Jouer", "Enregistrée dans ce navigateur"]]}
+              kanji="写" title="Depuis une fiche papier"
+              desc="Photos de ta fiche, lues par l'IA de ton choix, puis vérifiées ici."
+              steps={[["Photographier", "Ta fiche papier, chaque face"], ["Demander", "À ton IA, avec le prompt du Carnet"], ["Coller", "Ici, puis vérifier"]]}
             >
-              <button type="button" className="btn accent" onClick={() => void library.create()}>Nouvelle fiche vierge</button>
+              <PhotoImportButton />
             </StartOption>
             <StartOption
               kanji="鍛" title="Forger sur le portail" pending={!FORGE_JSON_OK}
@@ -44,11 +44,11 @@ export function Library() {
               <ForgeLink />
             </StartOption>
             <StartOption
-              kanji="写" title="Depuis une fiche papier"
-              desc="Photos de ta fiche, lues par l'IA de ton choix, puis vérifiées ici."
-              steps={[["Photographier", "Ta fiche papier, chaque face"], ["Demander", "À ton IA, avec le prompt du Carnet"], ["Coller", "Ici, puis vérifier"]]}
+              kanji="筆" title="Fiche vierge"
+              desc="Saisie directe dans le Carnet, depuis une fiche papier ou un personnage créé ailleurs."
+              steps={[["Créer", "Nom, clan, école et Rang"], ["Remplir", "Anneaux, compétences, techniques"], ["Jouer", "Enregistrée dans ce navigateur"]]}
             >
-              <PhotoImportButton />
+              <button type="button" className="btn accent" onClick={() => void library.create()}>Nouvelle fiche vierge</button>
             </StartOption>
           </div>
           <p className="guide-hint">Première visite ? <ExternalLink href={CARNET_LINKS.guide}>Lire le guide</ExternalLink></p>
@@ -81,8 +81,8 @@ export function Library() {
       <section className="panel newchar" aria-labelledby="newchar-title">
         <h2 id="newchar-title">Un nouveau personnage ?</h2>
         <div className="start-opts">
-          <StartOption compact kanji="筆" title="Fiche vierge" desc="Saisie directe dans le Carnet, depuis une fiche papier.">
-            <button type="button" className="btn accent" onClick={() => void library.create()}>Nouvelle fiche</button>
+          <StartOption compact kanji="写" title="Depuis une fiche papier" desc="Photos de ta fiche, lues par l'IA de ton choix, puis vérifiées ici.">
+            <PhotoImportButton />
           </StartOption>
           <StartOption
             compact kanji="鍛" title="Forger sur le portail" pending={!FORGE_JSON_OK}
@@ -92,8 +92,8 @@ export function Library() {
           >
             <ForgeLink />
           </StartOption>
-          <StartOption compact kanji="写" title="Depuis une fiche papier" desc="Photos de ta fiche, lues par l'IA de ton choix, puis vérifiées ici.">
-            <PhotoImportButton />
+          <StartOption compact kanji="筆" title="Fiche vierge" desc="Saisie directe dans le Carnet, depuis une fiche papier.">
+            <button type="button" className="btn accent" onClick={() => void library.create()}>Nouvelle fiche</button>
           </StartOption>
         </div>
         <p className="newchar-foot">
