@@ -27,8 +27,8 @@ export const PORTAL = {
 export const GRIMOIRE_FILES: readonly string[] = ["universels", "air", "terre", "feu", "eau", "vide"]
   .map((k) => `${PORTAL_BASE}data/sorts/sorts-${k}.js`);
 
-/** Passer à true quand l'export JSON de la Forge s'importe sans erreur dans le Carnet. */
-export const FORGE_JSON_OK = false;
+/** Export JSON de la Forge importable dans le Carnet depuis la v2.26.0 (lot 39). */
+export const FORGE_JSON_OK = true;
 
 /** Kanji de l'Anneau du clan affiché sur le portail, pour le menu Ressources (annexe L.2). */
 export const PORTAL_CLAN_KANJI: Readonly<Record<string, string>> = {

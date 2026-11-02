@@ -6,6 +6,11 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.26.0] - 2026-11-02
+
+### Modifié
+- La Forge du portail est compatible : son export JSON s'importe dans le Carnet avec **Importer un JSON**. Fin de la pastille « JSON pas encore compatible ».
+
 ## [2.25.2] - 2026-11-01
 
 ### Modifié
@@ -307,7 +312,8 @@ Simples liens ouverts dans un nouvel onglet : le Carnet ne fait toujours aucune 
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.25.2...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.26.0...HEAD
+[2.26.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.26.0
 [2.25.2]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.25.2
 [2.25.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.25.1
 [2.25.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.25.0

@@ -56,8 +56,8 @@ describe("O2 : sort dans le grimoire", () => {
 });
 
 describe("Forge en attente (lot 27)", () => {
-  it("FORGE_JSON_OK existe et vaut false tant que l'export de la Forge ne s'importe pas", () => {
-    expect(FORGE_JSON_OK).toBe(false);
+  it("FORGE_JSON_OK vaut true : l'export de la Forge s'importe depuis la v2.26.0 (lot 39)", () => {
+    expect(FORGE_JSON_OK).toBe(true);
   });
 });
 
