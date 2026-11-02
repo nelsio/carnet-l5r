@@ -81,7 +81,7 @@ Elle exporte un JSON compatible avec le Carnet : importe-le ici avec **Importer 
 
 D'autres liens mènent au portail : le **nom du clan**, au-dessus du nom du personnage, ouvre la page du clan ; dans **Rouleaux & invocations**, **Grimoire** ouvre le grimoire et l'icône de chaque sort le cherche par son nom et son élément ; dans l'**Assistant L5R**, un encadré propose le **Mémento de combat** en Combat, **Étiquette & coutumes** et **Bushido & honneur** en Cour.
 
-Le même menu se termine par la section **Le Carnet**, avec le numéro de version : ce **guide**, les **nouveautés** de chaque version, un formulaire pour **signaler un problème** (compte GitHub requis) et la **page du projet**. Ces liens sont aussi en **pied de page** de chaque écran, et la Bibliothèque vide propose **Lire le guide** dès la première visite.
+Le même menu se termine par la section **Le Carnet**, avec le numéro de version : ce **guide**, les **nouveautés** de chaque version, un formulaire pour **signaler un problème** (compte GitHub requis) et la **page du projet**. Ces liens sont aussi en **pied de page** de chaque écran, et la Bibliothèque vide propose **Lire le guide** dès la première visite. Le pied de page propose aussi **Règles L5R 4e**, un rappel des règles de jet utilisées par le Carnet.
 
 ## 4. Jouer avec l'Assistant L5R
 

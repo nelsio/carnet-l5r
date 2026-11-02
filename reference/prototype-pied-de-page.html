@@ -1,0 +1,222 @@
+<title>Carnet : pied de page</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+/* Prototype : allègement du bas de page. Jetons repris des prototypes précédents du Carnet.
+   Mobile simulé en @container (appli : @media max-width:720px). */
+:root{
+  --p-bg:#f4f2ee;--p-ink:#222;--p-muted:#5f5d58;--p-line:#d6d2ca;--p-chip:#fff;--p-on:#222;--p-on-ink:#fff;
+  --f-display:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+  --f-body:"Zen Kaku Gothic New","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--p-bg:#161718;--p-ink:#e6e4df;--p-muted:#a9a7a2;--p-line:#3a3c40;--p-chip:#222427;--p-on:#e6e4df;--p-on-ink:#161718;color-scheme:dark}}
+:root[data-theme="dark"]{--p-bg:#161718;--p-ink:#e6e4df;--p-muted:#a9a7a2;--p-line:#3a3c40;--p-chip:#222427;--p-on:#e6e4df;--p-on-ink:#161718;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--p-bg);color:var(--p-ink);font:14px/1.5 var(--f-body);padding-block:24px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1120px;margin:0 auto}
+h1.p{font:800 22px/1.2 var(--f-display);margin:0 0 4px;text-wrap:balance}
+.lede{color:var(--p-muted);margin:0 0 18px;max-width:70ch}
+.controls{display:flex;flex-wrap:wrap;gap:14px 22px;margin-bottom:14px}
+.ctl{display:grid;gap:6px}
+.ctl>span{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--p-muted)}
+.seg{display:flex;flex-wrap:wrap;gap:4px}
+.seg button{border:1px solid var(--p-line);background:var(--p-chip);color:var(--p-ink);border-radius:999px;padding:6px 12px;font:inherit;font-weight:500;cursor:pointer;min-height:36px}
+.seg button[aria-pressed="true"]{background:var(--p-on);color:var(--p-on-ink);border-color:var(--p-on)}
+.legend{border:1px solid var(--p-line);border-radius:10px;padding:12px 14px;margin-bottom:16px;max-width:86ch;display:grid;gap:6px}
+.legend p{margin:0}
+.stage{overflow-x:auto;padding-bottom:4px}
+.frame{margin:0 auto;border:1px solid var(--p-line);border-radius:10px;overflow:hidden}
+.frame.desk{width:1080px}
+.frame.mob{width:390px}
+
+/* ---- Appli ---- */
+.app{
+  --clan-l:#3d5a73;--clan-ink-l:#374754;--clan-d:#8fb0cc;--clan-ink-d:#a1bbd0;
+  --bg:#ece6d8;--surface:#f7f3ea;--surface-2:#fdfbf6;--ink:#2a261f;
+  --muted:color-mix(in oklab,var(--ink) 70%,var(--surface));
+  --line:color-mix(in oklab,var(--ink) 18%,transparent);
+  --shadow:0 10px 28px rgb(60 45 20 / .18);
+  --accent:var(--clan-l);--accent-ink:var(--clan-ink-l);
+  --accent-pale:color-mix(in oklab,var(--accent) 16%,var(--surface));
+  --on-accent:#fff;--seal:#a8382a;--seal-ink:#f7f3ea;
+  color-scheme:light;container-type:inline-size;position:relative;background:var(--bg);color:var(--ink);font:15px/1.55 var(--f-body);display:flex;flex-direction:column
+}
+.app[data-theme="dark"]{
+  --bg:#26252a;--surface:#302f33;--surface-2:#3a393e;--ink:#e7e5e0;
+  --shadow:0 10px 28px rgb(0 0 0 / .45);
+  --accent:var(--clan-d);--accent-ink:var(--clan-ink-d);--on-accent:var(--bg);
+  --seal:#b5402f;--seal-ink:#f3ece0;color-scheme:dark
+}
+.app .body{padding:0 24px;display:flex;flex-direction:column}
+.app h2,.app h3{font-family:var(--f-display);margin:0;line-height:1.2;text-wrap:balance}
+.app button{font:inherit;color:inherit}
+.app a{color:var(--accent-ink)}
+.app :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ext{width:13px;height:13px;flex:none;vertical-align:-1px}
+.new{outline:2px dashed color-mix(in oklab,var(--seal) 70%,transparent);outline-offset:3px;border-radius:8px}
+.crop{font-size:12px;color:var(--muted);text-align:center;padding:10px 0 2px;letter-spacing:.08em}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px}
+.card h3{font-size:18px;font-weight:800;margin-bottom:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px}
+.tech{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.tech li{padding:8px 10px;border-left:3px solid var(--accent);background:var(--bg);border-radius:0 6px 6px 0}
+.tech .n{font-weight:700;font-size:14px}
+.tech .m{font-size:12px;color:var(--muted)}
+.roll{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pool{font:800 30px/1 var(--f-display);font-variant-numeric:tabular-nums}
+.pool small{font:500 13px var(--f-body);color:var(--muted);margin-left:6px}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:8px;padding:10px 14px;font-weight:700;font-size:14px;cursor:pointer;min-height:44px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--on-accent);margin-left:auto}
+.muted{color:var(--muted);font-size:13px;margin:8px 0 0}
+
+/* Note actuelle */
+.note{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px;margin:16px 0 0}
+
+/* Pied de page */
+.appfoot{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;margin-top:8px;padding-block:12px 16px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+.appfoot .id{display:inline-flex;align-items:center;gap:8px;font-weight:700;color:var(--ink)}
+.appfoot .mini{display:grid;place-items:center;width:20px;height:20px;border-radius:4px;background:var(--seal);color:var(--seal-ink);font:800 12px/1 var(--f-display);rotate:-3deg}
+.appfoot .ver{font-variant-numeric:tabular-nums;font-weight:500;color:var(--accent-ink);text-decoration:none;border-bottom:1px dotted currentColor}
+.appfoot .saved{font-size:12px}
+.appfoot nav{display:flex;flex-wrap:wrap;gap:4px 14px;margin-left:auto}
+.appfoot nav a{display:inline-flex;align-items:center;gap:4px;color:var(--muted);text-decoration:none;min-height:32px}
+.appfoot nav a:hover{color:var(--accent-ink);text-decoration:underline;text-underline-offset:3px}
+
+/* Option A : mention repliable dans le pied */
+.rulesbtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:transparent;border-radius:999px;padding:3px 10px 3px 4px;min-height:32px;font-size:12.5px;font-weight:500;color:var(--muted);cursor:pointer}
+.rulesbtn:hover,.rulesbtn[aria-expanded="true"]{color:var(--accent-ink);border-color:var(--accent);background:var(--accent-pale)}
+.rulesbtn .kj{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--surface);border:1px solid var(--line);font:800 12px/1 var(--f-display);color:var(--accent-ink)}
+.rulesbtn .chev{width:12px;height:12px;transition:rotate .15s}
+.rulesbtn[aria-expanded="true"] .chev{rotate:180deg}
+.rulespanel{flex-basis:100%;order:10;margin-top:6px;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:8px;font-size:12.5px}
+
+/* Liste de repères (A et B) */
+.memo{display:grid;gap:4px;margin:0;padding:0;list-style:none}
+.memo li{display:grid;grid-template-columns:7.5em 1fr;gap:10px}
+.memo b{color:var(--ink);font-weight:700}
+.memo .warn{color:var(--muted);font-style:italic}
+
+/* Option B : encart dans l'Assistant */
+.ref{margin-top:16px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);font-size:13px;color:var(--muted)}
+.ref h3{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;color:var(--ink);margin-bottom:8px}
+.ref h3 .kj{display:grid;place-items:center;width:22px;height:22px;border-radius:5px;background:var(--accent-pale);color:var(--accent-ink);font:800 12px/1 var(--f-display)}
+.edtag{font-size:12px;padding:1px 8px;border-radius:999px;border:1px solid var(--line)}
+
+.mtabs{display:none}
+@container (max-width:720px){
+  .app .body{padding:0 16px 72px}
+  .grid2{grid-template-columns:1fr}
+  .appfoot{font-size:12px;gap:2px 12px}
+  .appfoot nav{margin-left:0;width:100%}
+  .memo li{grid-template-columns:1fr;gap:0}
+  .memo li + li{margin-top:4px}
+  .mtabs{display:grid;position:absolute;left:0;right:0;bottom:0;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;background:var(--surface);border-top:1px solid var(--line);padding:6px 12px;z-index:4}
+  .mtabs span{text-align:center;padding:12px 4px;border-radius:8px;font-weight:700;font-size:15px;color:var(--muted)}
+  .mtabs span.on{background:var(--accent-pale);color:var(--accent-ink)}
+  .btn.pri{margin-left:0}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <h1 class="p">Carnet de Rokugan : alléger le bas de page</h1>
+  <p class="lede">Prototype. Bas de page seul (le haut de l'écran est coupé). Les éléments nouveaux sont entourés en pointillés rouges. Le texte de la note est aussi réécrit en repères courts.</p>
+
+  <div class="controls">
+    <div class="ctl"><span>Version</span><div class="seg" data-ctl="opt">
+      <button type="button" data-v="now">Actuel</button>
+      <button type="button" data-v="a">A · Repli dans le pied</button>
+      <button type="button" data-v="b">B · Dans l'Assistant</button>
+    </div></div>
+    <div class="ctl"><span>Écran</span><div class="seg" data-ctl="screen">
+      <button type="button" data-v="sheet">Fiche</button>
+      <button type="button" data-v="aid">Assistant L5R</button>
+    </div></div>
+    <div class="ctl"><span>Thème</span><div class="seg" data-ctl="theme">
+      <button type="button" data-v="light">Clair</button>
+      <button type="button" data-v="dark">Sombre</button>
+    </div></div>
+    <div class="ctl"><span>Largeur</span><div class="seg" data-ctl="width">
+      <button type="button" data-v="desk">Bureau 1080</button>
+      <button type="button" data-v="mob">Mobile 390</button>
+    </div></div>
+  </div>
+
+  <div class="legend" id="legend"></div>
+
+  <div class="stage">
+    <div class="frame desk" id="frame"><div class="app" id="app" data-theme="light"></div></div>
+  </div>
+</div>
+
+<script>
+const VERSION = "2.24.0";
+const state = { opt:"a", screen:"sheet", theme:"light", width:"desk", open:true };
+const EXT = '<svg class="ext" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3H3.5A.5.5 0 0 0 3 3.5v9a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5V10M9 3h4v4M13 3 7.5 8.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const CHEV = '<svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+const LEGEND = {
+  now:`<p><b>Actuel :</b> la note de règles (4 lignes sur bureau, 8 sur mobile) s'affiche sur tous les écrans, juste au-dessus du pied de page, et forme deux bandeaux gris d'affilée.</p>`,
+  a:`<p><b>Option A (retenue le 02/11/2026) :</b> la note disparaît. Le pied gagne une pastille « 規 Règles L5R 4e » qui déplie les repères juste en dessous, sur tous les écrans. Repliée par défaut.</p><p>Simple à coder (un bouton <code>aria-expanded</code> dans <code>AppFooter</code>), mais le pied reste un peu plus chargé.</p>`,
+  b:`<p><b>Option B (non retenue) :</b> la note quitte Fiche et Statistiques. Elle devient un encart « Repères de règles » en bas de l'Assistant L5R, là où on lance les dés, le duel et la bataille. Le pied redevient une seule ligne.</p><p>Bascule l'écran sur <b>Fiche</b> pour voir le pied seul.</p>`
+};
+
+const MEMO = `<ul class="memo">
+  <li><b>Système</b><span>Roll &amp; Keep, L5R 4e édition</span></li>
+  <li><b>Explosion</b><span>sur 10 ; dégâts sur 9 et 10 avec Kenjutsu ou Armes lourdes au rang 7</span></li>
+  <li><b>Augmentations</b><span>+5 au ND chacune, maximum = Anneau de Vide</span></li>
+  <li><b>Blessures</b><span>la pénalité s'ajoute au ND</span></li>
+  <li><b>Duel, bataille</b><span class="warn">procédures résumées : vérifie le détail dans ton livre de base</span></li>
+</ul>`;
+
+function content(){
+  if (state.screen === "sheet") return `<div class="grid2">
+    <section class="card"><h3>Techniques d'école</h3><ul class="tech">
+      <li><div class="n">Rang 2 · La voie du Crabe</div><div class="m">Technique d'école de rang 2</div></li>
+      <li><div class="n">Rang 3 · Briser les ténèbres</div><div class="m">Technique d'école de rang 3</div></li></ul></section>
+    <section class="card"><h3>Équipement</h3><ul class="tech">
+      <li><div class="n">Tetsubō</div><div class="m">Armes lourdes · 3g3</div></li>
+      <li><div class="n">Armure lourde</div><div class="m">ND +10 · Réduction 3</div></li></ul></section>
+  </div>`;
+  const ref = state.opt === "b" ? `<section class="ref new" aria-labelledby="refh"><h3 id="refh"><span class="kj" aria-hidden="true">規</span>Repères de règles</h3>${MEMO}</section>` : "";
+  return `<section class="card" style="margin-top:12px"><h3>Lanceur</h3>
+    <div class="roll"><span class="pool">6g3<small>Kenjutsu + Feu · ND 20</small></span><button type="button" class="btn">1 augmentation</button><button type="button" class="btn pri">Lancer</button></div>
+    <p class="muted">Dernier jet : 27 (10 explosé → 10 + 4)</p>
+  </section>${ref}`;
+}
+
+function foot(){
+  const a = state.opt === "a";
+  const rules = a ? `<button type="button" class="rulesbtn new" aria-expanded="${state.open}" aria-controls="rp" data-act="rules"><span class="kj" aria-hidden="true">規</span>Règles L5R 4e${CHEV}</button>` : "";
+  const panel = a && state.open ? `<div class="rulespanel" id="rp">${MEMO}</div>` : "";
+  return `<footer class="appfoot">
+    <span class="id"><span class="mini" aria-hidden="true">帳</span>Carnet de Rokugan</span>
+    <a class="ver" href="#">v${VERSION}</a>
+    ${rules}
+    <span class="saved">Enregistré dans ce navigateur</span>
+    <nav aria-label="Liens du Carnet"><a href="#">Guide ${EXT}</a><a href="#">Signaler un bug ${EXT}</a><a href="#">Projet ${EXT}</a></nav>
+    ${panel}
+  </footer>`;
+}
+
+function render(){
+  const app = document.getElementById("app");
+  app.dataset.theme = state.theme;
+  document.getElementById("frame").className = "frame " + state.width;
+  const note = state.opt === "now" ? `<p class="note">Règles de référence : L5R 4e édition (Roll &amp; Keep). Les jets explosent sur 10 (dégâts : sur 9 et 10 avec Kenjutsu ou Armes lourdes au rang 7), les augmentations ajoutent +5 au ND (max = Anneau de Vide), la pénalité de blessure s'ajoute au ND. Les procédures de duel et de bataille de masse sont résumées : vérifie le détail dans ton livre de base.</p>` : "";
+  const tabs = `<nav class="mtabs" aria-hidden="true"><span class="${state.screen==="sheet"?"on":""}">Fiche</span><span class="${state.screen==="aid"?"on":""}">Assistant</span><span>Stats</span></nav>`;
+  app.innerHTML = `<div class="body"><div class="crop">⋯ haut de l'écran coupé ⋯</div>${content()}${note}${foot()}</div>${tabs}`;
+  document.getElementById("legend").innerHTML = LEGEND[state.opt];
+  document.querySelectorAll(".seg").forEach(s => s.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", state[s.dataset.ctl] === b.dataset.v)));
+}
+
+document.addEventListener("click", e => {
+  const b = e.target.closest(".seg button");
+  if (b){ state[b.parentElement.dataset.ctl] = b.dataset.v; render(); return; }
+  if (e.target.closest('[data-act="rules"]')){ state.open = !state.open; render(); document.querySelector('[data-act="rules"]')?.focus(); return; }
+  if (e.target.closest('.app a[href="#"]')) e.preventDefault();
+});
+render();
+</script>

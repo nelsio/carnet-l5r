@@ -6,6 +6,11 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.26.2] - 2026-11-02
+
+### Modifié
+- Le rappel des règles ne s'affiche plus en bas de chaque écran : il se déplie depuis **Règles L5R 4e**, dans le pied de page.
+
 ## [2.26.1] - 2026-11-02
 
 ### Modifié
@@ -317,7 +322,8 @@ Simples liens ouverts dans un nouvel onglet : le Carnet ne fait toujours aucune 
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.26.1...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.26.2...HEAD
+[2.26.2]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.26.2
 [2.26.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.26.1
 [2.26.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.26.0
 [2.25.2]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.25.2

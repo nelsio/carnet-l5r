@@ -6,7 +6,7 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document.
 
-**État au 02/11/2026 :** version **v2.26.1** : l'export JSON de la Forge s'importe dans le Carnet (v2.26.0, annexe Q, lot 39) ; installé, le Carnet s'appelle « Carnet L5R » (v2.26.1, annexe Q bis, lot 40). Lots 32 à 38 (annexes O et P) livrés en v2.23.1 à v2.25.2.
+**État au 02/11/2026 :** version **v2.26.2** : l'export JSON de la Forge s'importe dans le Carnet (v2.26.0, annexe Q, lot 39) ; installé, le Carnet s'appelle « Carnet L5R » (v2.26.1, annexe Q bis, lot 40) ; la note de règles se déplie depuis le pied de page (v2.26.2, annexe R, lot 41). Lots 32 à 38 (annexes O et P) livrés en v2.23.1 à v2.25.2.
 
 **État au 31/10/2026 :** version **v2.23.0** (sorts depuis le grimoire du portail et autocomplétion de leur nom, annexe N ; correctifs v2.21.1 Safari, v2.21.2 Forge en attente, L.12, v2.21.3 `sharp`, M.5, et v2.21.4 liens de sort filtrés par élément, L.13), lots 1 à 31 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
 
@@ -606,7 +606,8 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 33. **v2.25.2 — référencement** (**livrée**, écarts en P.2) : annexe P, lot 38. Balises, JSON-LD, sitemap, `og-image.png` et présentation statique sur l'adresse Pages.
 34. **v2.26.0 — Forge compatible** (**livrée**, écarts en Q.2) : annexe Q, lot 39. `FORGE_JSON_OK` passe à `true`, fin des mentions « pas encore compatible ».
 35. **v2.26.1 — nom de l'appli installée** (**livrée**, écarts en Q.4) : annexe Q bis, lot 40. `short_name` « Carnet L5R » et balise `apple-mobile-web-app-title`, au déploiement Pages seulement.
-36. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
+36. **v2.26.2 — note de règles dans le pied de page** (**livrée**, écarts en R.2) : annexe R, lot 41. La note « Règles de référence » quitte le bas de chaque écran pour la pastille repliable **Règles L5R 4e** du pied de page.
+37. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
 
 ---
 
@@ -2661,7 +2662,7 @@ export const CARNET_LINKS = {
 
 - **Adresses** : `src/rules/links.ts`, à côté de `src/rules/portal.ts` (les adresses du portail sont dans `src/rules`, pas `src/ui`).
 - **Menu Ressources** : groupe `role="group"` « Le Carnet » (classe `.res-carnet`), version lue dans `__APP_VERSION__`. Le pied du menu (« Liens externes : s'ouvrent dans un nouvel onglet. ») remplace l'ancien « Site de la campagne. S'ouvre dans un nouvel onglet. », devenu inexact avec les liens GitHub. Le menu compte 11 entrées avec une fiche d'un Grand Clan, 10 sinon (O4 et O10 mis à jour).
-- **Pied de page** : composant `AppFooter`, qui remplace l'ancien `footer.version` centré. L'état d'enregistrement (« Enregistré dans ce navigateur », échec d'enregistrement) y reste, entre la version et les liens. La note « Règles de référence » reste au-dessus.
+- **Pied de page** : composant `AppFooter`, qui remplace l'ancien `footer.version` centré. L'état d'enregistrement (« Enregistré dans ce navigateur », échec d'enregistrement) y reste, entre la version et les liens. La note « Règles de référence » reste au-dessus (jusqu'à la v2.26.1 : depuis la v2.26.2, elle se déplie depuis la pastille **Règles L5R 4e**, placée entre la version et l'état d'enregistrement, annexe R).
 - **Lien de version** : sans icône externe, comme dans le prototype (souligné en pointillés) ; son nom accessible le complète : « Version 2.21.0 : nouveautés (nouvel onglet) ». Les trois autres liens ont l'icône.
 - **Mobile** : le pied de page reste au-dessus de la barre d'onglets grâce au `padding-bottom` existant du `body` (§7) ; pas de règle en plus.
 - **Captures du README** : inchangées. La capture bureau montre le haut de la fiche, sans le pied de page.
@@ -3281,3 +3282,33 @@ Retour de Nelson (02/11/2026) : installé sur mobile, le Carnet s'affichait « C
 
 - **`docs/GUIDE.md`** : inchangé, la section d'installation ne cite pas le nom affiché.
 - **Après déploiement (Nelson)** : sur Android et iOS, désinstaller puis réinstaller l'appli (le nom d'une appli déjà installée ne se met pas toujours à jour, surtout sur iOS) ; le nom sous l'icône doit être « Carnet L5R ».
+
+## Annexe R — Lot 41 : note de règles dans le pied de page (v2.26.2)
+
+Source : `handoff-pied-de-page.md`, reçu le 02/11/2026. Maquette `reference/prototype-pied-de-page.html`, option **A** retenue par Nelson (l'option B, encart dans l'Assistant, n'est pas faite). Constat : la note « Règles de référence » (4 lignes sur bureau, environ 8 à 390 px) et le pied de page faisaient deux bandeaux gris d'affilée en bas de chaque écran.
+
+### R.1 Livré
+
+- **`src/ui/App.tsx`** : le `<p className="note">` au-dessus d'`AppFooter` est supprimé.
+- **`src/ui/components/AppFooter.tsx`** : pastille `button.rulesbtn` « 規 Règles L5R 4e » + chevron, entre le lien de version et l'état d'enregistrement, `aria-expanded` et `aria-controls="rules-memo"`. Panneau `#rules-memo`, dernier enfant du `<footer>`, rendu seulement s'il est ouvert : cinq repères (Système, Explosion, Augmentations, Blessures, Duel, bataille). État local, **replié par défaut**, non mémorisé.
+- **`src/ui/styles.css`** : `.note` supprimé (bureau et mobile) ; `.rulesbtn`, `.rulespanel` (`flex-basis:100%`, `order:10` : sous toute la ligne, après les liens), `.memo` repris de la maquette avec les jetons existants. Mobile : libellé au-dessus de la valeur. La règle globale `prefers-reduced-motion` coupe déjà la rotation du chevron (`transition:none`).
+- **Guide** (§ 3, paragraphe « Le Carnet ») et **CHANGELOG** (2.26.2, Modifié).
+- **Tests** : `tests/ui/rules-memo.spec.tsx` (R1 à R4), `tests/e2e/carnet-links.spec.ts` (V6 étendu, R5 à 390 et 360 px, R6 clavier), `tests/colors.spec.ts` (V9).
+
+| Cas | Vérifie |
+|---|---|
+| R1 | Plus de note de règles (`.note`, « Règles de référence ») sur la Bibliothèque, la Fiche, l'Assistant L5R et les Statistiques |
+| R2 | Pastille « Règles L5R 4e » dans le pied, `aria-expanded="false"`, `aria-controls="rules-memo"`, panneau absent |
+| R3 | Clic : panneau dans le pied avec les cinq libellés ; second clic : replié |
+| R4 | Panneau ouvert : état d'enregistrement et trois liens toujours dans le pied |
+| R5 | 390 et 360 px, panneau ouvert : pas de défilement horizontal, pastille ≥ 32 px, liens sous la pastille ; à 390 px, pastille sur la ligne de la version |
+| R6 | Clavier : Tab depuis la version atteint la pastille, Entrée ouvre puis ferme, le focus reste sur le bouton |
+| V9 | `accent-ink` sur `accent-pale` (pastille ouverte) ≥ 4,5:1, tous les clans, deux thèmes |
+
+### R.2 Écarts avec le handoff
+
+- **Maquette** : le handoff la cite sous `handoff/reference/` ; elle est versionnée dans `reference/`, avec les autres prototypes.
+- **Tests UI** : nouveau fichier `tests/ui/rules-memo.spec.tsx` plutôt que le describe « V3 » de `carnet-links.spec.tsx`, laissé inchangé (R4 s'ajoute aux cas existants).
+- **360 px** : nom, version et pastille ne tiennent pas sur une ligne ; la pastille passe sur sa propre ligne, entre le nom et les liens. Le critère « sur la ligne de la version » n'est donc vérifié qu'à 390 px (le handoff ne l'exige qu'à cette largeur).
+- **R6** : la tabulation part du lien de version (focus posé dessus) plutôt que du haut de la page, pour vérifier l'ordre sans dépendre du nombre de contrôles de l'écran.
+- **Captures du README** : inchangées, elles montrent le haut des écrans.

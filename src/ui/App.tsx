@@ -57,11 +57,6 @@ export function App({ storage, rng = d10, ...libraryOptions }: AppProps) {
             : !c ? <Library />
               : ui.view === "sheet" ? <Sheet /> : ui.view === "stats" ? <Stats /> : <Aid />}
         </main>
-        <p className="note">
-          Règles de référence : L5R 4e édition (Roll &amp; Keep). Les jets explosent sur 10 (dégâts : sur 9 et 10 avec Kenjutsu ou Armes lourdes au rang 7), les augmentations ajoutent +5 au ND
-          (max = Anneau de Vide), la pénalité de blessure s'ajoute au ND. Les procédures de duel et de bataille de masse sont résumées :
-          vérifie le détail dans ton livre de base.
-        </p>
         <AppFooter status={<>
           {c && state.mode === "edit" && api.saveStatus === "saved" && !api.degraded && <span className="saved">Enregistré dans ce navigateur</span>}
           {api.saveStatus === "error" && <span className="save-error" role="alert">Échec de l'enregistrement dans ce navigateur</span>}
