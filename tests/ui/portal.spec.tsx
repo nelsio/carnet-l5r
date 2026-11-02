@@ -164,10 +164,10 @@ describe("O7 : Bibliothèque vide", () => {
     expect(within(start).getByRole("button", { name: "Importer un JSON" })).toHaveClass("linkbtn");
     expect(start).toHaveTextContent("Tu as déjà un fichier du Carnet ? Importer un JSON");
     const options = within(start).getAllByRole("article");
-    // Lot 27 : Fiche vierge d'abord, avec le bouton principal ; la Forge ensuite, bouton secondaire.
-    expect(options.map((o) => within(o).getByRole("heading").textContent)).toEqual(["Fiche vierge", "Forger sur le portail", "Depuis une fiche papier"]);
+    // Lot 43 : Fiche papier, Forge (bouton secondaire), puis Fiche vierge, qui garde le bouton principal.
+    expect(options.map((o) => within(o).getByRole("heading").textContent)).toEqual(["Depuis une fiche papier", "Forger sur le portail", "Fiche vierge"]);
     for (const o of options) expect(within(o).getAllByRole("listitem")).toHaveLength(3);
-    expect(within(options[0]!).getByRole("button", { name: "Nouvelle fiche vierge" })).toHaveClass("btn", "accent");
+    expect(within(options[2]!).getByRole("button", { name: "Nouvelle fiche vierge" })).toHaveClass("btn", "accent");
     const forge = within(options[1]!).getByRole("link", { name: "Ouvrir la Forge (nouvel onglet)" });
     expect(forge).toHaveAttribute("href", `${PORTAL}createcharacter.html`);
     expect(forge).toHaveClass("btn");
@@ -187,7 +187,7 @@ describe("O7 : Bibliothèque vide", () => {
     for (const s of within(forge).getAllByRole("listitem")) expect(s).not.toHaveClass("off");
     expect(within(forge).queryByRole("note")).toBeNull();
     expect(screen.queryByText("JSON pas encore compatible")).toBeNull();
-    const blank = within(screen.getByRole("region", { name: "Pas encore de personnage ?" })).getAllByRole("article")[0]!;
+    const blank = within(screen.getByRole("region", { name: "Pas encore de personnage ?" })).getAllByRole("article")[2]!;
     expect(blank).toHaveTextContent("Saisie directe dans le Carnet, depuis une fiche papier ou un personnage créé ailleurs.");
     expect(within(blank).queryByRole("note")).toBeNull();
   });
@@ -244,10 +244,12 @@ describe("O9 : Bibliothèque avec fiches", () => {
     const head = document.querySelector(".panel-head")!;
     expect(within(head as HTMLElement).getAllByRole("button").map((b) => b.textContent)).toEqual(["Importer un JSON…"]);
     const card = screen.getByRole("region", { name: "Un nouveau personnage ?" });
-    const [blank, forge] = within(card).getAllByRole("article");
+    // Lot 43 : Fiche papier, Forge, puis Fiche vierge (bouton principal).
+    const [photo, forge, blank] = within(card).getAllByRole("article");
+    expect(within(photo!).getByRole("heading").textContent).toBe("Depuis une fiche papier");
     expect(within(blank!).getByRole("heading").textContent).toBe("Fiche vierge");
     expect(within(blank!).getByRole("button", { name: "Nouvelle fiche" })).toHaveClass("btn", "accent");
-    // Lot 39 : Forge en second, compatible, bouton secondaire.
+    // Lot 39 : Forge compatible, bouton secondaire.
     expect(forge).not.toHaveClass("wait");
     expect(forge!.querySelector(".pend")).toBeNull();
     expect(forge).toHaveTextContent("Création guidée, puis export JSON à importer ici.");

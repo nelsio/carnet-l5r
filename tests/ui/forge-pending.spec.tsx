@@ -23,7 +23,7 @@ describe("Forge pas encore compatible (FORGE_JSON_OK = false)", () => {
     await renderApp(null);
     const start = screen.getByRole("region", { name: "Pas encore de personnage ?" });
     const options = within(start).getAllByRole("article");
-    expect(options.map((o) => within(o).getByRole("heading").textContent)).toEqual(["Fiche vierge", "Forger sur le portail JSON pas encore compatible", "Depuis une fiche papier"]);
+    expect(options.map((o) => within(o).getByRole("heading").textContent)).toEqual(["Depuis une fiche papier", "Forger sur le portail JSON pas encore compatible", "Fiche vierge"]);
     const forge = options[1]!;
     expect(forge).toHaveClass("start-opt", "wait");
     const pend = within(forge).getByText("JSON pas encore compatible");
@@ -37,14 +37,14 @@ describe("Forge pas encore compatible (FORGE_JSON_OK = false)", () => {
       "一ForgerClan, école, anneaux, compétences", "二RecopierDans une fiche vierge du Carnet", "三ImporterBientôt : import direct du JSON",
     ]);
     expect(steps[2]).toHaveClass("off");
-    expect(within(options[0]!).getByRole("button", { name: "Nouvelle fiche vierge" })).toHaveClass("accent");
+    expect(within(options[2]!).getByRole("button", { name: "Nouvelle fiche vierge" })).toHaveClass("accent");
   });
 
   it("Bibliothèque avec fiches et menu Ressources : texte « à recopier » et pastille", async () => {
     await renderApp(structuredClone(kakita) as Character);
     fireEvent.click(screen.getByRole("button", { name: "Carnet de Rokugan — ouvrir la bibliothèque" }));
     const card = await screen.findByRole("region", { name: "Un nouveau personnage ?" });
-    const [blank, forge] = within(card).getAllByRole("article");
+    const [, forge, blank] = within(card).getAllByRole("article");
     expect(within(blank!).getByRole("heading").textContent).toBe("Fiche vierge");
     expect(forge).toHaveClass("wait");
     expect(within(forge!).getByText("JSON pas encore compatible")).toHaveClass("pend");

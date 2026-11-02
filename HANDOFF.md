@@ -6,7 +6,7 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document.
 
-**État au 02/11/2026 (lot 42) :** version **v2.27.0** : import d'un personnage depuis une fiche papier, via l'IA du joueur (annexe S).
+**État au 02/11/2026 (lot 43) :** version **v2.27.1** : étapes en liste sur ordinateur, ordre Fiche papier · Forge · Fiche vierge (annexe T). v2.27.0 (lot 42) : import d'un personnage depuis une fiche papier, via l'IA du joueur (annexe S).
 
 **État au 02/11/2026 :** version **v2.26.2** : l'export JSON de la Forge s'importe dans le Carnet (v2.26.0, annexe Q, lot 39) ; installé, le Carnet s'appelle « Carnet L5R » (v2.26.1, annexe Q bis, lot 40) ; la note de règles se déplie depuis le pied de page (v2.26.2, annexe R, lot 41). Lots 32 à 38 (annexes O et P) livrés en v2.23.1 à v2.25.2.
 
@@ -610,7 +610,8 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 35. **v2.26.1 — nom de l'appli installée** (**livrée**, écarts en Q.4) : annexe Q bis, lot 40. `short_name` « Carnet L5R » et balise `apple-mobile-web-app-title`, au déploiement Pages seulement.
 36. **v2.26.2 — note de règles dans le pied de page** (**livrée**, écarts en R.2) : annexe R, lot 41. La note « Règles de référence » quitte le bas de chaque écran pour la pastille repliable **Règles L5R 4e** du pied de page.
 37. **v2.27.0 — import depuis une fiche papier** (**livrée**, écarts en S.3) : annexe S, lot 42. Prompt généré depuis le schéma, réponse de l'IA collée, extraite puis importée par le chemin habituel, encadré « À vérifier » → cas P1 à P7.
-38. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
+38. **v2.27.1 — étapes en liste, nouvel ordre** (**livrée**, écarts en T.2) : annexe T, lot 43. Étapes empilées dans chaque carte à toutes les largeurs ; ordre Fiche papier · Forge · Fiche vierge.
+39. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
 
 ---
 
@@ -2455,7 +2456,8 @@ Remplace le contenu de l'accueil vide. Deux blocs, puis une ligne.
 | Étapes (一 二 三) | **Forger** : clan, école, anneaux, compétences · **Exporter** : bouton « JSON » de la Forge · **Importer** : ici, avec « Importer un JSON » | **Créer** : nom, clan, école et Rang · **Remplir** : anneaux, compétences, techniques · **Jouer** : enregistrée dans ce navigateur |
 | Bouton principal (`btn` plein accent) | « Ouvrir la Forge » + icône externe → `PORTAL.forge` | « Nouvelle fiche vierge » → action « Nouvelle fiche » existante |
 
-- Les étapes : trois cases en ligne sur bureau, empilées sur mobile (numéro kanji à gauche).
+- Les étapes : empilées à toutes les largeurs depuis le lot 43 (numéro kanji à gauche, intitulé et description à droite, annexe T) ; trois cases en ligne sur bureau jusqu'à la v2.27.0.
+- **Ordre des options depuis le lot 43** : Depuis une fiche papier · Forger sur le portail · Fiche vierge, sur bureau et mobile (annexe T). Remplace l'ordre de ce tableau et la règle « Fiche vierge d'abord » de L.12.
 
 **Bloc « Modèles de personnage »** (remplace la ligne « Modèles de fiche (JSON) » de J.5) :
 - Sous-titre : « Une fiche d'exemple complète, à ouvrir ou à copier pour partir d'une base. »
@@ -2473,6 +2475,7 @@ Remplace le contenu de l'accueil vide. Deux blocs, puis une ligne.
     - **Forger sur le portail** (鍛) : « Création guidée, puis export JSON à importer ici. » → « Ouvrir la Forge » + icône externe ;
     - **Fiche vierge** (筆) : « Saisie directe dans le Carnet, depuis une fiche papier. » → « Nouvelle fiche » ;
   - ligne de pied : « Ou partir d'un modèle : **Bushi** · **Shugenja** · **Courtisan** » (liens-boutons, même action que « Utiliser » de L.3).
+  - **Depuis le lot 43** : trois cartes compactes, dans l'ordre Depuis une fiche papier (写) · Forger sur le portail · Fiche vierge (annexe T).
 
 ### L.5 Tests du lot 22
 
@@ -2560,7 +2563,7 @@ Retour de Nelson le 30/10/2026 : sur bureau, la description de « Fiche vierge �
 L'export JSON de la Forge ne s'importe pas encore dans le Carnet (demande ouverte côté portail : `issues/issue-export-carnet-rokugan.md`). Prototype : `reference/prototype-forge-attente.html`.
 
 - **Interrupteur** `FORGE_JSON_OK` (`src/rules/portal.ts`, voir L.1). À `false` : pastille « JSON pas encore compatible » (`ForgePending`, jetons `--warn` / `--warn-pale`), carte Forge en pointillés, encadré 待 (`role="note"`), étapes Forger · **Recopier** · Importer (« Bientôt », case en pointillés), descriptions « à recopier dans une fiche vierge » dans la carte « Un nouveau personnage ? » et le menu Ressources. À `true` : textes et étapes de L.2 à L.4.
-- **Ordre, dans les deux états** : Fiche vierge d'abord, avec le bouton principal (`btn accent`) ; Forge ensuite, bouton secondaire (`btn`). Description de Fiche vierge (L.3) : « Saisie directe dans le Carnet, depuis une fiche papier ou un personnage créé ailleurs. » En-tête : « Tu as déjà un fichier du Carnet ? »
+- **Ordre, dans les deux états** (remplacé au lot 43 : Fiche papier · Forge · Fiche vierge, annexe T ; les boutons ne changent pas) : Fiche vierge d'abord, avec le bouton principal (`btn accent`) ; Forge ensuite, bouton secondaire (`btn`). Description de Fiche vierge (L.3) : « Saisie directe dans le Carnet, depuis une fiche papier ou un personnage créé ailleurs. » En-tête : « Tu as déjà un fichier du Carnet ? »
 - **Grille** : les options pleines partagent quatre lignes (en-tête, encadré, étapes, bouton). La ligne de l'encadré est vide côté Fiche vierge : étapes et boutons restent alignés (L.11).
 - `--warn-pale` passe de 14 % à 12 % de `--warn` : à 14 %, `--warn` sur `--warn-pale` faisait 4,47:1 en clair.
 - **Depuis la v2.26.0** (annexe Q) : constante à `true`, état « en attente » testé seulement dans `tests/ui/forge-pending.spec.tsx` (constante simulée à `false`).
@@ -3364,3 +3367,21 @@ Le prompt ne demande pas `schoolId`, `insightBonus`, `maneuvers`, `modifiers`, `
 ### S.4 Vérification manuelle (Nelson, après déploiement)
 
 Copier le prompt depuis le Carnet, l'envoyer avec les photos de la fiche d'Okado Hiruma à deux IA différentes, coller chaque réponse. Noter les champs mal lus : ils serviront à ajuster le prompt dans un lot de suivi.
+
+## Annexe T — Lot 43 : étapes en liste, nouvel ordre des options (v2.27.1)
+
+Source : `handoff-ordre-etapes.md`, reçu le 02/11/2026. Maquette `reference/prototype-start-horizontal.html`, disposition « Proposé : étapes en liste ». Constat : à 1024 px, une étape faisait environ 85 px de large, « Photographier » se coupait et les descriptions passaient sur 3 ou 4 lignes.
+
+### T.1 Livré
+
+- **`src/ui/styles.css`** : les trois règles mobiles des étapes (une colonne, `li` en `24px 1fr`, numéro sur deux lignes) rejoignent les règles de base du bloc « Bibliothèque vide » et quittent le `@media (max-width:720px)`. Espacement : `gap:6px`, `li` en `padding:8px 12px` et `row-gap:0`, numéro centré (`align-self:center`). Cartes (`auto-fit`, `minmax(260px,1fr)`), subgrid, état `.off` et cartes compactes inchangés.
+- **`src/ui/components/Library.tsx`** : ordre DOM (= ordre visuel) **Depuis une fiche papier · Forger sur le portail · Fiche vierge**, dans la Bibliothèque vide et dans « Un nouveau personnage ? ». Boutons inchangés : « Nouvelle fiche vierge » / « Nouvelle fiche » restent en `btn accent`.
+- **Tests** : `tests/e2e/portal.spec.ts` (O7 bureau et 390 px sur le nouvel ordre ; la n-ième étape de chaque carte au même niveau ; nouveau cas à 1024 et 1280 px : `li` empilés au même `x`, largeur ≥ 80 % de la liste, numéro à gauche de l'intitulé, intitulé sur une ligne, trois listes au même `y` ; describe renommé « ordre lot 43 », `accent` vérifié en `nth(2)`), `tests/ui/portal.spec.tsx` (O7, lot 39, O9), `tests/ui/forge-pending.spec.tsx`, `tests/ui/photo-import.spec.tsx` (carte photo en premier).
+- **Docs** : guide § 3 (les trois façons dans le nouvel ordre), L.3, L.4, L.12, CHANGELOG 2.27.1.
+
+### T.2 Écarts avec le handoff
+
+- **Mobile** : l'espacement du handoff (`gap:6px`, `padding:8px 12px`, `row-gap:0`) est dans les règles de base, donc s'applique aussi à 720 px et moins : la liste des étapes y est un peu plus serrée qu'en v2.27.0 (6 px entre étapes au lieu de 10). Disposition et ordre de lecture identiques.
+- **O7 bureau** : l'ancienne vérification « neuf cases au même niveau » n'a plus de sens avec des étapes empilées ; elle devient « la n-ième étape de chaque carte au même niveau », hauteurs égales conservées.
+- **Captures** : `scripts/screenshots.mjs` ne montre pas la Bibliothèque vide ; rien à régénérer.
+- **Maquette** versionnée dans `reference/` ; le handoff reste hors du dépôt.
