@@ -113,4 +113,5 @@ test("W10 : le build ne contient ni manifeste ni service worker", () => {
   const html = readFileSync("dist/carnet-l5r.html", "utf8");
   expect(html).not.toContain('rel="manifest"');
   expect(html).not.toContain("serviceWorker.register");
+  expect(html).not.toContain("apple-mobile-web-app-title");
 });

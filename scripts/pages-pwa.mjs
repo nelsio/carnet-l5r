@@ -7,7 +7,8 @@ const site = resolve(process.argv[2] ?? "site");
 const { version } = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
 
 // localhost : contexte sûr, pour les tests de bout en bout (cas W8 et W9).
-const TAGS = `<link rel="manifest" href="manifest.webmanifest" />
+const TAGS = `<meta name="apple-mobile-web-app-title" content="Carnet L5R" />
+    <link rel="manifest" href="manifest.webmanifest" />
     <script>
       if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
         addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });

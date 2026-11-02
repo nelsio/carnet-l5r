@@ -6,11 +6,11 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document.
 
-**État au 02/11/2026 :** version **v2.26.0** : l'export JSON de la Forge s'importe dans le Carnet (annexe Q, lot 39). Lots 32 à 38 (annexes O et P) livrés en v2.23.1 à v2.25.2.
+**État au 02/11/2026 :** version **v2.26.1** : l'export JSON de la Forge s'importe dans le Carnet (v2.26.0, annexe Q, lot 39) ; installé, le Carnet s'appelle « Carnet L5R » (v2.26.1, annexe Q bis, lot 40). Lots 32 à 38 (annexes O et P) livrés en v2.23.1 à v2.25.2.
 
 **État au 31/10/2026 :** version **v2.23.0** (sorts depuis le grimoire du portail et autocomplétion de leur nom, annexe N ; correctifs v2.21.1 Safari, v2.21.2 Forge en attente, L.12, v2.21.3 `sharp`, M.5, et v2.21.4 liens de sort filtrés par élément, L.13), lots 1 à 31 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
 
-**Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie), F (lot 13 : shugenja et Magie), G (lot 14 : nom de l'outil dans l'en-tête), H (lots 15 et 16 : dépôt GitHub et correctifs), I (lots 17 à 19 : couleurs, Anneaux, sélecteurs), J (lot 20 : correctifs et retouches), K (lot 21 : points d'Insight), L (lots 22 et 23 : liens vers le portail de campagne), M (lots 24 et 25 : README allégé, liens vers le guide et le dépôt), N (lots 30 et 31 : sorts depuis le grimoire du portail), O (lots 32 à 37 : diffusion), P (lot 38 : référencement), Q (lot 39 : Forge compatible).
+**Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie), F (lot 13 : shugenja et Magie), G (lot 14 : nom de l'outil dans l'en-tête), H (lots 15 et 16 : dépôt GitHub et correctifs), I (lots 17 à 19 : couleurs, Anneaux, sélecteurs), J (lot 20 : correctifs et retouches), K (lot 21 : points d'Insight), L (lots 22 et 23 : liens vers le portail de campagne), M (lots 24 et 25 : README allégé, liens vers le guide et le dépôt), N (lots 30 et 31 : sorts depuis le grimoire du portail), O (lots 32 à 37 : diffusion), P (lot 38 : référencement), Q (lots 39 et 40 : Forge compatible, nom de l'appli installée).
 
 **Prochain lot (30/10/2026) :** à définir (§11, point 26). Les lots 24 et 25 (annexe M : README allégé, liens vers le guide et le dépôt) sont livrés ; la localisation est reportée.
 
@@ -605,7 +605,8 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 32. **v2.25.1 — portail « Les chroniques de Rokugan »** (**livrée**, écarts en O.2 bis ; P11) : annexe O.2, lot 37 (ancien lot 33). Libellés du portail renommés et neutres (`PORTAL_NAME`), guide et crédits → cas W5.
 33. **v2.25.2 — référencement** (**livrée**, écarts en P.2) : annexe P, lot 38. Balises, JSON-LD, sitemap, `og-image.png` et présentation statique sur l'adresse Pages.
 34. **v2.26.0 — Forge compatible** (**livrée**, écarts en Q.2) : annexe Q, lot 39. `FORGE_JSON_OK` passe à `true`, fin des mentions « pas encore compatible ».
-35. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
+35. **v2.26.1 — nom de l'appli installée** (**livrée**, écarts en Q.4) : annexe Q bis, lot 40. `short_name` « Carnet L5R » et balise `apple-mobile-web-app-title`, au déploiement Pages seulement.
+36. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
 
 ---
 
@@ -3115,7 +3116,7 @@ Objectif : un joueur ouvre l'adresse une fois, l'ajoute à son écran d'accueil,
      ```json
      {
        "name": "Carnet de Rokugan",
-       "short_name": "Carnet",
+       "short_name": "Carnet L5R",
        "description": "Compagnon de jeu L5R 4e : fiche et jets Roll & Keep.",
        "lang": "fr",
        "start_url": "./",
@@ -3130,6 +3131,7 @@ Objectif : un joueur ouvre l'adresse une fois, l'ajoute à son écran d'accueil,
        ]
      }
      ```
+     `short_name` « Carnet L5R » depuis la v2.26.1 (annexe Q bis), « Carnet » avant. `pages-pwa.mjs` ajoute aussi `<meta name="apple-mobile-web-app-title" content="Carnet L5R" />`, nom proposé par iOS pour l'écran d'accueil.
      Couleurs : reprendre celles des `theme-color` existants (sombre). Icônes : dérivées de `src/ui/favicon.svg` par un script `sharp` (`scripts/pwa-icons.mjs`, lancé à la main comme les captures, PNG committés) ; la version maskable garde le sceau dans les 80 % centraux.
    - `sw.js`, service worker minimal, **même origine uniquement** :
      - cache nommé avec la version (`carnet-v2.24.0`, injectée au déploiement) ;
@@ -3264,3 +3266,18 @@ Source : `handoff-forge-compatible.md`, reçu le 02/11/2026. Décision de Nelson
 - **`forge-ok.spec.tsx`** : ses attentes passent dans `portal.spec.tsx` ; le fichier devient le cas inverse (`forge-pending.spec.tsx`), qui reprend les attentes « lot 27 » retirées de `portal.spec.tsx`.
 - **Critère « un JSON de la Forge s'importe »** : vérifié en automatique avec deux exports réels, ajoutés en fixtures, plutôt qu'à la main seulement.
 - **Constat pour le portail** (hors lot, suivi `issues/issue-export-carnet-rokugan.md`) : dans ces exports, `schoolRank` vaut `null`, `techniques`, `maneuvers`, `modifiers`, `advantages` et `disadvantages` sont vides, `spellSlotsUsed` est absent (shugenja). `affinity` est présent et reconnu par le Carnet.
+
+### Q bis Lot 40 : nom de l'appli installée (v2.26.1)
+
+Retour de Nelson (02/11/2026) : installé sur mobile, le Carnet s'affichait « Carnet » sous l'icône. Nom voulu : « Carnet L5R » (10 caractères, tient sous une icône Android et iOS).
+
+#### Q.3 Livré
+
+- **`public-pages/manifest.webmanifest`** : `short_name` « Carnet L5R ». `name` reste « Carnet de Rokugan » (écran de lancement Android, liste des applis).
+- **`scripts/pages-pwa.mjs`** : `<meta name="apple-mobile-web-app-title" content="Carnet L5R" />` avant le manifeste. iOS propose ce nom au lieu du titre de la page, long depuis le lot 38 (`HOME_TITLE`). Ajouté au déploiement seulement : le fichier de release ne change pas (W10).
+- **Tests** : `tests/pwa.spec.ts` (W7 `short_name`, W6 balise avant `</head>`), `tests/e2e/pwa.spec.ts` (W10 : balise absente du build).
+
+#### Q.4 Écarts et vérification manuelle
+
+- **`docs/GUIDE.md`** : inchangé, la section d'installation ne cite pas le nom affiché.
+- **Après déploiement (Nelson)** : sur Android et iOS, désinstaller puis réinstaller l'appli (le nom d'une appli déjà installée ne se met pas toujours à jour, surtout sur iOS) ; le nom sous l'icône doit être « Carnet L5R ».
