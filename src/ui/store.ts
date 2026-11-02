@@ -656,6 +656,8 @@ export interface Store {
   grimoire: GrimoireApi;
   /** Ouvre la fenêtre d'import pour un fichier choisi ou déposé. */
   startImport(file: File): void;
+  /** Ouvre la fenêtre « Importer depuis une fiche papier » (lot 42). */
+  startPhotoImport(): void;
 }
 
 export const StoreContext = createContext<Store | null>(null);

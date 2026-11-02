@@ -8,7 +8,7 @@ import type { LibraryEntry } from "../../storage";
 import { useStore } from "../store";
 import { ExternalLink } from "./ExternalLink";
 import { ForgePending } from "./ForgePending";
-import { ImportButton } from "./FileActions";
+import { ImportButton, PhotoImportButton } from "./FileActions";
 
 const dateFormat = new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeStyle: "short" });
 
@@ -22,7 +22,7 @@ export function Library() {
       <div className="lib-empty">
         <section className="panel start" aria-labelledby="start-title">
           <h2 id="start-title">Pas encore de personnage ?</h2>
-          <p className="muted">Deux façons de commencer. Tu as déjà un fichier du Carnet ? <ImportButton label="Importer un JSON" className="linkbtn" /></p>
+          <p className="muted">Trois façons de commencer. Tu as déjà un fichier du Carnet ? <ImportButton label="Importer un JSON" className="linkbtn" /></p>
           <div className="start-opts">
             <StartOption
               kanji="筆" title="Fiche vierge"
@@ -42,6 +42,13 @@ export function Library() {
                 : [["Forger", "Clan, école, anneaux, compétences"], ["Recopier", "Dans une fiche vierge du Carnet"], ["Importer", "Bientôt : import direct du JSON", true]]}
             >
               <ForgeLink />
+            </StartOption>
+            <StartOption
+              kanji="写" title="Depuis une fiche papier"
+              desc="Photos de ta fiche, lues par l'IA de ton choix, puis vérifiées ici."
+              steps={[["Photographier", "Ta fiche papier, chaque face"], ["Demander", "À ton IA, avec le prompt du Carnet"], ["Coller", "Ici, puis vérifier"]]}
+            >
+              <PhotoImportButton />
             </StartOption>
           </div>
           <p className="guide-hint">Première visite ? <ExternalLink href={CARNET_LINKS.guide}>Lire le guide</ExternalLink></p>
@@ -85,6 +92,9 @@ export function Library() {
           >
             <ForgeLink />
           </StartOption>
+          <StartOption compact kanji="写" title="Depuis une fiche papier" desc="Photos de ta fiche, lues par l'IA de ton choix, puis vérifiées ici.">
+            <PhotoImportButton />
+          </StartOption>
         </div>
         <p className="newchar-foot">
           Ou partir d'un modèle :{" "}
@@ -110,7 +120,7 @@ const STEP_NUMBERS = ["一", "二", "三"];
 type Step = [string, string, boolean?];
 
 /**
- * Une des deux façons de commencer : fiche vierge ou Forge du portail (annexe L.3, L.4).
+ * Une des trois façons de commencer : fiche vierge, Forge du portail (annexe L.3, L.4) ou fiche papier (annexe S).
  * `pending` : Forge pas encore compatible (lot 27), carte en pointillés et pastille ; `note` : encadré sous l'en-tête.
  */
 function StartOption({ kanji, title, desc, steps, note, pending, compact, children }: {
@@ -125,7 +135,7 @@ function StartOption({ kanji, title, desc, steps, note, pending, compact, childr
           <p className="muted">{desc}</p>
         </div>
       </div>
-      {/* Ligne de l'encadré, vide sans encadré : les étapes des deux cartes restent alignées (subgrid) */}
+      {/* Ligne de l'encadré, vide sans encadré : les étapes des cartes restent alignées (subgrid) */}
       {steps && (note ? <div className="warnbox" role="note"><span className="wk" aria-hidden="true">待</span><span>{note}</span></div> : <div />)}
       {steps && (
         <ol className="steps">

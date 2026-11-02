@@ -1,0 +1,436 @@
+<title>Carnet : import photo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Prototype : import d'un personnage depuis des photos de fiche papier (option C : prompt + IA du joueur + collage du JSON).
+   Jetons repris de prototype-forge-attente.html / styles.css. Mobile simulé en @container (appli : @media max-width:720px). */
+:root{
+  --p-bg:#f4f2ee;--p-ink:#222;--p-muted:#5f5d58;--p-line:#d6d2ca;--p-chip:#fff;--p-on:#222;--p-on-ink:#fff;
+  --f-display:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+  --f-body:"Zen Kaku Gothic New","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--p-bg:#161718;--p-ink:#e6e4df;--p-muted:#a9a7a2;--p-line:#3a3c40;--p-chip:#222427;--p-on:#e6e4df;--p-on-ink:#161718;color-scheme:dark}}
+:root[data-theme="dark"]{--p-bg:#161718;--p-ink:#e6e4df;--p-muted:#a9a7a2;--p-line:#3a3c40;--p-chip:#222427;--p-on:#e6e4df;--p-on-ink:#161718;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--p-bg);color:var(--p-ink);font:14px/1.5 var(--f-body);padding-block:24px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1120px;margin:0 auto}
+h1.p{font:800 22px/1.2 var(--f-display);margin:0 0 4px;text-wrap:balance}
+.lede{color:var(--p-muted);margin:0 0 18px;max-width:72ch}
+.controls{display:flex;flex-wrap:wrap;gap:14px 22px;margin-bottom:14px}
+.ctl{display:grid;gap:6px}
+.ctl>span{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--p-muted)}
+.seg{display:flex;flex-wrap:wrap;gap:4px}
+.seg button{border:1px solid var(--p-line);background:var(--p-chip);color:var(--p-ink);border-radius:999px;padding:6px 12px;font:inherit;font-weight:500;cursor:pointer;min-height:36px}
+.seg button[aria-pressed="true"]{background:var(--p-on);color:var(--p-on-ink);border-color:var(--p-on)}
+.seg button:focus-visible{outline:2px solid var(--p-ink);outline-offset:2px}
+.legend{border:1px solid var(--p-line);border-radius:10px;padding:12px 14px;margin-bottom:16px;max-width:86ch;display:grid;gap:6px}
+.legend p{margin:0}
+.legend .k{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--p-on);color:var(--p-on-ink);font:700 11px/1 var(--f-body);margin-right:6px;vertical-align:1px}
+.stage{overflow-x:auto;padding-bottom:4px}
+.frame{margin:0 auto;border:1px solid var(--p-line);border-radius:10px;overflow:hidden}
+.frame.desk{width:1080px}
+.frame.mob{width:390px}
+
+/* ---- Appli ---- */
+.app{
+  --clan-l:#3f5a6b;--clan-ink-l:#2f4554;--clan-d:#8fb3c9;--clan-ink-d:#a9c6d8;
+  --bg:#ece6d8;--surface:#f7f3ea;--surface-2:#fdfbf6;--sunk:#e0d9c8;--ink:#2a261f;
+  --muted:color-mix(in oklab,var(--ink) 70%,var(--surface));
+  --line:color-mix(in oklab,var(--ink) 18%,transparent);
+  --shadow:0 10px 28px rgb(60 45 20 / .18);--scrim:rgb(0 0 0 / .35);
+  --accent:var(--clan-l);--accent-ink:var(--clan-ink-l);--accent-fill:var(--accent-ink);
+  --accent-pale:color-mix(in oklab,var(--accent) 16%,var(--surface));
+  --on-accent:#fff;--danger:#b3261e;--ok:#276b2b;--warn:#8a5800;
+  --danger-pale:color-mix(in oklab,var(--danger) 14%,var(--surface));
+  --ok-pale:color-mix(in oklab,var(--ok) 14%,var(--surface));
+  --warn-pale:color-mix(in oklab,var(--warn) 12%,var(--surface));
+  --seal:#a8382a;--seal-ink:#f7f3ea;
+  color-scheme:light;container-type:inline-size;position:relative;background:var(--bg);color:var(--ink);font:15px/1.55 var(--f-body);min-height:760px
+}
+.app[data-theme="dark"]{
+  --bg:#26252a;--surface:#302f33;--surface-2:#3a393e;--sunk:#1c1e21;--ink:#e7e5e0;
+  --shadow:0 10px 28px rgb(0 0 0 / .45);--scrim:rgb(0 0 0 / .55);
+  --accent:var(--clan-d);--accent-ink:var(--clan-ink-d);--accent-fill:var(--accent);--on-accent:var(--bg);
+  --danger:#f2867e;--ok:#7fcb93;--warn:#e6bf55;--seal:#b5402f;--seal-ink:#f3ece0;color-scheme:dark
+}
+.app .body{padding:0 24px 28px;display:grid;gap:16px}
+.app h1,.app h2,.app h3{font-family:var(--f-display);margin:0;line-height:1.2;text-wrap:balance}
+.app button{font:inherit;color:inherit;cursor:pointer}
+.app a{color:var(--accent-ink)}
+.app :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.new{outline:2px dashed color-mix(in oklab,var(--seal) 70%,transparent);outline-offset:3px;border-radius:8px}
+
+header.top{display:flex;align-items:center;gap:14px;padding:18px 24px 12px;border-bottom:3px solid var(--accent);margin-bottom:16px}
+.seal{flex:none;display:grid;place-items:center;width:48px;height:48px;border-radius:8px;background:var(--seal);color:var(--seal-ink);font:800 28px/1 var(--f-display);rotate:-3deg;box-shadow:inset 0 0 0 3px var(--seal),inset 0 0 0 5px var(--seal-ink)}
+.top h1{font-size:26px;font-weight:800}
+.top .sub{color:var(--muted);font-size:13px}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+.panel h2{font-size:19px;margin-bottom:10px}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.panel-head h2{margin:0}
+.file-actions{display:flex;gap:6px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--surface);padding:7px 13px;border-radius:7px;font-weight:700}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.accent{background:var(--accent-fill);color:var(--on-accent);border-color:var(--accent-fill)}
+.btn.sm{padding:3px 9px;font-size:13px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.linkbtn{border:0;background:none;padding:0;color:var(--accent-ink)!important;font-weight:700;text-decoration:underline;text-underline-offset:2px}
+.hint{font-size:13px;color:var(--muted);margin:8px 0 0}
+.muted{color:var(--muted)}
+.chk{display:flex;align-items:center;gap:7px;font-size:14px}
+.chk input{width:17px;height:17px;accent-color:var(--accent)}
+.library{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px}
+.entry{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--accent);flex:none}
+.entry .muted{font-size:13px}
+
+.start-opts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:6px}
+.start-opt{border:1px solid var(--line);border-radius:10px;padding:14px;background:var(--bg);display:grid;gap:8px;align-content:start}
+.start-opt-h{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:start}
+.start-opt-h h3{font-size:16px}
+.start-opt-h p{margin:2px 0 0;font-size:13px}
+.opt-k{display:grid;place-items:center;width:40px;height:40px;border-radius:8px;background:var(--accent-fill);color:var(--on-accent);font:800 22px/1 var(--f-display)}
+.start-opt-act{margin-left:52px}
+
+/* Fiche ouverte (contexte fusion) */
+.sheet-sum{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:14px}
+.sheet-sum b{font-family:var(--f-display)}
+
+/* ---- Fenêtre ---- */
+.modal-backdrop{position:absolute;inset:0;z-index:40;background:var(--scrim);display:grid;place-items:start center;padding:40px 16px 16px}
+.modal{width:min(660px,100%);max-height:700px;overflow-y:auto;overscroll-behavior:contain;background:var(--surface-2);box-shadow:var(--shadow)}
+.modal h2{font-size:20px;margin-bottom:4px}
+.modal h3{font-size:15px;margin:0 0 4px}
+.modal ul{margin:4px 0;padding-left:20px}
+.modal li{margin:2px 0;overflow-wrap:anywhere}
+.modal code{font-family:var(--f-mono);font-size:12.5px}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;position:sticky;bottom:0;background:var(--surface-2);padding-top:8px}
+
+.psteps{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:12px}
+.pstep{display:grid;grid-template-columns:32px 1fr;gap:10px;align-items:start}
+.pstep-n{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;border:1px solid var(--accent);color:var(--accent-ink);font:800 16px/1 var(--f-display)}
+.pstep.done .pstep-n{background:var(--accent-fill);color:var(--on-accent);border-color:var(--accent-fill)}
+.pstep-b{min-width:0;display:grid;gap:6px}
+.pstep-b p{margin:0;font-size:14px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ok-tag{font-size:13px;color:var(--ok);font-weight:700}
+details.prompt{border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+details.prompt summary{padding:6px 10px;font-size:13px;font-weight:700;cursor:pointer;color:var(--muted)}
+details.prompt pre{margin:0;padding:10px;border-top:1px solid var(--line);font:12px/1.5 var(--f-mono);white-space:pre-wrap;max-height:220px;overflow:auto}
+.tips{display:grid;gap:4px;margin:0;padding:0;list-style:none;font-size:13px;color:var(--muted)}
+.tips li::before{content:"・";color:var(--accent-ink)}
+.privacy{font-size:13px;border-left:3px solid var(--warn);background:var(--warn-pale);padding:6px 10px;border-radius:0 6px 6px 0}
+textarea.paste{width:100%;min-height:120px;resize:vertical;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);padding:8px 10px;font:12.5px/1.45 var(--f-mono)}
+textarea.paste:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+
+fieldset.dest{border:0;padding:0;margin:12px 0 0;display:flex;flex-wrap:wrap;gap:6px 16px}
+fieldset.dest legend{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;padding:0}
+.result{margin-top:14px;display:grid;gap:10px}
+.import-errors{border:1px solid var(--danger);background:var(--danger-pale);border-radius:8px;padding:10px 12px}
+.import-errors b{color:var(--danger)}
+.who-card{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--surface)}
+.who-card .n{font:800 18px/1.2 var(--f-display)}
+.who-card .m{font-size:13px;color:var(--muted)}
+.digest{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:6px}
+.digest div{border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--surface)}
+.digest .l{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.digest .v{font:700 15px/1.3 var(--f-body);font-variant-numeric:tabular-nums}
+.verify{border:1px solid var(--warn);background:var(--warn-pale);border-radius:8px;padding:10px 12px}
+.verify h3{color:var(--warn)}
+.verify li b{font-variant-numeric:tabular-nums}
+.changes{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--surface)}
+.toast{position:absolute;left:50%;bottom:20px;translate:-50% 0;z-index:50;background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:8px;font-weight:700;font-size:14px;box-shadow:var(--shadow)}
+
+@container (max-width:720px){
+  .app .body{padding:0 14px 20px}
+  header.top{padding:14px 14px 10px}
+  .start-opts{grid-template-columns:1fr}
+  .start-opt .btn{min-height:44px}
+  .modal-backdrop{place-items:end stretch;padding:0}
+  .modal{width:100%;border-radius:16px 16px 0 0;max-height:680px}
+  .modal-actions .btn{min-height:44px;flex:1}
+  .pstep-b .btn{min-height:40px}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+
+<div class="wrap">
+  <h1 class="p">Carnet de Rokugan · Importer depuis une photo</h1>
+  <p class="lede">Prototype de l'option C : le Carnet fournit un prompt, le joueur l'envoie avec ses photos à l'IA de son choix, puis colle la réponse. Aucune clé, aucun serveur ; la suite passe par l'import existant (validation, destination, fusion). Les éléments ajoutés sont entourés en pointillés rouges. Personnages et chiffres : exemples fictifs.</p>
+
+  <div class="controls">
+    <div class="ctl"><span>Contexte</span><div class="seg" id="c-ctx">
+      <button type="button" data-v="lib" aria-pressed="true">Bibliothèque</button>
+      <button type="button" data-v="sheet" aria-pressed="false">Fiche ouverte (fusion)</button>
+    </div></div>
+    <div class="ctl"><span>Réponse de l'IA (exemple)</span><div class="seg" id="c-reply">
+      <button type="button" data-v="fenced" aria-pressed="true">Avec texte autour</button>
+      <button type="button" data-v="clean" aria-pressed="false">JSON seul</button>
+      <button type="button" data-v="broken" aria-pressed="false">Tronquée</button>
+      <button type="button" data-v="invalid" aria-pressed="false">Valeur hors limites</button>
+    </div></div>
+    <div class="ctl"><span>Thème</span><div class="seg" id="c-theme">
+      <button type="button" data-v="light" aria-pressed="true">Clair</button>
+      <button type="button" data-v="dark" aria-pressed="false">Sombre</button>
+    </div></div>
+    <div class="ctl"><span>Format</span><div class="seg" id="c-fmt">
+      <button type="button" data-v="desk" aria-pressed="true">Ordinateur</button>
+      <button type="button" data-v="mob" aria-pressed="false">Mobile</button>
+    </div></div>
+  </div>
+
+  <div class="legend" id="legend"></div>
+
+  <div class="stage"><div class="frame desk" id="frame">
+    <div class="app" id="app" data-theme="light">
+      <header class="top">
+        <span class="seal" aria-hidden="true">帳</span>
+        <div><h1 id="top-name">Carnet de Rokugan</h1><div class="sub" id="top-sub">Bibliothèque</div></div>
+      </header>
+      <div class="body" id="body"></div>
+      <div id="modal-root"></div>
+      <div class="toast" id="toast" hidden></div>
+    </div>
+  </div></div>
+</div>
+
+<script>
+const PROMPT = `Tu es un assistant de saisie pour le Carnet de Rokugan (L5R 4e édition, version française).
+Je joins une ou plusieurs photos de ma fiche de personnage papier. Transcris-la en un seul objet JSON, au format ci-dessous.
+
+RÈGLES
+- Réponds uniquement avec le JSON, sans texte avant ni après.
+- Recopie ce qui est écrit sur la fiche. N'invente rien, ne calcule rien.
+- Si une valeur est illisible ou absente, mets ta meilleure estimation et ajoute son chemin dans "_aVerifier" (ex. "traits.agility", "skills[3].rank").
+- Les listes absentes de la fiche restent vides : [].
+
+FORMAT
+{
+  "schemaVersion": 2,
+  "name": "Nom du personnage",
+  "clan": "", "family": "", "school": "Nom de l'école",
+  "schoolRank": null,
+  "insightRank": 1,                 // Rang d'Insight (entier 1 à 10)
+  "honor": 0, "glory": 0, "status": 0,   // 0 à 10, une décimale max
+  "xp": { "total": 0, "spent": 0 },
+  "traits": {                      // entiers 1 à 10
+    "stamina": 2,      // Constitution (Terre)
+    "willpower": 2,    // Volonté (Terre)
+    "strength": 2,     // Force (Eau)
+    "perception": 2,   // Perception (Eau)
+    "agility": 2,      // Agilité (Feu)
+    "intelligence": 2, // Intelligence (Feu)
+    "reflexes": 2,     // Réflexes (Air)
+    "awareness": 2     // Intuition (Air)
+  },
+  "voidRing": 2,          // Anneau de Vide
+  "voidPoints": 2,        // points de Vide restants (≤ voidRing)
+  "wounds": 0,            // points de blessure subis
+  "armor": { "name": "", "bonus": 0, "reduction": 0 },
+  "skills": [ { "name": "Kenjutsu", "rank": 1, "trait": "agility", "emphases": ["Katana"] } ],
+                          // trait : une des clés de "traits", ou "void"
+  "weapons": [ { "name": "Katana", "skill": "Kenjutsu", "dr": "3g2" } ],
+                          // dr : format NgN (ex. 3g2) ; arc : ajouter "bowStrength"
+  "techniques": [ { "name": "Nom", "text": "Texte de la technique" } ],
+  "spells": [ { "id": "slug", "name": "", "element": "fire", "mastery": 1 } ],
+                          // element : air, earth, fire, water, void ou all
+  "advantages": "texte libre, un par ligne",
+  "disadvantages": "texte libre, un par ligne",
+  "notes": "",
+  "_aVerifier": []
+}`;
+
+const BASE = {
+  schemaVersion:2,name:"Hiruma Daisuke",clan:"Crabe",family:"Hiruma",school:"École de bushi Hiruma",schoolRank:null,
+  insightRank:3,honor:4.5,glory:2.1,status:1,xp:{total:112,spent:104},
+  traits:{stamina:3,willpower:3,strength:3,perception:3,agility:4,intelligence:2,reflexes:4,awareness:2},
+  voidRing:3,voidPoints:3,wounds:0,armor:{name:"Armure légère",bonus:5,reduction:3},
+  skills:[
+    {name:"Kenjutsu",rank:4,trait:"agility",emphases:["Katana"]},
+    {name:"Kyujutsu",rank:3,trait:"reflexes",emphases:[]},
+    {name:"Athlétisme",rank:2,trait:"strength",emphases:[]},
+    {name:"Défense",rank:3,trait:"reflexes",emphases:[]},
+    {name:"Discrétion",rank:3,trait:"agility",emphases:["Silence"]},
+    {name:"Chasse",rank:3,trait:"perception",emphases:["Pistage"]},
+    {name:"Connaissance : Outremonde",rank:2,trait:"intelligence",emphases:[]},
+    {name:"Investigation",rank:2,trait:"perception",emphases:[]}
+  ],
+  weapons:[{name:"Katana",skill:"Kenjutsu",dr:"3g2"},{name:"Wakizashi",skill:"Kenjutsu",dr:"2g2"},{name:"Daikyu",skill:"Kyujutsu",dr:"2g2",bowStrength:4}],
+  techniques:[{name:"Rang 1 : Le Chemin dans l'ombre",text:"…"},{name:"Rang 2 : Danse avec la mort",text:"…"},{name:"Rang 3 : Le Fléau du Néant",text:"…"}],
+  spells:[],
+  advantages:"Rapide\nSens aigus",disadvantages:"Phobie : la Terre de l'Ombre",notes:"",
+  _aVerifier:["traits.intelligence","skills[6].rank","glory"]
+};
+const OPEN_SHEET = {name:"Hiruma Daisuke",xpTotal:98,xpSpent:94,kenjutsu:3,discretion:2,glory:1.8};
+
+function replyText(kind){
+  const j = JSON.stringify(BASE,null,2);
+  if(kind==="clean") return j;
+  if(kind==="fenced") return "Voici la transcription de ta fiche :\n\n```json\n"+j+"\n```\n\nTrois valeurs étaient difficiles à lire, je les ai listées dans _aVerifier.";
+  if(kind==="broken") return "```json\n"+j.slice(0,Math.floor(j.length*.55));
+  if(kind==="invalid"){const b=structuredClone(BASE);b.traits.agility=14;b.weapons[0].dr="3 dés gardés 2";b._aVerifier=[];return JSON.stringify(b,null,2);}
+}
+
+/* Extraction : premier « { » jusqu'au dernier « } », blocs ``` tolérés. */
+function extractJson(text){
+  const a=text.indexOf("{"),b=text.lastIndexOf("}");
+  if(a<0||b<=a) return {ok:false,errors:["La réponse ne contient pas de JSON. Recopie toute la réponse de l'IA, accolades comprises."]};
+  try{return {ok:true,json:JSON.parse(text.slice(a,b+1)),trimmed:a>0||b<text.trim().length-1};}
+  catch{return {ok:false,errors:["Le JSON est incomplet ou abîmé (réponse coupée ?). Demande à l'IA : « Renvoie le JSON complet, sans texte autour. »"]};}
+}
+/* Mini-validation du prototype ; dans l'appli : importCharacter / mergeCharacter (zod). */
+function validate(c){
+  const e=[];
+  if(!c.name) e.push("name : ne doit pas être vide");
+  for(const [k,v] of Object.entries(c.traits||{})) if(!Number.isInteger(v)||v<1||v>10) e.push(`traits.${k} : doit être un entier entre 1 et 10 (lu : ${v})`);
+  (c.weapons||[]).forEach((w,i)=>{if(!/^\s*\d+\s*[kg]\s*\d+\s*$/i.test(w.dr)) e.push(`weapons[${i}].dr : doit être au format 3g2 (lu : « ${w.dr} »)`);});
+  return e;
+}
+function getPath(o,p){return p.replace(/\[(\d+)\]/g,".$1").split(".").reduce((x,k)=>x==null?x:x[k],o);}
+const LABELS={"traits.intelligence":"Intelligence","glory":"Gloire","traits.agility":"Agilité"};
+function label(c,p){
+  const m=/^skills\[(\d+)\]\.rank$/.exec(p); if(m) return `Rang de ${c.skills[+m[1]]?.name??"compétence"}`;
+  return LABELS[p]??p;
+}
+
+const S={ctx:"lib",reply:"fenced",theme:"light",fmt:"desk",open:false,copied:false,pasted:"",result:null,dest:"new"};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function renderBody(){
+  $("#top-name").textContent = S.ctx==="lib" ? "Carnet de Rokugan" : OPEN_SHEET.name;
+  $("#top-sub").textContent = S.ctx==="lib" ? "Bibliothèque" : "Crabe · École de bushi Hiruma · Rang 3";
+  if(S.ctx==="lib"){
+    $("#body").innerHTML=`
+    <div class="panel">
+      <div class="panel-head"><h2>Bibliothèque</h2><div class="file-actions"><button type="button" class="btn">Importer un JSON…</button></div></div>
+      <p class="hint" style="margin-top:0">Les fiches restent dans ce navigateur. Rien n'est envoyé.</p>
+      <ul class="library"><li class="entry"><span class="dot"></span><div><b>Kakita Haruto</b><div class="muted">Grue · École de bushi Kakita · 28/10/2026</div></div></li></ul>
+    </div>
+    <section class="panel">
+      <h2>Un nouveau personnage ?</h2>
+      <div class="start-opts">
+        <article class="start-opt"><div class="start-opt-h"><span class="opt-k">筆</span><div><h3>Fiche vierge</h3><p class="muted">Saisie directe dans le Carnet.</p></div></div><div class="start-opt-act"><button type="button" class="btn accent">Nouvelle fiche</button></div></article>
+        <article class="start-opt"><div class="start-opt-h"><span class="opt-k">鍛</span><div><h3>Forger sur le portail</h3><p class="muted">Création guidée, puis export JSON à importer ici.</p></div></div><div class="start-opt-act"><button type="button" class="btn">Ouvrir la Forge</button></div></article>
+        <article class="start-opt new"><div class="start-opt-h"><span class="opt-k">写</span><div><h3>Depuis une fiche papier</h3><p class="muted">Photos de ta fiche, lues par l'IA de ton choix, puis vérifiées ici.</p></div></div><div class="start-opt-act"><button type="button" class="btn" id="open-photo">Depuis une photo…</button></div></article>
+      </div>
+    </section>`;
+  }else{
+    $("#body").innerHTML=`
+    <div class="panel">
+      <div class="sheet-sum"><span><b>Insight</b> 3</span><span><b>XP</b> ${OPEN_SHEET.xpSpent}/${OPEN_SHEET.xpTotal}</span><span><b>Kenjutsu</b> ${OPEN_SHEET.kenjutsu}</span><span><b>Gloire</b> ${OPEN_SHEET.glory}</span></div>
+      <p class="hint">Fiche ouverte (extrait). La fiche papier a été mise à jour à la dernière séance.</p>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Fichier</h2></div>
+      <div class="file-actions"><button type="button" class="btn">Exporter la fiche</button><button type="button" class="btn">Importer un JSON…</button><span class="new"><button type="button" class="btn" id="open-photo">Depuis une photo…</button></span></div>
+      <p class="hint">L'import peut aussi fusionner une fiche papier dans cette fiche, avec un aperçu avant d'appliquer.</p>
+    </div>`;
+  }
+  $("#open-photo").onclick=()=>{S.open=true;S.copied=false;S.pasted="";S.result=null;S.dest=S.ctx==="sheet"?"merge":"new";renderModal();setTimeout(()=>$("#m-copy")?.focus(),0);};
+}
+
+function renderResult(){
+  const r=S.result; if(!r) return "";
+  if(!r.ok) return `<div class="import-errors" role="alert"><b>Import refusé : rien n'a été modifié.</b><ul>${r.errors.map(e=>`<li>${esc(e)}</li>`).join("")}</ul></div>`;
+  const c=r.json, ver=(c._aVerifier||[]).filter(p=>getPath(c,p)!==undefined);
+  const dest=`<fieldset class="dest"><legend>Destination</legend>${
+    (S.ctx==="sheet"?[["merge",`Fusionner dans « ${OPEN_SHEET.name} »`],["new","Nouvelle fiche"]]:[["new","Nouvelle fiche"],["readonly","Consultation (MJ)"]])
+    .map(([v,l])=>`<label class="chk"><input type="radio" name="dest" value="${v}" ${S.dest===v?"checked":""}> ${l}</label>`).join("")}</fieldset>`;
+  const verify = ver.length?`<div class="verify new" role="note"><h3>À vérifier sur ta fiche (${ver.length})</h3><ul>${ver.map(p=>`<li>${esc(label(c,p))} : <b>${esc(getPath(c,p))}</b> <span class="muted">(<code>${esc(p)}</code>)</span></li>`).join("")}</ul><p class="hint" style="margin-top:4px">L'IA a eu du mal à lire ces valeurs. Corrige-les dans la fiche après l'import si besoin.</p></div>`:"";
+  let main;
+  if(S.dest==="merge"){
+    const ups=[["xp.total",OPEN_SHEET.xpTotal,c.xp.total],["xp.spent",OPEN_SHEET.xpSpent,c.xp.spent],["skills[Kenjutsu].rank",OPEN_SHEET.kenjutsu,4],["skills[Discrétion].rank",OPEN_SHEET.discretion,3],["glory",OPEN_SHEET.glory,c.glory]];
+    main=`<div class="changes"><h3>Modifications (${ups.length})</h3><ul>${ups.map(([p,a,b])=>`<li><code>${p}</code> : ${a} → <b>${b}</b></li>`).join("")}</ul><h3 style="margin-top:8px">Ajouts (1)</h3><ul><li>Compétence : Investigation</li></ul><p class="hint">Rien n'est supprimé : les éléments absents de la photo restent dans la fiche.</p></div>`;
+  }else{
+    const t=c.traits;
+    main=`<div class="who-card"><span class="dot"></span><div><div class="n">${esc(c.name)}</div><div class="m">${esc([c.clan,c.school].filter(Boolean).join(" · "))} · Rang ${c.insightRank}</div></div></div>
+    <div class="digest new">
+      <div><div class="l">Terre</div><div class="v">${Math.min(t.stamina,t.willpower)}</div></div>
+      <div><div class="l">Eau</div><div class="v">${Math.min(t.strength,t.perception)}</div></div>
+      <div><div class="l">Feu</div><div class="v">${Math.min(t.agility,t.intelligence)}</div></div>
+      <div><div class="l">Air</div><div class="v">${Math.min(t.reflexes,t.awareness)}</div></div>
+      <div><div class="l">Vide</div><div class="v">${c.voidRing}</div></div>
+      <div><div class="l">Compétences</div><div class="v">${c.skills.length}</div></div>
+      <div><div class="l">Armes</div><div class="v">${c.weapons.length}</div></div>
+      <div><div class="l">Techniques</div><div class="v">${c.techniques.length}</div></div>
+    </div>
+    <p class="hint" style="margin-top:0">${S.dest==="readonly"?"La fiche sera ajoutée en consultation : lecture seule.":"La fiche sera ajoutée à ta bibliothèque comme une nouvelle fiche modifiable."}</p>`;
+  }
+  return dest+`<div class="result">${verify}${main}</div>`;
+}
+
+function renderModal(){
+  const root=$("#modal-root");
+  if(!S.open){root.innerHTML="";return;}
+  const has=!!S.pasted.trim(), ready=S.result?.ok;
+  root.innerHTML=`<div class="modal-backdrop" id="m-bd"><div class="panel modal new" role="dialog" aria-modal="true" aria-labelledby="m-t">
+    <h2 id="m-t">Importer depuis une fiche papier</h2>
+    <p class="muted" style="margin:0;font-size:14px">L'IA lit tes photos et renvoie ta fiche au format du Carnet. Tu vérifies avant d'importer.</p>
+    <ol class="psteps">
+      <li class="pstep ${S.copied?"done":""}"><span class="pstep-n" aria-hidden="true">一</span><div class="pstep-b">
+        <p><b>Copie le prompt</b></p>
+        <div class="row"><button type="button" class="btn accent" id="m-copy">Copier le prompt</button>${S.copied?`<span class="ok-tag" role="status">Copié</span>`:""}</div>
+        <details class="prompt"><summary>Voir le prompt</summary><pre id="m-pre">${esc(PROMPT)}</pre></details>
+      </div></li>
+      <li class="pstep"><span class="pstep-n" aria-hidden="true">二</span><div class="pstep-b">
+        <p><b>Envoie-le à ton IA avec tes photos</b> (Claude, ChatGPT, Gemini… celle que tu utilises déjà).</p>
+        <ul class="tips"><li>Une photo par face de la fiche, à plat, bien éclairée.</li><li>Pas de reflet sur le crayon, cadre la fiche entière.</li></ul>
+        <p class="privacy">Tes photos partent chez le service d'IA que tu choisis, pas dans le Carnet.</p>
+      </div></li>
+      <li class="pstep ${ready?"done":""}"><span class="pstep-n" aria-hidden="true">三</span><div class="pstep-b">
+        <p><b>Colle sa réponse ici</b> <span class="muted">(tout le texte, même s'il y a des phrases autour)</span></p>
+        <label class="sr" for="m-paste" hidden>Réponse de l'IA</label>
+        <textarea class="paste" id="m-paste" spellcheck="false" placeholder="{ &quot;schemaVersion&quot;: 2, &quot;name&quot;: … }">${esc(S.pasted)}</textarea>
+        <div class="row"><button type="button" class="btn" id="m-check" ${has?"":"disabled"}>Vérifier</button><button type="button" class="linkbtn" id="m-sample">Coller l'exemple (prototype)</button></div>
+      </div></li>
+    </ol>
+    ${renderResult()}
+    <div class="modal-actions"><button type="button" class="btn" id="m-cancel">Annuler</button>${ready?`<button type="button" class="btn primary" id="m-apply">${S.dest==="merge"?"Appliquer":"Importer"}</button>`:""}</div>
+  </div></div>`;
+  $("#m-bd").onclick=e=>{if(e.target.id==="m-bd")close();};
+  $("#m-cancel").onclick=close;
+  $("#m-copy").onclick=async()=>{try{await navigator.clipboard.writeText(PROMPT);}catch{const d=$("details.prompt");d.open=true;getSelection().selectAllChildren($("#m-pre"));}S.copied=true;keep(renderModal);};
+  const ta=$("#m-paste");
+  ta.oninput=()=>{S.pasted=ta.value;S.result=null;$("#m-check").disabled=!ta.value.trim();};
+  $("#m-sample").onclick=()=>{S.pasted=replyText(S.reply);S.result=null;renderModal();};
+  $("#m-check").onclick=check;
+  root.querySelectorAll("input[name=dest]").forEach(r=>r.onchange=()=>{S.dest=r.value;keep(renderModal);});
+  $("#m-apply")&&($("#m-apply").onclick=()=>{close();toast(S.dest==="merge"?"Fiche mise à jour":"Fiche importée : Hiruma Daisuke");});
+}
+function keep(fn){const m=$(".modal"),y=m?.scrollTop??0;fn();const n=$(".modal");if(n)n.scrollTop=y;}
+function check(){
+  const ex=extractJson(S.pasted);
+  if(!ex.ok){S.result=ex;}else{const errs=validate(ex.json);S.result=errs.length?{ok:false,errors:errs}:{ok:true,json:ex.json};}
+  keep(renderModal);
+  requestAnimationFrame(()=>$(".result, .import-errors")?.scrollIntoView({block:"nearest"}));
+}
+function close(){S.open=false;renderModal();}
+function toast(t){const el=$("#toast");el.textContent=t;el.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>el.hidden=true,2200);}
+
+const LEGEND={
+  lib:()=>`<p><span class="k">1</span>Troisième carte « Depuis une fiche papier » (kanji 写, « copier ») à côté de Fiche vierge et Forge. Sur l'accueil sans fiche, même carte.</p>
+    <p><span class="k">2</span>Fenêtre en trois étapes : copier le prompt (généré depuis <code>schema.ts</code>), l'envoyer à son IA avec les photos, coller la réponse.</p>
+    <p><span class="k">3</span>« Vérifier » extrait le JSON même entouré de texte ou de <code>\`\`\`json</code>, puis passe par <code>importCharacter</code>. Les chemins listés dans <code>_aVerifier</code> s'affichent en encadré ; la clé est ensuite ignorée (zod l'écarte).</p>`,
+  sheet:()=>`<p><span class="k">1</span>Sur une fiche ouverte, bouton « Depuis une photo… » à côté de « Importer un JSON… » : sert à rattraper une fiche papier tenue à jour en séance.</p>
+    <p><span class="k">2</span>Destination « Fusionner » par défaut : aperçu des modifications et ajouts de <code>mergeCharacter</code>, rien n'est supprimé.</p>
+    <p><span class="k">3</span>Teste « Tronquée » et « Valeur hors limites » : messages d'erreur qui disent quoi redemander à l'IA.</p>`
+};
+
+function seg(id,key,after){
+  document.querySelectorAll(`#${id} button`).forEach(b=>b.onclick=()=>{
+    S[key]=b.dataset.v;document.querySelectorAll(`#${id} button`).forEach(x=>x.setAttribute("aria-pressed",x===b));after();
+  });
+}
+seg("c-ctx","ctx",()=>{S.open=false;renderAll();});
+seg("c-reply","reply",()=>{if(S.open&&S.pasted){S.pasted=replyText(S.reply);S.result=null;renderModal();}});
+seg("c-theme","theme",()=>$("#app").dataset.theme=S.theme);
+seg("c-fmt","fmt",()=>$("#frame").className="frame "+S.fmt);
+function renderAll(){renderBody();renderModal();$("#legend").innerHTML=LEGEND[S.ctx]();}
+try{if(matchMedia("(prefers-color-scheme: dark)").matches&&document.documentElement.dataset.theme!=="light"){S.theme="dark";$("#app").dataset.theme="dark";document.querySelectorAll("#c-theme button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.v==="dark"));}}catch{}
+renderAll();
+S.open=true;S.copied=true;S.pasted=replyText("fenced");check();
+</script>

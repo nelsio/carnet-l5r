@@ -18,6 +18,7 @@ Un seul fichier HTML, **sans serveur ni compte** : tes fiches restent dans ton n
 - **Assistant L5R** par situation : Enquête, Cour, Déplacement, Combat (escarmouche, duel iaijutsu, bataille de masse) et Magie.
 - **Lanceur** : il lance les dés pour toi, ou t'indique comment lancer tes vrais dés. Chance de réussite contre le ND, augmentations, manœuvres, Vide.
 - **40 écoles** (bushi, courtisans, shugenja) et les maîtrises de compétence appliquées d'office.
+- **Import depuis une photo de fiche papier**, via l'IA de ton choix : le Carnet fournit le prompt, tu colles la réponse et tu vérifies.
 - **Suivi en partie** : blessures, points de Vide, emplacements de sorts, nouvelle journée.
 - **Sur téléphone** comme sur ordinateur, en thème clair ou sombre.
 

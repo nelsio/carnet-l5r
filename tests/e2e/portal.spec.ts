@@ -91,22 +91,25 @@ test.describe("O6 : menu Ressources à 390 px", () => {
 });
 
 test.describe("O7 : Bibliothèque vide", () => {
-  test("bureau : deux options de même largeur, côte à côte ; modèles sur trois colonnes", async ({ page }) => {
+  test("bureau : trois options de même largeur, côte à côte ; modèles sur trois colonnes", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto(pageUrl);
     const opts = page.locator(".start .start-opt");
-    const [a, b] = [(await opts.nth(0).boundingBox())!, (await opts.nth(1).boundingBox())!];
-    expect(Math.round(a.width)).toBe(Math.round(b.width));
-    expect(Math.round(a.y)).toBe(Math.round(b.y));
-    expect(Math.round(a.height)).toBe(Math.round(b.height));
+    await expect(opts).toHaveCount(3);
+    const [a, b, c] = [(await opts.nth(0).boundingBox())!, (await opts.nth(1).boundingBox())!, (await opts.nth(2).boundingBox())!];
+    for (const o of [b, c]) {
+      expect(Math.round(o.width)).toBe(Math.round(a.width));
+      expect(Math.round(o.y)).toBe(Math.round(a.y));
+      expect(Math.round(o.height)).toBe(Math.round(a.height));
+    }
     // Description plus longue d'un côté : étapes et boutons restent alignés, cases de même taille (v2.20.1).
     const boxes = async (sel: string) => Promise.all((await page.locator(`.start ${sel}`).all()).map(async (x) => (await x.boundingBox())!));
     const steps = await boxes(".steps li");
-    expect(steps).toHaveLength(6);
+    expect(steps).toHaveLength(9);
     expect(new Set(steps.map((s) => Math.round(s.y))).size).toBe(1);
     expect(new Set(steps.map((s) => Math.round(s.height))).size).toBe(1);
     const acts = await boxes(".start-opt-act");
-    expect(Math.round(acts[0]!.y)).toBe(Math.round(acts[1]!.y));
+    expect(new Set(acts.map((x) => Math.round(x.y))).size).toBe(1);
     // Lot 27 : Fiche vierge à gauche (ordre DOM et visuel), Forge à droite.
     await expect(opts.nth(0).getByRole("heading")).toHaveText("Fiche vierge");
     expect(b.x).toBeGreaterThan(a.x);
