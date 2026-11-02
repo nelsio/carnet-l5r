@@ -1,9 +1,11 @@
 /** Import et export de fiches (HANDOFF §8). */
 import { describe, expect, it } from "vitest";
 import {
-  exportFileName, importCharacter, MAX_CHARACTER_BYTES, migrate, parseCharacterFile, serializeCharacter, type Character,
+  exportFileName, importCharacter, MAX_CHARACTER_BYTES, mergeCharacter, migrate, parseCharacterFile, serializeCharacter, type Character,
 } from "@carnet/core";
+import isawa from "./fixtures/forge-isawa.json";
 import kakita from "./fixtures/kakita-v1.json";
+import mirumoto from "./fixtures/forge-mirumoto.json";
 
 const base = () => structuredClone(kakita) as Character;
 /** La même fiche au format courant (v2). */
@@ -55,5 +57,18 @@ describe("Import d'une fiche complète", () => {
   });
   it("laisse remonter une erreur inattendue", () => {
     expect(() => importCharacter({ f: () => 1 })).toThrow();
+  });
+});
+
+describe("Lot 39 : export JSON de la Forge (portail, 02/11/2026)", () => {
+  it.each([["bushi", mirumoto], ["shugenja", isawa]])("importe un export %s sans erreur", (_, json) => {
+    const r = importCharacter(structuredClone(json));
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.character).toMatchObject({ name: json.name, clan: json.clan, schoolId: json.schoolId });
+  });
+  it("fusionne un export dans une fiche existante", () => {
+    const r = mergeCharacter(v2(), structuredClone(isawa));
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.character.spells?.map((s) => s.name)).toEqual(isawa.spells.map((s) => s.name));
   });
 });

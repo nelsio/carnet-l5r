@@ -95,3 +95,24 @@ test("E5 : fusion ajoutant Kyujutsu et un arc : aperçu, puis tir sur Réflexes 
   await expect(page.getByText("Arc 2 + VD 2g2")).toBeVisible();
   await expect(page.getByText("Force 2 : l'arc de force 3 tire à 2.")).toBeVisible();
 });
+
+test("Lot 39 : export de la Forge importé depuis la Bibliothèque vide, puis avec fiches, puis en fusion", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto(pageUrl);
+  await importFile(page, resolve("tests/fixtures/forge-mirumoto.json"), /Nouvelle fiche/);
+  await dialog(page).getByRole("button", { name: "Importer" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Testeur Kitsuki" })).toBeVisible();
+
+  await page.getByRole("button", { name: "Carnet de Rokugan — ouvrir la bibliothèque" }).click();
+  await importFile(page, resolve("tests/fixtures/forge-isawa.json"), /Nouvelle fiche/);
+  await dialog(page).getByRole("button", { name: "Importer" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Testeur Shiba" })).toBeVisible();
+
+  await importFile(page, resolve("tests/fixtures/forge-mirumoto.json"), /Fusionner dans « Testeur Shiba »/);
+  await expect(dialog(page).getByRole("alert")).toHaveCount(0);
+  await dialog(page).getByRole("button", { name: "Appliquer" }).click();
+  await expect(dialog(page)).toBeHidden();
+  await expect(page.getByRole("heading", { level: 1, name: "Testeur Kitsuki" })).toBeVisible();
+  expect(errors).toEqual([]);
+});

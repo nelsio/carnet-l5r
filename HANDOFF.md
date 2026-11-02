@@ -6,9 +6,11 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document.
 
+**État au 02/11/2026 :** version **v2.26.0** : l'export JSON de la Forge s'importe dans le Carnet (annexe Q, lot 39). Lots 32 à 38 (annexes O et P) livrés en v2.23.1 à v2.25.2.
+
 **État au 31/10/2026 :** version **v2.23.0** (sorts depuis le grimoire du portail et autocomplétion de leur nom, annexe N ; correctifs v2.21.1 Safari, v2.21.2 Forge en attente, L.12, v2.21.3 `sharp`, M.5, et v2.21.4 liens de sort filtrés par élément, L.13), lots 1 à 31 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
 
-**Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie), F (lot 13 : shugenja et Magie), G (lot 14 : nom de l'outil dans l'en-tête), H (lots 15 et 16 : dépôt GitHub et correctifs), I (lots 17 à 19 : couleurs, Anneaux, sélecteurs), J (lot 20 : correctifs et retouches), K (lot 21 : points d'Insight), L (lots 22 et 23 : liens vers le portail de campagne), M (lots 24 et 25 : README allégé, liens vers le guide et le dépôt), N (lots 30 et 31 : sorts depuis le grimoire du portail), O (lots 32 à 37 : diffusion), P (lot 38 : référencement).
+**Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie), F (lot 13 : shugenja et Magie), G (lot 14 : nom de l'outil dans l'en-tête), H (lots 15 et 16 : dépôt GitHub et correctifs), I (lots 17 à 19 : couleurs, Anneaux, sélecteurs), J (lot 20 : correctifs et retouches), K (lot 21 : points d'Insight), L (lots 22 et 23 : liens vers le portail de campagne), M (lots 24 et 25 : README allégé, liens vers le guide et le dépôt), N (lots 30 et 31 : sorts depuis le grimoire du portail), O (lots 32 à 37 : diffusion), P (lot 38 : référencement), Q (lot 39 : Forge compatible).
 
 **Prochain lot (30/10/2026) :** à définir (§11, point 26). Les lots 24 et 25 (annexe M : README allégé, liens vers le guide et le dépôt) sont livrés ; la localisation est reportée.
 
@@ -602,7 +604,8 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 31. **v2.24.1 — mesure de fréquentation** (**livrée**, écarts en O.5 bis ; P13) : annexe O.5. Compteur GoatCounter ajouté au déploiement Pages seulement, titre fixe, script épinglé → cas W12 à W18.
 32. **v2.25.1 — portail « Les chroniques de Rokugan »** (**livrée**, écarts en O.2 bis ; P11) : annexe O.2, lot 37 (ancien lot 33). Libellés du portail renommés et neutres (`PORTAL_NAME`), guide et crédits → cas W5.
 33. **v2.25.2 — référencement** (**livrée**, écarts en P.2) : annexe P, lot 38. Balises, JSON-LD, sitemap, `og-image.png` et présentation statique sur l'adresse Pages.
-34. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
+34. **v2.26.0 — Forge compatible** (**livrée**, écarts en Q.2) : annexe Q, lot 39. `FORGE_JSON_OK` passe à `true`, fin des mentions « pas encore compatible ».
+35. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
 
 ---
 
@@ -2378,7 +2381,7 @@ Le Carnet renvoie vers le **portail de la campagne** du MJ (site statique sur Gi
 | Page | Adresse |
 |---|---|
 | Portail | `https://vincenzorpg.github.io/L5R/index.html` |
-| Forge de personnage | `…/createcharacter.html` (export JSON pas encore importable dans le Carnet : `FORGE_JSON_OK`, L.12) |
+| Forge de personnage | `…/createcharacter.html` (export JSON importable dans le Carnet : `FORGE_JSON_OK`, L.12, annexe Q) |
 | Grimoire | `…/grimoire.html` |
 | Page de clan | `…/clans/<slug>.html` (8 Grands Clans) |
 | Mémento de combat | `…/aides/combat-memento.html` |
@@ -2402,7 +2405,7 @@ Le Carnet renvoie vers le **portail de la campagne** du MJ (site statique sur Gi
 
 Un seul module porte toutes les adresses, pour qu'un changement d'URL du portail ne touche qu'un fichier : `PORTAL_BASE`, `PORTAL` (`home`, `forge`, `grimoire`, `combat`, `bushido`, `etiquette`), `clanUrl(clanId)` et `spellUrl(name, element?)` (élément ajouté au lot 29, L.13).
 
-Constante de configuration **`FORGE_JSON_OK`** (lot 27, L.12), `false` à ce jour. La passer à `true` quand les critères d'acceptation de `issues/issue-export-carnet-rokugan.md` (portail) sont validés, c'est-à-dire quand l'export JSON de la Forge s'importe sans erreur dans le Carnet ; retirer alors les phrases marquées `<!-- FORGE_JSON_OK -->` dans `docs/GUIDE.md`.
+Constante de configuration **`FORGE_JSON_OK`** (lot 27, L.12), **`true` depuis la v2.26.0** (lot 39, annexe Q) : l'export JSON de la Forge s'importe sans erreur dans le Carnet. Les branches `false` restent, pour revenir en arrière en une ligne si un export récent casse l'import.
 
 - `clanUrl` lit le champ **`portalSlug`** de la table des clans (`CLANS`, `src/rules/l5r4e.ts`) : `crabe`, `grue`, `dragon`, `lion`, `mante`, `phenix`, `scorpion`, `licorne`. Araignée, Familles impériales et clan non reconnu n'en ont pas → `null`.
 - `spellUrl` : `PORTAL.grimoire + "?q=" + encodeURIComponent(name.trim())`. Un nom vide renvoie `PORTAL.grimoire`.
@@ -2555,6 +2558,7 @@ L'export JSON de la Forge ne s'importe pas encore dans le Carnet (demande ouvert
 - **Ordre, dans les deux états** : Fiche vierge d'abord, avec le bouton principal (`btn accent`) ; Forge ensuite, bouton secondaire (`btn`). Description de Fiche vierge (L.3) : « Saisie directe dans le Carnet, depuis une fiche papier ou un personnage créé ailleurs. » En-tête : « Tu as déjà un fichier du Carnet ? »
 - **Grille** : les options pleines partagent quatre lignes (en-tête, encadré, étapes, bouton). La ligne de l'encadré est vide côté Fiche vierge : étapes et boutons restent alignés (L.11).
 - `--warn-pale` passe de 14 % à 12 % de `--warn` : à 14 %, `--warn` sur `--warn-pale` faisait 4,47:1 en clair.
+- **Depuis la v2.26.0** (annexe Q) : constante à `true`, état « en attente » testé seulement dans `tests/ui/forge-pending.spec.tsx` (constante simulée à `false`).
 - **Tests** : `tests/core.portal.spec.ts` (constante à `false`), `tests/ui/portal.spec.tsx` (ordre, pastille, encadré, menu), `tests/ui/forge-ok.spec.tsx` (constante simulée à `true` par `vi.mock` : le build livré ne permet pas de la changer dans Playwright), `tests/e2e/portal.spec.ts` (ordre bureau et 390 px, pastille dans la carte et dans le menu, sans défilement horizontal), `tests/colors.spec.ts` (contraste ≥ 4,5:1 dans les deux thèmes).
 
 ### L.13 Lot 29 : liens des sorts filtrés par élément (v2.21.4)
@@ -3239,3 +3243,24 @@ Source : `handoff-seo-carnet-l5r.md`, reçu le 01/11/2026. Objectif : rendre le 
 ### P.3 Après déploiement (Nelson)
 
 Critères à vérifier en ligne : `curl` sur « Cinq Anneaux », `sitemap.xml` et `og-image.png` en 200, JSON-LD sur validator.schema.org, aperçu Discord. Puis Search Console, Bing, sujets du dépôt et lien retour depuis le portail, comme listés dans le handoff.
+
+---
+
+## Annexe Q — Lot 39 : Forge compatible (v2.26.0)
+
+Source : `handoff-forge-compatible.md`, reçu le 02/11/2026. Décision de Nelson : l'export JSON de la Forge s'importe dans le Carnet, on retire les mentions « pas encore compatible ». Les champs encore absents de l'export relèvent du portail.
+
+### Q.1 Livré
+
+- **`FORGE_JSON_OK = true`** (`src/rules/portal.ts`). Effet déjà codé (L.12, état `true`) : carte Forge sans pointillés, pastille ni encadré, étapes Forger · Exporter · Importer, « Création guidée, puis export JSON à importer ici. », menu Ressources « Exporte un JSON compatible avec le Carnet ». Ordre inchangé : Fiche vierge d'abord (bouton principal), Forge ensuite.
+- **Branches `false` conservées** (`ForgePending`, styles `.wait` et `.pend`, encadré 待) pour revenir en arrière en une ligne. Leur nettoyage fera l'objet d'un lot ultérieur si la Forge reste stable.
+- **Guide** : phrases marquées `<!-- FORGE_JSON_OK -->` remplacées (« Elle exporte un JSON compatible avec le Carnet : importe-le ici avec **Importer un JSON**. », « puis importer son JSON »).
+- **Présentation injectée** (`scripts/pages-seo.mjs`, P.2) : le lien vers Les chroniques de Rokugan reprend « créateur de personnage compatible ».
+- **Tests** : `tests/core.portal.spec.ts` (constante à `true`) ; `tests/ui/portal.spec.tsx` et `tests/e2e/portal.spec.ts` sur l'état compatible (sans `.pend` ni encadré, étapes, description du menu, ligne Forge sans défilement horizontal à 390 px) ; `tests/ui/forge-ok.spec.tsx` renommé `tests/ui/forge-pending.spec.tsx`, constante simulée à `false`, pour garder les branches `false` testées ; `tests/seo.spec.ts` (mention compatible).
+- **Exports réels de la Forge** (portail en ligne, 02/11/2026) : `tests/fixtures/forge-mirumoto.json` (bushi) et `tests/fixtures/forge-isawa.json` (shugenja). Importés sans erreur en nouvelle fiche et en fusion (`tests/core.io.spec.ts`), et dans le build depuis la Bibliothèque vide, la Bibliothèque avec fiches et en fusion sur une fiche ouverte (`tests/e2e/import-export.spec.ts`).
+
+### Q.2 Écarts avec le handoff
+
+- **`forge-ok.spec.tsx`** : ses attentes passent dans `portal.spec.tsx` ; le fichier devient le cas inverse (`forge-pending.spec.tsx`), qui reprend les attentes « lot 27 » retirées de `portal.spec.tsx`.
+- **Critère « un JSON de la Forge s'importe »** : vérifié en automatique avec deux exports réels, ajoutés en fixtures, plutôt qu'à la main seulement.
+- **Constat pour le portail** (hors lot, suivi `issues/issue-export-carnet-rokugan.md`) : dans ces exports, `schoolRank` vaut `null`, `techniques`, `maneuvers`, `modifiers`, `advantages` et `disadvantages` sont vides, `spellSlotsUsed` est absent (shugenja). `affinity` est présent et reconnu par le Carnet.

@@ -124,25 +124,23 @@ test.describe("O7 : Bibliothèque vide", () => {
     const steps = (await opts.nth(0).locator("li").all());
     const ys = await Promise.all(steps.map(async (s) => (await s.boundingBox())!.y));
     expect(ys[1]!).toBeGreaterThan(ys[0]!);
-    // Lot 27 : Fiche vierge en haut, Forge dessous, pastille entière dans la carte.
+    // Lot 27 : Fiche vierge en haut, Forge dessous ; lot 39 : plus de pastille.
     await expect(opts.nth(0).getByRole("heading")).toHaveText("Fiche vierge");
-    const pend = (await opts.nth(1).locator(".pend").boundingBox())!;
-    expect(pend.x + pend.width).toBeLessThanOrEqual(b.x + b.width);
-    expect(pend.height).toBeLessThan(30);
+    await expect(opts.nth(1).locator(".pend")).toHaveCount(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   });
 });
 
-test.describe("Lot 27 : Forge pas encore compatible", () => {
-  test("Bibliothèque vide : Fiche vierge d'abord (bouton principal), Forge avec pastille, encadré et étape « Recopier »", async ({ page }) => {
+test.describe("Lot 27, lot 39 : Forge compatible, ordre conservé", () => {
+  test("Bibliothèque vide : Fiche vierge d'abord (bouton principal), Forge sans pastille ni encadré, étapes Forger · Exporter · Importer", async ({ page }) => {
     await page.goto(pageUrl);
     const opts = page.locator(".start .start-opt");
     await expect(opts.nth(0).getByRole("heading")).toHaveText("Fiche vierge");
     await expect(opts.nth(0).getByRole("button", { name: "Nouvelle fiche vierge" })).toHaveClass(/\baccent\b/);
     const forge = opts.nth(1);
-    await expect(forge.locator(".pend")).toHaveText("JSON pas encore compatible");
-    await expect(forge.getByRole("note")).toContainText("L'import direct arrive bientôt.");
-    await expect(forge.locator(".step-s")).toHaveText(["Forger", "Recopier", "Importer"]);
+    await expect(forge.locator(".pend")).toHaveCount(0);
+    await expect(forge.getByRole("note")).toHaveCount(0);
+    await expect(forge.locator(".step-s")).toHaveText(["Forger", "Exporter", "Importer"]);
     const link = forge.getByRole("link", { name: "Ouvrir la Forge (nouvel onglet)" });
     await expect(link).toHaveAttribute("href", "https://vincenzorpg.github.io/L5R/createcharacter.html");
     await expect(link).toHaveAttribute("target", "_blank");
@@ -150,27 +148,28 @@ test.describe("Lot 27 : Forge pas encore compatible", () => {
     await expect(link).not.toHaveClass(/\baccent\b/);
   });
 
-  test("Bibliothèque avec fiches : même ordre, pastille ; menu Ressources : pastille et nouvelle description", async ({ page }) => {
+  test("Bibliothèque avec fiches : même ordre, sans pastille ; menu Ressources : description compatible", async ({ page }) => {
     await page.goto(pageUrl);
     await page.getByRole("button", { name: "Utiliser le modèle Bushi" }).click();
     await page.getByRole("button", { name: "Carnet de Rokugan — ouvrir la bibliothèque" }).click();
     const opts = page.locator(".newchar .start-opt");
     await expect(opts.nth(0).getByRole("heading")).toHaveText("Fiche vierge");
-    await expect(opts.nth(1).locator(".pend")).toBeVisible();
+    await expect(opts.nth(1).locator(".pend")).toHaveCount(0);
+    await expect(opts.nth(1)).toContainText("Création guidée, puis export JSON à importer ici.");
     await resources(page).click();
     const forge = menu(page).getByRole("menuitem", { name: /^Forge de personnage/ });
-    await expect(forge.locator(".pend")).toBeVisible();
-    await expect(forge).toContainText("Création guidée. Pour l'instant, recopie le résultat dans une fiche vierge.");
+    await expect(forge.locator(".pend")).toHaveCount(0);
+    await expect(forge).toContainText("Exporte un JSON compatible avec le Carnet");
   });
 
-  test("390 px : menu Ressources, pastille dans la ligne Forge, sans défilement horizontal", async ({ page }) => {
+  test("390 px : menu Ressources, ligne Forge sans défilement horizontal", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(pageUrl);
     await resources(page).click();
     const forge = menu(page).getByRole("menuitem", { name: /^Forge de personnage/ });
     const row = (await forge.boundingBox())!;
-    const pend = (await forge.locator(".pend").boundingBox())!;
-    expect(pend.x + pend.width).toBeLessThanOrEqual(row.x + row.width);
+    const items = await menu(page).boundingBox();
+    expect(row.x + row.width).toBeLessThanOrEqual(items!.x + items!.width + 1);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   });
 });

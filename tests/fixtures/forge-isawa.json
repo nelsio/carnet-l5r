@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 2,
+  "name": "Testeur Shiba",
+  "clan": "Phénix",
+  "family": "Shiba",
+  "school": "Shugenja Isawa",
+  "schoolId": "isawa-shugenja",
+  "schoolRank": null,
+  "insightRank": 1,
+  "honor": 4.5,
+  "glory": 1,
+  "status": 1,
+  "xp": {
+    "total": 40,
+    "spent": 0
+  },
+  "traits": {
+    "stamina": 2,
+    "willpower": 3,
+    "strength": 2,
+    "perception": 3,
+    "agility": 2,
+    "intelligence": 2,
+    "reflexes": 2,
+    "awareness": 2
+  },
+  "voidRing": 2,
+  "voidPoints": 2,
+  "wounds": 0,
+  "armor": {
+    "name": "",
+    "bonus": 0,
+    "reduction": 0,
+    "catalogId": "none"
+  },
+  "skills": [
+    {
+      "name": "Kenjutsu",
+      "rank": 1,
+      "trait": "agility",
+      "emphases": [
+        "Katana"
+      ]
+    }
+  ],
+  "weapons": [
+    {
+      "name": "Katana",
+      "skill": "Kenjutsu",
+      "dr": "3g2",
+      "keywords": [
+        "samourai",
+        "moyenne"
+      ]
+    }
+  ],
+  "techniques": [],
+  "maneuvers": [],
+  "modifiers": [],
+  "spells": [
+    {
+      "id": "sentir",
+      "name": "Sentir",
+      "element": "all",
+      "mastery": 1,
+      "keywords": [
+        "Divination"
+      ],
+      "range": "Personnelle",
+      "area": "Rayon de 15 m",
+      "duration": "Instantanée",
+      "raises": "Portée (+5 m)",
+      "damage": "",
+      "memorized": true,
+      "effect": "Ressent la présence, la quantité et l'humeur des esprits élémentaires dans la zone."
+    },
+    {
+      "id": "communier",
+      "name": "Communier",
+      "element": "all",
+      "mastery": 1,
+      "keywords": [
+        "Divination"
+      ],
+      "range": "Personnelle",
+      "area": "Les esprits contactés",
+      "duration": "Concentration",
+      "raises": "Questions (+1)",
+      "damage": "",
+      "memorized": true,
+      "effect": "Pose des questions aux esprits d'un élément présent pour connaître les événements passés."
+    },
+    {
+      "id": "invoquer",
+      "name": "Invoquer",
+      "element": "all",
+      "mastery": 1,
+      "keywords": [
+        "Artisanat"
+      ],
+      "range": "Toucher",
+      "area": "Une petite quantité",
+      "duration": "Permanente",
+      "raises": "Quantité accrue",
+      "damage": "",
+      "memorized": true,
+      "effect": "Fait apparaître une petite quantité pure de l'élément souhaité (eau fraîche, braise, terreau, brise)."
+    }
+  ],
+  "advantages": "",
+  "disadvantages": "",
+  "notes": "Robes somptueuses brodées de flammes, Wakizashi, Étui de parchemins sacrés, 5 koku",
+  "affinity": "fire"
+}
