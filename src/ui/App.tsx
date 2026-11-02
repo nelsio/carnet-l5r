@@ -5,6 +5,7 @@ import { AppFooter } from "./components/AppFooter";
 import { Header } from "./components/Header";
 import { ImportDialog } from "./components/ImportDialog";
 import { Library } from "./components/Library";
+import { PhotoImportDialog } from "./components/PhotoImportDialog";
 import { Sheet } from "./components/Sheet";
 import { Stats } from "./components/Stats";
 import { StatusBar } from "./components/StatusBar";
@@ -29,7 +30,12 @@ export function App({ storage, rng = d10, ...libraryOptions }: AppProps) {
   const startImport = useCallback((file: File) => {
     void file.text().then((text) => setPending({ fileName: file.name, text }));
   }, []);
-  const store = useMemo<Store>(() => ({ state, dispatch, rng, library: api, grimoire, startImport }), [state, rng, api, grimoire, startImport]);
+  const [photoImport, setPhotoImport] = useState(false);
+  const startPhotoImport = useCallback(() => setPhotoImport(true), []);
+  const store = useMemo<Store>(
+    () => ({ state, dispatch, rng, library: api, grimoire, startImport, startPhotoImport }),
+    [state, rng, api, grimoire, startImport, startPhotoImport],
+  );
   const { character: c, ui } = state;
   useThemeAndClan(ui.theme, c?.clan);
 
@@ -62,6 +68,7 @@ export function App({ storage, rng = d10, ...libraryOptions }: AppProps) {
           {api.saveStatus === "error" && <span className="save-error" role="alert">Échec de l'enregistrement dans ce navigateur</span>}
         </>} />
         {pending && <ImportDialog pending={pending} onClose={() => setPending(null)} />}
+        {photoImport && <PhotoImportDialog onClose={() => setPhotoImport(false)} />}
       </div>
     </StoreContext.Provider>
   );

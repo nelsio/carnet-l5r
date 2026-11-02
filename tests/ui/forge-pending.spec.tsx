@@ -23,7 +23,7 @@ describe("Forge pas encore compatible (FORGE_JSON_OK = false)", () => {
     await renderApp(null);
     const start = screen.getByRole("region", { name: "Pas encore de personnage ?" });
     const options = within(start).getAllByRole("article");
-    expect(options.map((o) => within(o).getByRole("heading").textContent)).toEqual(["Fiche vierge", "Forger sur le portail JSON pas encore compatible"]);
+    expect(options.map((o) => within(o).getByRole("heading").textContent)).toEqual(["Fiche vierge", "Forger sur le portail JSON pas encore compatible", "Depuis une fiche papier"]);
     const forge = options[1]!;
     expect(forge).toHaveClass("start-opt", "wait");
     const pend = within(forge).getByText("JSON pas encore compatible");

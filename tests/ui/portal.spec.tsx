@@ -158,14 +158,14 @@ describe("O5 : menu Ressources au clavier", () => {
 });
 
 describe("O7 : Bibliothèque vide", () => {
-  it("deux options, trois étapes chacune, import en lien", async () => {
+  it("trois options, trois étapes chacune, import en lien", async () => {
     await renderApp(null);
     const start = screen.getByRole("region", { name: "Pas encore de personnage ?" });
     expect(within(start).getByRole("button", { name: "Importer un JSON" })).toHaveClass("linkbtn");
     expect(start).toHaveTextContent("Tu as déjà un fichier du Carnet ? Importer un JSON");
     const options = within(start).getAllByRole("article");
     // Lot 27 : Fiche vierge d'abord, avec le bouton principal ; la Forge ensuite, bouton secondaire.
-    expect(options.map((o) => within(o).getByRole("heading").textContent)).toEqual(["Fiche vierge", "Forger sur le portail"]);
+    expect(options.map((o) => within(o).getByRole("heading").textContent)).toEqual(["Fiche vierge", "Forger sur le portail", "Depuis une fiche papier"]);
     for (const o of options) expect(within(o).getAllByRole("listitem")).toHaveLength(3);
     expect(within(options[0]!).getByRole("button", { name: "Nouvelle fiche vierge" })).toHaveClass("btn", "accent");
     const forge = within(options[1]!).getByRole("link", { name: "Ouvrir la Forge (nouvel onglet)" });

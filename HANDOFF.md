@@ -6,11 +6,13 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document.
 
+**État au 02/11/2026 (lot 42) :** version **v2.27.0** : import d'un personnage depuis une fiche papier, via l'IA du joueur (annexe S).
+
 **État au 02/11/2026 :** version **v2.26.2** : l'export JSON de la Forge s'importe dans le Carnet (v2.26.0, annexe Q, lot 39) ; installé, le Carnet s'appelle « Carnet L5R » (v2.26.1, annexe Q bis, lot 40) ; la note de règles se déplie depuis le pied de page (v2.26.2, annexe R, lot 41). Lots 32 à 38 (annexes O et P) livrés en v2.23.1 à v2.25.2.
 
 **État au 31/10/2026 :** version **v2.23.0** (sorts depuis le grimoire du portail et autocomplétion de leur nom, annexe N ; correctifs v2.21.1 Safari, v2.21.2 Forge en attente, L.12, v2.21.3 `sharp`, M.5, et v2.21.4 liens de sort filtrés par élément, L.13), lots 1 à 31 livrés (§11) dont le lot 13 shugenja et Magie (annexe F, v2.9.0 à v2.12.0) et le lot 14 nom de l'outil dans l'en-tête (annexe G, v2.13.0 et v2.13.1), format de fiche `schemaVersion: 2`. **Lot 12** (annexe E, validée le 24/10/2026) livré : v2.2.0 (correctifs de règles et retouches d'interface), v2.3.0 (combat complet), v2.4.0 (maîtrises et armures), v2.5.0 (récupération), v2.6.0 (vocabulaire français), v2.7.0 (bataille de masse) et v2.8.0 (bloc Armure et retouches d'interface, E.18 et E.19).
 
-**Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie), F (lot 13 : shugenja et Magie), G (lot 14 : nom de l'outil dans l'en-tête), H (lots 15 et 16 : dépôt GitHub et correctifs), I (lots 17 à 19 : couleurs, Anneaux, sélecteurs), J (lot 20 : correctifs et retouches), K (lot 21 : points d'Insight), L (lots 22 et 23 : liens vers le portail de campagne), M (lots 24 et 25 : README allégé, liens vers le guide et le dépôt), N (lots 30 et 31 : sorts depuis le grimoire du portail), O (lots 32 à 37 : diffusion), P (lot 38 : référencement), Q (lots 39 et 40 : Forge compatible, nom de l'appli installée).
+**Ordre de lecture :** §1 Périmètre → §2 Architecture → §3 Données → §4 Moteur de règles → §5 Stockage → §6 Interface → §7 Mobile → §8 Import/export → §9 Distribution GitHub → §10 Tests → §11 Lots → §12 Points ouverts. Annexes : A (format v0), B (bonus de jet), C (écoles bushi), D (courtisans et Shosuro), E (lot 12 : règles du livre, combat complet, ergonomie), F (lot 13 : shugenja et Magie), G (lot 14 : nom de l'outil dans l'en-tête), H (lots 15 et 16 : dépôt GitHub et correctifs), I (lots 17 à 19 : couleurs, Anneaux, sélecteurs), J (lot 20 : correctifs et retouches), K (lot 21 : points d'Insight), L (lots 22 et 23 : liens vers le portail de campagne), M (lots 24 et 25 : README allégé, liens vers le guide et le dépôt), N (lots 30 et 31 : sorts depuis le grimoire du portail), O (lots 32 à 37 : diffusion), P (lot 38 : référencement), Q (lots 39 et 40 : Forge compatible, nom de l'appli installée), R (lot 41 : note de règles dans le pied de page), S (lot 42 : import depuis une fiche papier).
 
 **Prochain lot (30/10/2026) :** à définir (§11, point 26). Les lots 24 et 25 (annexe M : README allégé, liens vers le guide et le dépôt) sont livrés ; la localisation est reportée.
 
@@ -414,7 +416,7 @@ Point de rupture : **largeur ≤ 720 px**. Au-dessus, mise en page bureau inchan
 « Exporter la fiche » télécharge `<nom-normalisé>-l5r.json` : JSON indenté, `schemaVersion` inclus. Disponible pour toutes les fiches, y compris en consultation.
 
 ### Import
-Depuis un fichier (bouton ou glisser-déposer). Trois destinations :
+Depuis un fichier (bouton ou glisser-déposer), ou depuis une **fiche papier** (« Depuis une photo… », annexe S) : l'IA du joueur lit ses photos avec le prompt du Carnet, il colle la réponse, `extractPhotoReply` en tire le JSON, qui suit ensuite le même chemin qu'un fichier. Trois destinations :
 
 | Destination | Effet |
 |---|---|
@@ -607,7 +609,8 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 34. **v2.26.0 — Forge compatible** (**livrée**, écarts en Q.2) : annexe Q, lot 39. `FORGE_JSON_OK` passe à `true`, fin des mentions « pas encore compatible ».
 35. **v2.26.1 — nom de l'appli installée** (**livrée**, écarts en Q.4) : annexe Q bis, lot 40. `short_name` « Carnet L5R » et balise `apple-mobile-web-app-title`, au déploiement Pages seulement.
 36. **v2.26.2 — note de règles dans le pied de page** (**livrée**, écarts en R.2) : annexe R, lot 41. La note « Règles de référence » quitte le bas de chaque écran pour la pastille repliable **Règles L5R 4e** du pied de page.
-37. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
+37. **v2.27.0 — import depuis une fiche papier** (**livrée**, écarts en S.3) : annexe S, lot 42. Prompt généré depuis le schéma, réponse de l'IA collée, extraite puis importée par le chemin habituel, encadré « À vérifier » → cas P1 à P7.
+38. **À définir** : journal d'achats en XP (K.6), **localisation** (français + anglais, reportée le 30/10/2026, spécification d'origine dans `handoff/handoff-lots-15-17.md`, lot 17), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
 
 ---
 
@@ -3312,3 +3315,52 @@ Source : `handoff-pied-de-page.md`, reçu le 02/11/2026. Maquette `reference/pro
 - **360 px** : nom, version et pastille ne tiennent pas sur une ligne ; la pastille passe sur sa propre ligne, entre le nom et les liens. Le critère « sur la ligne de la version » n'est donc vérifié qu'à 390 px (le handoff ne l'exige qu'à cette largeur).
 - **R6** : la tabulation part du lien de version (focus posé dessus) plutôt que du haut de la page, pour vérifier l'ordre sans dépendre du nombre de contrôles de l'écran.
 - **Captures du README** : inchangées, elles montrent le haut des écrans.
+
+## Annexe S — Lot 42 : import depuis une fiche papier (v2.27.0)
+
+Source : `handoff-import-photo.md`, reçu le 02/11/2026. Maquette `reference/prototype-import-photo.html`, option **C** retenue par Nelson : le Carnet fournit un prompt, le joueur l'envoie avec ses photos à l'IA qu'il utilise déjà, puis colle la réponse. Pas d'OCR local, pas d'appel d'API, pas d'envoi de photo depuis le Carnet : aucune requête nouvelle, aucune dépendance ajoutée. Livré en une PR (pas de découpage 42a / 42b).
+
+### S.1 Livré
+
+- **`src/core/photo.ts`** (exporté par `src/core/index.ts`) :
+  - `buildPhotoPrompt()` : rôle, règles, squelette commenté de la fiche v2. Les lignes des Traits viennent de `TRAIT_KEYS`, `TRAIT_LABELS` et `RINGS` (« `"awareness": 2  // Vigilance (Air) (Intuition sur certaines fiches)` ») ; les valeurs de `skills[].trait` et `spells[].element` de `ROLL_TRAITS` et `SPELL_ELEMENTS`.
+  - `PHOTO_PROMPT_FIELDS` / `PHOTO_PROMPT_SKIPPED` : garde-fou contre la dérive du schéma (P1).
+  - `extractPhotoReply(text)` : du premier `{` au dernier `}`, puis `parseCharacterFile` (limite de taille inchangée). Trois messages : pas de JSON, JSON incomplet ou abîmé (avec la phrase à redemander à l'IA), pas une fiche. `_aVerifier` est **toujours retiré** du JSON ; `review` n'en garde que les textes, sans doublons, désignant une valeur présente, 50 au plus.
+  - `reviewLabel(path, json)` et `valueAtPath(json, path)` : libellé et valeur de chaque ligne de l'encadré.
+- **`src/ui/components/ImportReview.tsx`** : `Modal` (fond, Échap) et `ImportReview` (destination, aperçu ou modifications et ajouts, erreurs, Annuler / Importer / Appliquer), extraits d'`ImportDialog`, qui garde son comportement. `show` passe dans `src/ui/format.ts`.
+- **`src/ui/components/PhotoImportDialog.tsx`** : « Importer depuis une fiche papier », trois étapes 一 二 三 (pastille pleine : prompt copié, réponse lue), copie avec repli (prompt déplié et sélectionné), conseils photo, encadré de confidentialité, champ « Réponse de l'IA », « Vérifier » ; puis `ImportReview` avec l'encadré **À vérifier sur ta fiche (n)** au-dessus de l'aperçu. Modifier le texte collé efface le résultat. Aucun lien vers un service d'IA.
+- **Points d'entrée** (`startPhotoImport` dans le `Store`, bouton `PhotoImportButton`) : troisième carte 写 de la Bibliothèque avec fiches (grille à trois colonnes) ; troisième `StartOption` de la Bibliothèque vide (Photographier · Demander · Coller, « Trois façons de commencer ») ; bloc **Fichier** d'une fiche ouverte, après « Importer un JSON… », masqué en consultation, fusion par défaut, phrase d'aide « un fichier ou une fiche papier ».
+- **Styles** : `.psteps`, `details.prompt`, `.tips`, `.privacy`, `textarea.paste`, `.verify` (`--warn` sur `--warn-pale`) ; boutons des étapes à 44 px à 720 px et moins.
+- **Docs** : guide § 3 (« Depuis une fiche papier »), README (une ligne), CHANGELOG 2.27.0, §8.
+- **Tests** : `tests/core.photo.spec.ts` (P1 à P7), `tests/ui/photo-import.spec.tsx` (trois points d'entrée, copie et refus, « Vérifier » désactivé, encadré, nouvelle fiche, fusion, consultation, Échap et fond), `tests/e2e/import-export.spec.ts` (réponse collée dans la Bibliothèque vide sans aucune requête ; 390 px : feuille du bas, boutons ≥ 44 px, pas de défilement horizontal), `tests/e2e/portal.spec.ts` (O7 : trois cartes alignées, neuf étapes). Fixture `tests/fixtures/photo-reponse.txt` (Hiruma Daisuke, fictif).
+
+| Cas | Vérifie |
+|---|---|
+| P1 | Chaque clé de `characterShape` est dans `PHOTO_PROMPT_FIELDS` ou `PHOTO_PROMPT_SKIPPED`, jamais les deux ; idem pour les sous-champs de `xp`, `armor`, `skills`, `weapons`, `techniques`, `spells` |
+| P2 | Le prompt cite chaque Trait avec son libellé et son Anneau, `schemaVersion: 2`, `3g2`, `_aVerifier`, les éléments de sort |
+| P3 | JSON seul, entouré de texte, en bloc ```` ```json ```` : même `json` |
+| P4 | Réponse coupée, sans accolade, tableau à la racine, fichier trop gros : refusés |
+| P5 | `_aVerifier` retiré ; `review` sans doublons, 50 au plus, sans chemin absent ; ignoré s'il n'est pas une liste de textes |
+| P6 | `importCharacter` et `mergeCharacter` sur le JSON extrait : `ok`, aucun avertissement |
+| P7 | `reviewLabel` : Trait, Anneau de Vide, Gloire, XP, compétence (avec élision « Rang d'Athlétisme »), arme, chemin inconnu |
+
+### S.2 Prompt
+
+Le prompt ne demande pas `schoolId`, `insightBonus`, `maneuvers`, `modifiers`, `affinity`, `spellSlotsUsed`, `armor.catalogId`, `weapons[].keywords`, ni, dans `spells`, autre chose que `id`, `name`, `element` et `mastery` : l'import les remplit (école « aucune », manœuvres par défaut, mots-clés d'arme déduits par `migrate()`).
+
+### S.3 Écarts avec le handoff
+
+- **Règle ajoutée au prompt** : « sans les commentaires // du modèle ». Le squelette est commenté ; une IA qui les recopierait produirait un JSON illisible pour `JSON.parse`.
+- **`PHOTO_PROMPT_SKIPPED`** contient aussi les sous-champs ignorés, sous forme de chemins (`armor.catalogId`, `weapons[].keywords`, `spells[].range`…), et P1 les vérifie : un nouveau sous-champ du schéma fait aussi échouer le test.
+- **Tableau à la racine** : avec la règle « premier `{`, dernier `}` », `[{…}]` donnerait l'objet intérieur. Une réponse qui commence par `[` (après un éventuel ```` ``` ````) est donc refusée d'emblée (« pas une fiche »). La vérification de l'objet après analyse reste, par sécurité. Un `{` sans `}` derrière donne le message « incomplet ou abîmé », pas « pas de JSON ».
+- **`valueAtPath`** exporté en plus : l'encadré affiche la valeur lue dans le JSON collé.
+- **Pastilles des étapes** : la 1re se remplit après une copie réussie (pas en cas de repli), la 3e quand la réponse est lue, même si la validation refuse ensuite une valeur ; la 2e reste vide (comme la maquette).
+- **Résumé nouvelle fiche** : la ligne actuelle d'`ImportDialog` ; le bloc Anneaux et compteurs de la maquette (facultatif) n'est pas fait.
+- **Grille des options** : `repeat(auto-fit, minmax(260px, 1fr))` avec subgrid. Un `row-gap` sur la grille se reportait dans chaque carte (le subgrid le compense par des marges) : les rangées sont espacées par une marge sous chaque carte, rattrapée par une marge négative de la grille. À 768 px, deux cartes puis une. Les titres d'étape passent en césure (`hyphens:auto`) : « Photographier » débordait de sa case à 1280 et 1024 px.
+- **README** : il n'y a qu'un `README.md`, en français ; pas de `README-fr.md` ni de version anglaise, donc une seule ligne.
+- **Couleurs** : le couple `--warn` / `--warn-pale` est déjà vérifié dans les deux thèmes (`tests/colors.spec.ts`, lot 27) : pas de nouveau cas.
+- **Maquette** : versionnée dans `reference/` ; le handoff lui-même reste hors du dépôt, comme les précédents.
+
+### S.4 Vérification manuelle (Nelson, après déploiement)
+
+Copier le prompt depuis le Carnet, l'envoyer avec les photos de la fiche d'Okado Hiruma à deux IA différentes, coller chaque réponse. Noter les champs mal lus : ils serviront à ajuster le prompt dans un lot de suivi.

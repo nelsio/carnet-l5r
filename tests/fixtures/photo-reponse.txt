@@ -1,0 +1,58 @@
+Voici la transcription de ta fiche :
+
+```json
+{
+  "schemaVersion": 2,
+  "name": "Hiruma Daisuke",
+  "clan": "Crabe",
+  "family": "Hiruma",
+  "school": "École de bushi Hiruma",
+  "schoolRank": null,
+  "insightRank": 3,
+  "honor": 4.5,
+  "glory": 2.1,
+  "status": 1,
+  "xp": { "total": 112, "spent": 104 },
+  "traits": {
+    "stamina": 3,
+    "willpower": 3,
+    "strength": 3,
+    "perception": 3,
+    "agility": 4,
+    "intelligence": 2,
+    "reflexes": 4,
+    "awareness": 2
+  },
+  "voidRing": 3,
+  "voidPoints": 3,
+  "wounds": 0,
+  "armor": { "name": "Armure légère", "bonus": 5, "reduction": 3 },
+  "skills": [
+    { "name": "Kenjutsu", "rank": 4, "trait": "agility", "emphases": ["Katana"] },
+    { "name": "Kyujutsu", "rank": 3, "trait": "reflexes", "emphases": [] },
+    { "name": "Athlétisme", "rank": 2, "trait": "strength", "emphases": [] },
+    { "name": "Défense", "rank": 3, "trait": "reflexes", "emphases": [] },
+    { "name": "Discrétion", "rank": 3, "trait": "agility", "emphases": ["Silence"] },
+    { "name": "Chasse", "rank": 3, "trait": "perception", "emphases": ["Pistage"] },
+    { "name": "Connaissance : Outremonde", "rank": 2, "trait": "intelligence", "emphases": [] },
+    { "name": "Investigation", "rank": 2, "trait": "perception", "emphases": [] }
+  ],
+  "weapons": [
+    { "name": "Katana", "skill": "Kenjutsu", "dr": "3g2" },
+    { "name": "Wakizashi", "skill": "Kenjutsu", "dr": "2g2" },
+    { "name": "Daikyu", "skill": "Kyujutsu", "dr": "2g2", "bowStrength": 4 }
+  ],
+  "techniques": [
+    { "name": "Rang 1 : Le Chemin dans l'ombre", "text": "Texte de la technique, recopié de la fiche." },
+    { "name": "Rang 2 : Danse avec la mort", "text": "Texte de la technique, recopié de la fiche." },
+    { "name": "Rang 3 : Le Fléau du Néant", "text": "Texte de la technique, recopié de la fiche." }
+  ],
+  "spells": [],
+  "advantages": "Rapide\nSens aigus",
+  "disadvantages": "Phobie : la Terre de l'Ombre",
+  "notes": "",
+  "_aVerifier": ["traits.intelligence", "skills[6].rank", "glory"]
+}
+```
+
+Trois valeurs étaient difficiles à lire, je les ai listées dans _aVerifier.

@@ -22,6 +22,12 @@ export function ImportButton({ label = "Importer un JSON…", className = "btn" 
   );
 }
 
+/** Bouton « Depuis une photo… » : fenêtre d'import depuis une fiche papier (lot 42). */
+export function PhotoImportButton({ className = "btn" }: { className?: string }) {
+  const { startPhotoImport } = useStore();
+  return <button type="button" className={className} onClick={startPhotoImport}>Depuis une photo…</button>;
+}
+
 /** Export et import depuis la fiche (HANDOFF §8). L'export reste possible en consultation. */
 export function FileActions() {
   const { state, library } = useStore();
@@ -34,6 +40,7 @@ export function FileActions() {
       <div className="file-actions">
         <button type="button" className="btn" onClick={() => downloadText(exportFileName(c), serializeCharacter(c))}>Exporter la fiche</button>
         {!readonly && <ImportButton />}
+        {!readonly && <PhotoImportButton />}
         {!readonly && file.supported && file.state === "none" && (
           <button type="button" className="btn" onClick={() => void library.linkFile()}>Lier à un fichier…</button>
         )}
@@ -46,7 +53,7 @@ export function FileActions() {
       )}
       <p className="hint">
         L'export télécharge un fichier JSON à ranger où tu veux, par exemple le dossier partagé de ton groupe (Drive, Dropbox…).
-        {!readonly && " L'import peut aussi fusionner un fichier dans cette fiche, avec un aperçu avant d'appliquer. Tu peux aussi déposer un fichier sur la page."}
+        {!readonly && " L'import peut aussi fusionner un fichier ou une fiche papier dans cette fiche, avec un aperçu avant d'appliquer. Tu peux aussi déposer un fichier sur la page."}
         {!readonly && file.supported && file.state === "none" && " Lier à un fichier enregistre chaque modification dans ce fichier : pratique avec un dossier Drive synchronisé sur ton ordinateur."}
       </p>
     </div>

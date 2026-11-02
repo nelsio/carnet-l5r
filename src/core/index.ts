@@ -20,3 +20,4 @@ export type { ActionDef, ArmyStatus, CombatSub, Engagement, Situation, Stance } 
 export * from "./spells";
 export * from "./insight";
 export * from "./grimoire";
+export * from "./photo";
