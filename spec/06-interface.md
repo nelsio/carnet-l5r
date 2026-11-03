@@ -26,7 +26,7 @@
     - le changement s'applique immédiatement, sans recharger ;
   - onglets Fiche, Aide de jeu et Statistiques (dans la barre du bas sur mobile, §7).
 - **Barre d'état collante** :
-  - piste des 8 niveaux de blessure, avec le niveau courant ;
+  - piste des 8 niveaux de blessure, avec le niveau courant. Aucun libellé n'y est coupé : trois niveaux y sont abrégés (« Égrat. », « Grav. », « HdC », champ `short` de `WOUND_LEVELS`, 6 caractères au plus), le nom complet reste en infobulle et pour les lecteurs d'écran. Le résumé, le détail déplié et la tuile Blessures gardent les noms complets. Entre 721 et 1179 px, la piste prend sa propre ligne au-dessus des tuiles (annexe 45) ;
   - compteur −/+ ;
   - pastilles de Vide cliquables ;
   - quatre **tuiles compactes** (petit libellé au-dessus, valeur en chiffres) : **Dépl.** (action libre / action simple, ex. « 10/20 pi »), **ND armure**, **Réduction**, **Pénalité** (bordure et chiffre rouges dès que la pénalité dépasse 0). Jamais une ligne de texte unique : elle serait tronquée sur mobile.

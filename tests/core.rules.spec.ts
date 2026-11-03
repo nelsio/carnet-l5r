@@ -9,6 +9,7 @@ import {
   woundState, armorTN, targetNumber, maneuverRaises, raiseCapExceeded,
   mergeCharacter, migrate, movement, poolStats, DEFAULT_MANEUVERS, type Character,
 } from "@carnet/core";
+import { WOUND_LEVELS } from "../src/rules/l5r4e";
 import kakita from "./fixtures/kakita-v1.json";
 
 const base = () => structuredClone(kakita) as Character;
@@ -205,6 +206,11 @@ describe("Blessures", () => {
   ])("%i blessures → niveau %i (%s)", (wounds, level, label, penalty, status) => {
     const c = base(); c.wounds = wounds;
     expect(woundState(c)).toMatchObject({ level, label, penalty, status });
+  });
+  it("abréviations de la piste : trois niveaux, 6 caractères au plus (annexe 45.1)", () => {
+    const shorts = Object.fromEntries(WOUND_LEVELS.filter((w) => w.short).map((w) => [w.label, w.short]));
+    expect(shorts).toEqual({ "Égratigné": "Égrat.", "Gravement blessé": "Grav.", "Hors de combat": "HdC" });
+    for (const short of Object.values(shorts)) expect(short!.length).toBeLessThanOrEqual(6);
   });
 });
 

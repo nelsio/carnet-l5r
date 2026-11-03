@@ -117,6 +117,12 @@ button.seal:focus-visible{outline-offset:4px}
 .wl.past{background:var(--sunk);opacity:.55}
 .wl.cur{border-color:var(--danger);background:var(--danger-pale)}
 .wl.cur span{color:var(--ink);font-weight:700}
+/* Sous 1180 px, 8 cases sur une ligne de tuiles coupent « Indemne » : la piste prend sa propre ligne (annexe 45.3) */
+@media (min-width:721px) and (max-width:1179px){
+  .status-in{grid-template-columns:auto auto minmax(0,1fr);row-gap:8px}
+  .wtrack{grid-column:1/-1}
+  .cstats{justify-self:end}
+}
 .stepper{display:flex;align-items:center;gap:6px}
 .stepper button{width:30px;height:30px;border-radius:6px;border:1px solid var(--line);background:var(--surface);font-weight:700;flex:none}
 .stat-big{font-family:var(--f-mono);font-size:22px;font-weight:700;line-height:1}

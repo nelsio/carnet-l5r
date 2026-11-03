@@ -6,6 +6,18 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.27.3] - 2026-11-03
+
+### Corrigé
+- Barre d'état : les niveaux de blessure ne sont plus coupés (Égrat., Grav., HdC). Le nom complet s'affiche au survol.
+
+### Modifié
+- Sur un écran moyen (tablette, petit portable), la piste des blessures prend sa propre ligne au-dessus des tuiles.
+
+### Technique
+- Les lecteurs d'écran annoncent le nom complet de chaque niveau de la piste.
+- Test de bout en bout de la piste sous Chromium et WebKit, de 700 à 1280 px.
+
 ## [2.27.2] - 2026-11-03
 
 ### Documentation
@@ -338,7 +350,9 @@ Simples liens ouverts dans un nouvel onglet : le Carnet ne fait toujours aucune 
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.27.1...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.27.3...HEAD
+[2.27.3]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.27.3
+[2.27.2]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.27.2
 [2.27.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.27.1
 [2.27.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.27.0
 [2.26.2]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.26.2
