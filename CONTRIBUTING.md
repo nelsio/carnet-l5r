@@ -17,7 +17,7 @@ Une faille de sécurité ne se signale pas en issue publique : voir [`SECURITY.m
 
 ## 3. Proposer une évolution
 
-Ouvre une issue **Idée d'évolution** avant de coder. Les évolutions importantes passent par une annexe de [`HANDOFF.md`](HANDOFF.md) : la spécification est écrite et validée avant le code.
+Ouvre une issue **Idée d'évolution** avant de coder. Les évolutions importantes passent par une annexe de la spécification ([`HANDOFF.md`](HANDOFF.md), dossier `spec/`) : la spécification est écrite et validée avant le code.
 
 ## 4. Développer
 
@@ -28,7 +28,7 @@ Prérequis et commandes : section [Développement du README](README.md#développ
 - TypeScript **strict**.
 - Logique de jeu dans `src/core` : pure, sans DOM, **couverte à 100 %**.
 - Règles du jeu sous forme de données dans `src/rules`.
-- Couleurs uniquement en **jetons CSS** (vérifié par le lint N8 à partir du lot 17, annexe I.1 de `HANDOFF.md`).
+- Couleurs uniquement en **jetons CSS** (vérifié par le lint N8 à partir du lot 17, annexe I.1 de la spécification, `spec/annexes/`).
 - Aucun `dangerouslySetInnerHTML`.
 - Aucune dépendance chargée depuis un CDN : tout est embarqué dans le fichier HTML.
 

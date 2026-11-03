@@ -54,12 +54,12 @@ Outil de fan **non officiel** et gratuit, sans lien avec les ayants droit de *Le
 
 ## Développement
 
-Spécification : [`HANDOFF.md`](HANDOFF.md). **Node 24** (voir `.nvmrc`).
+Spécification : [`HANDOFF.md`](HANDOFF.md) (index), détail dans [`spec/`](spec/). **Node 24** (voir `.nvmrc`).
 
 ```sh
 npm install
 npm run dev            # serveur de développement
-npm run lint           # ESLint
+npm run lint           # ESLint et contrôle des références à la spécification
 npm run typecheck      # tsc --noEmit
 npm test               # Vitest
 npm run test:coverage  # Vitest + couverture (100 % des lignes de src/core)

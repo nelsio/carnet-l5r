@@ -2,9 +2,14 @@
 
 Toutes les évolutions notables du Carnet de Rokugan sont notées ici.
 
-Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le projet respecte le [versionnement sémantique](https://semver.org/lang/fr/). Le détail de chaque version est dans l'annexe correspondante de [`HANDOFF.md`](HANDOFF.md).
+Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le projet respecte le [versionnement sémantique](https://semver.org/lang/fr/). Le détail de chaque version est dans l'annexe correspondante de la spécification ([`HANDOFF.md`](HANDOFF.md), dossier `spec/annexes/`).
 
 ## [Non publié]
+
+## [2.27.2] - 2026-11-03
+
+### Documentation
+- La spécification est découpée en fichiers par section (dossier `spec/`) ; `HANDOFF.md` devient un index.
 
 ## [2.27.1] - 2026-11-02
 
