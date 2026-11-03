@@ -111,7 +111,7 @@ button.seal:focus-visible{outline-offset:4px}
 .armedit{grid-column:1/-1;display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;background:var(--surface-2);box-shadow:var(--shadow);border:1px solid var(--accent);border-radius:8px;padding:10px;margin-top:6px}
 @media (max-width:720px){.armedit{grid-template-columns:1fr 1fr}.armedit label:first-child{grid-column:1/-1}.cstats .ct{text-align:center;padding:4px 4px}}
 .wtrack{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:3px;min-width:0}
-.wl{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:3px 4px;font-size:10.5px;line-height:1.2;min-width:0;overflow:hidden}
+.wl{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:3px;font-size:10.5px;letter-spacing:-.01em;line-height:1.2;min-width:0;overflow:hidden}
 .wl b{display:block;font-family:var(--f-mono);font-size:11px}
 .wl span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
 .wl.past{background:var(--sunk);opacity:.55}
