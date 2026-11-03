@@ -5,7 +5,7 @@
 |---|---|---|
 | `ci.yml` | push, pull request | install → lint → `tsc --noEmit` → Vitest → build → Playwright |
 | `pages.yml` | push sur `main` | build → publication de `dist/carnet-l5r.html` comme `index.html` sur GitHub Pages ; lance `scripts/pages-pwa.mjs` (manifeste, service worker, sitemap et image de partage, annexes O.3 et P), `scripts/pages-seo.mjs` (présentation statique, annexe P) puis `scripts/pages-compteur.mjs` (compteur de visites, annexe O.5) |
-| `release.yml` | tag `v*` | build → release GitHub avec `carnet-l5r.html` en pièce jointe et notes générées |
+| `release.yml` | tag `v*` | build → release GitHub avec `carnet-l5r.html` en pièce jointe et notes générées ; marquée « Latest » seulement si le tag est la plus haute version (un tag oublié posé en retard ne la remplace pas) |
 
 ### 9.2 Versionnement
 - SemVer. La version de l'outil est affichée en pied de page (lien vers les nouveautés, annexe M.3) et dans la section « Le Carnet » du menu Ressources.
