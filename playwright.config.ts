@@ -14,6 +14,8 @@ export default defineConfig({
   },
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] }, testIgnore: /mobile\.spec\.ts/ },
+    // Annexe 45.4 : la piste de la barre d'état aussi sous WebKit (Safari sur ordinateur).
+    { name: "webkit", use: { ...devices["Desktop Safari"] }, testMatch: /status-bar\.spec\.ts/ },
     // HANDOFF §10.5 : appareils « iPhone 13 » et « Pixel 7 ».
     { name: "iphone-13", use: { ...devices["iPhone 13"] }, testMatch: /mobile\.spec\.ts/ },
     { name: "pixel-7", use: { ...devices["Pixel 7"] }, testMatch: /mobile\.spec\.ts/ },

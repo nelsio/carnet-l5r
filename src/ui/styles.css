@@ -111,12 +111,18 @@ button.seal:focus-visible{outline-offset:4px}
 .armedit{grid-column:1/-1;display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;background:var(--surface-2);box-shadow:var(--shadow);border:1px solid var(--accent);border-radius:8px;padding:10px;margin-top:6px}
 @media (max-width:720px){.armedit{grid-template-columns:1fr 1fr}.armedit label:first-child{grid-column:1/-1}.cstats .ct{text-align:center;padding:4px 4px}}
 .wtrack{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:3px;min-width:0}
-.wl{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:3px 4px;font-size:10.5px;line-height:1.2;min-width:0;overflow:hidden}
+.wl{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:3px;font-size:10.5px;letter-spacing:-.01em;line-height:1.2;min-width:0;overflow:hidden}
 .wl b{display:block;font-family:var(--f-mono);font-size:11px}
 .wl span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
 .wl.past{background:var(--sunk);opacity:.55}
 .wl.cur{border-color:var(--danger);background:var(--danger-pale)}
 .wl.cur span{color:var(--ink);font-weight:700}
+/* Sous 1180 px, 8 cases sur une ligne de tuiles coupent « Indemne » : la piste prend sa propre ligne (annexe 45.3) */
+@media (min-width:721px) and (max-width:1179px){
+  .status-in{grid-template-columns:auto auto minmax(0,1fr);row-gap:8px}
+  .wtrack{grid-column:1/-1}
+  .cstats{justify-self:end}
+}
 .stepper{display:flex;align-items:center;gap:6px}
 .stepper button{width:30px;height:30px;border-radius:6px;border:1px solid var(--line);background:var(--surface);font-weight:700;flex:none}
 .stat-big{font-family:var(--f-mono);font-size:22px;font-weight:700;line-height:1}
