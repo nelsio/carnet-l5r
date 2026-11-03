@@ -6,6 +6,9 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+### Technique
+- Publication : une ancienne version publiée en retard ne devient plus la « dernière release » à télécharger.
+
 ## [2.27.3] - 2026-11-03
 
 ### Corrigé
