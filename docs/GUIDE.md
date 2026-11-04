@@ -119,6 +119,8 @@ En **Bataille**, il n'y a pas d'initiative ; le panneau **Bataille de masse** su
 
 Les boutons **« i »** affichent ou masquent le détail des dépenses de Vide, du déplacement, de la bataille de masse et des rappels d'école.
 
+**Masquer les explications des actions.** Quand tu connais tes actions par cœur, le bouton **« i »** à côté du titre **Actions** masque leurs explications : la liste tient en moins de place et seule l'action choisie garde la sienne. La mention « explications masquées » rappelle que le réglage est actif ; un nouvel appui sur **« i »** les fait revenir. Le réglage est mémorisé sur l'appareil, pour toutes tes fiches.
+
 ## 5. Le lanceur : vrais dés ou dés de l'outil
 
 Choisir une action ouvre le **lanceur** (un panneau qui monte du bas sur mobile). Il donne :

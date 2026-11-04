@@ -37,6 +37,8 @@ export interface Prefs {
   showDiceRoller?: boolean;
   /** Multiplicateur des niveaux de blessure après Indemne : Terre × 2 par défaut (annexe E-d). */
   woundMultiplier?: number;
+  /** Explications des actions masquées dans l'Assistant ; absente = affichées (annexe 46.2). */
+  compactActions?: boolean;
   lastOpenedId?: string;
   persistRequested?: boolean;
 }

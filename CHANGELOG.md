@@ -6,8 +6,17 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.28.0] - 2026-11-04
+
+### Ajouté
+- Assistant L5R : le bouton **i** à côté du titre Actions masque les explications des actions, pour les joueurs habitués. Seule l'action choisie garde la sienne. Réglage mémorisé sur l'appareil.
+
 ### Technique
 - Publication : une ancienne version publiée en retard ne devient plus la « dernière release » à télécharger.
+- Tests de la vue compacte : interface, préférence, et de bout en bout à 1280 et 390 px.
+
+### Documentation
+- Guide : « Masquer les explications des actions ».
 
 ## [2.27.3] - 2026-11-03
 
@@ -353,7 +362,8 @@ Simples liens ouverts dans un nouvel onglet : le Carnet ne fait toujours aucune 
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.27.3...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.28.0...HEAD
+[2.28.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.28.0
 [2.27.3]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.27.3
 [2.27.2]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.27.2
 [2.27.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.27.1

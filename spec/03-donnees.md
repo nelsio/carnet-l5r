@@ -45,7 +45,7 @@ interface LibraryEntry {
   linkedFile?: { handle: FileSystemFileHandle; name: string; lastModified: number };  // Chrome/Edge uniquement
 }
 ```
-Préférences, dans un magasin séparé : thème, **lanceur de dés** (`diceRoller`, booléen, **affiché par défaut** depuis la v2.17.0 ; l'ancienne clé `showDiceRoller` est ignorée puis supprimée, annexe J.7), **multiplicateur de blessures** (`woundMultiplier`, 2 à 5, 2 par défaut, v2.5 : annexe E.6), dernière fiche ouverte.
+Préférences, dans un magasin séparé : thème, **lanceur de dés** (`diceRoller`, booléen, **affiché par défaut** depuis la v2.17.0 ; l'ancienne clé `showDiceRoller` est ignorée puis supprimée, annexe J.7), **multiplicateur de blessures** (`woundMultiplier`, 2 à 5, 2 par défaut, v2.5 : annexe E.6), **vue compacte de l'Assistant** (`compactActions`, booléen, absente = explications affichées, v2.28.0 : annexe 46.2), dernière fiche ouverte.
 
 ### 3.3 État non persisté
 Restent en mémoire de l'onglet :

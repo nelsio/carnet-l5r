@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Carnet : vue compacte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Prototype lot 46 v2 : vue compacte de l'Assistant L5R, cinq propositions d'emplacement et d'état.
+   Jetons et règles .act / .sit / .panel / .btn / .theme-btn / .tabs / .ib repris de src/ui/styles.css (v2.27.1).
+   Mobile simulé en @container (appli : @media max-width:720px ; lanceur en feuille du bas). */
+:root{
+  color-scheme:light;
+  --p-bg:#f4f2ee;--p-ink:#222;--p-muted:#5f5d58;--p-line:#d6d2ca;--p-chip:#fff;--p-on:#222;--p-on-ink:#fff;
+  --bg:#ece6d8;--surface:#f7f3ea;--sunk:#e0d9c8;--ink:#2a261f;
+  --muted:color-mix(in oklab,var(--ink) 70%,var(--surface));
+  --line:color-mix(in oklab,var(--ink) 18%,transparent);
+  --accent:#7a6a3a;--accent-ink:#5c5131;--accent-fill:var(--accent-ink);
+  --accent-pale:color-mix(in oklab,var(--accent) 16%,var(--surface));
+  --on-accent:#fff;--danger:#b3261e;--seal:#a8382a;--seal-ink:#f7f3ea;
+  --f-display:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+  --f-body:"Zen Kaku Gothic New","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --p-bg:#161718;--p-ink:#e6e4df;--p-muted:#a9a7a2;--p-line:#3a3c40;--p-chip:#222427;--p-on:#e6e4df;--p-on-ink:#161718;
+  --bg:#26252a;--surface:#302f33;--sunk:#1c1e21;--ink:#e7e5e0;
+  --accent:#cdb67a;--accent-ink:#d2bf8f;--accent-fill:var(--accent);--on-accent:#26252a;--danger:#f2867e;
+  --seal:#b5402f;--seal-ink:#f3ece0;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--p-bg);color:var(--p-ink);font:14px/1.5 var(--f-body);padding:24px max(16px,env(safe-area-inset-left,0px)) 64px}
+.wrap{max-width:1120px;margin:0 auto}
+h1.p{font:800 22px/1.2 var(--f-display);margin:0 0 4px}
+.lede{color:var(--p-muted);margin:0 0 16px;max-width:80ch}
+.controls{display:flex;flex-wrap:wrap;gap:14px 22px;margin-bottom:14px}
+.ctl{display:grid;gap:6px}
+.ctl>span{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--p-muted)}
+.seg{display:flex;flex-wrap:wrap;gap:4px}
+.seg button{border:1px solid var(--p-line);background:var(--p-chip);color:var(--p-ink);border-radius:999px;padding:6px 12px;font:inherit;font-weight:500;cursor:pointer;min-height:36px}
+.seg button[aria-pressed="true"]{background:var(--p-on);color:var(--p-on-ink);border-color:var(--p-on)}
+.props{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-bottom:14px}
+.props button{text-align:left;border:1px solid var(--p-line);background:var(--p-chip);color:var(--p-ink);border-radius:10px;padding:10px 12px;font:inherit;cursor:pointer;display:grid;gap:2px}
+.props button b{font-size:14px}
+.props button span{font-size:12.5px;color:var(--p-muted);line-height:1.4}
+.props button[aria-pressed="true"]{border-color:var(--p-on);box-shadow:inset 0 0 0 1px var(--p-on)}
+.props .reco{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#b45309}
+.note{border:1px solid var(--p-line);border-radius:10px;padding:10px 14px;margin-bottom:12px;max-width:90ch}
+.note p{margin:0}
+.note p+p{margin-top:4px}
+.measure{font-family:var(--f-mono);font-size:13px;color:var(--p-muted);margin:0 0 10px}
+.measure b{color:var(--p-ink)}
+
+/* ---- Cadre de l'appli ---- */
+.frame{container-type:inline-size;background:var(--bg);color:var(--ink);font:15px/1.55 var(--f-body);border:1px solid var(--p-line);border-radius:12px;padding:0 16px 16px;margin-inline:auto}
+.frame.mobile{max-width:390px;padding:0 12px 12px}
+.frame button{font:inherit;color:inherit;cursor:pointer}
+h2,h3{font-family:var(--f-display);margin:0;line-height:1.2}
+.muted{color:var(--muted)}
+.label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+
+/* En-tête (simplifié) */
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;padding-block:18px 12px;border-bottom:3px solid var(--accent);margin-bottom:14px}
+.who{display:flex;align-items:center;gap:14px;min-width:0}
+.seal{flex:none;display:grid;place-items:center;width:52px;height:52px;border-radius:8px;background:var(--seal);color:var(--seal-ink);font:800 30px/1 var(--f-display);rotate:-3deg;box-shadow:inset 0 0 0 3px var(--seal),inset 0 0 0 5px var(--seal-ink)}
+.brand{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.who h1{font:800 28px/1.15 var(--f-display);margin:0}
+.top-right{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.theme-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 10px;font-weight:700;font-size:13px;color:var(--muted)}
+.theme-btn.on{border-color:var(--accent);background:var(--accent-pale);color:var(--ink)}
+.theme-btn .ico{width:16px;height:16px;flex:none}
+.tabs{display:flex;gap:2px;background:var(--sunk);padding:4px;border-radius:999px}
+.tabs button{border:0;background:transparent;padding:8px 12px;border-radius:999px;font-weight:700;color:var(--muted)}
+.tabs button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px var(--line)}
+
+.sit{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;align-items:center}
+.sit>button{border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:7px;font-weight:700}
+.sit>button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.sit.sub>button{padding:5px 12px;font-size:13.5px}
+.sit.sub>button[aria-pressed="true"]{background:var(--accent-fill);border-color:var(--accent-fill);color:var(--on-accent)}
+.sit .push{margin-left:auto}
+.aid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:16px;align-items:start}
+.col{display:grid;gap:12px;min-width:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:0}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+.stub{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.stub .muted{font-size:13px}
+.btn{border:1px solid var(--line);background:var(--surface);padding:7px 13px;border-radius:7px;font-weight:700}
+.btn.sm{padding:3px 9px;font-size:13px}
+.btn.accent{background:var(--accent-fill);color:var(--on-accent);border-color:var(--accent-fill)}
+.tag{display:inline-block;font-size:11.5px;padding:1px 7px;border-radius:999px;background:var(--sunk);color:var(--muted);margin:1px 2px 1px 0}
+.actions{display:grid;gap:8px}
+.act{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:10px 12px;width:100%}
+.act:hover{border-color:var(--accent)}
+.act[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
+.act .t{font-weight:700}
+.act .t .tag{margin-left:6px;font-weight:500;vertical-align:1px}
+.act .d{grid-column:1/-1;font-size:13px;color:var(--muted)}
+.act .p{font-family:var(--f-mono);font-weight:700;color:var(--accent-ink);text-align:right}
+.act.info{cursor:default;background:var(--bg)}
+.act.child{margin-left:26px;width:calc(100% - 26px);position:relative;overflow:visible}
+.act.child::before{content:"";position:absolute;left:-17px;top:-10px;width:13px;height:calc(50% + 10px);border-left:2px solid var(--line);border-bottom:2px solid var(--line);border-bottom-left-radius:7px;pointer-events:none}
+.act.blocked{opacity:.6;cursor:default}
+.act.blocked .reason{color:var(--danger);font-weight:600}
+.actions.compact .act:not([aria-pressed="true"]):not(.blocked):not(.info){padding-block:7px}
+.linkbtn{background:none;border:0;padding:0;color:var(--accent-ink);text-decoration:underline;font:inherit}
+.actgroup{margin:10px 0 0}
+
+/* Ligne de titre de la liste (propositions 2 et 3) */
+.listhead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:2px 0 -2px}
+.panel-title{display:flex;gap:8px;align-items:center;white-space:nowrap}
+/* Bouton « i » existant (Rappels, Bataille) */
+.ib{position:relative;flex:none;width:22px;height:22px;border-radius:50%;border:1px solid var(--line);background:var(--bg);color:var(--muted);font:italic 700 13px/1 Georgia,"Times New Roman",serif;padding:0;display:grid;place-items:center}
+.ib::after{content:"";position:absolute;inset:-9px}
+.ib.on{background:var(--accent-fill);border-color:var(--accent-fill);color:var(--on-accent)}
+.ibhint{font-size:12.5px;color:var(--muted)}
+/* Sélecteur segmenté : .tabs en petit */
+.tabs.sm{padding:3px}
+.tabs.sm button{padding:4px 10px;font-size:13px}
+.tabs.ico button{padding:4px 8px;display:grid;place-items:center}
+.tabs.ico svg{width:18px;height:18px}
+/* Interrupteur (nouveau composant) */
+.switch{display:inline-flex;align-items:center;gap:8px;border:0;background:none;padding:4px 0;font-weight:700;font-size:13.5px;color:var(--muted)}
+.switch .tr{width:34px;height:20px;border-radius:999px;background:var(--sunk);border:1px solid var(--line);position:relative;transition:background .15s}
+.switch .tr::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--surface);box-shadow:0 1px 2px rgb(0 0 0/.3);transition:left .15s}
+.switch[aria-checked="true"]{color:var(--ink)}
+.switch[aria-checked="true"] .tr{background:var(--accent-fill);border-color:var(--accent-fill)}
+.switch[aria-checked="true"] .tr::after{left:16px}
+
+/* Repère du prototype (absent de l'appli) */
+.new{outline:2px dashed #d97706;outline-offset:3px;border-radius:8px}
+.ib.new,.theme-btn.new{border-radius:999px}
+
+.roller .poolbig{font-family:var(--f-mono);font-size:40px;font-weight:700;color:var(--accent-ink);line-height:1;margin:6px 0 10px}
+.roller .lancer{width:100%;padding:12px;font-weight:700}
+
+@container (max-width:720px){
+  .aid{grid-template-columns:1fr}
+  .side{display:none}
+  .sit>button{padding:7px 11px}
+  .theme-btn{position:relative;width:40px;height:40px;padding:0;justify-content:center;border-radius:50%}
+  .theme-btn .txt{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .theme-btn .ico{width:20px;height:20px}
+  .top-right{width:100%}
+  .who h1{font-size:24px}
+  .tabs.views button{padding:7px 10px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="p">Vue compacte : emplacement et état</h1>
+  <p class="lede">Cinq propositions. Les deux premières réutilisent des commandes qui existent déjà dans le Carnet ; les trois autres en ajoutent. Clique sur la commande dans l'appli (contour orange pointillé) pour basculer, et sur une carte pour la choisir.</p>
+
+  <div class="props" id="props"></div>
+  <div class="note" id="note"></div>
+
+  <div class="controls">
+    <div class="ctl"><span>Situation</span><div class="seg" data-ctl="sit">
+      <button type="button" data-v="combat" aria-pressed="true">Escarmouche</button><button type="button" data-v="investigation" aria-pressed="false">Enquête</button></div></div>
+    <div class="ctl"><span>Largeur</span><div class="seg" data-ctl="width">
+      <button type="button" data-v="desk" aria-pressed="true">Ordinateur</button><button type="button" data-v="mobile" aria-pressed="false">Mobile 390 px</button></div></div>
+    <div class="ctl"><span>Thème</span><div class="seg" data-ctl="theme">
+      <button type="button" data-v="light" aria-pressed="true">Clair</button><button type="button" data-v="dark" aria-pressed="false">Sombre</button></div></div>
+  </div>
+
+  <p class="measure" id="measure" aria-live="polite"></p>
+
+  <div class="frame" id="frame"></div>
+</div>
+
+<script>
+const S = { prop: 2, compact: false, sit: "combat", width: "desk", theme: "light", selected: "atk-katana" };
+
+const PROPS = [
+  { id: 1, title: "1 · En-tête, comme le lanceur de dés",
+    sub: "Bouton « Explications : affichées / masquées », même composant que « Lanceur de dés ».",
+    note: ["<b>Logique</b> : c'est un réglage d'affichage mémorisé sur l'appareil, exactement comme « Lanceur de dés » et « Thème », qui sont déjà dans l'en-tête. Aucun nouveau composant.",
+           "<b>État</b> : actif = explications affichées (bouton surligné, comme le lanceur de dés affiché). Le texte dit l'état : « Explications : masquées ». Sur mobile, icône seule, nom complet au lecteur d'écran et en infobulle.",
+           "<b>Limite</b> : sur mobile, un cinquième bouton rond dans l'en-tête, et il reste visible sur la Fiche où il ne sert à rien (le masquer hors Assistant)."] },
+  { id: 2, reco: true, kept: true, title: "2 · Bouton « i » sur un titre Actions",
+    sub: "Même bouton « i » que les panneaux Rappels et Bataille : plein = explications visibles.",
+    note: ["<b>Logique</b> : le bouton « i » déplie déjà les explications des panneaux Rappels et Bataille. On l'applique à la liste des actions, avec un petit titre « Actions » au-dessus.",
+           "<b>État</b> : « i » plein (couleur du clan) = explications affichées ; « i » vide = masquées. Même lecture que dans les panneaux, rien de nouveau à apprendre.",
+           "<b>Limite</b> : en combat, le titre est sous Initiative, Posture et Vide, donc hors du premier écran sur mobile. Peu gênant : c'est un réglage qu'on touche une fois."] },
+  { id: 3, title: "3 · Sélecteur Détaillée | Compacte",
+    sub: "Deux choix visibles côte à côte, style des onglets Fiche / Assistant.",
+    note: ["<b>Logique</b> : les deux états sont écrits, aucun doute sur ce qui est actif. Style repris des onglets de l'en-tête (.tabs), en petit.",
+           "<b>Limite</b> : prend plus de place qu'un bouton, sur la même ligne de titre que la proposition 2 ; deux sélecteurs segmentés presque identiques (vue et onglets) peuvent se confondre."] },
+  { id: 4, title: "4 · Interrupteur « Explications »",
+    sub: "Interrupteur au bout de la barre des situations.",
+    note: ["<b>Logique</b> : l'interrupteur est la forme la plus claire d'un réglage marche / arrêt, et le libellé positif évite la double négation (« Vue compacte » activée = explications désactivées).",
+           "<b>Limite</b> : nouveau composant, absent du reste du Carnet. Sur mobile, il passe à la ligne avec les situations."] },
+  { id: 5, title: "5 · Icônes de densité",
+    sub: "Deux icônes (lignes larges / serrées) au bout de la barre des situations.",
+    note: ["<b>Logique</b> : compact et familier (Gmail, Finder, explorateurs de fichiers).",
+           "<b>Limite</b> : les icônes seules ne disent pas ce qui change ; il faut l'infobulle. Peu clair pour un joueur qui ne connaît pas ce motif."] },
+];
+
+const COMBAT = [
+  { id: "atk-katana", t: "Attaque · Katana", p: "5g3", attack: true, d: "Kenjutsu (Agilité) contre le ND d'armure de la cible. Choisis tes manœuvres dans le lanceur." },
+  { id: "dmg-katana", t: "Dégâts · Katana", p: "5g2", child: true, d: "Force + VD 3g2. Les augmentations de dégâts s'ajoutent en dés lancés." },
+  { id: "atk-waki", t: "Attaque · Wakizashi", p: "5g3", attack: true, simple: true, d: "Kenjutsu (Agilité) contre le ND d'armure de la cible. Choisis tes manœuvres dans le lanceur." },
+  { id: "dmg-waki", t: "Dégâts · Wakizashi", p: "4g2", child: true, d: "Force + VD 2g2. Les augmentations de dégâts s'ajoutent en dés lancés." },
+  { id: "atk-yumi", t: "Tir · Yumi", p: "4g3", attack: true, d: "Kyujutsu (Réflexes) contre le ND d'armure de la cible. Choisis tes manœuvres dans le lanceur." },
+  { id: "dmg-yumi", t: "Dégâts · Yumi", p: "5g2", child: true, d: "Force de l'arc 3 + VD de la flèche 2g2." },
+  { id: "unarmed", t: "Attaque à mains nues", p: "4g3", attack: true, d: "Jiujutsu (Agilité) contre le ND d'armure. Dégâts : Force + 0g1." },
+  { id: "unarmed-dmg", t: "Dégâts · mains nues", p: "3g1", child: true, d: "Force + 0g1." },
+  { id: "grapple", t: "Lutte (saisie)", p: "4g3", attack: true, d: "Attaque Jiujutsu ; si elle touche, jets de Force en opposition pour établir et tenir la prise." },
+];
+const INVESTIGATION = [
+  { id: "notice", t: "Remarquer un détail", p: "6g3", d: "Indice discret, objet dissimulé à la vue, comportement suspect. ND 10 évident, 20 bien caché." },
+  { id: "search", t: "Fouiller un lieu", p: "6g3", d: "Fouille méthodique d'une pièce ou d'un corps. Prends du temps : le MJ peut accorder des augmentations gratuites." },
+  { id: "interrogate", t: "Interroger un témoin", p: "5g3", d: "Questionner pour obtenir des faits. Un témoin réticent oppose sa Volonté ou Étiquette." },
+  { id: "lie", t: "Percer un mensonge", p: "5g3", d: "Jet en opposition contre Sincérité (Vigilance) de l'interlocuteur." },
+  { id: "lore", t: "Se souvenir · Shadowlands", p: "5g2", d: "Connaissance : Shadowlands (Intelligence). Les augmentations donnent des détails de plus." },
+  { id: "etiquette", t: "Garder contenance", p: "3g2", d: "Ne rien laisser paraître, éviter un faux pas qui coûte de l'Honneur." },
+  { id: "info-repos", group: "Repos", info: true, t: "Se reposer", d: "Une nuit de repos rend Terre × 2 blessures, plus le rang de Médecine d'un soigneur." },
+  { id: "meditate", t: "Méditer (récupérer du Vide)", p: "5g3", d: "Une heure de méditation, une fois par jour. Réussite : tu récupères des points de Vide." },
+];
+
+const svg = (inner) => `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">${inner}</svg>`;
+const I = {
+  library: '<path d="M4 4h4v16H4zM10 4h4v16h-4zM16.2 5.2l3.8-1 3 15.6-3.8 1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>',
+  dice: '<rect x="3.5" y="3.5" width="17" height="17" rx="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="8.5" cy="8.5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.6" fill="currentColor"/>',
+  theme: '<circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/>',
+  res: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+  explain: '<rect x="3.5" y="4" width="17" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M7 9h10M7 12.5h10M7 16h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+  wide: '<path d="M4 5h16M4 8.5h11M4 14h16M4 17.5h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/>',
+  dense: '<path d="M4 6h16M4 10h16M4 14h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/>',
+};
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const shown = () => !S.compact;
+
+/* ---- Les cinq commandes ---- */
+function control() {
+  switch (S.prop) {
+    case 1: { const l = `Explications : ${shown() ? "affichées" : "masquées"}`;
+      return `<button type="button" class="theme-btn new${shown() ? " on" : ""}" title="${l}" aria-pressed="${shown()}" data-act="toggle">${svg(I.explain)}<span class="txt">${l}</span></button>`; }
+    case 2: return `<span class="panel-title"><span class="label">Actions</span><button type="button" class="ib new${shown() ? " on" : ""}" aria-pressed="${shown()}" aria-label="Explications des actions" title="Explications des actions" data-act="toggle">i</button>${shown() ? "" : `<span class="ibhint">explications masquées</span>`}</span>`;
+    case 3: return `<span class="label">Actions</span><div class="tabs sm new" role="group" aria-label="Vue des actions"><button type="button" aria-pressed="${!S.compact}" data-act="detail">Détaillée</button><button type="button" aria-pressed="${S.compact}" data-act="compact">Compacte</button></div>`;
+    case 4: return `<button type="button" role="switch" class="switch push new" aria-checked="${shown()}" data-act="toggle"><span class="tr" aria-hidden="true"></span>Explications</button>`;
+    case 5: return `<div class="tabs sm ico push new" role="group" aria-label="Densité des actions"><button type="button" aria-pressed="${!S.compact}" title="Vue détaillée" aria-label="Vue détaillée" data-act="detail"><svg viewBox="0 0 24 24" aria-hidden="true">${I.wide}</svg></button><button type="button" aria-pressed="${S.compact}" title="Vue compacte" aria-label="Vue compacte" data-act="compact"><svg viewBox="0 0 24 24" aria-hidden="true">${I.dense}</svg></button></div>`;
+  }
+}
+
+function header() {
+  const hb = (icon, label, on) => `<button type="button" class="theme-btn${on ? " on" : ""}" title="${label}">${svg(icon)}<span class="txt">${label}</span></button>`;
+  return `<header class="top"><div class="who"><div class="seal" aria-hidden="true">蟹</div><div><div class="brand">Carnet de Rokugan · Crabe</div><h1>Okado Hiruma</h1></div></div>
+    <div class="top-right">${hb(I.library, "Bibliothèque")}${hb(I.dice, "Lanceur de dés : affiché", true)}${hb(I.theme, "Thème : auto")}${hb(I.res, "Ressources")}${S.prop === 1 ? control() : ""}
+    <div class="tabs views" role="group"><button type="button">Fiche</button><button type="button" aria-pressed="true">Assistant</button><button type="button">Statistiques</button></div></div></header>`;
+}
+
+function card(a) {
+  if (a.info) return `${a.group ? `<h3 class="label actgroup">${a.group}</h3>` : ""}<div class="act info"><span class="t">${esc(a.t)}</span><span></span><span class="d">${esc(a.d)}</span></div>`;
+  const sel = S.selected === a.id;
+  const tag = a.simple ? `<span class="tag">Attaque : Action simple</span>` : "";
+  const showDesc = !S.compact || sel;
+  const d = showDesc ? `<span class="d">${tag}${tag ? " " : ""}${esc(a.d)}</span>` : "";
+  const t = esc(a.t) + (!showDesc && tag ? tag : "");
+  return `<button type="button" class="act${a.child ? " child" : ""}" aria-pressed="${sel}" data-sel="${a.id}"><span class="t">${t}</span><span class="p">${a.p}</span>${d}</button>`;
+}
+const list = () => (S.sit === "combat" ? COMBAT : INVESTIGATION);
+const actionsHtml = () => `<div class="actions${S.compact ? " compact" : ""}" id="actions">${list().map(card).join("")}</div>`;
+
+function render() {
+  document.documentElement.dataset.theme = S.theme;
+  document.getElementById("props").innerHTML = PROPS.map((p) =>
+    `<button type="button" aria-pressed="${S.prop === p.id}" data-prop="${p.id}">${p.kept ? '<em class="reco">Retenue (02/11)</em>' : ""}<b>${p.title}</b><span>${p.sub}</span></button>`).join("");
+  document.getElementById("note").innerHTML = PROPS.find((p) => p.id === S.prop).note.map((n) => `<p>${n}</p>`).join("");
+
+  if (!list().some((a) => a.id === S.selected)) S.selected = list()[0].id;
+  const frame = document.getElementById("frame");
+  frame.classList.toggle("mobile", S.width === "mobile");
+  const sits = [["investigation", "Enquête"], ["court", "Cour"], ["move", "Déplacement"], ["combat", "Combat"], ["magic", "Magie"]];
+  const sitbar = `<div class="sit" role="group" aria-label="Situation">${sits.map(([id, l]) =>
+    `<button type="button" aria-pressed="${S.sit === id}" data-sit="${id}">${l}</button>`).join("")}${S.prop >= 4 ? control() : ""}</div>`;
+  const subbar = S.sit === "combat" ? `<div class="sit sub">${["Escarmouche", "Duel", "Bataille"].map((l, i) => `<button type="button" aria-pressed="${i === 0}">${l}</button>`).join("")}</div>` : "";
+  const panels = S.sit === "combat" ? `
+    <div class="panel"><div class="stub"><div><span class="label">Initiative</span> <b>32</b></div><button type="button" class="btn sm">Nouveau round</button></div></div>
+    <div class="panel"><div class="panel-head"><span class="label">Posture</span></div><div class="stub"><b>Attaque</b><span class="muted">Posture normale.</span></div></div>
+    <div class="panel"><div class="panel-head"><span class="label">Dépenser du Vide</span><span class="muted">Points de Vide <b>2</b></span></div><span class="muted" style="font-size:13px">Au jet · +1g1 · dépensé au prochain jet lancé.</span></div>` : "";
+  const head = S.prop === 2 || S.prop === 3 ? `<div class="listhead">${control()}</div>` : "";
+  const a = list().find((x) => x.id === S.selected);
+  frame.innerHTML = `${header()}${sitbar}${subbar}<div class="aid"><div class="col">${panels}${head}${actionsHtml()}</div>
+    <div class="side col"><div class="panel roller"><span class="label">Lanceur</span><h3 style="font-size:17px;margin-top:4px">${esc(a.t)}</h3>
+    <div class="poolbig">${a.p ?? "—"}</div><button type="button" class="btn accent lancer">Lancer ${a.p ?? ""}</button></div></div></div>`;
+  measure();
+}
+
+function measure() {
+  const el = document.getElementById("actions"); if (!el) return;
+  const keep = S.compact, h = {}, c = {};
+  for (const mode of [false, true]) {
+    S.compact = mode; el.classList.toggle("compact", mode); el.innerHTML = list().map(card).join("");
+    h[mode] = el.getBoundingClientRect().height;
+    const one = el.querySelector("button.act[aria-pressed='false']"); c[mode] = one ? one.getBoundingClientRect().height : 0;
+  }
+  S.compact = keep; el.classList.toggle("compact", keep); el.innerHTML = list().map(card).join("");
+  document.getElementById("measure").innerHTML = `Liste des actions : <b>${Math.round(h[false])} px</b> en détaillé, <b>${Math.round(h[true])} px</b> en compact (−${Math.round(100 - h[true] / h[false] * 100)} %) · carte non choisie : ${Math.round(c[true] / c[false] * 100)} % de sa hauteur détaillée`;
+}
+
+document.addEventListener("click", (e) => {
+  const t = e.target;
+  const p = t.closest("[data-prop]"); if (p) { S.prop = +p.dataset.prop; return render(); }
+  const seg = t.closest(".seg button");
+  if (seg) { S[seg.parentElement.dataset.ctl] = seg.dataset.v; seg.parentElement.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b === seg))); return render(); }
+  const act = t.closest("[data-act]");
+  if (act) { const k = act.dataset.act; S.compact = k === "toggle" ? !S.compact : k === "compact"; return render(); }
+  const sel = t.closest("[data-sel]"); if (sel) { S.selected = sel.dataset.sel; return render(); }
+  const sit = t.closest("[data-sit]");
+  if (sit && ["combat", "investigation"].includes(sit.dataset.sit)) {
+    S.sit = sit.dataset.sit;
+    document.querySelectorAll('[data-ctl="sit"] button').forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === S.sit)));
+    render();
+  }
+});
+addEventListener("resize", measure);
+document.fonts?.ready.then(measure);
+render();
+</script>
+</body>
+</html>
