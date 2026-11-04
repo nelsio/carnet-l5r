@@ -111,12 +111,18 @@ button.seal:focus-visible{outline-offset:4px}
 .armedit{grid-column:1/-1;display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;background:var(--surface-2);box-shadow:var(--shadow);border:1px solid var(--accent);border-radius:8px;padding:10px;margin-top:6px}
 @media (max-width:720px){.armedit{grid-template-columns:1fr 1fr}.armedit label:first-child{grid-column:1/-1}.cstats .ct{text-align:center;padding:4px 4px}}
 .wtrack{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:3px;min-width:0}
-.wl{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:3px 4px;font-size:10.5px;line-height:1.2;min-width:0;overflow:hidden}
+.wl{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:3px;font-size:10.5px;letter-spacing:-.01em;line-height:1.2;min-width:0;overflow:hidden}
 .wl b{display:block;font-family:var(--f-mono);font-size:11px}
 .wl span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
 .wl.past{background:var(--sunk);opacity:.55}
 .wl.cur{border-color:var(--danger);background:var(--danger-pale)}
 .wl.cur span{color:var(--ink);font-weight:700}
+/* Sous 1180 px, 8 cases sur une ligne de tuiles coupent « Indemne » : la piste prend sa propre ligne (annexe 45.3) */
+@media (min-width:721px) and (max-width:1179px){
+  .status-in{grid-template-columns:auto auto minmax(0,1fr);row-gap:8px}
+  .wtrack{grid-column:1/-1}
+  .cstats{justify-self:end}
+}
 .stepper{display:flex;align-items:center;gap:6px}
 .stepper button{width:30px;height:30px;border-radius:6px;border:1px solid var(--line);background:var(--surface);font-weight:700;flex:none}
 .stat-big{font-family:var(--f-mono);font-size:22px;font-weight:700;line-height:1}
@@ -280,7 +286,6 @@ div.man button{border:0;background:var(--surface);width:24px;height:24px;border-
 .hist{display:grid;gap:4px;margin-top:10px;font-size:13px}
 .hist div{display:flex;justify-content:space-between;gap:8px;border-top:1px dashed var(--line);padding-top:4px}
 .hint{font-size:13px;color:var(--muted);margin-top:8px}
-.note{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px;margin-top:16px}
 .empty{text-align:center;padding:60px 16px}
 .empty h2{font-size:26px;margin-bottom:8px}
 .toast{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:7px 12px;border-radius:7px;font-size:13px;opacity:0;transition:opacity .2s}
@@ -357,7 +362,6 @@ div.man button{border:0;background:var(--surface);width:24px;height:24px;border-
   .backdrop.open{display:block;position:fixed;inset:0;z-index:30;background:var(--scrim)}
   .rollbtn{position:sticky;bottom:0;box-shadow:0 -10px 14px var(--surface-2)}
   .opts{grid-template-columns:1fr 1fr}
-  .note{margin-bottom:12px}
 }
 @keyframes sheetIn{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
 @media (max-width:720px){body.sheet-open,html:has(body.sheet-open){overflow:hidden}}
@@ -412,6 +416,32 @@ header.top + main{margin-top:18px}
   .modal-backdrop{place-items:end stretch;padding:0}
   .modal{width:100%;border-radius:16px 16px 0 0;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
   .modal-actions .btn{min-height:44px;flex:1}
+}
+
+/* ---------- Import depuis une fiche papier (lot 42, annexe S) ---------- */
+.modal .photo-lede{margin:0;font-size:14px}
+.psteps{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:12px}
+.pstep{display:grid;grid-template-columns:32px minmax(0,1fr);gap:10px;align-items:start;margin:0}
+.pstep-n{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;border:1px solid var(--accent);color:var(--accent-ink);font:800 16px/1 var(--f-display)}
+.pstep.done .pstep-n{background:var(--accent-fill);color:var(--on-accent);border-color:var(--accent-fill)}
+.pstep-b{min-width:0;display:grid;gap:6px}
+.pstep-b p{margin:0;font-size:14px}
+.pstep-b .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ok-tag{font-size:13px;color:var(--ok);font-weight:700}
+details.prompt{border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+details.prompt summary{padding:6px 10px;font-size:13px;font-weight:700;cursor:pointer;color:var(--muted)}
+details.prompt pre{margin:0;padding:10px;border-top:1px solid var(--line);font:12px/1.5 var(--f-mono);white-space:pre-wrap;overflow-wrap:anywhere;max-height:220px;overflow:auto}
+.modal .tips{display:grid;gap:4px;margin:0;padding:0;list-style:none;font-size:13px;color:var(--muted)}
+.modal .tips li{margin:0}
+.tips li::before{content:"・";color:var(--accent-ink)}
+.privacy{font-size:13px;border-left:3px solid var(--warn);background:var(--warn-pale);padding:6px 10px;border-radius:0 6px 6px 0}
+textarea.paste{width:100%;min-height:120px;resize:vertical;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);padding:8px 10px;font:12.5px/1.45 var(--f-mono)}
+.verify{border:1px solid var(--warn);background:var(--warn-pale);border-radius:8px;padding:10px 12px;margin-bottom:10px}
+.modal .verify h3{color:var(--warn);margin-top:0}
+.verify li b{font-variant-numeric:tabular-nums}
+.verify .hint{margin-top:4px}
+@media (max-width:720px){
+  .pstep-b .btn{min-height:44px}
 }
 
 /* ---------- Fichier lié (lot 7) ---------- */
@@ -714,22 +744,24 @@ a.btn .ext{margin-left:8px}
 .res-menu .d{display:block;font-weight:400;font-size:12px;color:var(--muted)}
 .res-menu .ext{color:var(--muted);margin:0}
 .res-foot{border-top:1px solid var(--line);margin:6px 0 0;padding:8px 10px 4px;font-size:12px;color:var(--muted)}
-/* Bibliothèque vide : deux façons de commencer, puis les modèles (L.3) */
+/* Bibliothèque vide : trois façons de commencer, puis les modèles (L.3, annexe S) */
 .lib-empty{display:grid;gap:22px}
 .start h2{font-size:21px;margin-bottom:6px}
 .start > p{margin:0}
-/* Les deux options partagent les lignes de la grille (subgrid) : en-têtes, étapes et boutons alignés et de même hauteur */
-.start-opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:14px;margin-top:16px}
-.start-opt{display:grid;grid-row:span 4;grid-template-rows:subgrid;row-gap:0;border:1px solid var(--line);border-radius:10px;padding:16px;background:var(--bg)}
+/* Les options partagent les lignes de la grille (subgrid) : en-têtes, étapes et boutons alignés et de même hauteur */
+/* Pas de row-gap sur la grille : le subgrid le reporterait dans chaque carte. Deux rangées de cartes (768 px) : marge sous chaque carte, rattrapée en bas. */
+.start-opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));column-gap:14px;margin:16px 0 -14px}
+.start-opt{display:grid;grid-row:span 4;grid-template-rows:subgrid;row-gap:0;border:1px solid var(--line);border-radius:10px;padding:16px;background:var(--bg);margin-bottom:14px}
 .start-opt-h{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:start}
 .start-opt-h h3{font-size:18px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
 .start-opt-h p{margin:2px 0 0;font-size:14px}
 .start-opt-act{justify-self:start}
 .opt-k{display:grid;place-items:center;width:40px;height:40px;border-radius:8px;background:var(--accent-pale);color:var(--accent-ink);font:800 20px/1 var(--f-display)}
-.steps{list-style:none;margin:14px 0 16px;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.steps li{display:grid;gap:4px;align-content:start;padding:12px;border-radius:8px;background:var(--surface);border:1px solid var(--line)}
-.steps .step-n{font:800 18px/1 var(--f-display);color:var(--accent-ink)}
-.steps .step-s{font-weight:700;font-size:14px}
+/* Étapes empilées à toutes les largeurs (lot 43) : numéro à gauche, intitulé et description à droite */
+.steps{list-style:none;margin:14px 0 16px;padding:0;display:grid;grid-template-columns:1fr;gap:6px}
+.steps li{display:grid;grid-template-columns:24px 1fr;column-gap:10px;row-gap:0;align-content:start;padding:8px 12px;border-radius:8px;background:var(--surface);border:1px solid var(--line)}
+.steps .step-n{grid-row:span 2;align-self:center;font:800 18px/1 var(--f-display);color:var(--accent-ink)}
+.steps .step-s{font-weight:700;font-size:14px;hyphens:auto;overflow-wrap:break-word}
 .steps .step-x{font-size:12px;color:var(--muted)}
 /* Forge pas encore compatible (lot 27) : carte en pointillés, pastille, encadré 待, étape à venir */
 .start-opt.wait{border-style:dashed}
@@ -753,6 +785,7 @@ a.btn .ext{margin-left:8px}
 .discover a{font-weight:700;text-decoration:underline}
 /* Bibliothèque avec fiches : « Un nouveau personnage ? » sous la liste (L.4) */
 .newchar{margin-top:16px}
+.newchar .start-opts{grid-template-columns:repeat(3,minmax(0,1fr))}
 .start-opt.compact{grid-row:span 2;padding:14px}
 .start-opt.compact h3{font-size:16px}
 .start-opt.compact p{font-size:13px}
@@ -769,14 +802,10 @@ a.btn .ext{margin-left:8px}
     animation:sheetIn .2s ease-out}
   .res-menu .grip{display:block;width:44px;height:5px;border-radius:3px;background:var(--line);margin:8px auto 2px}
   body.menu-open,html:has(body.menu-open){overflow:hidden}
-  .start-opts,.tpl-list{grid-template-columns:1fr}
-  /* Une colonne : chaque option garde ses propres lignes */
-  .start-opts{row-gap:14px}
+  .start-opts,.newchar .start-opts,.tpl-list{grid-template-columns:1fr}
+  /* Une colonne : chaque option garde ses propres lignes (espacées par leur marge du bas) */
   .start-opt{grid-row:auto;grid-template-rows:auto auto 1fr auto}
   .start-opt.compact{grid-template-rows:auto auto}
-  .steps{grid-template-columns:1fr}
-  .steps li{grid-template-columns:24px 1fr;column-gap:10px}
-  .steps .step-n{grid-row:span 2}
   .tplc .btn,.start-opt .btn{min-height:44px}
 }
 
@@ -819,6 +848,17 @@ a.mon .ext{margin-left:0}
 .appfoot nav a{display:inline-flex;align-items:center;color:var(--muted);min-height:32px}
 .appfoot nav a:hover{color:var(--accent-ink)}
 .appfoot nav .ext{margin-left:4px}
+/* Pastille Règles L5R 4e, repliée par défaut ; le panneau passe sous toute la ligne (lot 41) */
+.rulesbtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:transparent;border-radius:999px;padding:3px 10px 3px 4px;min-height:32px;font-size:12.5px;font-weight:500;color:var(--muted);cursor:pointer}
+.rulesbtn:hover,.rulesbtn[aria-expanded="true"]{color:var(--accent-ink);border-color:var(--accent);background:var(--accent-pale)}
+.rulesbtn .kj{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--surface);border:1px solid var(--line);font:800 12px/1 var(--f-display);color:var(--accent-ink)}
+.rulesbtn .chev{width:12px;height:12px;transition:rotate .15s}
+.rulesbtn[aria-expanded="true"] .chev{rotate:180deg}
+.rulespanel{flex-basis:100%;order:10;margin-top:6px;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:8px;font-size:12.5px}
+.memo{display:grid;gap:4px;margin:0;padding:0;list-style:none}
+.memo li{display:grid;grid-template-columns:7.5em 1fr;gap:10px}
+.memo b{color:var(--ink);font-weight:700}
+.memo .warn{font-style:italic}
 /* Présentation statique sous l'application, ajoutée sur l'adresse Pages seulement (annexe P) */
 .presentation{max-width:1080px;margin:12px auto 0;padding-top:12px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
 .presentation h1{margin:0 0 4px;font:800 15px/1.3 var(--f-display);color:var(--ink)}
@@ -830,6 +870,8 @@ a.mon .ext{margin-left:0}
   /* Liens sous le nom, tous visibles ; le padding bas du body garde le pied au-dessus de la barre d'onglets */
   .appfoot{font-size:12px;gap:2px 12px}
   .appfoot nav{margin-left:0;width:100%}
+  .memo li{grid-template-columns:1fr;gap:0}
+  .memo li + li{margin-top:4px}
 }
 /* ---------- v2.22.0 : sorts depuis le grimoire du portail (annexe N.5) ---------- */
 .spell-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}

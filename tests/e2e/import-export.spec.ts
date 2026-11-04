@@ -95,3 +95,60 @@ test("E5 : fusion ajoutant Kyujutsu et un arc : aperçu, puis tir sur Réflexes 
   await expect(page.getByText("Arc 2 + VD 2g2")).toBeVisible();
   await expect(page.getByText("Force 2 : l'arc de force 3 tire à 2.")).toBeVisible();
 });
+
+test("Lot 39 : export de la Forge importé depuis la Bibliothèque vide, puis avec fiches, puis en fusion", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto(pageUrl);
+  await importFile(page, resolve("tests/fixtures/forge-mirumoto.json"), /Nouvelle fiche/);
+  await dialog(page).getByRole("button", { name: "Importer" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Testeur Kitsuki" })).toBeVisible();
+
+  await page.getByRole("button", { name: "Carnet de Rokugan — ouvrir la bibliothèque" }).click();
+  await importFile(page, resolve("tests/fixtures/forge-isawa.json"), /Nouvelle fiche/);
+  await dialog(page).getByRole("button", { name: "Importer" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Testeur Shiba" })).toBeVisible();
+
+  await importFile(page, resolve("tests/fixtures/forge-mirumoto.json"), /Fusionner dans « Testeur Shiba »/);
+  await expect(dialog(page).getByRole("alert")).toHaveCount(0);
+  await dialog(page).getByRole("button", { name: "Appliquer" }).click();
+  await expect(dialog(page)).toBeHidden();
+  await expect(page.getByRole("heading", { level: 1, name: "Testeur Kitsuki" })).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test.describe("Lot 42 : import depuis une fiche papier", () => {
+  const reply = readFileSync(resolve("tests/fixtures/photo-reponse.txt"), "utf8");
+  const photoDialog = (page: Page) => page.getByRole("dialog", { name: "Importer depuis une fiche papier" });
+
+  test("réponse collée dans la Bibliothèque vide : import, la fiche s'ouvre, aucune requête", async ({ page }) => {
+    const requests: string[] = [];
+    page.on("request", (r) => { if (!r.url().startsWith("file:")) requests.push(r.url()); });
+    await page.goto(pageUrl);
+    await page.getByRole("button", { name: "Depuis une photo…" }).click();
+    await photoDialog(page).getByRole("textbox", { name: "Réponse de l'IA" }).fill(reply);
+    await photoDialog(page).getByRole("button", { name: "Vérifier" }).click();
+    await expect(photoDialog(page).getByRole("region", { name: "À vérifier sur ta fiche (3)" })).toBeVisible();
+    await photoDialog(page).getByRole("button", { name: "Importer" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Hiruma Daisuke" })).toBeVisible();
+    expect(requests).toEqual([]);
+  });
+
+  test("390 px : feuille du bas sans défilement horizontal, boutons d'au moins 44 px", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(pageUrl);
+    await page.getByRole("button", { name: "Depuis une photo…" }).click();
+    const box = (await photoDialog(page).boundingBox())!;
+    expect(Math.round(box.x)).toBe(0);
+    expect(Math.round(box.width)).toBe(390);
+    expect(Math.round(box.y + box.height)).toBe(844);
+    await photoDialog(page).getByText("Voir le prompt").click();
+    await photoDialog(page).getByRole("textbox", { name: "Réponse de l'IA" }).fill(reply);
+    await photoDialog(page).getByRole("button", { name: "Vérifier" }).click();
+    for (const name of ["Copier le prompt", "Vérifier", "Annuler", "Importer"]) {
+      expect((await photoDialog(page).getByRole("button", { name }).boundingBox())!.height, name).toBeGreaterThanOrEqual(44);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+    expect(await photoDialog(page).evaluate((d) => d.scrollWidth <= d.clientWidth)).toBe(true);
+  });
+});

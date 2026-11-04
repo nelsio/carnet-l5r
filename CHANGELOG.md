@@ -2,9 +2,55 @@
 
 Toutes les évolutions notables du Carnet de Rokugan sont notées ici.
 
-Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le projet respecte le [versionnement sémantique](https://semver.org/lang/fr/). Le détail de chaque version est dans l'annexe correspondante de [`HANDOFF.md`](HANDOFF.md).
+Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le projet respecte le [versionnement sémantique](https://semver.org/lang/fr/). Le détail de chaque version est dans l'annexe correspondante de la spécification ([`HANDOFF.md`](HANDOFF.md), dossier `spec/annexes/`).
 
 ## [Non publié]
+
+### Technique
+- Publication : une ancienne version publiée en retard ne devient plus la « dernière release » à télécharger.
+
+## [2.27.3] - 2026-11-03
+
+### Corrigé
+- Barre d'état : les niveaux de blessure ne sont plus coupés (Égrat., Grav., HdC). Le nom complet s'affiche au survol.
+
+### Modifié
+- Sur un écran moyen (tablette, petit portable), la piste des blessures prend sa propre ligne au-dessus des tuiles.
+
+### Technique
+- Les lecteurs d'écran annoncent le nom complet de chaque niveau de la piste.
+- Test de bout en bout de la piste sous Chromium et WebKit, de 700 à 1280 px.
+
+## [2.27.2] - 2026-11-03
+
+### Documentation
+- La spécification est découpée en fichiers par section (dossier `spec/`) ; `HANDOFF.md` devient un index.
+
+## [2.27.1] - 2026-11-02
+
+### Modifié
+- Sur ordinateur, les étapes de chaque façon de commencer s'affichent en liste, comme sur mobile : plus lisibles.
+- Nouvel ordre des façons de commencer : fiche papier, Forge, fiche vierge.
+
+## [2.27.0] - 2026-11-02
+
+### Ajouté
+- Importer un personnage depuis une fiche papier : le Carnet fournit un prompt, ton IA lit tes photos, tu colles sa réponse et tu vérifies avant d'importer.
+
+## [2.26.2] - 2026-11-02
+
+### Modifié
+- Le rappel des règles ne s'affiche plus en bas de chaque écran : il se déplie depuis **Règles L5R 4e**, dans le pied de page.
+
+## [2.26.1] - 2026-11-02
+
+### Modifié
+- Installé sur l'écran d'accueil, le Carnet s'appelle désormais « Carnet L5R ».
+
+## [2.26.0] - 2026-11-02
+
+### Modifié
+- La Forge du portail est compatible : son export JSON s'importe dans le Carnet avec **Importer un JSON**. Fin de la pastille « JSON pas encore compatible ».
 
 ## [2.25.2] - 2026-11-01
 
@@ -307,7 +353,14 @@ Simples liens ouverts dans un nouvel onglet : le Carnet ne fait toujours aucune 
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.25.2...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.27.3...HEAD
+[2.27.3]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.27.3
+[2.27.2]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.27.2
+[2.27.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.27.1
+[2.27.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.27.0
+[2.26.2]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.26.2
+[2.26.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.26.1
+[2.26.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.26.0
 [2.25.2]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.25.2
 [2.25.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.25.1
 [2.25.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.25.0

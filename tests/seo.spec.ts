@@ -22,7 +22,7 @@ describe("présentation sur GitHub Pages (annexe P)", () => {
     const block = doc.getElementById("root")!.nextElementSibling!;
     expect(block.querySelector("h1")?.textContent).toBe("Carnet de Rokugan");
     const text = block.textContent!.replace(/\s+/g, " ");
-    for (const word of ["La Légende des Cinq Anneaux", "L5R", "4e édition", "fiche de personnage", "jets de dés", "joueurs", "mobile", "import/export JSON", "gratuit", "sans compte"]) {
+    for (const word of ["La Légende des Cinq Anneaux", "L5R", "4e édition", "fiche de personnage", "jets de dés", "joueurs", "mobile", "import/export JSON", "gratuit", "sans compte", "créateur de personnage compatible"]) {
       expect(text).toContain(word);
     }
     expect(block.querySelector("a")?.getAttribute("href")).toBe("https://vincenzorpg.github.io/L5R/");

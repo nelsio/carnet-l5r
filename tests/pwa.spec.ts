@@ -23,6 +23,10 @@ describe("publication sur GitHub Pages (O.3)", () => {
     expect(run(site).status).toBe(0);
     const html = readFileSync(join(site, "index.html"), "utf8");
     expect(html).toContain('<link rel="manifest" href="manifest.webmanifest" />');
+    // Lot 40 : nom proposé par iOS pour l'écran d'accueil.
+    const apple = html.indexOf('<meta name="apple-mobile-web-app-title" content="Carnet L5R" />');
+    expect(apple).toBeGreaterThan(0);
+    expect(apple).toBeLessThan(html.indexOf("</head>"));
     expect(html.indexOf("serviceWorker.register('sw.js')")).toBeGreaterThan(0);
     expect(html.indexOf("serviceWorker.register('sw.js')")).toBeLessThan(html.indexOf("</head>"));
     expect(html).toContain("<title>t</title>");
@@ -48,6 +52,7 @@ describe("publication sur GitHub Pages (O.3)", () => {
 describe("manifeste (O.3)", () => {
   const manifest = JSON.parse(readFileSync(resolve("public-pages/manifest.webmanifest"), "utf8")) as {
     name: string;
+    short_name: string;
     start_url: string;
     display: string;
     theme_color: string;
@@ -56,6 +61,7 @@ describe("manifeste (O.3)", () => {
 
   it("W7 : nom, adresse de départ et affichage", () => {
     expect(manifest.name).toBe("Carnet de Rokugan");
+    expect(manifest.short_name).toBe("Carnet L5R");
     expect(manifest.start_url).toBe("./");
     expect(manifest.display).toBe("standalone");
     expect(readFileSync(resolve("index.html"), "utf8")).toContain(`content="${manifest.theme_color}"`);

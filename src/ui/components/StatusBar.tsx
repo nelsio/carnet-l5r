@@ -52,7 +52,9 @@ export function StatusBar() {
           {levels.map((l) => (
             <div key={l.label} className={l.cls("wl")} title={`${l.label} jusqu'à ${l.max} blessures`} aria-current={l.current ? "step" : undefined}>
               <b>{l.penaltyText}</b>
-              <span>{l.short}</span>
+              {/* Abréviation à l'écran, libellé complet pour les lecteurs d'écran (annexe 45.2). */}
+              <span aria-hidden="true">{l.short}</span>
+              <span className="sr-only">{l.label}</span>
             </div>
           ))}
         </div>

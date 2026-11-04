@@ -15,7 +15,8 @@ const BLOCK = `
         une fiche de personnage et un assistant de jets de dés Roll &amp; Keep. Il fonctionne sur ordinateur et sur mobile, sans compte,
         et tes fiches restent dans ton navigateur. L'import/export JSON sert à sauvegarder une fiche ou à changer d'appareil.
         Pour découvrir les clans et créer un personnage, va voir
-        <a href="https://vincenzorpg.github.io/L5R/" target="_blank" rel="noopener noreferrer">Les chroniques de Rokugan</a>, un site de fan indépendant.
+        <a href="https://vincenzorpg.github.io/L5R/" target="_blank" rel="noopener noreferrer">Les chroniques de Rokugan</a>, un site de fan indépendant
+        avec un créateur de personnage compatible : son export JSON s'importe dans le Carnet.
       </p>
     </section>`;
 

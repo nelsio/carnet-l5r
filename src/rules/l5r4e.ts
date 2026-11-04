@@ -56,17 +56,17 @@ export const INSIGHT = { ringMultiplier: 10, firstThreshold: 150, step: 25, maxR
 
 /**
  * Niveaux de blessure : pénalité au ND, `null` = aucune action possible.
- * `short` : libellé abrégé pour la piste de la barre d'état.
+ * `short` : libellé abrégé (6 caractères au plus) pour la piste de la barre d'état seulement (annexe 45.1).
  */
 export const WOUND_LEVELS: readonly { label: string; short?: string; penalty: number | null }[] = [
   { label: "Indemne", penalty: 0 },
-  { label: "Égratigné", penalty: 3 },
+  { label: "Égratigné", short: "Égrat.", penalty: 3 },
   { label: "Éraflé", penalty: 5 },
   { label: "Blessé", penalty: 10 },
-  { label: "Gravement blessé", short: "Grav. blessé", penalty: 15 },
+  { label: "Gravement blessé", short: "Grav.", penalty: 15 },
   { label: "Estropié", penalty: 20 },
   { label: "À terre", penalty: 40 },
-  { label: "Hors de combat", penalty: null },
+  { label: "Hors de combat", short: "HdC", penalty: null },
 ];
 export const DEAD_LABEL = "Mort";
 /** Seuils cumulés : Indemne jusqu'à Terre × 5, puis Terre × 2 de plus par niveau. */

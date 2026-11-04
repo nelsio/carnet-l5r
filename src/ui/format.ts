@@ -12,6 +12,15 @@ export function toMeters(feet: number): string {
   return `${(feet * FEET_TO_METERS).toFixed(1).replace(".", ",")} m`;
 }
 
+/** Valeur lisible dans l'aperçu d'un import. */
+export function show(v: unknown): string {
+  if (v === undefined || v === null) return "—";
+  if (typeof v === "string") return v === "" ? "(vide)" : `« ${v} »`;
+  if (Array.isArray(v)) return v.length ? v.map(show).join(", ") : "(aucune)";
+  if (typeof v === "object") return JSON.stringify(v);
+  return String(v);
+}
+
 /** Réputation : une décimale, virgule française. */
 export function decimal(n: number): string {
   return n.toFixed(1).replace(".", ",");

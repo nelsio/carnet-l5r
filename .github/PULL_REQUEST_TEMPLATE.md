@@ -2,7 +2,7 @@
 
 ## Résumé
 
-<!-- Ce qui change, en quelques puces. Lien vers l'annexe de HANDOFF.md si besoin. -->
+<!-- Ce qui change, en quelques puces. Lien vers l'annexe du lot dans `spec/annexes/` si besoin. -->
 
 ## Vérifications
 
@@ -12,4 +12,4 @@
 - [ ] Playwright (`npm run test:e2e`)
 - [ ] Captures bureau et 390 px (si l'interface change)
 - [ ] `CHANGELOG.md` à jour
-- [ ] `HANDOFF.md` à jour (écarts de mise en œuvre)
+- [ ] Spécification à jour : ligne « État actuel » de `HANDOFF.md`, annexe du lot (livré / écarts), `spec/11-lots.md`

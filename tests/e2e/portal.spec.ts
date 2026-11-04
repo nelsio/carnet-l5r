@@ -91,25 +91,30 @@ test.describe("O6 : menu Ressources à 390 px", () => {
 });
 
 test.describe("O7 : Bibliothèque vide", () => {
-  test("bureau : deux options de même largeur, côte à côte ; modèles sur trois colonnes", async ({ page }) => {
+  test("bureau : trois options de même largeur, côte à côte ; modèles sur trois colonnes", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto(pageUrl);
     const opts = page.locator(".start .start-opt");
-    const [a, b] = [(await opts.nth(0).boundingBox())!, (await opts.nth(1).boundingBox())!];
-    expect(Math.round(a.width)).toBe(Math.round(b.width));
-    expect(Math.round(a.y)).toBe(Math.round(b.y));
-    expect(Math.round(a.height)).toBe(Math.round(b.height));
+    await expect(opts).toHaveCount(3);
+    const [a, b, c] = [(await opts.nth(0).boundingBox())!, (await opts.nth(1).boundingBox())!, (await opts.nth(2).boundingBox())!];
+    for (const o of [b, c]) {
+      expect(Math.round(o.width)).toBe(Math.round(a.width));
+      expect(Math.round(o.y)).toBe(Math.round(a.y));
+      expect(Math.round(o.height)).toBe(Math.round(a.height));
+    }
     // Description plus longue d'un côté : étapes et boutons restent alignés, cases de même taille (v2.20.1).
     const boxes = async (sel: string) => Promise.all((await page.locator(`.start ${sel}`).all()).map(async (x) => (await x.boundingBox())!));
     const steps = await boxes(".steps li");
-    expect(steps).toHaveLength(6);
-    expect(new Set(steps.map((s) => Math.round(s.y))).size).toBe(1);
+    expect(steps).toHaveLength(9);
+    // Lot 43 : étapes empilées ; la n-ième étape de chaque carte est au même niveau.
+    for (let i = 0; i < 3; i++) expect(new Set([steps[i]!, steps[i + 3]!, steps[i + 6]!].map((s) => Math.round(s.y))).size).toBe(1);
     expect(new Set(steps.map((s) => Math.round(s.height))).size).toBe(1);
     const acts = await boxes(".start-opt-act");
-    expect(Math.round(acts[0]!.y)).toBe(Math.round(acts[1]!.y));
-    // Lot 27 : Fiche vierge à gauche (ordre DOM et visuel), Forge à droite.
-    await expect(opts.nth(0).getByRole("heading")).toHaveText("Fiche vierge");
+    expect(new Set(acts.map((x) => Math.round(x.y))).size).toBe(1);
+    // Lot 43 : Fiche papier à gauche, Forge au milieu, Fiche vierge à droite (ordre DOM et visuel).
+    await expect(opts.getByRole("heading")).toHaveText(["Depuis une fiche papier", "Forger sur le portail", "Fiche vierge"]);
     expect(b.x).toBeGreaterThan(a.x);
+    expect(c.x).toBeGreaterThan(b.x);
     const cards = await page.locator(".tplc").all();
     const tops = await Promise.all(cards.map(async (c) => Math.round((await c.boundingBox())!.y)));
     expect(new Set(tops).size).toBe(1);
@@ -124,25 +129,52 @@ test.describe("O7 : Bibliothèque vide", () => {
     const steps = (await opts.nth(0).locator("li").all());
     const ys = await Promise.all(steps.map(async (s) => (await s.boundingBox())!.y));
     expect(ys[1]!).toBeGreaterThan(ys[0]!);
-    // Lot 27 : Fiche vierge en haut, Forge dessous, pastille entière dans la carte.
-    await expect(opts.nth(0).getByRole("heading")).toHaveText("Fiche vierge");
-    const pend = (await opts.nth(1).locator(".pend").boundingBox())!;
-    expect(pend.x + pend.width).toBeLessThanOrEqual(b.x + b.width);
-    expect(pend.height).toBeLessThan(30);
+    // Lot 43 : Fiche papier en haut, Forge, puis Fiche vierge ; lot 39 : plus de pastille.
+    await expect(opts.getByRole("heading")).toHaveText(["Depuis une fiche papier", "Forger sur le portail", "Fiche vierge"]);
+    await expect(opts.nth(1).locator(".pend")).toHaveCount(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   });
+
+  for (const width of [1024, 1280]) {
+    test(`lot 43, ${width} px : étapes empilées dans chaque carte, listes alignées`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(pageUrl);
+      await expect(page.locator(".start .steps")).toHaveCount(3);
+      const lists = await page.locator(".start .steps").all();
+      const tops: number[] = [];
+      for (const list of lists) {
+        const l = (await list.boundingBox())!;
+        tops.push(Math.round(l.y));
+        const items = await list.locator("li").all();
+        expect(items).toHaveLength(3);
+        const boxes = await Promise.all(items.map(async (li) => (await li.boundingBox())!));
+        expect(new Set(boxes.map((x) => Math.round(x.x))).size).toBe(1);
+        for (const x of boxes) expect(x.width).toBeGreaterThanOrEqual(l.width * 0.8);
+        expect(boxes[1]!.y).toBeGreaterThanOrEqual(boxes[0]!.y + boxes[0]!.height);
+        for (const li of items) {
+          const n = (await li.locator(".step-n").boundingBox())!;
+          const s = (await li.locator(".step-s").boundingBox())!;
+          expect(n.x + n.width).toBeLessThanOrEqual(s.x);
+          // Intitulé sur une ligne : aucun mot coupé.
+          expect(await li.locator(".step-s").evaluate((el) => el.getClientRects().length)).toBe(1);
+        }
+      }
+      expect(new Set(tops).size).toBe(1);
+    });
+  }
 });
 
-test.describe("Lot 27 : Forge pas encore compatible", () => {
-  test("Bibliothèque vide : Fiche vierge d'abord (bouton principal), Forge avec pastille, encadré et étape « Recopier »", async ({ page }) => {
+test.describe("Lot 27, lot 39, lot 43 : Forge compatible, ordre lot 43", () => {
+  test("Bibliothèque vide : Fiche papier, Forge sans pastille ni encadré (étapes Forger · Exporter · Importer), Fiche vierge (bouton principal)", async ({ page }) => {
     await page.goto(pageUrl);
     const opts = page.locator(".start .start-opt");
-    await expect(opts.nth(0).getByRole("heading")).toHaveText("Fiche vierge");
-    await expect(opts.nth(0).getByRole("button", { name: "Nouvelle fiche vierge" })).toHaveClass(/\baccent\b/);
+    await expect(opts.nth(0).getByRole("heading")).toHaveText("Depuis une fiche papier");
+    await expect(opts.nth(2).getByRole("heading")).toHaveText("Fiche vierge");
+    await expect(opts.nth(2).getByRole("button", { name: "Nouvelle fiche vierge" })).toHaveClass(/\baccent\b/);
     const forge = opts.nth(1);
-    await expect(forge.locator(".pend")).toHaveText("JSON pas encore compatible");
-    await expect(forge.getByRole("note")).toContainText("L'import direct arrive bientôt.");
-    await expect(forge.locator(".step-s")).toHaveText(["Forger", "Recopier", "Importer"]);
+    await expect(forge.locator(".pend")).toHaveCount(0);
+    await expect(forge.getByRole("note")).toHaveCount(0);
+    await expect(forge.locator(".step-s")).toHaveText(["Forger", "Exporter", "Importer"]);
     const link = forge.getByRole("link", { name: "Ouvrir la Forge (nouvel onglet)" });
     await expect(link).toHaveAttribute("href", "https://vincenzorpg.github.io/L5R/createcharacter.html");
     await expect(link).toHaveAttribute("target", "_blank");
@@ -150,27 +182,28 @@ test.describe("Lot 27 : Forge pas encore compatible", () => {
     await expect(link).not.toHaveClass(/\baccent\b/);
   });
 
-  test("Bibliothèque avec fiches : même ordre, pastille ; menu Ressources : pastille et nouvelle description", async ({ page }) => {
+  test("Bibliothèque avec fiches : même ordre, sans pastille ; menu Ressources : description compatible", async ({ page }) => {
     await page.goto(pageUrl);
     await page.getByRole("button", { name: "Utiliser le modèle Bushi" }).click();
     await page.getByRole("button", { name: "Carnet de Rokugan — ouvrir la bibliothèque" }).click();
     const opts = page.locator(".newchar .start-opt");
-    await expect(opts.nth(0).getByRole("heading")).toHaveText("Fiche vierge");
-    await expect(opts.nth(1).locator(".pend")).toBeVisible();
+    await expect(opts.getByRole("heading")).toHaveText(["Depuis une fiche papier", "Forger sur le portail", "Fiche vierge"]);
+    await expect(opts.nth(1).locator(".pend")).toHaveCount(0);
+    await expect(opts.nth(1)).toContainText("Création guidée, puis export JSON à importer ici.");
     await resources(page).click();
     const forge = menu(page).getByRole("menuitem", { name: /^Forge de personnage/ });
-    await expect(forge.locator(".pend")).toBeVisible();
-    await expect(forge).toContainText("Création guidée. Pour l'instant, recopie le résultat dans une fiche vierge.");
+    await expect(forge.locator(".pend")).toHaveCount(0);
+    await expect(forge).toContainText("Exporte un JSON compatible avec le Carnet");
   });
 
-  test("390 px : menu Ressources, pastille dans la ligne Forge, sans défilement horizontal", async ({ page }) => {
+  test("390 px : menu Ressources, ligne Forge sans défilement horizontal", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(pageUrl);
     await resources(page).click();
     const forge = menu(page).getByRole("menuitem", { name: /^Forge de personnage/ });
     const row = (await forge.boundingBox())!;
-    const pend = (await forge.locator(".pend").boundingBox())!;
-    expect(pend.x + pend.width).toBeLessThanOrEqual(row.x + row.width);
+    const items = await menu(page).boundingBox();
+    expect(row.x + row.width).toBeLessThanOrEqual(items!.x + items!.width + 1);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   });
 });

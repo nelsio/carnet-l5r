@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 2,
+  "name": "Testeur Kitsuki",
+  "clan": "Dragon",
+  "family": "Kitsuki",
+  "school": "Bushi Mirumoto",
+  "schoolId": "mirumoto-bushi",
+  "schoolRank": null,
+  "insightRank": 1,
+  "honor": 4.5,
+  "glory": 1,
+  "status": 1,
+  "xp": {
+    "total": 40,
+    "spent": 0
+  },
+  "traits": {
+    "stamina": 3,
+    "willpower": 2,
+    "strength": 2,
+    "perception": 3,
+    "agility": 2,
+    "intelligence": 2,
+    "reflexes": 2,
+    "awareness": 2
+  },
+  "voidRing": 2,
+  "voidPoints": 2,
+  "wounds": 0,
+  "armor": {
+    "name": "Armure lourde",
+    "bonus": 10,
+    "reduction": 5,
+    "catalogId": "heavy"
+  },
+  "skills": [
+    {
+      "name": "Kenjutsu",
+      "rank": 1,
+      "trait": "agility",
+      "emphases": [
+        "Katana"
+      ]
+    }
+  ],
+  "weapons": [
+    {
+      "name": "Katana",
+      "skill": "Kenjutsu",
+      "dr": "3g2",
+      "keywords": [
+        "samourai",
+        "moyenne"
+      ]
+    }
+  ],
+  "techniques": [],
+  "maneuvers": [],
+  "modifiers": [],
+  "spells": [],
+  "advantages": "",
+  "disadvantages": "",
+  "notes": "Armure légère ou lourde, Daisho Mirumoto, Nécessaire de voyage, 3 koku"
+}

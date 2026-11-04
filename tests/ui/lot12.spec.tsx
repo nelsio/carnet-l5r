@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import type { Character } from "@carnet/core";
 import { memoryStorage, type LibraryEntry } from "../../src/storage";
 import { App } from "../../src/ui/App";
+import { WOUND_LEVELS } from "../../src/rules/l5r4e";
 import kakita from "../fixtures/kakita-v1.json";
 import { VIEW } from "../helpers/views";
 
@@ -124,6 +125,19 @@ describe("Barre d'état : pénalités effectives et détail mobile (annexe E.9 S
     expect(track.getByTitle("À terre jusqu'à 34 blessures")).toHaveTextContent("+37");
     fireEvent.click(summary);
     expect(within(screen.getByTestId("wound-detail")).getAllByRole("listitem")[1]).toHaveTextContent("+0");
+  });
+
+  it("piste : abréviations à l'écran, libellé complet en sr-only et en title (annexe 45.1, 45.2)", async () => {
+    await renderApp({ ...base(), wounds: 24 });
+    const cells = Array.from(screen.getByLabelText("Niveaux de blessure").querySelectorAll(".wl"));
+    const shown = cells.map((cell) => cell.querySelector("[aria-hidden='true']")?.textContent);
+    expect(shown).toEqual(["Indemne", "Égrat.", "Éraflé", "Blessé", "Grav.", "Estropié", "À terre", "HdC"]);
+    expect(cells.map((cell) => cell.querySelector(".sr-only")?.textContent)).toEqual(WOUND_LEVELS.map((w) => w.label));
+    expect(cells[4]).toHaveAttribute("title", "Gravement blessé jusqu'à 26 blessures");
+    // Le libellé courant et le détail déplié gardent le nom complet.
+    const summary = screen.getByRole("button", { name: /Gravement blessé/ });
+    fireEvent.click(summary);
+    expect(within(screen.getByTestId("wound-detail")).getAllByRole("listitem")[4]).toHaveTextContent("Gravement blessé");
   });
 });
 
