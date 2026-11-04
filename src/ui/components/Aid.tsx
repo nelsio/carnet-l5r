@@ -74,7 +74,13 @@ export function Aid() {
           {combat && ui.sub !== "duel" && <StancePanel />}
           {combat && <VoidPanel />}
           {(combat || ui.situation === "court") && <RemindersPanel />}
-          <div className="actions">
+          <div className="listhead">
+            <span className="panel-title">
+              <span className="label">Actions</span><ActionsInfoButton />
+              {ui.compactActions && <span className="ibhint">explications masquées</span>}
+            </span>
+          </div>
+          <div className={`actions${ui.compactActions ? " compact" : ""}`}>
             {actions.filter((a) => a.kind !== "initiative").map((a, i, list) => (
               // Titre de groupe avant la première action du groupe (« Repos », annexe E.6).
               a.group && a.group !== list[i - 1]?.group
@@ -598,6 +604,19 @@ function InfoButton({ panel, label }: { panel: InfoPanel; label: string }) {
   );
 }
 
+/** « i » de la liste des actions : plein quand les explications sont affichées (défaut), vide en vue compacte (annexe 46.3). */
+function ActionsInfoButton() {
+  const { state, dispatch } = useStore();
+  const shown = !state.ui.compactActions;
+  return (
+    <button
+      type="button" className={`ib${shown ? " on" : ""}`} aria-pressed={shown}
+      aria-label="Explications des actions" title="Explications des actions"
+      onClick={() => dispatch({ type: "compactActions", value: shown })}
+    >i</button>
+  );
+}
+
 function ActionCard({ action: a }: { action: ActionDef }) {
   const { state, dispatch } = useStore();
   const c = useCharacter();
@@ -631,16 +650,20 @@ function ActionCard({ action: a }: { action: ActionDef }) {
       </div>
     );
   }
+  const selected = ui.selectedId === a.id;
+  // Vue compacte : seule l'action choisie garde sa description ; « Action simple » remonte sur la ligne du titre (annexe 46.1).
+  const showDesc = !ui.compactActions || selected;
+  const tag = simple && <span className="tag sa">Attaque : Action simple</span>;
   return (
     <button
       type="button"
       className={["act", child ? "child" : "", pending ? "linked" : ""].filter(Boolean).join(" ")}
-      aria-pressed={ui.selectedId === a.id}
+      aria-pressed={selected}
       onClick={() => dispatch({ type: "select", id: a.id })}
     >
-      <span className="t">{a.label}{pending > 0 && <> <span className="pend">+{pending}g0 en attente</span></>}</span>
+      <span className="t">{a.label}{pending > 0 && <> <span className="pend">+{pending}g0 en attente</span></>}{!showDesc && tag}</span>
       <span className="p">{p ? poolLabel(p) : ""}</span>
-      <span className="d">{simple && <><span className="tag sa">Attaque : Action simple</span>{" "}</>}{a.description}</span>
+      {showDesc && <span className="d">{tag && <>{tag}{" "}</>}{a.description}</span>}
     </button>
   );
 }

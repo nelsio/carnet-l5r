@@ -6,7 +6,7 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document et le dossier `spec/` qu'il indexe.
 
-**État actuel :** version **v2.27.3**, lot 45 : niveaux de blessure abrégés dans la barre d'état, plus de troncature (annexe 45).
+**État actuel :** version **v2.28.0**, lot 46 : vue compacte de l'Assistant L5R, explications des actions masquables par le « i » du titre Actions (annexe 46).
 
 ---
 
@@ -53,6 +53,7 @@ Fait foi :
 | T | Étapes en liste, nouvel ordre des options | 43 | v2.27.1 | [`T-lot-43-etapes.md`](spec/annexes/T-lot-43-etapes.md) |
 | 44 | Spécification découpée | 44 | v2.27.2 | [`44-spec-decoupee.md`](spec/annexes/44-spec-decoupee.md) |
 | 45 | Barre d'état : niveaux de blessure abrégés | 45 | v2.27.3 | [`45-barre-etat.md`](spec/annexes/45-barre-etat.md) |
+| 46 | Assistant L5R : vue compacte | 46 | v2.28.0 | [`46-vue-compacte.md`](spec/annexes/46-vue-compacte.md) |
 
 ## Lire pour un lot
 

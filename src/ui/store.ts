@@ -58,6 +58,8 @@ export interface UiState {
   showDiceRoller: boolean;
   /** Préférence : niveaux de blessure après Indemne à Terre × 2 (défaut) à × 5 (annexe E.6). */
   woundMultiplier: number;
+  /** Préférence : explications des actions masquées dans l'Assistant, sauf celle de l'action choisie (annexe 46.2). */
+  compactActions: boolean;
   /** Détails dépliés par le « i » de chaque panneau (non persisté). */
   info: Partial<Record<InfoPanel, boolean>>;
   /** Éditeur d'armure ouvert sous les tuiles de la barre d'état. */
@@ -167,6 +169,7 @@ export const initialUi: UiState = {
   theme: "auto",
   showDiceRoller: true,
   woundMultiplier: WOUND_NEXT_MULTIPLIER,
+  compactActions: false,
   info: {},
   armorEdit: false,
   view: "sheet",
@@ -225,6 +228,7 @@ export type AppAction =
   | { type: "theme"; theme: Theme }
   | { type: "diceRoller"; show: boolean }
   | { type: "woundMultiplier"; value: number }
+  | { type: "compactActions"; value: boolean }
   /** Nouvelle journée (annexe E.6) : Vide plein, blessures soignées, initiative et compteurs à zéro. */
   | { type: "newDay" }
   /** Méditation réussie : points de Vide rendus. */
@@ -340,6 +344,7 @@ function uiReducer(state: AppState, action: AppAction): AppState {
     case "diceRoller": return withUi({ showDiceRoller: action.show });
     case "woundMultiplier":
       return (WOUND_MULTIPLIERS as readonly number[]).includes(action.value) ? withUi({ woundMultiplier: action.value }) : state;
+    case "compactActions": return withUi({ compactActions: action.value });
     case "toggleInfo": return withUi({ info: { ...ui.info, [action.panel]: !ui.info[action.panel] } });
     case "toggleArmorEdit": return withUi({ armorEdit: state.mode === "edit" && !ui.armorEdit });
     case "view":
@@ -396,8 +401,8 @@ function uiReducer(state: AppState, action: AppAction): AppState {
 }
 
 /** État d'interface conservé d'une fiche à l'autre : préférences et détails dépliés. */
-const kept = (ui: UiState): Pick<UiState, "theme" | "showDiceRoller" | "woundMultiplier" | "info"> =>
-  ({ theme: ui.theme, showDiceRoller: ui.showDiceRoller, woundMultiplier: ui.woundMultiplier, info: ui.info });
+const kept = (ui: UiState): Pick<UiState, "theme" | "showDiceRoller" | "woundMultiplier" | "compactActions" | "info"> =>
+  ({ theme: ui.theme, showDiceRoller: ui.showDiceRoller, woundMultiplier: ui.woundMultiplier, compactActions: ui.compactActions, info: ui.info });
 
 /** Actions qui modifient la fiche : refusées en consultation. */
 const EDITING = new Set<AppAction["type"]>(["set", "add", "remove", "wounds", "pip", "toggleBlockEdit", "replaceCharacter", "newDay", "meditate", "vocabulary", "castSpell", "cancelCast"]);

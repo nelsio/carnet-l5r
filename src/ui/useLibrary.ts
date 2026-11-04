@@ -75,6 +75,7 @@ export function useLibrary(
       // Lanceur affiché par défaut ; l'ancienne clé `showDiceRoller` est ignorée (annexe J.7).
       dispatch({ type: "diceRoller", show: prefs.diceRoller ?? true });
       if (prefs.woundMultiplier) dispatch({ type: "woundMultiplier", value: prefs.woundMultiplier });
+      dispatch({ type: "compactActions", value: prefs.compactActions ?? false });
       setEntries(list);
       const last = list.find((e) => e.id === prefs.lastOpenedId) ?? list[0];
       if (last) await openEntry(last);
@@ -86,11 +87,11 @@ export function useLibrary(
     };
   }, [storage, dispatch, openEntry]);
 
-  // Thème, lanceur de dés et multiplicateur de blessures mémorisés dans les préférences.
-  const { theme, showDiceRoller, woundMultiplier } = state.ui;
+  // Thème, lanceur de dés, multiplicateur de blessures et vue compacte mémorisés dans les préférences.
+  const { theme, showDiceRoller, woundMultiplier, compactActions } = state.ui;
   useEffect(() => {
-    if (ready) void storage.prefs.set({ theme, diceRoller: showDiceRoller, showDiceRoller: undefined, woundMultiplier });
-  }, [ready, theme, showDiceRoller, woundMultiplier, storage]);
+    if (ready) void storage.prefs.set({ theme, diceRoller: showDiceRoller, showDiceRoller: undefined, woundMultiplier, compactActions });
+  }, [ready, theme, showDiceRoller, woundMultiplier, compactActions, storage]);
 
   /** Bilan de l'écriture du fichier lié. */
   const applyReport = useCallback((report: SaveReport) => {

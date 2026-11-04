@@ -74,6 +74,10 @@
   - le « i » est rempli en couleur d'accent quand les détails sont ouverts ; les panneaux sont indépendants ;
   - l'encart **Se déplacer en combat** affiche par défaut seulement les trois distances en pieds ; son « i », à côté du titre, déplie les mètres, les formules et le rappel « terrain difficile » ;
   - l'état ouvert ou fermé reste en mémoire de l'onglet (non persisté). Accessibilité : `aria-expanded` et libellé « Afficher / Masquer le détail : <panneau> ». Zone de toucher d'au moins 40 px (pseudo-élément étendu).
+- **Vue compacte des actions** (v2.28.0, annexe 46) : la liste des actions de l'Assistant a un titre **Actions** dans chaque situation, suivi d'un « i » au même rendu que ceux des panneaux.
+  - « i » plein (défaut) : explications affichées ; « i » vide : vue compacte, avec la mention « explications masquées » à sa droite. `aria-pressed` = explications affichées ; nom et `title` « Explications des actions ».
+  - En vue compacte, une carte de jet non choisie n'a plus de description (non rendue) et un padding vertical de 7 px ; « Attaque : Action simple » passe sur la ligne du titre. La carte choisie, les cartes bloquées (raison et « Lancer quand même ») et les cartes info sont inchangées, de même que les panneaux Posture, Vide et Nouveau round.
+  - Réglage d'appareil, conservé au changement de fiche et mémorisé dans les préférences (`compactActions`, §3).
 - **Arbre attaque → dégâts** : chaque carte « Dégâts » est rattachée à son attaque (champ `parent` de l'action). Elle est affichée juste sous cette attaque, décalée d'environ 26 px, avec un connecteur en coude (└). Son titre garde l'arme : « Dégâts · Katana ». Le connecteur passe en couleur d'accent quand des dés de dégâts sont en attente pour ce parent, avec la mention « +Ng0 en attente ». Concerne : armes, mains nues, et Frappe → Dégâts en duel.
 - **Enchaînements** :
   - une attaque réussie avec « Augmentation des dégâts » × N pré-remplit +N dés au jet de dégâts suivant ;
