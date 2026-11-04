@@ -1,7 +1,7 @@
 /** Import et export de fiches (HANDOFF §8). */
 import { describe, expect, it } from "vitest";
 import {
-  exportFileName, importCharacter, MAX_CHARACTER_BYTES, mergeCharacter, migrate, parseCharacterFile, serializeCharacter, type Character,
+  exportFileName, formatDR, importCharacter, MAX_CHARACTER_BYTES, mergeCharacter, migrate, parseCharacterFile, serializeCharacter, type Character,
 } from "@carnet/core";
 import isawa from "./fixtures/forge-isawa.json";
 import kakita from "./fixtures/kakita-v1.json";
@@ -70,5 +70,18 @@ describe("Lot 39 : export JSON de la Forge (portail, 02/11/2026)", () => {
     const r = mergeCharacter(v2(), structuredClone(isawa));
     expect(r.ok).toBe(true);
     if (r.ok) expect(r.character.spells?.map((s) => s.name)).toEqual(isawa.spells.map((s) => s.name));
+  });
+});
+
+describe("Fiches anciennes (H.5)", () => {
+  it("K5 : export puis import d'une fiche en « 3k2 » : fusion sans changement sur la VD, VD gardée telle quelle", () => {
+    const old = structuredClone(kakita) as Character;
+    expect(old.weapons[0]!.dr).toBe("3k2");
+    const r = mergeCharacter(old, JSON.parse(serializeCharacter(old)));
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.changes.filter((ch) => ch.path.startsWith("weapons"))).toEqual([]);
+    expect(r.character.weapons[0]!.dr).toBe("3k2");
+    expect(formatDR(r.character.weapons[0]!.dr)).toBe("3g2");
   });
 });

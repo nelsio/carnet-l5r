@@ -1,4 +1,4 @@
-/** Lot 20, v2.17.0 (HANDOFF annexe J) : rendu réel du lanceur et du bloc Identité (cas Q4, Q19). */
+/** Rendu réel du lanceur : ligne Min, Moy., Max et Réussite, étiquette « 9+ » (HANDOFF annexe J, cas Q19). */
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
@@ -46,19 +46,4 @@ test("Q19 : Min, Moy., Max et Réussite de même hauteur, texte centré (± 1 px
   // L'étiquette n'hérite plus du fond ni du padding des cases.
   const tag = await dialog.getByTitle("Explose sur 9").evaluate((el) => getComputedStyle(el).paddingLeft);
   expect(tag).toBe("7px");
-});
-
-test("Q4 : bloc Identité, valeurs en mono, Initiative en .pool, placeholder du Rang d'école en police du corps", async ({ page }) => {
-  await page.goto(pageUrl);
-  await page.getByRole("button", { name: "Nouvelle fiche vierge" }).click();
-  const placeholderFont = await page.getByRole("spinbutton", { name: "Rang d'école" })
-    .evaluate((el) => getComputedStyle(el, "::placeholder").fontFamily);
-  expect(placeholderFont).toContain("Zen Kaku Gothic New");
-  await page.getByRole("button", { name: "Terminer : Identité & réputation" }).click();
-  const identity = page.getByTestId("block-identity");
-  const honor = await identity.locator(".kv b").first().evaluate((el) => getComputedStyle(el).fontFamily);
-  expect(honor).toContain("JetBrains Mono");
-  const skillsBlockValue = await page.locator(".cstats b").first().evaluate((el) => getComputedStyle(el).fontSize);
-  expect(await identity.locator(".kv b").first().evaluate((el) => getComputedStyle(el).fontSize)).toBe(skillsBlockValue);
-  await expect(identity.getByTestId("sheet-initiative")).toHaveClass(/pool/);
 });

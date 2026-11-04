@@ -6,6 +6,11 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.28.1] - 2026-11-04
+
+### Technique
+- Les tests sont rangés par fonctionnalité.
+
 ## [2.28.0] - 2026-11-04
 
 ### Ajouté
@@ -362,7 +367,8 @@ Simples liens ouverts dans un nouvel onglet : le Carnet ne fait toujours aucune 
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.28.0...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.28.1...HEAD
+[2.28.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.28.1
 [2.28.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.28.0
 [2.27.3]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.27.3
 [2.27.2]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.27.2

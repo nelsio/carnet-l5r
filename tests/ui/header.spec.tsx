@@ -1,7 +1,8 @@
-/** En-tête v2.13.0 (HANDOFF annexe G) : sceau de l'outil, surtitre, titre d'onglet. */
-import { fireEvent, render, screen } from "@testing-library/react";
+/** En-tête (HANDOFF annexe E.19, G) : sceau de l'outil, surtitre, sous-titre d'école, titre d'onglet. */
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import type { Character } from "@carnet/core";
+import { EXAMPLES } from "../../src/rules/example";
 import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
@@ -18,6 +19,8 @@ async function renderApp(character: Character | null = base(), mode: "edit" | "r
   return view;
 }
 const header = () => document.querySelector("header.top")!;
+const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
+const exampleCharacter = () => EXAMPLES[0]!.build();
 
 describe("Sceau et surtitre (G.3)", () => {
   it("H1 : fiche ouverte : sceau 帳 cliquable, surtitre « Carnet de Rokugan | Clan », bouton Bibliothèque gardé", async () => {
@@ -72,5 +75,40 @@ describe("Titre d'onglet (G.3)", () => {
     fireEvent.click(screen.getByRole("button", { name: SEAL }));
     await screen.findByRole("heading", { name: "Bibliothèque" });
     expect(document.title).toBe("Carnet de Rokugan – Fiche de personnage et assistant de jets L5R 4e édition");
+  });
+});
+
+describe("En-tête (E.19 S8, S9)", () => {
+  it("E33 : fiche d'exemple : sous-titre « École de bushi Kakita · Rang 1 »", async () => {
+    await renderApp(exampleCharacter());
+    expect(screen.getByText("École de bushi Kakita · Rang 1")).toBeInTheDocument();
+  });
+
+  it("sans école affichée : « Rang N » (rang d'école saisi)", async () => {
+    await renderApp(base({ school: "", schoolRank: 2 }));
+    expect(document.querySelector(".who .sub")).toHaveTextContent(/^Rang 2$/);
+  });
+
+  it("E34 : choisir Hiruma, renommer, puis choisir Kakita : nom Hiruma, texte saisi gardé, nom Kakita", async () => {
+    await renderApp(base({ school: "", schoolId: "" }));
+    click("Edit : Identité & réputation");
+    const identity = within(screen.getByTestId("block-identity"));
+    const schoolName = () => identity.getByRole("textbox", { name: "École (nom affiché)" });
+    const techniques = () => identity.getByRole("combobox", { name: "Techniques d'école" });
+    fireEvent.change(techniques(), { target: { value: "hiruma-bushi" } });
+    expect(schoolName()).toHaveValue("École de bushi Hiruma");
+    fireEvent.change(schoolName(), { target: { value: "École Hiruma (variante)" } });
+    expect(schoolName()).toHaveValue("École Hiruma (variante)");
+    fireEvent.change(techniques(), { target: { value: "kakita-bushi" } });
+    expect(schoolName()).toHaveValue("École de bushi Kakita");
+    // « — Aucune » ne vide pas le champ.
+    fireEvent.change(techniques(), { target: { value: "" } });
+    expect(schoolName()).toHaveValue("École de bushi Kakita");
+  });
+
+  it("le bouton « Associer » remplit aussi le nom affiché", async () => {
+    await renderApp(base({ school: "bushi Hiruma", schoolId: "" }));
+    click("Associer");
+    expect(screen.getByText("École de bushi Hiruma · Rang 1")).toBeInTheDocument();
   });
 });
