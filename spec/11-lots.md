@@ -51,12 +51,15 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 40. **v2.27.3 — barre d'état lisible** (**livrée**, écarts en 45.6) : annexe 45, lot 45. Trois niveaux abrégés dans la piste (Égrat., Grav., HdC), libellé complet pour les lecteurs d'écran ; entre 721 et 1179 px, la piste prend sa propre ligne.
 41. **v2.28.0 — vue compacte de l'Assistant** (**livrée**, écarts en 46.7) : annexe 46, lot 46. Titre « Actions » et son « i » : explications des actions masquées sauf celle de l'action choisie, préférence d'appareil `compactActions`.
 42. **v2.28.1 — tests rangés par fonctionnalité** (**livrée**, écarts en 47.6) : annexe 47, lot 47. Plus aucun fichier de test nommé d'après un lot ou une version ; mêmes tests, même couverture.
-43. **Planifiés le 02/11/2026** : lots 48 et 49 (v2.28.2, v2.28.3, `Sheet.tsx` et `store.ts` découpés), puis la localisation en six lots (50 à 55, v2.28.4 à v2.31.1).
-44. **À définir** : journal d'achats en XP (K.6), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
+43. **v2.28.2 — fiche découpée par bloc** (**livrée**, écarts en 48.4) : annexe 48, lot 48. `Sheet.tsx` (904 lignes) devient le dossier `src/ui/components/sheet/`, un fichier par bloc ; déplacement pur, mêmes tests.
+44. **Planifiés le 02/11/2026** : lot 49 (v2.28.3, `store.ts` découpé), puis la localisation en six lots (50 à 55, v2.28.4 à v2.31.1).
+45. **À définir** : journal d'achats en XP (K.6), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
 
 ### Historique des états
 
 Lignes d'état de l'ancien en-tête de `HANDOFF.md`, déplacées telles quelles au lot 44 (annexe 44.2).
+
+**État au 04/11/2026 (lot 47) :** version **v2.28.1**, lot 47 : tests rangés par fonctionnalité, plus aucun fichier nommé d'après un lot ou une version (annexe 47).
 
 **État au 04/11/2026 (lot 46) :** version **v2.28.0**, lot 46 : vue compacte de l'Assistant L5R, explications des actions masquables par le « i » du titre Actions (annexe 46).
 

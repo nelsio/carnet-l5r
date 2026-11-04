@@ -6,7 +6,7 @@ import { Header } from "./components/Header";
 import { ImportDialog } from "./components/ImportDialog";
 import { Library } from "./components/Library";
 import { PhotoImportDialog } from "./components/PhotoImportDialog";
-import { Sheet } from "./components/Sheet";
+import { Sheet } from "./components/sheet";
 import { Stats } from "./components/Stats";
 import { StatusBar } from "./components/StatusBar";
 import { initialState, reducer, StoreContext, type PendingImport, type Store } from "./store";
