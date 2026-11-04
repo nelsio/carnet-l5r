@@ -2,6 +2,7 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { CharacterSchema, type Character, type Spell } from "@carnet/core";
+import { EXAMPLES } from "../../src/rules/example";
 import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import perso from "../../reference/perso-test-shugenja.json";
@@ -137,5 +138,29 @@ describe("Situation « Magie » (F.5)", () => {
     expect(within(row).getByText("5g3")).toBeInTheDocument();
     expect(screen.getByText("Sort · Sentir (Terre)")).toBeInTheDocument();
     expect(within(screen.getAllByText(/Dégâts · Feux intérieurs/)[0]!.closest("tr")!).getByText("sans ND")).toBeInTheDocument();
+  });
+});
+
+describe("Shugenja en escarmouche (J.8)", () => {
+  it("Q14 : Initiative, titre « Sorts », sorts, titre « Attaques », armes, actions fixes", async () => {
+    await renderApp(EXAMPLES.find((x) => x.id === "shugenja")!.build());
+    click(VIEW.aid);
+    click("Combat");
+    const actions = screen.getByText("Sorts", { selector: "h3" }).closest(".actions")!;
+    const items = [...actions.children].map((el) => (el.tagName === "H3" ? `# ${el.textContent}` : el.querySelector(".t")?.textContent ?? ""));
+    expect(items[0]).toBe("# Sorts");
+    const attacks = items.indexOf("# Attaques");
+    expect(attacks).toBeGreaterThan(1);
+    expect(items.slice(1, attacks).every((t) => !t.startsWith("#"))).toBe(true);
+    expect(items[attacks + 1]).toMatch(/^Attaque · Wakizashi/);
+    expect(items.at(-1)).toMatch(/^Défense totale/);
+  });
+
+  it("Q15 : bushi, aucun titre de groupe en escarmouche", async () => {
+    await renderApp(structuredClone(kakita) as Character);
+    click(VIEW.aid);
+    click("Combat");
+    expect(screen.queryByText("Attaques", { selector: "h3" })).toBeNull();
+    expect(screen.queryByText("Sorts", { selector: "h3" })).toBeNull();
   });
 });

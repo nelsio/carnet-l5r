@@ -2,7 +2,13 @@
 
 « Terminé » = tests verts, `tsc --noEmit` sans erreur, lint propre, CI verte.
 
-État en v2.8.0 : **509 tests Vitest** (moteur, stockage, interface) et **70 tests Playwright** (chromium, iPhone 13, Pixel 7), lignes de `src/core` couvertes à 100 %.
+État en v2.8.0 : **509 tests Vitest** (moteur, stockage, interface) et **70 tests Playwright** (chromium, iPhone 13, Pixel 7), lignes de `src/core` couvertes à 100 %. En v2.28.1 : 922 tests Vitest, 173 tests Playwright.
+
+### 10.0 Rangement des fichiers de test (annexe 47)
+- Un fichier par fonctionnalité, jamais par lot ni par version.
+- `tests/core.<domaine>.spec.ts` pour le moteur, `tests/ui/<fonctionnalité>.spec.tsx` pour l'interface, `tests/e2e/<fonctionnalité>.spec.ts` pour les parcours de bout en bout.
+- La traçabilité vers la spécification passe par le titre du `describe` (« (annexe E.2) », « (46.1) »), pas par le nom du fichier.
+- Un nouveau test va dans le fichier de sa fonctionnalité ; s'il n'existe pas, on le crée sous ce nom.
 
 ### 10.1 Moteur (`tests/core.rules.spec.ts`) — fourni, 80 tests
 - C'est la **spécification exécutable** du moteur. Elle a été validée contre une implémentation de référence : 80 tests sur 80 passent (v1.1 : règle des dix dés du livre, maîtrise 7+).
@@ -10,6 +16,7 @@
 - L'agent implémente `src/core` jusqu'à ce que le fichier passe, **sans modifier les valeurs attendues**. Un désaccord se signale (§12), il ne se corrige pas.
 - Couverture visée : 100 % des lignes de `src/core`.
 - Personnage de référence : `reference/exemple-personnage.json` (Kakita Haruto).
+- Depuis le lot 47, le fichier se termine par « Moteur : correctifs de règles (annexe E.2) » (15 tests, venus de `core.lot12.spec.ts`), après les 80 tests fournis, qui restent inchangés.
 
 ### 10.1 bis Bonus de jet (annexe B) — à écrire par l'agent
 Ces cas complètent la spec fournie. L'agent les écrit dans `tests/core.modifiers.spec.ts` avec la signature réelle de son implémentation, sans changer les attendus.
