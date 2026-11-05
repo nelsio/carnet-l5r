@@ -1,11 +1,13 @@
 import { rings, type TraitKey } from "@carnet/core";
 import { RINGS, TRAIT_LABELS } from "../../../rules/l5r4e";
+import { useT } from "../../../i18n";
 import { NumberField } from "../fields";
 import { RING_ORDER } from "./constants";
 import { useSheet } from "./hooks";
 
 export function Rings() {
   const { c, edit, set } = useSheet("rings");
+  const s = useT().sheet.rings;
   const r = rings(c);
   const value = (path: (string | number)[], v: number, label: string) =>
     edit
@@ -20,8 +22,8 @@ export function Rings() {
           <div className="rv">{r[key]}</div>
           {key === "void" ? (
             <>
-              <div className="tr"><span>Anneau</span>{value(["voidRing"], c.voidRing, "Anneau de Vide")}</div>
-              <div className="tr"><span>Augm. max</span><b className="mono">{c.voidRing}</b></div>
+              <div className="tr"><span>{s.ring}</span>{value(["voidRing"], c.voidRing, s.voidRing)}</div>
+              <div className="tr"><span>{s.maxRaises}</span><b className="mono">{c.voidRing}</b></div>
             </>
           ) : (
             RINGS[key].traits.map((t: TraitKey) => (

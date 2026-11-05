@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useT } from "../../../i18n";
 import { useStore, type ListKey } from "../../store";
 
 /**
@@ -17,8 +18,9 @@ export function AddButton({ list, label, item }: { list: ListKey; label: string;
 
 export function RemoveButton({ list, index, name }: { list: ListKey; index: number; name: string }) {
   const { dispatch } = useStore();
+  const t = useT();
   return (
-    <button type="button" className="x" aria-label={`Supprimer ${name || "la ligne"}`} onClick={() => dispatch({ type: "remove", list, index })}>×</button>
+    <button type="button" className="x" aria-label={t.sheet.remove(name)} onClick={() => dispatch({ type: "remove", list, index })}>×</button>
   );
 }
 
