@@ -45,7 +45,7 @@ export function Stats() {
   const { state, dispatch } = useStore();
   const c = useCharacter();
   const { stats: ts, roller: r } = useT();
-  const { intl } = useLocale();
+  const { intl, locale } = useLocale();
   const opts = state.ui.stats;
   const currentPenalty = woundState(c, { woundMultiplier: shownWoundMultiplier(state.ui.woundMultiplier) }).penalty ?? 0;
   const penalty = opts.penalty ? currentPenalty : 0;
@@ -75,13 +75,13 @@ export function Stats() {
               return (
                 <tr key={row.label} className={row.child ? "child" : undefined}>
                   <td className="jl">{row.child ? "└ " : ""}{row.label}</td>
-                  <td className="pool">{poolLabel(row.pool)}</td>
+                  <td className="pool">{poolLabel(row.pool, locale)}</td>
                   <td className="mono">{st.min}</td>
                   <td className="mono"><b>{Math.round(st.mean)}</b></td>
                   <td className="mono">{st.max}{st.open ? "+" : ""}{row.pool.explodeOn === 9 && <> <span className="tag" title={r.explodesOn9}>9+</span></>}</td>
                   {row.hasTN ? TNS.map((tn) => {
                     const p = st.chance(tn + penalty);
-                    return <td key={tn} className="pc" style={{ ["--p" as string]: `${Math.round(p * 60)}%` }}>{pct(p)}</td>;
+                    return <td key={tn} className="pc" style={{ ["--p" as string]: `${Math.round(p * 60)}%` }}>{pct(p, locale)}</td>;
                   }) : <td className="muted" style={{ textAlign: "center" }} colSpan={TNS.length}>{ts.noTn}</td>}
                 </tr>
               );

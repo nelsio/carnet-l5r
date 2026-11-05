@@ -20,7 +20,7 @@ function InsightMismatch({ c }: { c: Character }) {
 export function Identity() {
   const { c, edit, set } = useSheet("identity");
   const s = useT().sheet.identity;
-  const { intl } = useLocale();
+  const { intl, locale } = useLocale();
   const text = (path: string[], value: string, extra?: { list?: string; maxLength?: number }) => (
     <input className="in" type="text" value={value} maxLength={extra?.maxLength ?? 80} list={extra?.list} onChange={(e) => set(path, e.target.value)} />
   );
@@ -97,7 +97,7 @@ export function Identity() {
         <b data-testid="sheet-insight">{s.insightSummary(insightPoints(c), suggestedInsightRank(insightPoints(c)))}</b>
         <InsightMismatch c={c} />
       </div>
-      <div><span className="label">{s.initiative}</span><b className="pool" data-testid="sheet-initiative">{poolLabel(init)}</b></div>
+      <div><span className="label">{s.initiative}</span><b className="pool" data-testid="sheet-initiative">{poolLabel(init, locale)}</b></div>
     </div>
   );
 }

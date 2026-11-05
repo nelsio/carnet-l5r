@@ -19,6 +19,7 @@
   - **sceau 帳** de l'outil à gauche, qui ouvre aussi la Bibliothèque, et surtitre « CARNET DE ROKUGAN | ● CLAN … » au-dessus du nom (annexe G) ; le nom du clan est un lien vers sa page sur le portail de campagne quand elle existe (v2.20.0, annexe L.7) ;
   - famille, école et Rang dessous ;
   - bouton de thème (auto, clair, sombre) ;
+  - **bouton de langue** `FR` / `EN` juste après Thème : affiche la langue courante, un clic bascule ; nom accessible « Langue : français » / « Language: English ». Choix mémorisé dans `localStorage["carnet-lang"]` ; sans choix, `navigator.language` (`en*` → anglais, sinon français). Le changement met à jour `<html lang>`, le titre de l'onglet et la description de la page (annexe 52.2) ;
   - **boutons d'en-tête** Bibliothèque, Lanceur de dés, Thème et **Ressources** (v2.19.0, annexe L.2 : menu de liens vers le portail de campagne, sur tous les écrans) : chacun = **icône + texte** sur bureau (livres, dé, demi-cercle, torii), **icône seule** sur mobile (§7) ; le texte reste présent pour les lecteurs d'écran et en info-bulle, avec l'état courant (« Thème : sombre », « Lanceur de dés : masqué ») ;
   - bouton **« Lanceur de dés : masqué / affiché »**, à côté du thème et de la Bibliothèque (même style ; fond d'accent pâle quand affiché). **Affiché par défaut** (v2.17.0, annexe J.7), choix mémorisé dans les préférences :
     - **masqué** : le panneau d'action reste un panneau d'aide (réserve, ligne « lancer à la main », Min · Moy. · Max, chance de réussite, ND final, options, manœuvres) mais **sans** bouton « Lancer », sans dés obtenus, sans verdict et sans historique. Les enchaînements qui dépendent d'un lancer (score d'initiative affiché, bonus de Défense totale, dés de dégâts pré-remplis) ne se déclenchent pas ; les dépenses de Vide se font par les pastilles et le panneau Vide ;
@@ -85,7 +86,7 @@
 
 ### 6.3 Qualité
 - Aucun texte saisi n'est rendu en HTML (pas de `dangerouslySetInnerHTML`).
-- Aucun texte d'interface en dur dans un composant : libellés, `aria-label`, `title`, `placeholder` viennent de `useT()` (annexe 50). Dates et nombres suivent `useLocale().intl`. `scripts/check-i18n.mjs` refuse tout texte JSX brut dans `src/ui` depuis le lot 51 (annexe 51.3).
+- Aucun texte d'interface en dur dans un composant : libellés, `aria-label`, `title`, `placeholder` viennent de `useT()` (annexe 50). Dates et nombres suivent `useLocale().intl`. En anglais : réserves en `XkY` (`formatPool`), distances en pieds (`formatDistance`), `50%` sans espace ; en français, comportement inchangé (annexe 52.3). Les saisies acceptent `3g2` et `3k2` dans les deux langues. Le grimoire et le portail, en français, sont signalés comme tels en anglais (annexe 52.4). `scripts/check-i18n.mjs` refuse tout texte JSX brut dans `src/ui` depuis le lot 51 (annexe 51.3).
 - Focus clavier visible, Échap ferme le panneau mobile, `prefers-reduced-motion` respecté.
 - Aucun appel réseau : polices embarquées, aucune bibliothèque chargée depuis un CDN.
 

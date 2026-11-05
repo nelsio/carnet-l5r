@@ -1,15 +1,15 @@
 import { useEffect, useRef } from "react";
 import {
   applicableModifiers, armorRollTn, bowStrength, DAMAGE_MANEUVER_ID, describeEffect, focusOutcome, opposedMargin, opposedVerdict, stanceRestriction, woundEffectNote, describeModifier, effectOn, findSkill, fullDefenseBonus, maneuverCost, maneuverFreeRaises, modifierTN,
-  formatDice, formatDR, isRanged, isSocialSkill, meditationVoidPoints, poolStats, reminderText, rollDice, schoolContext, schoolReminders, verdict, voidMultiplier,
+  formatDR, isRanged, isSocialSkill, meditationVoidPoints, poolStats, reminderText, rollDice, schoolContext, schoolReminders, verdict, voidMultiplier,
   castTime, castTimeLabel, concentrationTn, schoolRankOf, slotFor, spellCast, spellcastingOf, spellOptions, spellRaises, spellRestriction, SPELL_RINGS, spellSlotNeed, spellSlots,
   voidPointBonus, voidSpendBonus, voidSpendOption, woundState, type Spell, type SpellAction, type SpellRing, type SpellSlotKey,
   type ActionDef, type ActiveEffect, type Character, type Pool,
 } from "@carnet/core";
 import type { SpellOption } from "../../rules/ecoles";
 import { CALLED_ZONES, CENTER_BONUS, COMBAT_SUBS, CONCENTRATE_ACTION_ID, ELEMENT_LABELS, MEDITATE_ACTION_ID, MELEE_TARGET_PENALTY, SITUATIONS, SPELL_CONCENTRATION, TN_PER_RAISE, TN_SCALE, TRAIT_LABELS, type CalledZone } from "../../rules/l5r4e";
-import { useT, type Messages } from "../../i18n";
-import { pct } from "../format";
+import { useLocale, useT, type Locale, type Messages } from "../../i18n";
+import { DICE_LETTER, formatPool, pct } from "../format";
 import {
   activeModifiers, calledRaises, contextOf, effectiveManeuvers, finalTN, isActive, isUnskilled, maneuverCosts, poolFor, rollWoundPenalty,
   selectedKeys, targetBaseTN, toPoolAction, uiRollStance, type RollOptions,
@@ -25,6 +25,7 @@ export function Roller() {
   const { state, dispatch, rng } = useStore();
   const t = useT();
   const r = t.roller;
+  const { locale } = useLocale();
   const c = useCharacter();
   const { ui } = state;
   const a = selectedAction(c, ui);
@@ -112,13 +113,13 @@ export function Roller() {
       )}
       {woundNote && <div className="hint" data-testid="wound-note" style={{ color: "var(--danger)", marginTop: 0 }}>{woundNote}</div>}
       <div style={{ display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
-        <span className="poolbig" data-testid="pool">{formatDice(pool.rolled, pool.kept)}</span>
-        <span className="muted" style={{ fontSize: 13 }}>{poolOrigin(c, a, opts, r)}{pool.bonus ? r.poolBonus(pool.bonus) : ""}</span>
+        <span className="poolbig" data-testid="pool">{formatPool(pool.rolled, pool.kept, locale)}</span>
+        <span className="muted" style={{ fontSize: 13 }}>{poolOrigin(c, a, opts, r, locale)}{pool.bonus ? r.poolBonus(pool.bonus) : ""}</span>
       </div>
       {/* Augmentations de dégâts de l'attaque, seule source de dés lancés en plus (annexe J.9). */}
       {opts.extraRolled > 0 && (
         <div className="tchips" data-testid="attack-raises">
-          <span className="tchip">{r.attackRaisesChip(formatDice(opts.extraRolled, 0))}</span>
+          <span className="tchip">{r.attackRaisesChip(formatPool(opts.extraRolled, 0, locale))}</span>
           <button type="button" className="btn sm" onClick={() => set({ extraRolled: 0 })}>{r.remove}</button>
         </div>
       )}
@@ -137,7 +138,7 @@ export function Roller() {
           <span>{r.min} <b>{stats.min}</b></span>
           <span>{r.mean} <b>{Math.round(stats.mean)}</b></span>
           <span>{r.max} <b>{stats.max}{stats.open ? "+" : ""}</b>{pool.explodeOn === 9 && <> <span className="tag" title={r.explodesOn9}>9+</span></>}</span>
-          {typeof tn === "number" && <span className="ch">{r.success} <b data-testid="chance">{pct(stats.chance(tn))}</b></span>}
+          {typeof tn === "number" && <span className="ch">{r.success} <b data-testid="chance">{pct(stats.chance(tn), locale)}</b></span>}
         </div>
       )}
       {mastery && <div className="hint" data-testid="mastery" style={{ color: "var(--accent-ink)" }}>{mastery}.</div>}
@@ -177,8 +178,8 @@ export function Roller() {
           <label className="chk">
             <input type="checkbox" checked={opts.voidPoint} disabled={c.voidPoints < 1 && !opts.voidPoint} onChange={(e) => set({ voidPoint: e.target.checked })} />
             {" "}{pool.katanaVoid
-              ? r.voidKatana(formatDice(perVoid.rolled * vm, perVoid.kept * vm))
-              : r.voidSpendOne(formatDice(perVoid.rolled * vm, perVoid.kept * vm))}
+              ? r.voidKatana(formatPool(perVoid.rolled * vm, perVoid.kept * vm, locale))
+              : r.voidSpendOne(formatPool(perVoid.rolled * vm, perVoid.kept * vm, locale))}
             {" "}<span className="muted">{r.left(c.voidPoints)}</span>
           </label>
         )}
@@ -188,7 +189,7 @@ export function Roller() {
               type="checkbox" checked={opts.voidSpend} disabled={c.voidPoints < spend.points && !opts.voidSpend}
               onChange={(e) => set({ voidSpend: e.target.checked })}
             />
-            {" "}{r.voidSpend(spend.points, formatDice(spendDice.rolled * vm, spendDice.kept * vm))} <span className="muted">· {spend.source}</span>
+            {" "}{r.voidSpend(spend.points, formatPool(spendDice.rolled * vm, spendDice.kept * vm, locale))} <span className="muted">· {spend.source}</span>
           </label>
         )}
         {unskilled && (
@@ -215,7 +216,7 @@ export function Roller() {
         {centerOffered && (
           <label className="chk">
             <input type="checkbox" checked={opts.centerBonus} onChange={(e) => set({ centerBonus: e.target.checked })} />
-            {" "}{r.centerBonus} <span className="muted">{r.centerBonusDetail(formatDice(CENTER_BONUS.rolled, CENTER_BONUS.kept), c.voidRing)}</span>
+            {" "}{r.centerBonus} <span className="muted">{r.centerBonusDetail(formatPool(CENTER_BONUS.rolled, CENTER_BONUS.kept, locale), c.voidRing)}</span>
           </label>
         )}
         {ranged && (
@@ -303,7 +304,7 @@ export function Roller() {
       {ui.showDiceRoller && (
         <>
           <button type="button" className="btn primary rollbtn" style={{ width: "100%", marginTop: 12, padding: 12 }} onClick={roll}>
-            {r.roll(formatDice(pool.rolled, pool.kept))}
+            {r.roll(formatPool(pool.rolled, pool.kept, locale))}
           </button>
           <div ref={resultRef} aria-live="polite">
             {lastRoll && lastRoll.actionId === a.id && <RollOutcome roll={lastRoll} />}
@@ -391,7 +392,7 @@ function ManualLine({ pool, emphasis, flat, free }: { pool: Pool; emphasis: bool
 }
 
 /** Origine de la réserve, en clair. */
-function poolOrigin(c: Character, a: ActionDef, opts: RollOptions, r: Messages["roller"]): string {
+function poolOrigin(c: Character, a: ActionDef, opts: RollOptions, r: Messages["roller"], locale: Locale): string {
   const o = r.origin;
   const extra = opts.extraRolled ? o.extraDice(opts.extraRolled) : "";
   switch (a.kind) {
@@ -404,7 +405,7 @@ function poolOrigin(c: Character, a: ActionDef, opts: RollOptions, r: Messages["
     case "damage": {
       // Force effective de l'arc : plafonnée par la Force, +1 avec Kyujutsu 7 (annexe E.2 C11).
       const bow = a.weapon && isRanged(a.weapon) ? o.bow(bowStrength(c, a.weapon)) : null;
-      return `${bow ?? o.strength(c.traits.strength)} + ${o.dr(formatDR(a.dr ?? ""))}${extra}`;
+      return `${bow ?? o.strength(c.traits.strength)} + ${o.dr(formatDR(a.dr ?? "", DICE_LETTER[locale]))}${extra}`;
     }
     case "spell": {
       // « Feu 3 + rang 1 + affinité 1 » (annexe F.5).
@@ -414,7 +415,7 @@ function poolOrigin(c: Character, a: ActionDef, opts: RollOptions, r: Messages["
       const minus = cast.deficiency ? o.deficiency : "";
       return `${parts.join(" + ")}${minus}${cast.rolled ? o.schoolDice(cast.rolled) : ""}${extra}`;
     }
-    case "spellDamage": return `${o.dr(formatDR(a.spell?.damage ?? ""))}${extra}`;
+    case "spellDamage": return `${o.dr(formatDR(a.spell?.damage ?? "", DICE_LETTER[locale]))}${extra}`;
     default: return `${o.initiative(c.insightRank, c.traits.reflexes)}${extra}`;
   }
 }
@@ -476,18 +477,19 @@ const forSpellRoll = (o: SpellOption) =>
   o.rolled !== undefined || o.freeRaises !== undefined || o.extraAffinity !== undefined || o.extraSlot !== undefined;
 const forSpellDamage = (o: SpellOption) => o.damageRolled !== undefined || o.damageKept !== undefined || o.damageFlat !== undefined;
 
-function optionEffect(o: SpellOption, c: Character, r: Messages["roller"]): string {
+function optionEffect(o: SpellOption, c: Character, r: Messages["roller"], locale: Locale): string {
   if (o.extraAffinity) return r.option.affinity(ELEMENT_LABELS[o.extraAffinity]);
   if (o.extraSlot) return r.option.extraSlot(o.extraSlot);
   if (o.freeRaises) return r.option.freeRaises(o.freeRaises);
-  if (o.rolled) return `+${formatDice(o.rolled, 0)}`;
+  if (o.rolled) return `+${formatPool(o.rolled, 0, locale)}`;
   if (o.damageFlat === "schoolRank") return r.option.damage(`+${schoolRankOf(c)}`);
-  return r.option.damage(`+${formatDice(o.damageRolled ?? 0, o.damageKept ?? 0)}`);
+  return r.option.damage(`+${formatPool(o.damageRolled ?? 0, o.damageKept ?? 0, locale)}`);
 }
 
 /** Lanceur d'un sort (annexe F.5) : élément, autre Anneau, cases de l'école, temps d'incantation, rappels. */
 function SpellPanel({ action: a, spell }: { action: ActionDef; spell: Spell }) {
   const { state, dispatch } = useStore();
+  const { locale } = useLocale();
   const r = useT().roller;
   const c = useCharacter();
   const { opts } = state.ui;
@@ -500,7 +502,7 @@ function SpellPanel({ action: a, spell }: { action: ActionDef; spell: Spell }) {
       {options.map((o) => (
         <label key={o.id} className="chk">
           <input type="checkbox" checked={!!opts.spellOptions[o.id]} onChange={(e) => set({ spellOptions: { ...opts.spellOptions, [o.id]: e.target.checked } })} />
-          {" "}{o.label} <span className="muted">· {optionEffect(o, c, r)}</span>
+          {" "}{o.label} <span className="muted">· {optionEffect(o, c, r, locale)}</span>
         </label>
       ))}
     </div>
@@ -724,6 +726,7 @@ function ManeuverPicker({ effects }: { effects: readonly ActiveEffect[] }) {
 }
 
 function RollOutcome({ roll: r }: { roll: RollRecord }) {
+  const { locale } = useLocale();
   const t = useT().roller;
   const { total } = r.result;
   const hasTN = typeof r.tn === "number";
@@ -754,7 +757,7 @@ function RollOutcome({ roll: r }: { roll: RollRecord }) {
             <div className="hint">{t.raisesToApply(r.raises + r.free, r.free)}</div>
           )}
           {r.maneuvers.length > 0 && <div className="hint">{t.maneuversResult(ok, r.maneuvers.join(", "))}</div>}
-          {r.damageDice > 0 && !r.disarm && <div className="hint">{t.prefilled(`+${formatDice(r.damageDice, 0)}`)}</div>}
+          {r.damageDice > 0 && !r.disarm && <div className="hint">{t.prefilled(`+${formatPool(r.damageDice, 0, locale)}`)}</div>}
           {r.feint ? <div className="hint" data-testid="feint-note">{t.feint(r.feint)}</div> : null}
           {r.disarm && <div className="hint" data-testid="disarm-note">{t.disarm}</div>}
           {ok && !r.raises && margin >= TN_PER_RAISE && r.kind !== "damage" && (

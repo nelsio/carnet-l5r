@@ -28,7 +28,7 @@ describe("Dictionnaire typé (50.1, I3)", () => {
 
   it("une clé absente de l'anglais fait échouer tsc", () => {
     const { notEmpty, ...validation } = en.validation;
-    expect(notEmpty).toBe(fr.validation.notEmpty);
+    expect(notEmpty).toBe("must not be empty");
     // @ts-expect-error clé manquante : `tsc --noEmit` échoue sans cette directive.
     const incomplete: Messages = { ...en, validation };
     // @ts-expect-error clé en trop : idem.

@@ -9,7 +9,7 @@
 - `tests/core.<domaine>.spec.ts` pour le moteur, `tests/ui/<fonctionnalité>.spec.tsx` pour l'interface, `tests/e2e/<fonctionnalité>.spec.ts` pour les parcours de bout en bout.
 - La traçabilité vers la spécification passe par le titre du `describe` (« (annexe E.2) », « (46.1) »), pas par le nom du fichier.
 - Un nouveau test va dans le fichier de sa fonctionnalité ; s'il n'existe pas, on le crée sous ce nom.
-- Langue (annexe 50.3) : sans fournisseur, un composant s'affiche en français ; `renderApp(ui, { locale })` (`tests/helpers/render.tsx`) enveloppe le fournisseur de langue. Playwright force `locale: "fr-FR"`.
+- Langue (annexe 50.3) : sans fournisseur, un composant s'affiche en français ; `renderApp(ui, { locale })` (`tests/helpers/render.tsx`) enveloppe le fournisseur de langue. Playwright force `locale: "fr-FR"` ; les tests de l'anglais (E1 à E8 de l'annexe 52.5) le remplacent par `en-US` (`tests/e2e/i18n-en.spec.ts`, `tests/ui/i18n-en.spec.tsx`).
 
 ### 10.1 Moteur (`tests/core.rules.spec.ts`) — fourni, 80 tests
 - C'est la **spécification exécutable** du moteur. Elle a été validée contre une implémentation de référence : 80 tests sur 80 passent (v1.1 : règle des dix dés du livre, maîtrise 7+).
@@ -87,7 +87,7 @@ Ces cas complètent la spec fournie. L'agent les écrit dans `tests/core.modifie
 | M8 | Cibles tactiles (boutons −/+, pastilles, onglets) | Au moins 40 × 40 px |
 | M9 | Tuiles de la barre d'état à 360 px de large | Les 4 libellés et valeurs sont entièrement visibles, sans troncature ni retour à la ligne |
 | M10 | Boutons « i » (reformulé au lot 19, I.3.7) | Zone de toucher ≥ 40 × 40 px ; le panneau Vide tient sur moins d'un écran détails fermés ; le panneau Posture tient sur moins d'un écran avec sa description |
-| M11 | En-tête à 360 px de large | Sceau de 52 px ; Bibliothèque, Lanceur de dés et Thème en icônes de 40 px sous le nom, alignés à gauche ; libellé accessible avec l'état courant (annexe G, H7) |
+| M11 | En-tête à 360 px de large | Sceau de 52 px ; Bibliothèque, Lanceur de dés, Thème et Langue (annexe 52.2) en icônes de 40 px sous le nom, alignés à gauche ; libellé accessible avec l'état courant (annexe G, H7) |
 | M12 | Combat sur mobile, et à 360 px de large | Carte « Nouveau round » entre l'Initiative et la Posture ; sa description tient sur 2 lignes au plus |
 | M13 | Aide de jeu sur mobile, et à 360 px de large | Les 4 onglets de situation (Enquête, Cour, Déplacement, Combat) sur une ligne, sans défilement ni texte tronqué, zones de 40 px de haut ; Statistiques est dans la barre du bas |
 | M14 | Bonus de jet sur mobile, et à 360 px de large (E24) | Chaque bonus sur 3 lignes (nom et source, effet, cible et note), aucun texte tronqué |

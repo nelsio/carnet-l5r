@@ -9,7 +9,7 @@ import { AddButton, RemoveButton } from "./shared";
 export function Skills() {
   const { c, edit, set } = useSheet("skills");
   const s = useT().sheet.skills;
-  const { intl } = useLocale();
+  const { intl, locale } = useLocale();
   if (edit) {
     return (
       <>
@@ -51,7 +51,7 @@ export function Skills() {
               </td>
               <td className="mono">{sk.rank}</td>
               <td className="muted">{TRAIT_LABELS[sk.trait]}</td>
-              <td className="pool" data-testid={`skill-pool-${sk.name}`}>{pool(c, sk.trait, sk.name)}</td>
+              <td className="pool" data-testid={`skill-pool-${sk.name}`}>{pool(c, sk.trait, sk.name, locale)}</td>
             </tr>
           )) : (
             <tr><td colSpan={4} className="muted">{s.empty}</td></tr>

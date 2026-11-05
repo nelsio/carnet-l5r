@@ -3,7 +3,7 @@ import { clanAccent, schoolRankOf } from "@carnet/core";
 import { SHOW_WOUND_MULTIPLIER, WOUND_MULTIPLIERS } from "../../rules/l5r4e";
 import { useStore } from "../store";
 import { clanUrl } from "../../rules/portal";
-import { useT } from "../../i18n";
+import { useLocale, useT } from "../../i18n";
 import { NEXT_THEME } from "../theme";
 import { ExternalLink } from "./ExternalLink";
 import { ResourcesMenu } from "./ResourcesMenu";
@@ -11,6 +11,7 @@ import { ResourcesMenu } from "./ResourcesMenu";
 export function Header() {
   const { state, dispatch, library } = useStore();
   const t = useT();
+  const { locale, setLocale } = useLocale();
   const { character: c, ui } = state;
   const readonly = state.mode === "readonly";
   const clan = c?.clan.trim() ? clanAccent(c.clan) : null;
@@ -63,6 +64,9 @@ export function Header() {
           onClick={() => dispatch({ type: "diceRoller", show: !ui.showDiceRoller })}
         />
         <HeaderButton icon={ICONS.theme} label={t.header.theme(t.header.themes[ui.theme])} onClick={() => dispatch({ type: "theme", theme: NEXT_THEME[ui.theme] })} />
+        {/* Langue courante, un clic bascule (annexe 52.2). */}
+        <button type="button" className="theme-btn lang-btn" title={t.header.language.label} aria-label={t.header.language.label}
+          onClick={() => setLocale(locale === "fr" ? "en" : "fr")}>{t.header.language.code}</button>
         <ResourcesMenu />
         {SHOW_WOUND_MULTIPLIER && (
           <HeaderButton

@@ -15,6 +15,8 @@ export const fr = {
   nav: { label: "Vue", sheet: "Fiche", aid: "Assistant L5R", aidShort: "Assistant", stats: "Statistiques" },
   header: {
     homeTitle: (app: string) => `${app} – Fiche de personnage et assistant de jets L5R 4e édition`,
+    /** `<meta name="description">`, mis à jour au changement de langue (annexe 52.2). */
+    metaDescription: "Outil gratuit pour joueurs de La Légende des Cinq Anneaux (L5R 4e édition) : fiche de personnage, assistant de jets de dés, import/export JSON. Fonctionne sur mobile.",
     tagline: "Compagnon de campagne · L5R 4e",
     sealTitle: (app: string) => `${app} — Bibliothèque`,
     sealLabel: (app: string) => `${app} — ouvrir la bibliothèque`,
@@ -26,6 +28,8 @@ export const fr = {
     diceRoller: (shown: boolean) => `Lanceur de dés : ${shown ? "affiché" : "masqué"}`,
     theme: (label: string) => `Thème : ${label}`,
     themes: { auto: "auto", light: "clair", dark: "sombre" },
+    /** Bouton de langue : code affiché, nom accessible (annexe 52.2). */
+    language: { code: "FR", label: "Langue : français" },
     woundMultiplier: (n: number) => `Blessures : Terre × ${n}`,
   },
   /** Fiche : blocs et leur mode édition. */
@@ -432,7 +436,7 @@ export const fr = {
     focusFirst: (freeRaises: number) => `Tu frappes en premier, ${freeRaises} augmentation(s) gratuite(s) pré-remplie(s) sur la Frappe.`,
     focusSimultaneous: (threshold: number) => `Frappe simultanée (il faut ${threshold} d'écart pour frapper en premier).`,
     explodeBefore: "Les ",
-    explodeOn: (nine: boolean) => (nine ? "9 et 10" : "10"),
+    explodeOn: (nine: boolean): string => (nine ? "9 et 10" : "10"),
     explodeAfter: (nine: boolean) => ` explosent : relance le dé et additionne, tant qu'il retombe sur ${nine ? "9 ou 10" : "10"}.`,
     noExplode: "Aucun dé n'explose (compétence non maîtrisée).",
     emphasisReroll: "Spécialisation : relance une fois chaque ",
@@ -724,6 +728,8 @@ export const fr = {
     menu: "Ressources L5R",
     groups: { create: "Créer", references: "Références", carnet: "Le Carnet" },
     foot: "Liens externes : s'ouvrent dans un nouvel onglet.",
+    /** Suffixe des liens vers un contenu en français : vide en français (annexe 52.4). */
+    french: "",
     item: (title: string, pending: boolean, desc: string) => `${title}${pending ? ", JSON pas encore compatible" : ""} : ${desc} (nouvel onglet)`,
     portal: "Clans, règles, aides de jeu",
     clan: "Histoire, familles et serments",
@@ -760,6 +766,8 @@ export const fr = {
   },
   /** Grimoire du portail : état, autocomplétion, confirmation, panneau d'ajout (annexe N). */
   grimoire: {
+    /** Bandeau en tête du panneau quand l'interface n'est pas en français ; vide en français (annexe 52.4). */
+    frenchNotice: "",
     allElements: "Tous",
     universals: "Universels",
     universal: "Universel",
