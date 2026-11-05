@@ -3,7 +3,7 @@
 ### 9.1 Workflows (`.github/workflows/`)
 | Workflow | Déclencheur | Étapes |
 |---|---|---|
-| `ci.yml` | push, pull request | install → lint → `tsc --noEmit` → Vitest → build → Playwright |
+| `ci.yml` | pull request ; push sur `main` et tags `v*` (annexe 51.6) | install → lint → `tsc --noEmit` → Vitest → build → Playwright ; 20 min au plus |
 | `pages.yml` | push sur `main` | build → publication de `dist/carnet-l5r.html` comme `index.html` sur GitHub Pages ; lance `scripts/pages-pwa.mjs` (manifeste, service worker, sitemap et image de partage, annexes O.3 et P), `scripts/pages-seo.mjs` (présentation statique, annexe P) puis `scripts/pages-compteur.mjs` (compteur de visites, annexe O.5) |
 | `release.yml` | tag `v*` | build → release GitHub avec `carnet-l5r.html` en pièce jointe et notes générées ; marquée « Latest » seulement si le tag est la plus haute version (un tag oublié posé en retard ne la remplace pas) |
 

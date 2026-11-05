@@ -53,3 +53,11 @@ Au lot 50, quatorze fichiers de `src/ui` gardaient leurs textes en dur (104 occu
 - **Notation des dés** (`3g2` en exemple de VD, `+1g1` du point de Vide dans les Statistiques, `poolLabel`) : passée telle quelle dans le dictionnaire ou laissée en place ; `formatPool(…, locale)` et la notation `XkY` arrivent au lot 52.
 - **Pourcentages** (`pct()`, `≥99 %`) : inchangés. Le format `Intl` du français insère une espace fine insécable, qui aurait changé l'affichage ; le format par langue est laissé au lot 52.
 - **Journaux de développement** (`console.error`, erreurs internes `throw new Error`) : non traduits, ils ne s'affichent pas dans l'interface.
+
+### 51.6 CI allégée
+
+Ajouté pendant la revue de la PR, à la demande de Nelson : le run « push » du lot est resté bloqué 29 minutes à l'installation de Playwright (`--with-deps`), alors que le run « pull_request » du même commit était passé en 5 min 46.
+
+- `ci.yml` se déclenchait sur tout `push` **et** sur `pull_request` : deux runs identiques par push sur une branche de lot. Désormais : `pull_request`, plus `push` sur `main` et sur les tags `v*`.
+- `timeout-minutes: 20` sur le job : un run bloqué échoue au lieu d'attendre la limite de 6 h de GitHub.
+- La vérification exigée pour fusionner (`ci`) vient du run de la PR : inchangée.

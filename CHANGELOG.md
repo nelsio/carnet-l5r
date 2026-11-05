@@ -10,6 +10,7 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ### Technique
 - Tous les textes de l'interface sont regroupés dans un dictionnaire. Rien ne change à l'écran.
+- CI : un seul run par PR (plus de doublon sur les branches de lot) et 20 minutes au plus par run.
 
 ## [2.28.4] - 2026-11-05
 
