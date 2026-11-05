@@ -6,7 +6,7 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document et le dossier `spec/` qu'il indexe.
 
-**État actuel :** version **v2.28.2**, lot 48 : fiche découpée en un fichier par bloc dans `src/ui/components/sheet/`, sans changement à l'écran (annexe 48).
+**État actuel :** version **v2.28.3**, lot 49 : état de l'application découpé par domaine dans `src/ui/store/`, sans changement à l'écran (annexe 49).
 
 ---
 
@@ -56,6 +56,7 @@ Fait foi :
 | 46 | Assistant L5R : vue compacte | 46 | v2.28.0 | [`46-vue-compacte.md`](spec/annexes/46-vue-compacte.md) |
 | 47 | Tests rangés par fonctionnalité | 47 | v2.28.1 | [`47-tests-renommes.md`](spec/annexes/47-tests-renommes.md) |
 | 48 | Fiche découpée par bloc | 48 | v2.28.2 | [`48-sheet-decoupe.md`](spec/annexes/48-sheet-decoupe.md) |
+| 49 | État de l'application découpé par domaine | 49 | v2.28.3 | [`49-store-decoupe.md`](spec/annexes/49-store-decoupe.md) |
 
 ## Lire pour un lot
 

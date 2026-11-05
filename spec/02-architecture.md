@@ -16,7 +16,8 @@ carnet-l5r/
 │  │              # ecoles.ts + ecoles-bushi.json (annexe C) + ecoles-courtisans.json (annexe D) : techniques d'école ; maitrises.json (annexe E.4) : maîtrises de compétence
 │  ├─ storage/    # LibraryStore : IndexedDB, fichiers, fichier lié
 │  ├─ ui/         # composants React, thème CSS, hooks
-│  │  └─ components/sheet/  # fiche : index.tsx (Sheet, Block), un fichier par bloc, shared.tsx, hooks.ts, constants.ts (annexe 48)
+│  │  ├─ components/sheet/  # fiche : index.tsx (Sheet, Block), un fichier par bloc, shared.tsx, hooks.ts, constants.ts (annexe 48)
+│  │  └─ store/             # état : index.ts (exports publics), types, state, reducer, ui-reducer, roll, selectors, path, context (annexe 49)
 │  └─ main.tsx
 ├─ tests/
 │  ├─ core.rules.spec.ts      # fourni : spécification exécutable du moteur
