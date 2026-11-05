@@ -8,6 +8,7 @@ import {
 } from "@carnet/core";
 import type { SpellOption } from "../../rules/ecoles";
 import { CALLED_ZONES, CENTER_BONUS, COMBAT_SUBS, CONCENTRATE_ACTION_ID, ELEMENT_LABELS, MEDITATE_ACTION_ID, MELEE_TARGET_PENALTY, SITUATIONS, SPELL_CONCENTRATION, TN_PER_RAISE, TN_SCALE, TRAIT_LABELS, type CalledZone } from "../../rules/l5r4e";
+import { useT, type Messages } from "../../i18n";
 import { pct } from "../format";
 import {
   activeModifiers, calledRaises, contextOf, effectiveManeuvers, finalTN, isActive, isUnskilled, maneuverCosts, poolFor, rollWoundPenalty,
@@ -22,6 +23,8 @@ const MOBILE_QUERY = "(max-width: 720px)";
 
 export function Roller() {
   const { state, dispatch, rng } = useStore();
+  const t = useT();
+  const r = t.roller;
   const c = useCharacter();
   const { ui } = state;
   const a = selectedAction(c, ui);
@@ -35,7 +38,7 @@ export function Roller() {
     }
   }, [lastRoll, ui.sheetOpen]);
 
-  if (!a) return <p className="muted">Choisis une action.</p>;
+  if (!a) return <p className="muted">{r.chooseAction}</p>;
 
   const { opts } = ui;
   const ctx = schoolContext({ ...contextOf(ui), emphasis: opts.emphasisName });
@@ -98,32 +101,32 @@ export function Roller() {
     <>
       <div className="sheet-head">
         <span className="grip" />
-        <button type="button" className="close" aria-label="Fermer" onClick={() => dispatch({ type: "closeSheet" })}>×</button>
+        <button type="button" className="close" aria-label={t.common.close} onClick={() => dispatch({ type: "closeSheet" })}>×</button>
       </div>
       <div className="label">{context}</div>
       <h2 style={{ margin: "2px 0 8px" }}>{a.label}</h2>
       {restriction && (
         <div className="hint" data-testid="stance-restriction" style={{ color: "var(--danger)", marginTop: 0 }}>
-          {restriction} Tu peux lancer quand même si le MJ l'accepte.
+          {restriction} {r.gmMayAllow}
         </div>
       )}
       {woundNote && <div className="hint" data-testid="wound-note" style={{ color: "var(--danger)", marginTop: 0 }}>{woundNote}</div>}
       <div style={{ display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
         <span className="poolbig" data-testid="pool">{formatDice(pool.rolled, pool.kept)}</span>
-        <span className="muted" style={{ fontSize: 13 }}>{poolOrigin(c, a, opts)}{pool.bonus ? ` · ${pool.bonus > 0 ? "+" : ""}${pool.bonus} au total` : ""}</span>
+        <span className="muted" style={{ fontSize: 13 }}>{poolOrigin(c, a, opts, r)}{pool.bonus ? r.poolBonus(pool.bonus) : ""}</span>
       </div>
       {/* Augmentations de dégâts de l'attaque, seule source de dés lancés en plus (annexe J.9). */}
       {opts.extraRolled > 0 && (
         <div className="tchips" data-testid="attack-raises">
-          <span className="tchip">+{opts.extraRolled}g0 · augmentations de l'attaque</span>
-          <button type="button" className="btn sm" onClick={() => set({ extraRolled: 0 })}>Retirer</button>
+          <span className="tchip">{r.attackRaisesChip(formatDice(opts.extraRolled, 0))}</span>
+          <button type="button" className="btn sm" onClick={() => set({ extraRolled: 0 })}>{r.remove}</button>
         </div>
       )}
       {chips.length > 0 && (
         <div className="tchips" data-testid="tech-chips">
           {chips.map((e) => (
             <span key={e.key} className={`tchip${e.mastery ? " mastery" : ""}`} title={e.technique}>
-              {e.mastery && <b className="tag">Maîtrise</b>}{describeEffect(e, c, ui.techInputs[e.key])} · {e.source}
+              {e.mastery && <b className="tag">{r.mastery}</b>}{describeEffect(e, c, ui.techInputs[e.key])} · {e.source}
             </span>
           ))}
         </div>
@@ -131,10 +134,10 @@ export function Roller() {
       <ManualLine pool={pool} emphasis={opts.emphasis && emphasisOffered} flat={opts.flat} free={bonusFree} />
       {stats && (
         <div className="statline">
-          <span>Min <b>{stats.min}</b></span>
-          <span>Moy. <b>{Math.round(stats.mean)}</b></span>
-          <span>Max <b>{stats.max}{stats.open ? "+" : ""}</b>{pool.explodeOn === 9 && <> <span className="tag" title="Explose sur 9">9+</span></>}</span>
-          {typeof tn === "number" && <span className="ch">Réussite <b data-testid="chance">{pct(stats.chance(tn))}</b></span>}
+          <span>{r.min} <b>{stats.min}</b></span>
+          <span>{r.mean} <b>{Math.round(stats.mean)}</b></span>
+          <span>{r.max} <b>{stats.max}{stats.open ? "+" : ""}</b>{pool.explodeOn === 9 && <> <span className="tag" title={r.explodesOn9}>9+</span></>}</span>
+          {typeof tn === "number" && <span className="ch">{r.success} <b data-testid="chance">{pct(stats.chance(tn))}</b></span>}
         </div>
       )}
       {mastery && <div className="hint" data-testid="mastery" style={{ color: "var(--accent-ink)" }}>{mastery}.</div>}
@@ -143,25 +146,25 @@ export function Roller() {
       ))}
       {armorRollTn(c, pa, ui.mounted).notes.map((n) => <div key={n} className="hint" data-testid="armor-note">{n}.</div>)}
       {pool.warnings?.map((w) => <div key={w} className="hint" data-testid="weapon-warning" style={{ color: "var(--danger)" }}>{w}</div>)}
-      {!pool.canRaise && a.kind === "skill" && <div className="hint" style={{ color: "var(--danger)" }}>Sans compétence : pas d'explosion, pas d'augmentation.</div>}
+      {!pool.canRaise && a.kind === "skill" && <div className="hint" style={{ color: "var(--danger)" }}>{r.unskilled}</div>}
 
       <div className="opts">
         <TnField action={a} opts={opts} set={set} />
         {/* Grille sans case vide (annexe J.9) : ND et Bonus fixe côte à côte quand il n'y a pas d'augmentations. */}
         {pool.canRaise && (
           <label className="field">
-            <span className="label">{a.attack ? "Augm. libres" : "Augmentations"}</span>
+            <span className="label">{a.attack ? r.raisesFree : r.raises}</span>
             <NumberField className="in mono" min={0} value={opts.raises} onChange={(n) => set({ raises: n })} />
           </label>
         )}
         {pool.canRaise && (
           <label className="field">
-            <span className="label">Augm. gratuites{bonusFree ? ` (+${bonusFree} bonus)` : ""}</span>
+            <span className="label">{r.freeRaises(bonusFree)}</span>
             <NumberField className="in mono" min={0} value={opts.free} onChange={(n) => set({ free: n })} />
           </label>
         )}
         <label className="field">
-          <span className="label">Bonus fixe</span>
+          <span className="label">{r.flat}</span>
           <NumberField className="in mono" value={opts.flat} onChange={(n) => set({ flat: n })} />
         </label>
       </div>
@@ -174,9 +177,9 @@ export function Roller() {
           <label className="chk">
             <input type="checkbox" checked={opts.voidPoint} disabled={c.voidPoints < 1 && !opts.voidPoint} onChange={(e) => set({ voidPoint: e.target.checked })} />
             {" "}{pool.katanaVoid
-              ? <>Vide : +{perVoid.rolled * vm}g{perVoid.kept * vm} aux dégâts (katana)</>
-              : <>Dépenser 1 point de Vide (+{perVoid.rolled * vm}g{perVoid.kept * vm})</>}
-            {" "}<span className="muted">· reste {c.voidPoints}</span>
+              ? r.voidKatana(formatDice(perVoid.rolled * vm, perVoid.kept * vm))
+              : r.voidSpendOne(formatDice(perVoid.rolled * vm, perVoid.kept * vm))}
+            {" "}<span className="muted">{r.left(c.voidPoints)}</span>
           </label>
         )}
         {spend && spendDice && (
@@ -185,20 +188,20 @@ export function Roller() {
               type="checkbox" checked={opts.voidSpend} disabled={c.voidPoints < spend.points && !opts.voidSpend}
               onChange={(e) => set({ voidSpend: e.target.checked })}
             />
-            {" "}Dépenser {spend.points} points de Vide (+{spendDice.rolled * vm}g{spendDice.kept * vm}) <span className="muted">· {spend.source}</span>
+            {" "}{r.voidSpend(spend.points, formatDice(spendDice.rolled * vm, spendDice.kept * vm))} <span className="muted">· {spend.source}</span>
           </label>
         )}
         {unskilled && (
           <label className="chk">
             <input type="checkbox" checked={opts.voidSkill} disabled={c.voidPoints < 1 && !opts.voidSkill} onChange={(e) => set({ voidSkill: e.target.checked })} />
-            {" "}Dépenser 1 point de Vide : jouer {a.skill} au rang 1
+            {" "}{r.voidSkill(a.skill ?? "")}
           </label>
         )}
         {emphasisOffered && emphases.length > 0 && (
           <label className="field">
-            <span className="label">Spécialisation · relance les 1</span>
+            <span className="label">{r.emphasisSelect}</span>
             <RichSelect variant="ligne" value={opts.emphasisName} onChange={(v) => set({ emphasisName: v, emphasis: v !== "" })}>
-              <option value="">Aucune</option>
+              <option value="">{r.none}</option>
               {emphases.map((e) => <option key={e} value={e}>{e}</option>)}
             </RichSelect>
           </label>
@@ -206,31 +209,31 @@ export function Roller() {
         {emphasisOffered && !emphases.length && (
           <label className="chk">
             <input type="checkbox" checked={opts.emphasis} onChange={(e) => set({ emphasis: e.target.checked })} />
-            {" "}Spécialisation : relancer les 1 {a.emphasisHint && <span className="muted">({a.emphasisHint})</span>}
+            {" "}{r.emphasisCheck} {a.emphasisHint && <span className="muted">({a.emphasisHint})</span>}
           </label>
         )}
         {centerOffered && (
           <label className="chk">
             <input type="checkbox" checked={opts.centerBonus} onChange={(e) => set({ centerBonus: e.target.checked })} />
-            {" "}Bonus de Centre <span className="muted">· +{CENTER_BONUS.rolled}g{CENTER_BONUS.kept} +{c.voidRing} sur ce seul jet</span>
+            {" "}{r.centerBonus} <span className="muted">{r.centerBonusDetail(formatDice(CENTER_BONUS.rolled, CENTER_BONUS.kept), c.voidRing)}</span>
           </label>
         )}
         {ranged && (
           <label className="chk">
             <input type="checkbox" checked={opts.meleeTarget} onChange={(e) => set({ meleeTarget: e.target.checked })} />
-            {" "}Cible au corps à corps <span className="muted">· −{MELEE_TARGET_PENALTY} au total</span>
+            {" "}{r.meleeTarget} <span className="muted">{r.meleePenalty(MELEE_TARGET_PENALTY)}</span>
           </label>
         )}
         {tnOffered && (
           <label className="chk">
             <input type="checkbox" checked={opts.freeToTn} onChange={(e) => set({ freeToTn: e.target.checked })} />
-            {" "}Utiliser les augmentations gratuites pour baisser le ND <span className="muted">· −{TN_PER_RAISE * totalFree}</span>
+            {" "}{r.freeToTn} <span className="muted">{r.freeToTnDetail(TN_PER_RAISE * totalFree)}</span>
           </label>
         )}
         {duel && a.id === "assess" && (
           <label className="chk">
             <input type="checkbox" checked={ui.assessmentWon} onChange={(e) => dispatch({ type: "assessmentWon", on: e.target.checked })} />
-            {" "}Gagnée de 10 ou plus <span className="muted">· bonus à la Concentration</span>
+            {" "}{r.assessmentWon} <span className="muted">{r.assessmentWonDetail}</span>
           </label>
         )}
         {duel && a.id === "focus" && <FocusGap />}
@@ -238,14 +241,14 @@ export function Roller() {
 
       {bonuses.length > 0 && (
         <div className="grid bonuses" style={{ gap: 6, marginBottom: 12 }}>
-          <div className="label">Bonus de jet <span style={{ textTransform: "none", letterSpacing: 0, fontWeight: 500 }}>· techniques, avantages, désavantages</span></div>
+          <div className="label">{r.bonuses} <span style={{ textTransform: "none", letterSpacing: 0, fontWeight: 500 }}>{r.bonusesDetail}</span></div>
           {bonuses.map((m) => (
             <label key={m.id} className="chk">
               <input
                 type="checkbox" checked={isActive(m, ui.modifierToggles)}
                 onChange={(e) => dispatch({ type: "toggleModifier", id: m.id, on: e.target.checked })}
               />
-              {" "}{m.name} <span className="muted">· {describeModifier(m)}{m.mode === "optional" ? " · situationnel" : ""}</span>
+              {" "}{m.name} <span className="muted">· {describeModifier(m)}{m.mode === "optional" ? r.situational : ""}</span>
             </label>
           ))}
         </div>
@@ -258,49 +261,49 @@ export function Roller() {
       {reminders.length > 0 && (
         <div data-testid="school-reminders">
           {reminders.map((e) => (
-            <div key={e.key} className="hint" style={{ color: "var(--accent-ink)" }}>{e.technique} ({e.source}) : {reminderText(e, c)}</div>
+            <div key={e.key} className="hint" style={{ color: "var(--accent-ink)" }}>{r.reminder(e.technique, e.source, reminderText(e, c))}</div>
           ))}
         </div>
       )}
 
-      {unlimited && <div className="hint" style={{ color: "var(--accent-ink)" }}>Augmentations non limitées par ton Vide.</div>}
+      {unlimited && <div className="hint" style={{ color: "var(--accent-ink)" }}>{r.unlimited}</div>}
       {raises > 0 && (
         <div className="tnline" style={{ marginTop: 10, color: !unlimited && raises > c.voidRing ? "var(--warn)" : undefined }}>
-          <span>Augmentations annoncées</span>
-          <span className="mono"><b>{raises}</b>{unlimited ? "" : ` / max ${c.voidRing}`}{!unlimited && raises > c.voidRing ? " · dépasse ton Vide" : ""}</span>
+          <span>{r.calledRaises}</span>
+          <span className="mono"><b>{raises}</b>{unlimited ? "" : r.raisesMax(c.voidRing)}{!unlimited && raises > c.voidRing ? r.overVoid : ""}</span>
         </div>
       )}
       {typeof tn === "number" && typeof base === "number" && (
         <div className="tnline">
-          <span>ND final</span>
+          <span>{r.finalTn}</span>
           <span className="mono">
             <b style={{ fontSize: 18 }} data-testid="final-tn">{tn}</b>{" "}
-            <span className="muted">= {base}{raises ? ` + ${TN_PER_RAISE * raises} augm.` : ""}{penalty ? ` + ${penalty} blessures` : ""}{bonusTN ? ` ${bonusTN > 0 ? "+" : "−"} ${Math.abs(bonusTN)} bonus` : ""}{weaponTn ? ` + ${weaponTn} arc` : ""}{pool.armorTn ? ` + ${pool.armorTn} armure` : ""}</span>
+            <span className="muted">{r.tnBreakdown({ base, raises: TN_PER_RAISE * raises, penalty, bonus: bonusTN, bow: weaponTn, armor: pool.armorTn ?? 0 })}</span>
           </span>
         </div>
       )}
       {tn === "opposed" && (
         <div className="tnline" style={{ marginTop: 10 }}>
-          <span>{raises > 0 ? <>Bats l'adversaire d'au moins <b data-testid="opposed-margin">{opposedMargin(raises)}</b></> : "Bats le total adverse"}</span>
+          <span>{raises > 0 ? <>{r.beatBy} <b data-testid="opposed-margin">{opposedMargin(raises)}</b></> : r.beatTotal}</span>
           <label className="mono" style={{ display: "flex", gap: 6, alignItems: "center" }}>
-            <span className="muted" style={{ fontFamily: "var(--f-body)", fontSize: 13 }}>Total adverse</span>
+            <span className="muted" style={{ fontFamily: "var(--f-body)", fontSize: 13 }}>{r.opponentTotal}</span>
             <input
-              className="in mono" type="number" min={0} style={{ width: 72 }} aria-label="Total adverse"
+              className="in mono" type="number" min={0} style={{ width: 72 }} aria-label={r.opponentTotal}
               value={opts.opponentTotal ?? ""}
               onChange={(e) => set({ opponentTotal: e.target.value === "" ? null : Math.max(0, Math.trunc(Number(e.target.value)) || 0) })}
             />
           </label>
         </div>
       )}
-      {freeToTn > 0 && typeof tn === "number" && <div className="hint">{freeToTn} augmentation(s) gratuite(s) déduites du ND (−{TN_PER_RAISE * freeToTn}).</div>}
-      {ws.penalty === null && <div className="hint" style={{ color: "var(--danger)" }}>Ton personnage est hors de combat.</div>}
+      {freeToTn > 0 && typeof tn === "number" && <div className="hint">{r.freeDeducted(freeToTn, TN_PER_RAISE * freeToTn)}</div>}
+      {ws.penalty === null && <div className="hint" style={{ color: "var(--danger)" }}>{r.outOfCombat}</div>}
       {a.id === MEDITATE_ACTION_ID && <MeditationSuccess />}
       {a.kind === "spell" && !ui.showDiceRoller && <SpellCastLine action={a} manual />}
 
       {ui.showDiceRoller && (
         <>
           <button type="button" className="btn primary rollbtn" style={{ width: "100%", marginTop: 12, padding: 12 }} onClick={roll}>
-            Lancer {formatDice(pool.rolled, pool.kept)}
+            {r.roll(formatDice(pool.rolled, pool.kept))}
           </button>
           <div ref={resultRef} aria-live="polite">
             {lastRoll && lastRoll.actionId === a.id && <RollOutcome roll={lastRoll} />}
@@ -310,7 +313,7 @@ export function Roller() {
       )}
       {ui.showDiceRoller && ui.history.length > 0 && (
         <div className="hist">
-          <span className="label">Derniers jets</span>
+          <span className="label">{r.history}</span>
           {ui.history.map((h, i) => (
             <div key={i}>
               <span>{h.label}</span>
@@ -326,15 +329,16 @@ export function Roller() {
 /** Méditation réussie (annexe E.6) : points de Vide rendus, plafonnés à l'Anneau de Vide ; rien en consultation. */
 function MeditationSuccess() {
   const { state, dispatch } = useStore();
+  const r = useT().roller;
   const c = useCharacter();
   const points = meditationVoidPoints(c);
   const full = c.voidPoints >= c.voidRing;
   return (
     <div className="tnline" style={{ marginTop: 10 }}>
-      <span className="muted">{full ? `Vide plein (${c.voidPoints}/${c.voidRing}).` : `Vide ${c.voidPoints}/${c.voidRing}.`}</span>
+      <span className="muted">{r.meditationVoid(c.voidPoints, c.voidRing, full)}</span>
       {state.mode !== "readonly" && (
         <button type="button" className="btn sm accent" disabled={full} onClick={() => dispatch({ type: "meditate" })}>
-          Réussi : +{points} point{points > 1 ? "s" : ""} de Vide
+          {r.meditationSuccess(points)}
         </button>
       )}
     </div>
@@ -344,23 +348,24 @@ function MeditationSuccess() {
 /** Concentration en duel (F10) : écart saisi → qui frappe en premier, augmentations gratuites pour la Frappe. */
 function FocusGap() {
   const { state, dispatch } = useStore();
+  const r = useT().roller;
   const c = useCharacter();
   const gap = state.ui.focusGap;
   const outcome = gap === null ? null : focusOutcome(c, gap);
   return (
     <div>
       <label className="field" style={{ maxWidth: 260 }}>
-        <span className="label">Écart de Concentration (ton total − adverse)</span>
+        <span className="label">{r.focusGap}</span>
         <input
-          className="in mono" type="number" min={0} aria-label="Écart de Concentration" value={gap ?? ""}
+          className="in mono" type="number" min={0} aria-label={r.focusGapShort} value={gap ?? ""}
           onChange={(e) => dispatch({ type: "focusGap", gap: e.target.value === "" ? null : Math.max(0, Math.trunc(Number(e.target.value)) || 0) })}
         />
       </label>
       {outcome && (
         <div className="hint" data-testid="focus-outcome" style={{ color: outcome.first ? "var(--accent-ink)" : undefined }}>
           {outcome.first
-            ? `Tu frappes en premier, ${outcome.freeRaises} augmentation(s) gratuite(s) pré-remplie(s) sur la Frappe.`
-            : `Frappe simultanée (il faut ${outcome.threshold} d'écart pour frapper en premier).`}
+            ? r.focusFirst(outcome.freeRaises)
+            : r.focusSimultaneous(outcome.threshold)}
         </div>
       )}
     </div>
@@ -369,65 +374,68 @@ function FocusGap() {
 
 /** Règles de relance pour jouer avec de vrais dés (HANDOFF §6.2). */
 function ManualLine({ pool, emphasis, flat, free }: { pool: Pool; emphasis: boolean; flat: number; free: number }) {
+  const r = useT().roller;
   const nine = pool.explodeOn === 9;
   const add = pool.bonus + flat;
   const tenDice = pool.notes.some((n) => n.startsWith("Règle des dix dés"));
   return (
     <div className="manual" data-testid="manual">
       {pool.explodes
-        ? <>Les <b>{nine ? "9 et 10" : "10"}</b> explosent : relance le dé et additionne, tant qu'il retombe sur {nine ? "9 ou 10" : "10"}.</>
-        : "Aucun dé n'explose (compétence non maîtrisée)."}
-      {emphasis && <> Spécialisation : relance une fois chaque <b>1</b>.</>}
-      {add !== 0 && <> Ajoute <b>{add > 0 ? "+" : ""}{add}</b> au total{tenDice ? " (dont règle des dix dés)" : ""}.</>}
-      {free > 0 && <> <b>{free}</b> augmentation(s) gratuite(s).</>}
+        ? <>{r.explodeBefore}<b>{r.explodeOn(nine)}</b>{r.explodeAfter(nine)}</>
+        : r.noExplode}
+      {emphasis && <> {r.emphasisReroll}<b>1</b>.</>}
+      {add !== 0 && <> {r.addBefore}<b>{add > 0 ? "+" : ""}{add}</b>{r.addAfter(tenDice)}</>}
+      {free > 0 && <> <b>{free}</b>{r.freeAfter}</>}
     </div>
   );
 }
 
 /** Origine de la réserve, en clair. */
-function poolOrigin(c: Character, a: ActionDef, opts: RollOptions): string {
-  const extra = opts.extraRolled ? ` + ${opts.extraRolled} dé(s)` : "";
+function poolOrigin(c: Character, a: ActionDef, opts: RollOptions, r: Messages["roller"]): string {
+  const o = r.origin;
+  const extra = opts.extraRolled ? o.extraDice(opts.extraRolled) : "";
   switch (a.kind) {
     case "skill": {
       const trait = a.trait ?? "agility";
       const value = trait === "void" ? c.voidRing : c.traits[trait];
       return `${a.skill} ${findSkill(c, a.skill ?? "")?.rank ?? 0} + ${TRAIT_LABELS[trait]} ${value}${extra}`;
     }
-    case "trait": return `${TRAIT_LABELS[a.trait ?? "stamina"]} pur${extra}`;
+    case "trait": return `${o.pureTrait(TRAIT_LABELS[a.trait ?? "stamina"])}${extra}`;
     case "damage": {
       // Force effective de l'arc : plafonnée par la Force, +1 avec Kyujutsu 7 (annexe E.2 C11).
-      const bow = a.weapon && isRanged(a.weapon) ? `Arc ${bowStrength(c, a.weapon)}` : null;
-      return `${bow ?? `Force ${c.traits.strength}`} + VD ${formatDR(a.dr ?? "")}${extra}`;
+      const bow = a.weapon && isRanged(a.weapon) ? o.bow(bowStrength(c, a.weapon)) : null;
+      return `${bow ?? o.strength(c.traits.strength)} + ${o.dr(formatDR(a.dr ?? ""))}${extra}`;
     }
     case "spell": {
       // « Feu 3 + rang 1 + affinité 1 » (annexe F.5).
       const cast = spellCast(c, toPoolAction(a, opts) as SpellAction);
-      const parts = [`${ELEMENT_LABELS[cast.ring]} ${cast.ringValue}`, `rang ${schoolRankOf(c)}`];
-      if (cast.affinity) parts.push("affinité 1");
-      const minus = cast.deficiency ? " − déficience 1" : "";
-      return `${parts.join(" + ")}${minus}${cast.rolled ? ` + ${cast.rolled} (école)` : ""}${extra}`;
+      const parts = [`${ELEMENT_LABELS[cast.ring]} ${cast.ringValue}`, o.schoolRank(schoolRankOf(c))];
+      if (cast.affinity) parts.push(o.affinity);
+      const minus = cast.deficiency ? o.deficiency : "";
+      return `${parts.join(" + ")}${minus}${cast.rolled ? o.schoolDice(cast.rolled) : ""}${extra}`;
     }
-    case "spellDamage": return `VD ${formatDR(a.spell?.damage ?? "")}${extra}`;
-    default: return `Rang ${c.insightRank} + Réflexes ${c.traits.reflexes}${extra}`;
+    case "spellDamage": return `${o.dr(formatDR(a.spell?.damage ?? ""))}${extra}`;
+    default: return `${o.initiative(c.insightRank, c.traits.reflexes)}${extra}`;
   }
 }
 
-const slotName = (k: SpellSlotKey) => (k === "free" ? "libre" : ELEMENT_LABELS[k]);
+const slotName = (k: SpellSlotKey, r: Messages["roller"]) => (k === "free" ? r.freeSlot : ELEMENT_LABELS[k]);
 
 /** Ligne « Emplacement : Feu 2/3 » (« libre 1/2 » si l'élément est épuisé, « aucun emplacement » en rouge), F.5. */
 function SlotLine({ action: a }: { action: ActionDef }) {
   const { state } = useStore();
+  const r = useT().roller;
   const c = useCharacter();
   const need = spellSlotNeed(c, toPoolAction(a, state.ui.opts) as SpellAction);
   const key = slotFor(c, need.ring);
   const slot = key && spellSlots(c)[key];
   return (
     <div className="tnline" data-testid="spell-slot" style={{ margin: 0, color: slot ? undefined : "var(--danger)" }}>
-      <span>Emplacement</span>
+      <span>{r.slot}</span>
       <span>
         {slot && key
-          ? <><b>{slotName(key)}</b> <span className="mono">{slot.left}/{slot.max}</span>{need.count > 1 ? ` · ${need.count} emplacements` : ""}</>
-          : "aucun emplacement"}
+          ? <><b>{slotName(key, r)}</b> <span className="mono">{slot.left}/{slot.max}</span>{need.count > 1 ? r.slotCount(need.count) : ""}</>
+          : r.noSlot}
       </span>
     </div>
   );
@@ -439,24 +447,25 @@ function SlotLine({ action: a }: { action: ActionDef }) {
  */
 function SpellCastLine({ action: a, manual = false }: { action: ActionDef; manual?: boolean }) {
   const { state, dispatch } = useStore();
+  const r = useT().roller;
   const cast = state.ui.spellCast?.actionId === a.id ? state.ui.spellCast : null;
   const readonly = state.mode === "readonly";
   const spent = cast && cast.slots.length > 0
-    ? <>{manual ? (cast.success ? "Lancé" : "Raté") + " : emplacement" : "Emplacement dépensé :"} {cast.slots.map(slotName).join(", ")}{manual ? " dépensé." : cast.success === false ? " (raté)" : ""}</>
-    : cast ? "Aucun emplacement dépensé." : null;
+    ? r.slotsSpent(manual, cast.success, cast.slots.map((k) => slotName(k, r)).join(", "))
+    : cast ? r.noSlotSpent : null;
   if (manual && readonly && !spent) return null;
   return (
     <div className="spellmanual" data-testid="spell-cast">
-      {manual && <span className="muted">Jet aux vrais dés :</span>}
+      {manual && <span className="muted">{r.realDice}</span>}
       {manual && !readonly && (
         <>
-          <button type="button" className="btn sm accent" onClick={() => dispatch({ type: "castSpell", success: true })}>Réussi</button>
-          <button type="button" className="btn sm" onClick={() => dispatch({ type: "castSpell", success: false })}>Raté</button>
+          <button type="button" className="btn sm accent" onClick={() => dispatch({ type: "castSpell", success: true })}>{r.succeeded}</button>
+          <button type="button" className="btn sm" onClick={() => dispatch({ type: "castSpell", success: false })}>{r.failed}</button>
         </>
       )}
       {spent && <span className="spelldone" data-testid="spell-spent">{spent}</span>}
       {cast?.success && cast.slots.length > 0 && (
-        <button type="button" className="btn sm" onClick={() => dispatch({ type: "cancelCast" })}>Annuler (interrompu)</button>
+        <button type="button" className="btn sm" onClick={() => dispatch({ type: "cancelCast" })}>{r.cancelInterrupted}</button>
       )}
     </div>
   );
@@ -467,18 +476,19 @@ const forSpellRoll = (o: SpellOption) =>
   o.rolled !== undefined || o.freeRaises !== undefined || o.extraAffinity !== undefined || o.extraSlot !== undefined;
 const forSpellDamage = (o: SpellOption) => o.damageRolled !== undefined || o.damageKept !== undefined || o.damageFlat !== undefined;
 
-function optionEffect(o: SpellOption, c: Character): string {
-  if (o.extraAffinity) return `affinité ${ELEMENT_LABELS[o.extraAffinity]}`;
-  if (o.extraSlot) return `${o.extraSlot} emplacement de plus`;
-  if (o.freeRaises) return `${o.freeRaises} augmentation gratuite`;
-  if (o.rolled) return `+${o.rolled}g0`;
-  if (o.damageFlat === "schoolRank") return `+${schoolRankOf(c)} aux dégâts`;
-  return `+${o.damageRolled ?? 0}g${o.damageKept ?? 0} aux dégâts`;
+function optionEffect(o: SpellOption, c: Character, r: Messages["roller"]): string {
+  if (o.extraAffinity) return r.option.affinity(ELEMENT_LABELS[o.extraAffinity]);
+  if (o.extraSlot) return r.option.extraSlot(o.extraSlot);
+  if (o.freeRaises) return r.option.freeRaises(o.freeRaises);
+  if (o.rolled) return `+${formatDice(o.rolled, 0)}`;
+  if (o.damageFlat === "schoolRank") return r.option.damage(`+${schoolRankOf(c)}`);
+  return r.option.damage(`+${formatDice(o.damageRolled ?? 0, o.damageKept ?? 0)}`);
 }
 
 /** Lanceur d'un sort (annexe F.5) : élément, autre Anneau, cases de l'école, temps d'incantation, rappels. */
 function SpellPanel({ action: a, spell }: { action: ActionDef; spell: Spell }) {
   const { state, dispatch } = useStore();
+  const r = useT().roller;
   const c = useCharacter();
   const { opts } = state.ui;
   const sc = spellcastingOf(c);
@@ -486,11 +496,11 @@ function SpellPanel({ action: a, spell }: { action: ActionDef; spell: Spell }) {
   const damage = a.kind === "spellDamage";
   const options = spellOptions(c).filter(damage ? forSpellDamage : forSpellRoll);
   const checkboxes = options.length > 0 && (
-    <div className="grid" style={{ gap: 6 }} role="group" aria-label="Cases de l'école">
+    <div className="grid" style={{ gap: 6 }} role="group" aria-label={r.schoolOptions}>
       {options.map((o) => (
         <label key={o.id} className="chk">
           <input type="checkbox" checked={!!opts.spellOptions[o.id]} onChange={(e) => set({ spellOptions: { ...opts.spellOptions, [o.id]: e.target.checked } })} />
-          {" "}{o.label} <span className="muted">· {optionEffect(o, c)}</span>
+          {" "}{o.label} <span className="muted">· {optionEffect(o, c, r)}</span>
         </label>
       ))}
     </div>
@@ -502,19 +512,19 @@ function SpellPanel({ action: a, spell }: { action: ActionDef; spell: Spell }) {
   const restriction = spellRestriction(c, spell, cast.element, pa.options);
   const raises = spellRaises(spell);
   const time = castTime(spell.mastery, opts.castRaises);
-  const otherRings = SPELL_RINGS.filter((r) => r !== cast.element);
+  const otherRings = SPELL_RINGS.filter((ring) => ring !== cast.element);
   return (
     <div className="spellbox" data-testid="spell-panel">
       {restriction && (
         <div className="hint" data-testid="spell-restriction" style={{ color: "var(--danger)", marginTop: 0 }}>
-          {restriction} Tu peux lancer quand même si le MJ l'accepte.
+          {restriction} {r.gmMayAllow}
         </div>
       )}
       {spell.element === "all" && (
         <label className="field" style={{ maxWidth: 260 }}>
-          <span className="label">Élément (sort universel)</span>
+          <span className="label">{r.universalElement}</span>
           <RichSelect variant="anneau" value={cast.element} onChange={(v) => set({ spellElement: v as SpellRing, spellRing: null })}>
-            {SPELL_RINGS.map((r) => <RingOption key={r} ring={r} />)}
+            {SPELL_RINGS.map((ring) => <RingOption key={ring} ring={ring} />)}
           </RichSelect>
         </label>
       )}
@@ -525,13 +535,13 @@ function SpellPanel({ action: a, spell }: { action: ActionDef; spell: Spell }) {
               type="checkbox" checked={!!opts.spellRing} disabled={c.voidPoints < 1 && !opts.spellRing}
               onChange={(e) => set({ spellRing: e.target.checked ? (otherRings[0] ?? null) : null })}
             />
-            {" "}1 point de Vide : lancer avec un autre Anneau <span className="muted">· reste {c.voidPoints}</span>
+            {" "}{r.ringSwap} <span className="muted">{r.left(c.voidPoints)}</span>
           </label>
           {opts.spellRing && (
             <label className="field" style={{ maxWidth: 260, marginLeft: 24 }}>
-              <span className="label">Anneau du jet</span>
+              <span className="label">{r.rollRing}</span>
               <RichSelect variant="anneau" value={opts.spellRing} onChange={(v) => set({ spellRing: v as SpellRing })}>
-                {otherRings.map((r) => <RingOption key={r} ring={r} />)}
+                {otherRings.map((ring) => <RingOption key={ring} ring={ring} />)}
               </RichSelect>
             </label>
           )}
@@ -540,63 +550,63 @@ function SpellPanel({ action: a, spell }: { action: ActionDef; spell: Spell }) {
       {checkboxes}
       {cast.freeRaises.length > 0 && (
         <div className="hint" data-testid="spell-free-raises" style={{ color: "var(--accent-ink)" }}>
-          {cast.freeRaises.length} augmentation{cast.freeRaises.length > 1 ? "s" : ""} gratuite{cast.freeRaises.length > 1 ? "s" : ""} de l'école : {cast.freeRaises.join(", ")}.
+          {r.spellFreeRaises(cast.freeRaises.length, cast.freeRaises.join(", "))}
         </div>
       )}
       <div className="castrow">
         <label className="field">
-          <span className="label">Augm. pour le temps d'incantation</span>
+          <span className="label">{r.castRaises}</span>
           <NumberField className="in mono" min={0} max={10} value={opts.castRaises} onChange={(n) => set({ castRaises: n })} />
         </label>
         <div className="tnline" style={{ margin: 0 }}>
-          <span>Temps d'incantation</span>
+          <span>{r.castTime}</span>
           <b data-testid="cast-time">{castTimeLabel(time)}</b>
         </div>
       </div>
       {raises.length > 0 && (
         <div className="spellraises" data-testid="spell-raises">
-          <span className="label">Augmentations du sort</span>
-          <ul>{raises.map((r) => <li key={r}>{r}</li>)}</ul>
+          <span className="label">{r.spellRaises}</span>
+          <ul>{raises.map((raise) => <li key={raise}>{raise}</li>)}</ul>
         </div>
       )}
       {!spell.memorized && (
-        <div className="hint" data-testid="spell-scroll">Sort non mémorisé : lance-le parchemin en main (le mémoriser coûte {spell.mastery} XP).</div>
+        <div className="hint" data-testid="spell-scroll">{r.scroll(spell.mastery)}</div>
       )}
       <SlotLine action={a} />
       <div className="hint">
-        Interrompu pendant l'incantation : « Rester concentré », Volonté ND {SPELL_CONCENTRATION.tn} (ou {SPELL_CONCENTRATION.base} + dégâts subis) ;
-        {" "}un sort réussi puis interrompu ne consomme pas l'emplacement.
+        {r.interrupted(SPELL_CONCENTRATION.tn, SPELL_CONCENTRATION.base)}
       </div>
-      {sc?.reminders?.map((r) => <div key={r} className="hint" style={{ color: "var(--accent-ink)" }}>{r}</div>)}
+      {sc?.reminders?.map((note) => <div key={note} className="hint" style={{ color: "var(--accent-ink)" }}>{note}</div>)}
       {spell.effect && <div className="spelleffect prose" data-testid="spell-effect">{spell.effect}</div>}
     </div>
   );
 }
 
 function TnField({ action: a, opts, set }: { action: ActionDef; opts: RollOptions; set: (p: Partial<RollOptions>) => void }) {
+  const r = useT().roller;
   switch (a.tn) {
     case null: return null;
     case "target":
       return (
-        <label className="field"><span className="label">ND d'armure cible</span>
+        <label className="field"><span className="label">{r.targetTn}</span>
           <NumberField className="in mono" min={0} value={opts.targetTN} onChange={(n) => set({ targetTN: n })} />
         </label>
       );
     case "assessment":
       return (
-        <label className="field"><span className="label">Rang adverse</span>
+        <label className="field"><span className="label">{r.opponentRank}</span>
           <NumberField className="in mono" min={1} max={10} value={opts.opponentRank} onChange={(n) => set({ opponentRank: n })} />
         </label>
       );
     case "opposed":
       return (
-        <div className="field"><span className="label">ND</span><span className="muted" style={{ fontSize: 13, paddingTop: 6 }}>Opposition : compare au jet adverse</span></div>
+        <div className="field"><span className="label">{r.tn}</span><span className="muted" style={{ fontSize: 13, paddingTop: 6 }}>{r.opposed}</span></div>
       );
     default:
       // Rester concentré : ND 10, ou 5 + dégâts subis (F.2).
       if (a.id === CONCENTRATE_ACTION_ID) {
         return (
-          <label className="field"><span className="label">Dégâts subis · ND {concentrationTn(opts.damageTaken)}</span>
+          <label className="field"><span className="label">{r.damageTakenTn(concentrationTn(opts.damageTaken))}</span>
             <NumberField className="in mono" min={0} value={opts.damageTaken ?? 0} onChange={(n) => set({ damageTaken: n || null })} />
           </label>
         );
@@ -605,13 +615,13 @@ function TnField({ action: a, opts, set }: { action: ActionDef; opts: RollOption
       if (a.kind === "spell") {
         return (
           <div className="field">
-            <span className="label">ND de base</span>
-            <span className="mono" data-testid="spell-tn" style={{ paddingTop: 6 }}>{a.tn} <span className="muted">· maîtrise {a.spell?.mastery}</span></span>
+            <span className="label">{r.baseTn}</span>
+            <span className="mono" data-testid="spell-tn" style={{ paddingTop: 6 }}>{a.tn} <span className="muted">{r.masteryOf(a.spell?.mastery ?? 0)}</span></span>
           </div>
         );
       }
       return (
-        <label className="field"><span className="label">ND de base</span>
+        <label className="field"><span className="label">{r.baseTn}</span>
           <RichSelect variant="ligne" className="mono" value={opts.tn} onChange={(v) => set({ tn: Number(v) })}>
             {TN_SCALE.map((t) => <option key={t.tn} value={t.tn}>{t.tn} · {t.label}</option>)}
           </RichSelect>
@@ -625,9 +635,10 @@ function TechniqueOptions({ effects }: { effects: readonly ActiveEffect[] }) {
   const { state, dispatch } = useStore();
   const c = useCharacter();
   const { techToggles, techInputs } = state.ui;
+  const r = useT().roller;
   return (
-    <div className="grid bonuses" style={{ gap: 6, marginBottom: 12 }} role="group" aria-label="Techniques à cocher">
-      <div className="label">Techniques à cocher</div>
+    <div className="grid bonuses" style={{ gap: 6, marginBottom: 12 }} role="group" aria-label={r.techniques}>
+      <div className="label">{r.techniques}</div>
       {effects.map((e) => {
         const effect = describeEffect(e, c, techInputs[e.key]);
         return (
@@ -635,7 +646,7 @@ function TechniqueOptions({ effects }: { effects: readonly ActiveEffect[] }) {
             <label className="chk">
               <input type="checkbox" checked={!!techToggles[e.key]} onChange={(ev) => dispatch({ type: "toggleTechnique", key: e.key, on: ev.target.checked })} />
               {" "}{("label" in e && e.label) || e.technique}{" "}
-              <span className="muted">· {effect ? `${effect} · ` : ""}{"void" in e && e.void ? `${e.void} point de Vide · ` : ""}{e.source}</span>
+              <span className="muted">· {effect ? `${effect} · ` : ""}{"void" in e && e.void ? r.voidCost(e.void) : ""}{e.source}</span>
             </label>
             {"input" in e && e.input && (
               <label className="field" style={{ marginLeft: 24, maxWidth: 260 }}>
@@ -661,17 +672,18 @@ function ManeuverPicker({ effects }: { effects: readonly ActiveEffect[] }) {
   const costs = maneuverCosts(state.ui.opts);
   const setCount = (id: string, count: number) => dispatch({ type: "maneuver", id, count });
   const setOpt = (patch: { calledZone?: CalledZone; quadruped?: boolean }) => dispatch({ type: "option", patch });
+  const r = useT().roller;
   return (
     <>
-      <div className="label">Manœuvres <span style={{ textTransform: "none", letterSpacing: 0, fontWeight: 500 }}>· coût en augmentations</span></div>
+      <div className="label">{r.maneuvers} <span style={{ textTransform: "none", letterSpacing: 0, fontWeight: 500 }}>{r.maneuversDetail}</span></div>
       <div className="mans">
         {list.map((m) => {
           const n = sel[m.id] ?? 0;
           return m.stackable ? (
             <div key={m.id} className={`man${n ? " on" : ""}`}>
-              <button type="button" aria-label={`Retirer ${m.name}`} onClick={() => setCount(m.id, n - 1)}>−</button>
+              <button type="button" aria-label={r.removeOne(m.name)} onClick={() => setCount(m.id, n - 1)}>−</button>
               <span title={m.effect}>{m.name} <b className="mono">{n}</b></span>
-              <button type="button" aria-label={`Ajouter ${m.name}`} onClick={() => setCount(m.id, n + 1)}>+</button>
+              <button type="button" aria-label={r.addOne(m.name)} onClick={() => setCount(m.id, n + 1)}>+</button>
             </div>
           ) : (
             <button key={m.id} type="button" className={`man${n ? " on" : ""}`} aria-pressed={n > 0} title={m.effect} onClick={() => setCount(m.id, n ? 0 : 1)}>
@@ -682,26 +694,26 @@ function ManeuverPicker({ effects }: { effects: readonly ActiveEffect[] }) {
       </div>
       {(sel.called ?? 0) > 0 && list.some((m) => m.id === "called") && (
         <label className="field" style={{ marginTop: 6, maxWidth: 260 }}>
-          <span className="label">Coup ciblé · zone</span>
+          <span className="label">{r.calledZone}</span>
           <RichSelect variant="ligne" value={state.ui.opts.calledZone} onChange={(v) => setOpt({ calledZone: v as CalledZone })}>
-            {CALLED_ZONES.map((z) => <option key={z.id} value={z.id}>{z.label} · {z.cost} augm.</option>)}
+            {CALLED_ZONES.map((z) => <option key={z.id} value={z.id}>{r.zoneCost(z.label, z.cost)}</option>)}
           </RichSelect>
         </label>
       )}
       {(sel.knockdown ?? 0) > 0 && list.some((m) => m.id === "knockdown") && (
         <label className="chk" style={{ marginTop: 6 }}>
           <input type="checkbox" checked={state.ui.opts.quadruped} onChange={(e) => setOpt({ quadruped: e.target.checked })} />
-          {" "}Renverser un quadrupède <span className="muted">· 4 augmentations</span>
+          {" "}{r.quadruped} <span className="muted">{r.quadrupedCost}</span>
         </label>
       )}
       {reserved.map((e) => (
         <div key={e.key} className="hint" style={{ marginTop: 4, color: "var(--accent-ink)" }}>
-          {describeEffect(e, c)} · {e.source} : déduites du coût de la manœuvre.
+          {r.reserved(describeEffect(e, c), e.source)}
         </div>
       ))}
       {(sel[DAMAGE_MANEUVER_ID] ?? 0) > 0 && (
         <div className="hint" data-testid="damage-raises-note" style={{ marginTop: 4 }}>
-          Toutes tes augmentations de dégâts du round comptent comme un seul effet pour les réductions de coût de manœuvre.
+          {r.damageRaisesNote}
         </div>
       )}
       {list.filter((m) => sel[m.id]).map((m) => (
@@ -712,57 +724,58 @@ function ManeuverPicker({ effects }: { effects: readonly ActiveEffect[] }) {
 }
 
 function RollOutcome({ roll: r }: { roll: RollRecord }) {
+  const t = useT().roller;
   const { total } = r.result;
   const hasTN = typeof r.tn === "number";
   const ok = hasTN && total >= (r.tn as number);
   const margin = hasTN ? total - (r.tn as number) : 0;
   return (
     <>
-      <div className="dice" aria-label="Dés">
+      <div className="dice" aria-label={t.dice}>
         {r.result.dice.map((d, i) => (
           <span
             key={i}
             className={["die", d.kept ? "kept" : "", d.faces.length > 1 ? "ex" : ""].filter(Boolean).join(" ")}
-            title={`${d.faces.join(" + ")}${d.rerolledOne ? " (1 relancé)" : ""}`}
+            title={t.dieTitle(d.faces.join(" + "), !!d.rerolledOne)}
           >{d.total}{d.faces.length > 1 && <small>{d.faces.join("+")}</small>}</span>
         ))}
       </div>
       {hasTN ? (
         <>
           <div className={`verdict ${ok ? "ok" : "ko"}`}>
-            {ok ? "Réussite" : "Échec"} <span className="mono" style={{ fontSize: 16 }}>{total} / {r.tn} ({margin >= 0 ? "+" : ""}{margin})</span>
+            {ok ? t.success : t.failure} <span className="mono" style={{ fontSize: 16 }}>{total} / {r.tn} ({margin >= 0 ? "+" : ""}{margin})</span>
           </div>
           {r.baseSuccess && (
             <div className="hint" data-testid="base-success" style={{ color: "var(--accent-ink)" }}>
-              Réussite sans les augmentations : le ND de base {r.baseTn} est atteint (Akodo R5), les augmentations n'ont pas d'effet.
+              {t.baseSuccess(r.baseTn ?? 0)}
             </div>
           )}
           {ok && (r.raises > 0 || r.free > 0) && (
-            <div className="hint">{r.raises + r.free} augmentation(s) à appliquer{r.free ? ` dont ${r.free} gratuite(s)` : ""}.</div>
+            <div className="hint">{t.raisesToApply(r.raises + r.free, r.free)}</div>
           )}
-          {r.maneuvers.length > 0 && <div className="hint">{ok ? "Manœuvres réussies" : "Manœuvres perdues"} : {r.maneuvers.join(", ")}.</div>}
-          {r.damageDice > 0 && !r.disarm && <div className="hint">+{r.damageDice}g0 pré-rempli sur le prochain jet de dégâts.</div>}
-          {r.feint ? <div className="hint" data-testid="feint-note">Feinte réussie : +{r.feint} pré-rempli sur le prochain jet de dégâts.</div> : null}
-          {r.disarm && <div className="hint" data-testid="disarm-note">Désarmement réussi : le prochain jet de dégâts est 2g1 sans la Force, sans augmentation de dégâts.</div>}
+          {r.maneuvers.length > 0 && <div className="hint">{t.maneuversResult(ok, r.maneuvers.join(", "))}</div>}
+          {r.damageDice > 0 && !r.disarm && <div className="hint">{t.prefilled(`+${formatDice(r.damageDice, 0)}`)}</div>}
+          {r.feint ? <div className="hint" data-testid="feint-note">{t.feint(r.feint)}</div> : null}
+          {r.disarm && <div className="hint" data-testid="disarm-note">{t.disarm}</div>}
           {ok && !r.raises && margin >= TN_PER_RAISE && r.kind !== "damage" && (
-            <div className="hint">Marge de {margin} : tu aurais pu annoncer {Math.floor(margin / TN_PER_RAISE)} augmentation(s).</div>
+            <div className="hint">{t.margin(margin, Math.floor(margin / TN_PER_RAISE))}</div>
           )}
         </>
       ) : (
         <div className="verdict">
           {total}{" "}
           <span className="muted" style={{ fontSize: 15, fontFamily: "var(--f-body)" }}>
-            {r.tn === "opposed" ? (r.opponent === undefined ? "à comparer au jet adverse" : `contre ${r.opponent}`) : r.kind === "damage" ? "blessures infligées" : r.kind === "initiative" ? "initiative" : ""}
+            {r.tn === "opposed" ? (r.opponent === undefined ? t.toCompare : t.against(r.opponent)) : r.kind === "damage" ? t.woundsDealt : r.kind === "initiative" ? t.initiative : ""}
           </span>
         </div>
       )}
       {r.tn === "opposed" && r.opponent !== undefined && (
         <div className={`verdict ${opposedVerdict(total, r.opponent, r.raises) === "win" ? "ok" : opposedVerdict(total, r.opponent, r.raises) === "lose" ? "ko" : ""}`} data-testid="opposed-verdict">
-          {{ win: "Tu l'emportes", tie: "Égalité", lose: "L'adversaire l'emporte" }[opposedVerdict(total, r.opponent, r.raises)]}
-          {r.raises > 0 && <span className="muted" style={{ fontSize: 14 }}> · il fallait {opposedMargin(r.raises)} d'écart</span>}
+          {t.opposedVerdict[opposedVerdict(total, r.opponent, r.raises)]}
+          {r.raises > 0 && <span className="muted" style={{ fontSize: 14 }}> {t.neededMargin(opposedMargin(r.raises))}</span>}
         </div>
       )}
-      {r.fullDefense && <div className="hint">+{fullDefenseBonus(total)} au ND d'armure ce round (posture Défense totale activée).</div>}
+      {r.fullDefense && <div className="hint">{t.fullDefense(fullDefenseBonus(total))}</div>}
     </>
   );
 }

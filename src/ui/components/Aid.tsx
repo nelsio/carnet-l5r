@@ -1,6 +1,6 @@
 import { Fragment, useEffect } from "react";
 import {
-  armorEffects, armyStatus, battleOutcome, battleRollBonus, battleRollTotal, describeEffect, describeModifier, rollBattleDice, stanceEffects, fullAttackAllowed, guardRule, initiativeScore, isSimpleAttack, stanceRestriction, modifiersOf, movement, movementBonus, movementWater, resolveValue,
+  armorEffects, armyStatus, formatDice, battleOutcome, battleRollBonus, battleRollTotal, describeEffect, describeModifier, rollBattleDice, stanceEffects, fullAttackAllowed, guardRule, initiativeScore, isSimpleAttack, stanceRestriction, modifiersOf, movement, movementBonus, movementWater, resolveValue,
   isShugenja, reminderText, rings, schoolOf, schoolReminders, spellRestriction, stackCount, stackEffects, stackMax, terrainWaiver, voidMultiplier,
   type ActionDef, type ActiveEffect,
 } from "@carnet/core";
@@ -10,6 +10,7 @@ import {
 } from "../../rules/l5r4e";
 import type { ReminderContext } from "../../rules/ecoles";
 import { SITUATION_LINKS } from "../../rules/portal";
+import { useLocale, useT } from "../../i18n";
 import { toMeters } from "../format";
 import { contextOf, currentArmorTN, DEFAULT_ROLL_OPTIONS, isActive, isRollable, poolFor, poolLabel, toPoolAction, uiRollStance } from "../rolls";
 import { currentActions, useCharacter, useStore, type AidSituation, type BattleState, type InfoPanel, type VoidChoice } from "../store";
@@ -24,6 +25,7 @@ const aidSituations = (shugenja: boolean): readonly { id: AidSituation; label: s
 
 export function Aid() {
   const { state, dispatch } = useStore();
+  const tx = useT().aid;
   const c = useCharacter();
   const { ui } = state;
 
@@ -44,7 +46,7 @@ export function Aid() {
   const tabs = aidSituations(isShugenja(c));
   const situations = (
     // Cinq onglets (Magie) : plus serrés sur mobile, pour tenir sur une ligne à 360 px.
-    <div className={`sit${tabs.length > 4 ? " many" : ""}`} role="group" aria-label="Situation">
+    <div className={`sit${tabs.length > 4 ? " many" : ""}`} role="group" aria-label={tx.situation}>
       {tabs.map((s) => (
         <button key={s.id} type="button" aria-pressed={ui.situation === s.id} onClick={() => dispatch({ type: "situation", situation: s.id })}>{s.label}</button>
       ))}
@@ -60,7 +62,7 @@ export function Aid() {
     <>
       {situations}
       {combat && (
-        <div className="sit sub" role="group" aria-label="Type de combat">
+        <div className="sit sub" role="group" aria-label={tx.combatType}>
           {COMBAT_SUBS.map((s) => (
             <button key={s.id} type="button" aria-pressed={ui.sub === s.id} onClick={() => dispatch({ type: "sub", sub: s.id })}>{s.label}</button>
           ))}
@@ -76,8 +78,8 @@ export function Aid() {
           {(combat || ui.situation === "court") && <RemindersPanel />}
           <div className="listhead">
             <span className="panel-title">
-              <span className="label">Actions</span><ActionsInfoButton />
-              {ui.compactActions && <span className="ibhint">explications masquées</span>}
+              <span className="label">{tx.actions}</span><ActionsInfoButton />
+              {ui.compactActions && <span className="ibhint">{tx.compactHint}</span>}
             </span>
           </div>
           <div className={`actions${ui.compactActions ? " compact" : ""}`}>
@@ -87,15 +89,15 @@ export function Aid() {
                 ? <Fragment key={a.id}><h3 className="label actgroup">{a.group}</h3><ActionCard action={a} /></Fragment>
                 : <ActionCard key={a.id} action={a} />
             ))}
-            {combat && !c.weapons.length && <p className="muted">Ajoute des armes dans la fiche pour voir les attaques.</p>}
+            {combat && !c.weapons.length && <p className="muted">{tx.noWeapons}</p>}
           </div>
         </div>
         {/* Colonne de droite : liens vers le portail (annexe L.8), puis le lanceur ; sous les actions sur mobile. */}
         <div className="aid-side">
           {links.length > 0 && (
-            <aside className="portal-links" aria-label="Liens vers le portail">
+            <aside className="portal-links" aria-label={tx.portalLinks}>
               {links.map((l) => (
-                <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer" aria-label={`${l.title} : ${l.desc} (nouvel onglet)`}>
+                <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer" aria-label={tx.portalLink(l.title, l.desc)}>
                   <span><span className="t">{l.title}</span><span className="d">{l.desc}</span></span>
                   <ExtIcon />
                 </a>
@@ -103,7 +105,7 @@ export function Aid() {
             </aside>
           )}
           <div className={`backdrop${ui.sheetOpen ? " open" : ""}`} onClick={() => dispatch({ type: "closeSheet" })} />
-          <div className={`panel roller${ui.sheetOpen ? " open" : ""}`} role="dialog" aria-label="Lanceur de dés">
+          <div className={`panel roller${ui.sheetOpen ? " open" : ""}`} role="dialog" aria-label={tx.roller}>
             <Roller />
           </div>
         </div>
@@ -114,6 +116,7 @@ export function Aid() {
 
 function InitiativeCard({ action }: { action: ActionDef }) {
   const { state, dispatch } = useStore();
+  const tx = useT().aid;
   const c = useCharacter();
   const { ui } = state;
   const p = poolFor(c, action, DEFAULT_ROLL_OPTIONS, "attack");
@@ -121,18 +124,18 @@ function InitiativeCard({ action }: { action: ActionDef }) {
   // Centre au round précédent : +10 ce round (F1) ; Vide : +10 pour l'escarmouche (F3).
   const center = ui.centerLastRound && ui.sub !== "duel";
   const value = ui.initiative === null ? null : initiativeScore(c, ui.initiative, { centerLastRound: center, voidPoints: ui.voidInitiative });
-  const tags = [center ? `+${CENTER_BONUS.initiative} Centre` : "", ui.voidInitiative ? `+${VOID_COMBAT.initiative * voidMultiplier(c) * ui.voidInitiative} Vide` : ""].filter(Boolean);
+  const tags = [center ? tx.initiativeCenter(CENTER_BONUS.initiative) : "", ui.voidInitiative ? tx.initiativeVoid(VOID_COMBAT.initiative * voidMultiplier(c) * ui.voidInitiative) : ""].filter(Boolean);
   return (
     <button type="button" className="act" aria-pressed={ui.selectedId === action.id} onClick={() => dispatch({ type: "select", id: action.id })}>
       <span className="t">
-        Initiative <span className="muted" style={{ fontWeight: 500 }}>· une fois par combat</span>
+        {tx.initiative} <span className="muted" style={{ fontWeight: 500 }}>{tx.oncePerCombat}</span>
         {tags.map((t) => <span key={t} className="tag" data-testid="initiative-bonus"> {t}</span>)}
       </span>
       <span className="p" data-testid="initiative">{value !== null ? <span style={{ color: "var(--ink)", fontSize: 20 }}>{value}</span> : dice}</span>
       <span className="d">
         {value !== null
-          ? `Ton rang dans l'ordre du combat. Clique pour relancer si un nouveau combat commence (${dice}).`
-          : `Rang ${c.insightRank} + Réflexes ${c.traits.reflexes}, gardé Réflexes. À lancer au début du combat.`}
+          ? tx.initiativeRolled(dice)
+          : tx.initiativeHint(c.insightRank, c.traits.reflexes)}
       </span>
     </button>
   );
@@ -140,6 +143,7 @@ function InitiativeCard({ action }: { action: ActionDef }) {
 
 function StancePanel() {
   const { state, dispatch } = useStore();
+  const tx = useT().aid;
   const c = useCharacter();
   const { ui } = state;
   const tn = currentArmorTN(c, ui);
@@ -152,22 +156,22 @@ function StancePanel() {
   return (
     <div className="panel" style={{ padding: 12 }}>
       <div className="panel-head" style={{ marginBottom: 8 }}>
-        <span className="label">Posture</span>
+        <span className="label">{tx.stance}</span>
         <span className="muted" style={{ fontSize: 13 }}>
-          ND d'armure <b className="mono" style={{ color: "var(--ink)", fontSize: 16 }}>{tn}</b>
-          {ui.voidArmor && <> <span className="tag">+{10 * voidMultiplier(c)} Vide</span></>}
+          {tx.armorTn} <b className="mono" style={{ color: "var(--ink)", fontSize: 16 }}>{tn}</b>
+          {ui.voidArmor && <> <span className="tag">{tx.voidTag(10 * voidMultiplier(c))}</span></>}
         </span>
       </div>
       {/* Menu déroulant à la place des boutons (annexe I.3.4) : nom, étiquettes et description de chaque posture. */}
       <RichSelect
-        variant="effet" aria-label="Posture" aria-describedby="posture-desc" value={ui.stance}
+        variant="effet" aria-label={tx.stance} aria-describedby="posture-desc" value={ui.stance}
         onChange={(v) => dispatch({ type: "stance", stance: v as Stance })}
       >
         {STANCES.map((s) => {
           // Assaut monté : seulement avec Équitation 3 (F2).
           const locked = s.id === "fullAttack" && !fullAttackAllowed(c, ui.mounted);
           return (
-            <option key={s.id} value={s.id} disabled={locked} title={locked ? "Assaut à cheval : Équitation 3 requise" : undefined}>
+            <option key={s.id} value={s.id} disabled={locked} title={locked ? tx.mountedAssaultLocked : undefined}>
               <span className="n">{s.label}</span>
               <EffectTags tags={tagsOf(s)} />
               <span className="d">{s.description}</span>
@@ -183,8 +187,8 @@ function StancePanel() {
       )}
       <div className="grid" style={{ gap: 4, marginTop: 8 }}>
         <label className="chk">
-          <input type="checkbox" checked={ui.mounted} onChange={(e) => dispatch({ type: "mounted", on: e.target.checked })} /> Monté
-          {ui.mounted && !fullAttackAllowed(c, true) && <span className="muted"> · Assaut impossible sans Équitation 3</span>}
+          <input type="checkbox" checked={ui.mounted} onChange={(e) => dispatch({ type: "mounted", on: e.target.checked })} /> {tx.mounted}
+          {ui.mounted && !fullAttackAllowed(c, true) && <span className="muted">{tx.mountedNoAssault}</span>}
         </label>
         <GuardBox />
       </div>
@@ -206,6 +210,7 @@ function StancePanel() {
 /** Techniques d'école du panneau Posture : monture, Centre du round précédent, compteurs et cases de ND d'armure. */
 function SchoolCombat() {
   const { state, dispatch } = useStore();
+  const tx = useT().aid;
   const c = useCharacter();
   const { ui } = state;
   if (!schoolOf(c)) return null;
@@ -215,18 +220,18 @@ function SchoolCombat() {
   const boxes = armor.filter((e) => e.kind === "armor" && !e.stack && e.mode === "optional");
   if (!ui.centerLastRound && !stacked.length && !boxes.length) return null;
   return (
-    <div className="techbox" role="group" aria-label="Techniques d'école">
-      <div className="label">Techniques d'école</div>
-      {ui.centerLastRound && <span className="tag" style={{ justifySelf: "start" }}>Bonus de Centre du round précédent actif</span>}
+    <div className="techbox" role="group" aria-label={tx.schoolTechniques}>
+      <div className="label">{tx.schoolTechniques}</div>
+      {ui.centerLastRound && <span className="tag" style={{ justifySelf: "start" }}>{tx.centerActive}</span>}
       {stacked.map((e) => <StackRow key={e.key} effect={e} />)}
       {boxes.map((e) => e.kind === "armor" && (
         <label key={e.key} className="chk">
           <input type="checkbox" checked={!!ui.schoolArmor[e.key]} onChange={(ev) => dispatch({ type: "toggleSchoolArmor", key: e.key, on: ev.target.checked })} />
-          {" "}<b>{e.label ?? e.technique}</b> <span className="muted">· +{resolveValue(e.value, c)} ND d'armure · {e.source}</span>
+          {" "}<b>{e.label ?? e.technique}</b> <span className="muted">{tx.armorBox(resolveValue(e.value, c), e.source)}</span>
         </label>
       ))}
       {stacked.some((e) => (ui.stacks[e.key] ?? 0) > 0) && (
-        <button type="button" className="btn sm" style={{ justifySelf: "start" }} onClick={() => dispatch({ type: "resetStacks" })}>Fin de l'escarmouche : compteurs à zéro</button>
+        <button type="button" className="btn sm" style={{ justifySelf: "start" }} onClick={() => dispatch({ type: "resetStacks" })}>{tx.resetStacks}</button>
       )}
     </div>
   );
@@ -235,6 +240,7 @@ function SchoolCombat() {
 /** « Je garde un allié » (F5) : indisponible en Assaut ; Daidoji R2 et Shiba R1 changent les valeurs. */
 function GuardBox() {
   const { state, dispatch } = useStore();
+  const tx = useT().aid;
   const c = useCharacter();
   const { ui } = state;
   const g = guardRule(c);
@@ -243,12 +249,11 @@ function GuardBox() {
     <div>
       <label className="chk">
         <input type="checkbox" checked={ui.guard} disabled={assault} onChange={(e) => dispatch({ type: "guard", on: e.target.checked })} />
-        {" "}Je garde un allié <span className="muted">· {g.free ? "action gratuite" : "action simple"}{assault ? " · impossible en Assaut" : ""}</span>
+        {" "}{tx.guard} <span className="muted">{tx.guardCost(g.free, assault)}</span>
       </label>
       {ui.guard && (
         <div className="hint" data-testid="guard-note" style={{ margin: "2px 0 0 24px" }}>
-          {g.selfPenalty ? `Ton ND d'armure −${g.selfPenalty}` : "Aucune pénalité pour toi"} jusqu'à ton tour suivant
-          {g.extraRound ? " (un round de plus)" : ""} ; ton allié : +{g.allyBonus} au ND d'armure{g.source ? ` · ${g.source}` : ""}.
+          {tx.guardNote(g)}
         </div>
       )}
     </div>
@@ -258,19 +263,20 @@ function GuardBox() {
 /** Compteur −/+ d'une technique cumulable, plafonné (Hiruma R2, Yoritomo R2). */
 function StackRow({ effect: e }: { effect: ActiveEffect }) {
   const { state, dispatch } = useStore();
+  const tx = useT().aid;
   const c = useCharacter();
   if (!("stack" in e) || !e.stack || (e.kind !== "armor" && e.kind !== "targetTn")) return null;
   const n = stackCount(c, e, state.ui.stacks);
   const max = stackMax(c, e);
   const value = resolveValue(e.value, c);
-  const each = e.kind === "armor" ? `+${value} ND d'armure` : `${value} au ND de la cible`;
+  const each = e.kind === "armor" ? tx.stackArmor(value) : tx.stackTarget(value);
   return (
     <div className="stackrow">
-      <span><b>{e.stack.label}</b> <span className="muted">· {each} chacune, max {max} · {e.source}</span></span>
+      <span><b>{e.stack.label}</b> <span className="muted">{tx.stackDetail(each, max, e.source)}</span></span>
       <span className="stepper">
-        <button type="button" aria-label={`Retirer : ${e.stack.label}`} onClick={() => dispatch({ type: "stack", key: e.key, count: n - 1 })}>−</button>
+        <button type="button" aria-label={tx.stackRemove(e.stack.label)} onClick={() => dispatch({ type: "stack", key: e.key, count: n - 1 })}>−</button>
         <b className="mono" data-testid={`stack-${e.key}`}>{n}</b>
-        <button type="button" aria-label={`Ajouter : ${e.stack.label}`} disabled={n >= max} onClick={() => dispatch({ type: "stack", key: e.key, count: Math.min(max, n + 1) })}>+</button>
+        <button type="button" aria-label={tx.stackAdd(e.stack.label)} disabled={n >= max} onClick={() => dispatch({ type: "stack", key: e.key, count: Math.min(max, n + 1) })}>+</button>
       </span>
     </div>
   );
@@ -279,6 +285,7 @@ function StackRow({ effect: e }: { effect: ActiveEffect }) {
 /** Techniques de contexte (combat, duel en Duel iaijutsu, social à la Cour) : noms, détail par le « i ». */
 function RemindersPanel() {
   const { state } = useStore();
+  const tx = useT().aid;
   const c = useCharacter();
   const { situation, sub } = state.ui;
   const contexts: ReminderContext[] = situation === "court" ? ["social"] : sub === "duel" ? ["combat", "duel"] : ["combat"];
@@ -286,7 +293,7 @@ function RemindersPanel() {
   if (!reminders.length) return null;
   const details = !!state.ui.info.reminders;
   // Rappels des techniques d'école et des maîtrises de compétence (annexe E.4).
-  const title = reminders.every((e) => e.mastery) ? "Rappels de maîtrise" : reminders.some((e) => e.mastery) ? "Rappels" : "Rappels d'école";
+  const title = reminders.every((e) => e.mastery) ? tx.reminders.mastery : reminders.some((e) => e.mastery) ? tx.reminders.mixed : tx.reminders.school;
   return (
     <div className="panel" style={{ padding: 12 }}>
       <div className="panel-head" style={{ marginBottom: 6 }}>
@@ -305,7 +312,6 @@ function RemindersPanel() {
   );
 }
 
-const plural = (n: number, one: string, many: string) => `${n} ${n > 1 ? many : one}`;
 /** Saisie d'un entier facultatif : vide → `null`. */
 const optionalInt = (v: string, min?: number) => (v === "" ? null : Math.max(min ?? -Infinity, Math.trunc(Number(v)) || 0));
 
@@ -315,6 +321,7 @@ const optionalInt = (v: string, min?: number) => (v === "" ? null : Math.max(min
  */
 function BattlePanel() {
   const { state, dispatch, rng } = useStore();
+  const tb = useT().aid.battle;
   const c = useCharacter();
   const { ui } = state;
   const b = ui.battle;
@@ -331,67 +338,67 @@ function BattlePanel() {
     set({ die, total: battleRollTotal(c, die) });
   };
   return (
-    <div className="panel battle" style={{ padding: 12 }} role="group" aria-label="Bataille de masse">
+    <div className="panel battle" style={{ padding: 12 }} role="group" aria-label={tb.title}>
       <div className="panel-head" style={{ marginBottom: 8 }}>
-        <span className="panel-title"><span className="label">Bataille de masse</span><InfoButton panel="battle" label="Bataille de masse" /></span>
+        <span className="panel-title"><span className="label">{tb.title}</span><InfoButton panel="battle" label={tb.title} /></span>
       </div>
 
       <label className="chk">
-        <input type="checkbox" checked={b.commanding} onChange={(e) => set({ commanding: e.target.checked })} /> Je commande l'armée
+        <input type="checkbox" checked={b.commanding} onChange={(e) => set({ commanding: e.target.checked })} /> {tb.commanding}
       </label>
       {b.commanding ? (
         <div style={{ marginTop: 6 }}>
           <label className="field" style={{ maxWidth: 260 }}>
-            <span className="label">Écart de Commandement (ton total − adverse)</span>
+            <span className="label">{tb.commandGap}</span>
             <input
-              className="in mono" type="number" aria-label="Écart de Commandement" value={b.gap ?? ""}
+              className="in mono" type="number" aria-label={tb.commandGapShort} value={b.gap ?? ""}
               onChange={(e) => set({ gap: optionalInt(e.target.value) })}
             />
           </label>
           <div className="hint" data-testid="army-status">
             {status
               ? <b>{ARMY_STATUSES.find((s) => s.id === status)?.verdict}</b>
-              : `Bataille/Perception en opposition avec le commandant adverse : ${BATTLE_COMMAND.margin} d'écart pour l'emporter.`}
+              : tb.commandHint(BATTLE_COMMAND.margin)}
           </div>
         </div>
       ) : (
-        <div className="terrain" role="group" aria-label="État de l'armée" style={{ marginTop: 6 }}>
+        <div className="terrain" role="group" aria-label={tb.armyStatus} style={{ marginTop: 6 }}>
           {ARMY_STATUSES.map((s) => (
             <button key={s.id} type="button" aria-pressed={b.status === s.id} onClick={() => set({ status: s.id })}>{s.label}</button>
           ))}
         </div>
       )}
 
-      <div className="label" style={{ marginTop: 8 }}>Engagement</div>
-      <div className="terrain seg4" role="group" aria-label="Engagement">
+      <div className="label" style={{ marginTop: 8 }}>{tb.engagement}</div>
+      <div className="terrain seg4" role="group" aria-label={tb.engagement}>
         {ENGAGEMENTS.map((e) => (
           <button key={e.id} type="button" aria-pressed={b.engagement === e.id} onClick={() => set({ engagement: e.id })}>{e.label}</button>
         ))}
       </div>
       {details && (
         <p className="hint" style={{ marginTop: 0 }}>
-          Plus tu t'engages, plus tu gagnes de Gloire et d'occasions, plus tu risques de blessures. Une armée à égalité ou qui perd décale la colonne d'un ou deux crans.
+          {tb.engagementHint}
         </p>
       )}
 
-      <div className="label" style={{ marginTop: 8 }}>Jet de bataille</div>
+      <div className="label" style={{ marginTop: 8 }}>{tb.roll}</div>
       <div className="hint" style={{ marginTop: 0 }} data-testid="battle-roll">
-        1d10 (sans explosion) + Eau {water} + Bataille {skill}{b.die !== null ? ` · d10 : ${b.die}` : ""}
+        {tb.rollFormula(water, skill, b.die)}
       </div>
       <div className="battleroll">
         <label className="field">
-          <span className="label">Total du jet</span>
+          <span className="label">{tb.total}</span>
           <input
-            className="in mono" type="number" min={0} aria-label="Total du jet de bataille" value={b.total ?? ""}
+            className="in mono" type="number" min={0} aria-label={tb.totalLabel} value={b.total ?? ""}
             onChange={(e) => set({ die: null, total: optionalInt(e.target.value, 0) })}
           />
         </label>
-        {ui.showDiceRoller && <button type="button" className="btn sm" onClick={roll}>Lancer 1d10</button>}
+        {ui.showDiceRoller && <button type="button" className="btn sm" onClick={roll}>{tb.rollD10}</button>}
         <label className="chk">
-          <input type="checkbox" checked={b.tactician !== 0} onChange={(e) => set({ tactician: e.target.checked ? BATTLE_ROLL.tactician : 0 })} /> Tacticien
+          <input type="checkbox" checked={b.tactician !== 0} onChange={(e) => set({ tactician: e.target.checked ? BATTLE_ROLL.tactician : 0 })} /> {tb.tactician}
         </label>
         {b.tactician !== 0 && (
-          <span className="stepper" role="group" aria-label="Tacticien">
+          <span className="stepper" role="group" aria-label={tb.tactician}>
             {[BATTLE_ROLL.tactician, -BATTLE_ROLL.tactician].map((t) => (
               <button key={t} type="button" aria-pressed={b.tactician === t} onClick={() => set({ tactician: t })}>{t > 0 ? `+${t}` : `−${-t}`}</button>
             ))}
@@ -401,33 +408,35 @@ function BattlePanel() {
 
       {outcome && total !== null && (
         <div className="battleres" data-testid="battle-outcome">
-          <b>{outcome.wounds ? plural(outcome.wounds, "dé de blessures", "dés de blessures") : "Aucun dé de blessures"}, {outcome.glory} Gloire</b>
+          <b>{tb.outcome(outcome.wounds, outcome.glory)}</b>
           {outcome.event && <>, <b className="tag">{BATTLE_EVENT_LABELS[outcome.event]}</b></>}
           {details && (
             <div className="muted" style={{ fontSize: 13 }}>
-              Total {total}{b.tactician ? ` (Tacticien ${b.tactician > 0 ? "+" : "−"}${Math.abs(b.tactician)})` : ""} → ligne {outcome.row.min}-{outcome.row.max} ;
-              {" "}colonne {ENGAGEMENTS.find((e) => e.id === b.engagement)?.label}{outcome.shift ? `, décalée de ${outcome.shift}` : ""}.
+              {tb.detail({
+                total, tactician: b.tactician, min: outcome.row.min, max: outcome.row.max,
+                column: ENGAGEMENTS.find((e) => e.id === b.engagement)?.label ?? "", shift: outcome.shift,
+              })}
             </div>
           )}
         </div>
       )}
       {outcome && outcome.wounds > 0 && state.mode === "edit" && (
-        b.woundsTaken ? <p className="hint" data-testid="battle-wounds-taken">Blessures du tour encaissées.</p> : (
+        b.woundsTaken ? <p className="hint" data-testid="battle-wounds-taken">{tb.woundsTaken}</p> : (
           <div style={{ marginTop: 8 }}>
             {ui.showDiceRoller ? (
               <>
                 <button type="button" className="btn sm" onClick={() => dispatch({ type: "battle", patch: { woundDice: rollBattleDice(outcome.wounds, rng) } })}>
-                  Lancer les dés de blessures ({outcome.wounds}d10)
+                  {tb.rollWoundDice(outcome.wounds)}
                 </button>
                 {b.woundDice && (
-                  <div className="dice" aria-label="Dés de blessures" data-testid="battle-wound-dice">
+                  <div className="dice" aria-label={tb.woundDice} data-testid="battle-wound-dice">
                     {b.woundDice.map((d, i) => <span key={i} className="die kept">{d}</span>)}
                   </div>
                 )}
               </>
-            ) : <p className="hint" style={{ marginTop: 0 }}>Lance {outcome.wounds}d10 et additionne-les, puis encaisse le total.</p>}
+            ) : <p className="hint" style={{ marginTop: 0 }}>{tb.manualWoundDice(outcome.wounds)}</p>}
             <TakeDamage
-              key={b.woundDice?.join(",") ?? "manual"} initial={woundSum} label="Total des dés de blessures"
+              key={b.woundDice?.join(",") ?? "manual"} initial={woundSum} label={tb.woundDiceTotal}
               onDone={() => dispatch({ type: "battle", patch: { woundsTaken: true } })}
             />
           </div>
@@ -440,10 +449,11 @@ function BattlePanel() {
 /** « Nouveau round », entre l'initiative et la posture ; description de deux lignes au plus sur mobile. */
 function RoundPanel() {
   const { dispatch } = useStore();
+  const tx = useT().aid;
   return (
     <div className="panel round" style={{ padding: 12 }}>
-      <button type="button" className="btn sm" onClick={() => dispatch({ type: "newRound" })}>Nouveau round</button>
-      <span className="muted" data-testid="round-desc">Efface le Vide en armure et la Défense totale ; garde l'initiative et les compteurs.</span>
+      <button type="button" className="btn sm" onClick={() => dispatch({ type: "newRound" })}>{tx.newRound}</button>
+      <span className="muted" data-testid="round-desc">{tx.newRoundHint}</span>
     </div>
   );
 }
@@ -462,37 +472,39 @@ interface VoidOption {
 
 function VoidPanel() {
   const { state, dispatch } = useStore();
+  const t = useT();
+  const tv = t.aid.void;
   const c = useCharacter();
   const { ui } = state;
   const m = voidMultiplier(c);
   const toggle = (patch: Partial<typeof ui.opts>) => () => dispatch({ type: "option", patch });
   const atRoll: VoidOption = {
-    id: "roll", label: "Au jet", tags: [{ label: `+${m}g${m}`, up: true }], description: "Dépensé au prochain jet lancé.",
-    active: `+${m}g${m} au jet`, on: ui.opts.voidPoint, spend: toggle({ voidPoint: !ui.opts.voidPoint }),
+    id: "roll", label: tv.roll, tags: [{ label: `+${formatDice(m, m)}`, up: true }], description: tv.rollHint,
+    active: tv.rollActive(`+${formatDice(m, m)}`), on: ui.opts.voidPoint, spend: toggle({ voidPoint: !ui.opts.voidPoint }),
   };
   const options: VoidOption[] = [
     atRoll,
     {
-      id: "armor", label: "ND d'armure", tags: [{ label: `+${10 * m}`, up: true }], description: "Jusqu'au prochain round.",
-      active: `+${10 * m} ND d'armure`, on: ui.voidArmor, spend: () => dispatch({ type: "voidArmor" }),
+      id: "armor", label: tv.armor, tags: [{ label: `+${10 * m}`, up: true }], description: tv.armorHint,
+      active: tv.armorActive(10 * m), on: ui.voidArmor, spend: () => dispatch({ type: "voidArmor" }),
     },
     {
-      id: "skill", label: "Compétence au rang 1", tags: [], description: "Jouer une compétence que tu n'as pas.",
-      active: "Compétence au rang 1", on: ui.opts.voidSkill, spend: toggle({ voidSkill: !ui.opts.voidSkill }),
+      id: "skill", label: tv.skill, tags: [], description: tv.skillHint,
+      active: tv.skill, on: ui.opts.voidSkill, spend: toggle({ voidSkill: !ui.opts.voidSkill }),
     },
     {
-      id: "ability", label: "Activer une capacité", tags: [{ label: "1 point" }], description: "Technique, kata ou avantage payé en Vide.",
+      id: "ability", label: tv.ability, tags: [{ label: tv.onePoint }], description: tv.abilityHint,
       spend: () => dispatch({ type: "voidTechnique" }),
     },
   ];
   if (ui.situation === "combat" && ui.sub === "skirmish") {
     options.push(
       {
-        id: "initiative", label: "Initiative", tags: [{ label: `+${VOID_COMBAT.initiative * m}`, up: true }], description: "Jusqu'à la fin de l'escarmouche.",
+        id: "initiative", label: tv.initiative, tags: [{ label: `+${VOID_COMBAT.initiative * m}`, up: true }], description: tv.initiativeHint,
         spend: () => dispatch({ type: "voidInitiative" }),
       },
       {
-        id: "swap", label: "Échanger l'Initiative", tags: [{ label: "1 point" }], description: "Avec un allié consentant ; échangez vos scores à la main.",
+        id: "swap", label: tv.swap, tags: [{ label: tv.onePoint }], description: tv.swapHint,
         spend: () => dispatch({ type: "voidTechnique" }),
       },
     );
@@ -501,20 +513,20 @@ function VoidPanel() {
   const toggleable = current.on !== undefined;
   const cancel = toggleable && current.on;
   return (
-    <div className="panel" style={{ padding: 12 }} role="group" aria-label="Dépenser du Vide">
+    <div className="panel" style={{ padding: 12 }} role="group" aria-label={tv.title}>
       <div className="panel-head" style={{ marginBottom: 8 }}>
-        <span className="label">Dépenser du Vide</span>
+        <span className="label">{tv.title}</span>
         <span className="muted" style={{ fontSize: 13 }}>
-          Points de Vide <b className="mono" style={{ color: "var(--ink)", fontSize: 16 }}>{c.voidPoints}</b>
+          {tv.points} <b className="mono" style={{ color: "var(--ink)", fontSize: 16 }}>{c.voidPoints}</b>
           {options.filter((o) => o.on).map((o) => <Fragment key={o.id}> <span className="tag" data-testid="void-active">{o.active}</span></Fragment>)}
         </span>
       </div>
       {ui.voidSpentThisRound && (
-        <p className="hint" style={{ color: "var(--danger)", margin: "0 0 8px" }}>Déjà un point de Vide dépensé ce round (limite normale : 1 par round).</p>
+        <p className="hint" style={{ color: "var(--danger)", margin: "0 0 8px" }}>{tv.alreadySpent}</p>
       )}
       {/* Même motif que le panneau Posture (annexe I.3.4) : choisir une option ne dépense rien. */}
       <RichSelect
-        variant="effet" aria-label="Dépense de Vide" aria-describedby="void-desc" value={current.id}
+        variant="effet" aria-label={tv.choice} aria-describedby="void-desc" value={current.id}
         onChange={(v) => dispatch({ type: "voidChoice", choice: v as VoidChoice })}
       >
         {options.map((o) => (
@@ -533,13 +545,15 @@ function VoidPanel() {
         type="button" className={`btn sm${cancel ? "" : " accent"}`} style={{ marginTop: 8 }}
         aria-pressed={toggleable ? !!current.on : undefined} disabled={!cancel && c.voidPoints < 1}
         onClick={current.spend}
-      >{cancel ? "Annuler" : "Dépenser 1 point de Vide"}</button>
+      >{cancel ? t.common.cancel : tv.spend}</button>
     </div>
   );
 }
 
 function MovePanel() {
   const { state, dispatch } = useStore();
+  const tm = useT().aid.move;
+  const { intl } = useLocale();
   const details = !!state.ui.info.move;
   const c = useCharacter();
   const { terrain } = state.ui;
@@ -548,22 +562,22 @@ function MovePanel() {
   const bonus = movementBonus(c, contextOf(state.ui));
   const waiver = terrain === "normal" ? undefined : terrainWaiver(c, terrain);
   const tiles = [
-    { label: "Action libre", ft: m.free, note: "1 fois par round" },
-    { label: "Action simple", ft: m.simple, note: "Eau × 10" },
-    { label: "Maximum / round", ft: m.max, note: "Eau × 20" },
+    { label: tm.free, ft: m.free, note: tm.freeNote },
+    { label: tm.simple, ft: m.simple, note: tm.simpleNote },
+    { label: tm.max, ft: m.max, note: tm.maxNote },
   ];
   return (
     <div className="panel movebox">
       <div className="panel-head" style={{ marginBottom: 8 }}>
-        <h2 style={{ fontSize: 17 }}>Se déplacer en combat</h2>
+        <h2 style={{ fontSize: 17 }}>{tm.title}</h2>
         <span className="panel-title">
           <span className="muted" style={{ fontSize: 13 }} data-testid="move-water">
-            Anneau d'Eau {rings(c).water}{water !== rings(c).water ? ` → ${water}` : ""}
+            {tm.waterRing(rings(c).water, water)}
           </span>
-          <InfoButton panel="move" label="Se déplacer en combat" />
+          <InfoButton panel="move" label={tm.title} />
         </span>
       </div>
-      <div className="terrain" role="group" aria-label="Terrain">
+      <div className="terrain" role="group" aria-label={tm.terrain}>
         {TERRAINS.map((t) => (
           <button
             key={t.id} type="button" aria-pressed={terrain === t.id}
@@ -575,16 +589,16 @@ function MovePanel() {
         {tiles.map((t) => (
           <div key={t.label}>
             <span className="label">{t.label}</span>
-            <b className="mono">{t.ft} pi</b>
-            {details && <span className="muted">{toMeters(t.ft)} · {t.note}</span>}
+            <b className="mono">{tm.feet(t.ft)}</b>
+            {details && <span className="muted">{toMeters(t.ft, intl)} · {t.note}</span>}
           </div>
         ))}
       </div>
-      {bonus > 0 && <p className="hint" style={{ margin: "6px 0 0", color: "var(--accent-ink)" }}>+{bonus} pieds par tour (technique d'école), sans dépasser le maximum.</p>}
-      {waiver && <p className="hint" data-testid="terrain-waiver" style={{ margin: "6px 0 0", color: "var(--accent-ink)" }}>Maîtrise {waiver.source} : terrain {TERRAINS.find((t) => t.id === terrain)?.label.toLowerCase()} sans pénalité.</p>}
+      {bonus > 0 && <p className="hint" style={{ margin: "6px 0 0", color: "var(--accent-ink)" }}>{tm.bonus(bonus)}</p>}
+      {waiver && <p className="hint" data-testid="terrain-waiver" style={{ margin: "6px 0 0", color: "var(--accent-ink)" }}>{tm.waiver(waiver.source, TERRAINS.find((t) => t.id === terrain)?.label.toLowerCase() ?? "")}</p>}
       {details && (
         <p className="hint" style={{ marginBottom: 0 }}>
-          Terrain modéré (broussailles, foule) : Anneau d'Eau −1 ; difficile (eau, escaliers, marais) : −2, avec 1 au minimum (livre p. 87).
+          {tm.terrainHint}
         </p>
       )}
     </div>
@@ -594,11 +608,12 @@ function MovePanel() {
 /** Un seul « i » par panneau : déplie ou replie toutes ses descriptions (HANDOFF §6.2). */
 function InfoButton({ panel, label }: { panel: InfoPanel; label: string }) {
   const { state, dispatch } = useStore();
+  const tx = useT().aid;
   const open = !!state.ui.info[panel];
   return (
     <button
       type="button" className={`ib${open ? " on" : ""}`} aria-expanded={open}
-      aria-label={`${open ? "Masquer" : "Afficher"} le détail : ${label}`}
+      aria-label={tx.infoToggle(open, label)}
       onClick={() => dispatch({ type: "toggleInfo", panel })}
     >i</button>
   );
@@ -607,11 +622,12 @@ function InfoButton({ panel, label }: { panel: InfoPanel; label: string }) {
 /** « i » de la liste des actions : plein quand les explications sont affichées (défaut), vide en vue compacte (annexe 46.3). */
 function ActionsInfoButton() {
   const { state, dispatch } = useStore();
+  const tx = useT().aid;
   const shown = !state.ui.compactActions;
   return (
     <button
       type="button" className={`ib${shown ? " on" : ""}`} aria-pressed={shown}
-      aria-label="Explications des actions" title="Explications des actions"
+      aria-label={tx.actionsInfo} title={tx.actionsInfo}
       onClick={() => dispatch({ type: "compactActions", value: shown })}
     >i</button>
   );
@@ -619,6 +635,7 @@ function ActionsInfoButton() {
 
 function ActionCard({ action: a }: { action: ActionDef }) {
   const { state, dispatch } = useStore();
+  const tx = useT().aid;
   const c = useCharacter();
   const { ui } = state;
   if (a.kind === "move") return <MovePanel />;
@@ -645,7 +662,7 @@ function ActionCard({ action: a }: { action: ActionDef }) {
         <span className="p">{p ? poolLabel(p) : ""}</span>
         <span className="d">
           <span className="reason">{blocked}</span>{" "}
-          <button type="button" className="linkbtn" aria-label={`Lancer quand même : ${a.label}`} onClick={() => dispatch({ type: "select", id: a.id })}>Lancer quand même</button>
+          <button type="button" className="linkbtn" aria-label={tx.rollAnywayLabel(a.label)} onClick={() => dispatch({ type: "select", id: a.id })}>{tx.rollAnyway}</button>
         </span>
       </div>
     );
@@ -653,7 +670,7 @@ function ActionCard({ action: a }: { action: ActionDef }) {
   const selected = ui.selectedId === a.id;
   // Vue compacte : seule l'action choisie garde sa description ; « Action simple » remonte sur la ligne du titre (annexe 46.1).
   const showDesc = !ui.compactActions || selected;
-  const tag = simple && <span className="tag sa">Attaque : Action simple</span>;
+  const tag = simple && <span className="tag sa">{tx.simpleAttack}</span>;
   return (
     <button
       type="button"
@@ -661,7 +678,7 @@ function ActionCard({ action: a }: { action: ActionDef }) {
       aria-pressed={selected}
       onClick={() => dispatch({ type: "select", id: a.id })}
     >
-      <span className="t">{a.label}{pending > 0 && <> <span className="pend">+{pending}g0 en attente</span></>}{!showDesc && tag}</span>
+      <span className="t">{a.label}{pending > 0 && <> <span className="pend">{tx.pending(`+${formatDice(pending, 0)}`)}</span></>}{!showDesc && tag}</span>
       <span className="p">{p ? poolLabel(p) : ""}</span>
       {showDesc && <span className="d">{tag && <>{tag}{" "}</>}{a.description}</span>}
     </button>

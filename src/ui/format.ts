@@ -7,9 +7,9 @@ export function pct(p: number): string {
   return `${Math.round(p * 100)} %`;
 }
 
-/** Pieds → mètres, une décimale, virgule française. */
-export function toMeters(feet: number): string {
-  return `${(feet * FEET_TO_METERS).toFixed(1).replace(".", ",")} m`;
+/** Pieds → mètres, une décimale, séparateur de la locale. */
+export function toMeters(feet: number, intl = "fr-FR"): string {
+  return `${decimal(feet * FEET_TO_METERS, intl)} m`;
 }
 
 /** Valeur lisible dans l'aperçu d'un import. */
@@ -21,9 +21,9 @@ export function show(v: unknown): string {
   return String(v);
 }
 
-/** Réputation : une décimale, virgule française. */
-export function decimal(n: number): string {
-  return n.toFixed(1).replace(".", ",");
+/** Une décimale, séparateur de la locale (virgule en français) ; arrondi de `toFixed`. */
+export function decimal(n: number, intl = "fr-FR"): string {
+  return Number(n.toFixed(1)).toLocaleString(intl, { minimumFractionDigits: 1, maximumFractionDigits: 1, useGrouping: false });
 }
 
 export function signed(n: number): string {

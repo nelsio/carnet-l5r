@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { clanAccent } from "@carnet/core";
 import type { Theme } from "./store";
 
-export const THEME_LABELS: Record<Theme, string> = { auto: "auto", light: "clair", dark: "sombre" };
 export const NEXT_THEME: Record<Theme, Theme> = { auto: "light", light: "dark", dark: "auto" };
 
 /** Valeur de `--bg` de chaque thème, reprise par la barre de Chrome sur Android (annexe I.1.8). */

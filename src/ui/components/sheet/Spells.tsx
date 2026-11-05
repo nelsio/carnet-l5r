@@ -4,6 +4,7 @@ import {
   type GrimoireDiff, type GrimoireSpell, type Spell, type SpellElement,
 } from "@carnet/core";
 import { ELEMENT_LABELS, SPELL_KEYWORDS, UNIVERSAL_SPELLS } from "../../../rules/l5r4e";
+import { useT } from "../../../i18n";
 import { PORTAL, spellUrl } from "../../../rules/portal";
 import { useCharacter, useStore } from "../../store";
 import { ExternalLink } from "../ExternalLink";
@@ -20,6 +21,7 @@ const isListedKeyword = (k: string) => (SPELL_KEYWORDS as readonly string[]).inc
 export function Spells() {
   const { c, edit, set, dispatch } = useSheet("magic");
   const { grimoire } = useStore();
+  const sp = useT().sheet.spells;
   const spells = c.spells ?? [];
   const starting = spellcastingOf(c)?.startingSpells;
   const [panel, setPanel] = useState(false);
@@ -50,7 +52,7 @@ export function Spells() {
     scrollTo.current = null;
   });
 
-  const head = starting && <p className="hint" style={{ marginTop: 0 }} data-testid="starting-spells">Sorts de départ de l'école : {starting}.</p>;
+  const head = starting && <p className="hint" style={{ marginTop: 0 }} data-testid="starting-spells">{sp.starting(starting)}</p>;
   if (edit) {
     const ready = grimoire.status === "ready" ? grimoire.cache : undefined;
     const missing = UNIVERSAL_SPELLS.filter((n) => !spells.some((s) => normalize(s.name).startsWith(normalize(n))));
@@ -102,14 +104,14 @@ export function Spells() {
       <>
         {head}
         {spells.map((s, i) => {
-          const label = s.name || "ce sort";
+          const label = s.name || sp.thisSpell;
           return (
-            <div key={s.id} className={`spelledit${fresh === s.id ? " fresh" : ""}`} role="group" aria-label={`Sort : ${label}`} data-spell={s.id}>
+            <div key={s.id} className={`spelledit${fresh === s.id ? " fresh" : ""}`} role="group" aria-label={sp.spellLabel(label)} data-spell={s.id}>
               {confirm?.id === s.id && <GrimoireConfirm g={confirm.g} diffs={confirm.diffs} onChoose={(choice) => chooseFill(s, choice)} />}
               {filled.has(s.id) && (
                 <div className="sp-top">
-                  <span className="from">✓ Rempli depuis le grimoire</span>
-                  {!s.damage && <span className="muted">Résume l'effet ; ajoute la VD si le sort en a une.</span>}
+                  <span className="from">{sp.filled}</span>
+                  {!s.damage && <span className="muted">{sp.filledHint}</span>}
                 </div>
               )}
               <div className="form-grid spellhead">
@@ -120,25 +122,25 @@ export function Spells() {
                     if (filled.has(s.id)) setFilled((prev) => new Set([...prev].filter((id) => id !== s.id)));
                   }}
                 />
-                <Field label="Élément">
+                <Field label={sp.element}>
                   <RichSelect variant="anneau" value={s.element} onChange={(v) => set(["spells", i, "element"], v)}>
                     <RingOption value="all" label={ELEMENT_LABELS.all} />
                     {SPELL_ELEMENTS.filter((x) => x !== "all").map((x) => <RingOption key={x} ring={x} />)}
                   </RichSelect>
                 </Field>
-                <Field label="Maîtrise"><NumberField min={1} max={6} value={s.mastery} onChange={(n) => set(["spells", i, "mastery"], n)} /></Field>
+                <Field label={sp.mastery}><NumberField min={1} max={6} value={s.mastery} onChange={(n) => set(["spells", i, "mastery"], n)} /></Field>
               </div>
               <GrimoireNameHint />
               <div className="form-grid">
-                <Field label="VD (dégâts)">
+                <Field label={sp.damage}>
                   <input className="in mono" type="text" placeholder="—" value={s.damage ?? ""} maxLength={10} onChange={(e) => set(["spells", i, "damage"], e.target.value || undefined)} />
                 </Field>
-                <Field label="Portée"><input className="in" type="text" placeholder="Personnel, contact, 30 pieds…" value={s.range} maxLength={80} onChange={(e) => set(["spells", i, "range"], e.target.value)} /></Field>
-                <Field label="Zone d'effet"><input className="in" type="text" placeholder="Une cible, rayon de 10 pieds…" value={s.area} maxLength={120} onChange={(e) => set(["spells", i, "area"], e.target.value)} /></Field>
-                <Field label="Durée"><input className="in" type="text" placeholder="Instantanée, 5 rounds…" value={s.duration} maxLength={80} onChange={(e) => set(["spells", i, "duration"], e.target.value)} /></Field>
+                <Field label={sp.range}><input className="in" type="text" placeholder={sp.rangePlaceholder} value={s.range} maxLength={80} onChange={(e) => set(["spells", i, "range"], e.target.value)} /></Field>
+                <Field label={sp.area}><input className="in" type="text" placeholder={sp.areaPlaceholder} value={s.area} maxLength={120} onChange={(e) => set(["spells", i, "area"], e.target.value)} /></Field>
+                <Field label={sp.duration}><input className="in" type="text" placeholder={sp.durationPlaceholder} value={s.duration} maxLength={80} onChange={(e) => set(["spells", i, "duration"], e.target.value)} /></Field>
               </div>
-              <div className="kwpick" role="group" aria-label={`Mots-clés de ${label}`}>
-                <span className="label">Mots-clés</span>
+              <div className="kwpick" role="group" aria-label={sp.keywordsOf(label)}>
+                <span className="label">{sp.keywords}</span>
                 {SPELL_KEYWORDS.map((k) => {
                   const on = s.keywords.includes(k);
                   return (
@@ -149,21 +151,21 @@ export function Spells() {
                   );
                 })}
                 <ListField
-                  aria-label={`Autres mots-clés de ${label}`} placeholder="autres, séparés par des virgules" style={{ maxWidth: 220 }}
+                  aria-label={sp.otherKeywordsOf(label)} placeholder={sp.otherKeywordsPlaceholder} style={{ maxWidth: 220 }}
                   value={s.keywords.filter((k) => !isListedKeyword(k))}
                   onChange={(v) => set(["spells", i, "keywords"], [...s.keywords.filter(isListedKeyword), ...v])}
                 />
               </div>
               <div className="form-grid wide">
-                <Field label="Augmentations (une par ligne)">
-                  <textarea className="in" placeholder={"Portée (+10 pieds)\nDurée (+1 round)"} value={s.raises} onChange={(e) => set(["spells", i, "raises"], e.target.value)} />
+                <Field label={sp.raises}>
+                  <textarea className="in" placeholder={sp.raisesPlaceholder} value={s.raises} onChange={(e) => set(["spells", i, "raises"], e.target.value)} />
                 </Field>
-                <Field label="Effet (résumé)"><textarea className="in" value={s.effect} onChange={(e) => set(["spells", i, "effect"], e.target.value)} /></Field>
+                <Field label={sp.effect}><textarea className="in" value={s.effect} onChange={(e) => set(["spells", i, "effect"], e.target.value)} /></Field>
               </div>
               <div className="spellfoot">
                 <label className="chk">
                   <input type="checkbox" checked={s.memorized} onChange={(e) => set(["spells", i, "memorized"], e.target.checked)} />
-                  {" "}Mémorisé <span className="muted">· {s.mastery} XP</span>
+                  {" "}{sp.memorized} <span className="muted">{sp.memorizeCost(s.mastery)}</span>
                 </label>
                 <SpellLink name={s.name} element={s.element} />
                 <RemoveButton list="spells" index={i} name={s.name} />
@@ -172,12 +174,12 @@ export function Spells() {
           );
         })}
         <div className="spell-tools">
-          <AddButton list="spells" label="+ Sort" item={() => createSpell()} />
+          <AddButton list="spells" label={sp.add} item={() => createSpell()} />
           <button
             ref={toggle} type="button" className={`btn sm ${panel ? "on" : "accent"}`}
             aria-expanded={panel} aria-controls={panel ? "grimoire-panel" : undefined} onClick={() => setPanel(!panel)}
-          ><ScrollIcon />Ajouter depuis le grimoire</button>
-          {missing.length > 0 && <button type="button" className="btn sm" onClick={addUniversals}>Ajouter les sorts universels</button>}
+          ><ScrollIcon />{sp.addFromGrimoire}</button>
+          {missing.length > 0 && <button type="button" className="btn sm" onClick={addUniversals}>{sp.addUniversals}</button>}
           <GrimoireStatus />
         </div>
         {panel && <GrimoirePanel spells={spells} onAdd={addFromGrimoire} onClose={closePanel} />}
@@ -185,31 +187,31 @@ export function Spells() {
       </>
     );
   }
-  if (!spells.length) return <>{head}<p className="muted">Aucun sort noté. Appuie sur « Edit » pour noter tes rouleaux et invocations.</p></>;
+  if (!spells.length) return <>{head}<p className="muted">{sp.empty}</p></>;
   return (
     <>
       {head}
       <div className="spells">
         {sortSpells(spells).map((s) => {
           const raises = spellRaises(s);
-          const line = [s.range && `Portée ${s.range}`, s.area && `Zone ${s.area}`, s.duration && `Durée ${s.duration}`].filter(Boolean).join(" · ");
+          const line = [s.range && sp.rangeLine(s.range), s.area && sp.areaLine(s.area), s.duration && sp.durationLine(s.duration)].filter(Boolean).join(" · ");
           return (
             <div key={s.id} className={`spell el-${s.element}`} data-testid={`spell-${s.id}`}>
               <div className="spell-body">
               <div className="sp1">
                 <b>{s.name}</b>
                 <span className="tag el">{ELEMENT_LABELS[s.element]}</span>
-                <span className="mono muted">Maîtrise {s.mastery} · ND {spellTn(s.mastery)}</span>
-                <span className={`tag${s.memorized ? " memo" : ""}`}>{s.memorized ? "mémorisé" : "parchemin"}</span>
+                <span className="mono muted">{sp.masteryLine(s.mastery, spellTn(s.mastery))}</span>
+                <span className={`tag${s.memorized ? " memo" : ""}`}>{s.memorized ? sp.memorizedTag : sp.scrollTag}</span>
               </div>
               {line && <div className="sp2 muted">{line}</div>}
               {(s.keywords.length > 0 || s.damage) && (
                 <div className="sp3">
                   {s.keywords.map((k) => <span key={k} className="tag">{k}</span>)}
-                  {s.damage && <span className="tag">VD {formatDR(s.damage)}</span>}
+                  {s.damage && <span className="tag">{sp.drTag(formatDR(s.damage))}</span>}
                 </div>
               )}
-              {raises.length > 0 && <div className="sp4"><span className="label">Augm.</span> {raises.join(" · ")}</div>}
+              {raises.length > 0 && <div className="sp4"><span className="label">{sp.raisesShort}</span> {raises.join(" · ")}</div>}
               {s.effect && <div className="prose sp5">{s.effect}</div>}
               </div>
               <SpellLink name={s.name} element={s.element} />
@@ -224,29 +226,33 @@ export function Spells() {
 
 /** Lien « Grimoire » du titre du bloc Sorts (annexe L.7). */
 export function GrimoireLink() {
-  return <ExternalLink href={PORTAL.grimoire} className="head-link" label="Grimoire (nouvel onglet)">Grimoire</ExternalLink>;
+  const sp = useT().sheet.spells;
+  return <ExternalLink href={PORTAL.grimoire} className="head-link" label={sp.grimoireLink}>{sp.grimoire}</ExternalLink>;
 }
 
 /** Sort dans le grimoire du portail, recherche par nom filtrée par élément ; rien pour un sort sans nom (annexe L.7). */
 function SpellLink({ name, element }: { name: string; element: SpellElement }) {
+  const sp = useT().sheet.spells;
   if (!name.trim()) return null;
-  return <ExternalLink href={spellUrl(name, element)} className="spell-link" label={`${name.trim()} dans le grimoire (nouvel onglet)`} />;
+  return <ExternalLink href={spellUrl(name, element)} className="spell-link" label={sp.spellLink(name.trim())} />;
 }
 
 function GrimoireNote() {
-  return <p className="hint grimoire-note">Chaque lien ouvre le grimoire sur ce sort, filtré par son élément.</p>;
+  const sp = useT().sheet.spells;
+  return <p className="hint grimoire-note">{sp.grimoireNote}</p>;
 }
 
 /** « Affinité Terre · Déficience Air » sous l'école de shugenja (annexe F.5), à la couleur de l'Anneau. */
 export function SpellAffinity({ page }: { page: number }) {
   const c = useCharacter();
+  const sp = useT().sheet.spells;
   const [affinity, deficiency] = [affinityOf(c), deficiencyOf(c)];
   const ring = (r: string | undefined) => (r ? { ["--rc" as string]: `var(--ring-${r})` } : undefined);
   return (
     <div className="affin" data-testid="affinity">
-      <span className="tag el" style={ring(affinity)}>Affinité {affinity ? ELEMENT_LABELS[affinity] : "à choisir (bloc Identité)"}</span>
-      <span className="tag el" style={ring(deficiency)}>{deficiency ? `Déficience ${ELEMENT_LABELS[deficiency]}` : "Sans déficience"}</span>
-      <span className="muted"> · p. {page}</span>
+      <span className="tag el" style={ring(affinity)}>{sp.affinity(affinity ? ELEMENT_LABELS[affinity] : undefined)}</span>
+      <span className="tag el" style={ring(deficiency)}>{sp.deficiency(deficiency ? ELEMENT_LABELS[deficiency] : undefined)}</span>
+      <span className="muted"> {sp.page(page)}</span>
     </div>
   );
 }

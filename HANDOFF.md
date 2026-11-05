@@ -6,7 +6,7 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document et le dossier `spec/` qu'il indexe.
 
-**État actuel :** version **v2.28.3**, lot 49 : état de l'application découpé par domaine dans `src/ui/store/`, sans changement à l'écran (annexe 49).
+**État actuel :** version **v2.28.4**, lot 50 : textes de l'interface regroupés dans un dictionnaire (`src/i18n`), première moitié des composants, sans changement à l'écran (annexe 50).
 
 ---
 
@@ -57,6 +57,7 @@ Fait foi :
 | 47 | Tests rangés par fonctionnalité | 47 | v2.28.1 | [`47-tests-renommes.md`](spec/annexes/47-tests-renommes.md) |
 | 48 | Fiche découpée par bloc | 48 | v2.28.2 | [`48-sheet-decoupe.md`](spec/annexes/48-sheet-decoupe.md) |
 | 49 | État de l'application découpé par domaine | 49 | v2.28.3 | [`49-store-decoupe.md`](spec/annexes/49-store-decoupe.md) |
+| 50 | Localisation : infrastructure, première moitié des textes | 50 | v2.28.4 | [`50-i18n-infra.md`](spec/annexes/50-i18n-infra.md) |
 
 ## Lire pour un lot
 

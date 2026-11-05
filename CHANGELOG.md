@@ -6,6 +6,11 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.28.4] - 2026-11-05
+
+### Technique
+- Les textes de l'interface commencent à être regroupés dans un dictionnaire, en préparation de la version anglaise. Rien ne change à l'écran.
+
 ## [2.28.3] - 2026-11-05
 
 ### Technique
