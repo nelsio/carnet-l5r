@@ -6,6 +6,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? "github" : "list",
+  // Annexe 50.3 : navigateur en français, sinon un runner anglais basculerait l'app en anglais (lot 52).
+  use: { locale: "fr-FR" },
   // E2 : le même fichier servi en HTTP, comme sur GitHub Pages.
   webServer: {
     command: "npx vite preview --port 4173 --strictPort",
