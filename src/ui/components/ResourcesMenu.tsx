@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { clanAccent } from "@carnet/core";
 import { CARNET_LINKS } from "../../rules/links";
 import { clanUrl, FORGE_JSON_OK, PORTAL, PORTAL_CLAN_KANJI, PORTAL_NAME } from "../../rules/portal";
+import { useT, type Messages } from "../../i18n";
 import { useStore } from "../store";
 import { ExtIcon } from "./ExternalLink";
 import { ForgePending } from "./ForgePending";
@@ -9,21 +10,21 @@ import { ForgePending } from "./ForgePending";
 /** `pending` : pastille « JSON pas encore compatible » après le titre (lot 27). */
 interface Entry { href: string; kanji: string; title: string; desc: string; pending?: boolean }
 
-const CREATE: Entry[] = [FORGE_JSON_OK
-  ? { href: PORTAL.forge, kanji: "鍛", title: "Forge de personnage", desc: "Exporte un JSON compatible avec le Carnet" }
-  : { href: PORTAL.forge, kanji: "鍛", title: "Forge de personnage", desc: "Création guidée. Pour l'instant, recopie le résultat dans une fiche vierge.", pending: true }];
-const REFERENCES: Entry[] = [
-  { href: PORTAL.grimoire, kanji: "巻", title: "Grimoire", desc: "Sorts, Kihō, recherche par effet" },
-  { href: PORTAL.combat, kanji: "刀", title: "Mémento de combat", desc: "Postures, duel Iaijutsu" },
-  { href: PORTAL.bushido, kanji: "義", title: "Bushido & honneur", desc: "Vertus et barème d'honneur" },
-  { href: PORTAL.etiquette, kanji: "茶", title: "Étiquette & coutumes", desc: "Castes, cadeaux, thé" },
+const create = (t: Messages["resources"]): Entry[] => [FORGE_JSON_OK
+  ? { href: PORTAL.forge, kanji: "鍛", title: t.forge, desc: t.forgeReady }
+  : { href: PORTAL.forge, kanji: "鍛", title: t.forge, desc: t.forgePending, pending: true }];
+const references = (t: Messages["resources"]): Entry[] => [
+  { href: PORTAL.grimoire, kanji: "巻", ...t.grimoire },
+  { href: PORTAL.combat, kanji: "刀", ...t.combat },
+  { href: PORTAL.bushido, kanji: "義", ...t.bushido },
+  { href: PORTAL.etiquette, kanji: "茶", ...t.etiquette },
 ];
 /** Liens vers le dépôt du Carnet (annexe M.3), kanji sur fond sceau. */
-const CARNET: Entry[] = [
-  { href: CARNET_LINKS.guide, kanji: "帳", title: "Guide d'utilisation", desc: "Import, fiches, lanceur de dés" },
-  { href: CARNET_LINKS.releases, kanji: "新", title: "Nouveautés", desc: "Ce qui a changé à chaque version" },
-  { href: CARNET_LINKS.bug, kanji: "報", title: "Signaler un problème", desc: "Formulaire GitHub (compte requis)" },
-  { href: CARNET_LINKS.code, kanji: "源", title: "Page du projet", desc: "Présentation, captures, code source" },
+const carnet = (t: Messages["resources"]): Entry[] => [
+  { href: CARNET_LINKS.guide, kanji: "帳", ...t.guide },
+  { href: CARNET_LINKS.releases, kanji: "新", ...t.releases },
+  { href: CARNET_LINKS.bug, kanji: "報", ...t.bug },
+  { href: CARNET_LINKS.code, kanji: "源", ...t.code },
 ];
 
 /**
@@ -32,6 +33,7 @@ const CARNET: Entry[] = [
  */
 export function ResourcesMenu() {
   const { state } = useStore();
+  const t = useT().resources;
   const [open, setOpen] = useState(false);
   const wrap = useRef<HTMLDivElement>(null);
   const button = useRef<HTMLButtonElement>(null);
@@ -40,9 +42,9 @@ export function ResourcesMenu() {
   const c = state.character;
   const clan = c ? clanAccent(c.clan) : null;
   const clanHref = clanUrl(clan?.id ?? null);
-  const portal: Entry[] = [{ href: PORTAL.home, kanji: "帝", title: PORTAL_NAME, desc: "Clans, règles, aides de jeu" }];
+  const portal: Entry[] = [{ href: PORTAL.home, kanji: "帝", title: PORTAL_NAME, desc: t.portal }];
   if (clan?.id && clan.label && clanHref) {
-    portal.push({ href: clanHref, kanji: PORTAL_CLAN_KANJI[clan.id], title: clan.label, desc: "Histoire, familles et serments" });
+    portal.push({ href: clanHref, kanji: PORTAL_CLAN_KANJI[clan.id], title: clan.label, desc: t.clan });
   }
 
   const close = (focusButton = false) => {
@@ -88,7 +90,7 @@ export function ResourcesMenu() {
       <div className="res-group" aria-hidden="true">{title}{extra && <span className="v">v{extra.version}</span>}</div>
       {entries.map((x) => (
         <a key={x.href} role="menuitem" href={x.href} target="_blank" rel="noopener noreferrer"
-          aria-label={`${x.title}${x.pending ? ", JSON pas encore compatible" : ""} : ${x.desc} (nouvel onglet)`} onClick={() => close()}>
+          aria-label={t.item(x.title, !!x.pending, x.desc)} onClick={() => close()}>
           <span className="kj" aria-hidden="true">{x.kanji}</span>
           <span className="t">{x.title}{x.pending && <> <ForgePending /></>}<span className="d">{x.desc}</span></span>
           <ExtIcon />
@@ -100,24 +102,24 @@ export function ResourcesMenu() {
   return (
     <div className="res" ref={wrap}>
       <button
-        ref={button} type="button" className="theme-btn" title="Ressources"
+        ref={button} type="button" className="theme-btn" title={t.button}
         aria-haspopup="menu" aria-expanded={open} aria-controls={open ? "res-menu" : undefined} onClick={() => setOpen(!open)}
       >
         <svg className="ico" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M3 5.5c3 .8 15 .8 18 0M5 9.5h14M7.5 6.3V20M16.5 6.3V20M12 6.6v2.9" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
         </svg>
-        <span className="txt">Ressources</span>
+        <span className="txt">{t.button}</span>
       </button>
       {open && (
         <>
           <div className="res-scrim" data-testid="res-scrim" onClick={() => close()} />
-          <div ref={menu} id="res-menu" className="res-menu" role="menu" aria-label="Ressources L5R" onKeyDown={onKeyDown}>
+          <div ref={menu} id="res-menu" className="res-menu" role="menu" aria-label={t.menu} onKeyDown={onKeyDown}>
             <span className="grip" aria-hidden="true" />
             {group(PORTAL_NAME, portal)}
-            {group("Créer", CREATE)}
-            {group("Références", REFERENCES)}
-            {group("Le Carnet", CARNET, { className: "res-carnet", version: __APP_VERSION__ })}
-            <p className="res-foot">Liens externes : s'ouvrent dans un nouvel onglet.</p>
+            {group(t.groups.create, create(t))}
+            {group(t.groups.references, references(t))}
+            {group(t.groups.carnet, carnet(t), { className: "res-carnet", version: __APP_VERSION__ })}
+            <p className="res-foot">{t.foot}</p>
           </div>
         </>
       )}

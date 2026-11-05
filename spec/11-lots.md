@@ -54,12 +54,15 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 43. **v2.28.2 — fiche découpée par bloc** (**livrée**, écarts en 48.4) : annexe 48, lot 48. `Sheet.tsx` (904 lignes) devient le dossier `src/ui/components/sheet/`, un fichier par bloc ; déplacement pur, mêmes tests.
 44. **v2.28.3 — état découpé par domaine** (**livrée**, écarts en 49.4) : annexe 49, lot 49. `store.ts` (681 lignes) devient le dossier `src/ui/store/` : types, état initial, reducer, logique des jets, contexte ; déplacement pur, mêmes tests.
 45. **v2.28.4 — localisation, infrastructure** (**livrée**, écarts en 50.6) : annexe 50, lot 50. Dictionnaire typé `src/i18n`, messages de validation, fiche, lanceur, Assistant, barre d'état et en-tête migrés ; `check-i18n` en mode rapport ; rien ne change à l'écran.
-46. **Planifiés le 02/11/2026** : la suite de la localisation (lots 51 à 55, v2.28.5 à v2.31.1).
-47. **À définir** : journal d'achats en XP (K.6), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
+46. **v2.28.5 — localisation, seconde moitié des textes** (**livrée**, écarts en 51.5) : annexe 51, lot 51. Bibliothèque, imports, grimoire, bonus de jet, statistiques, ressources et pied de page migrés ; dates et nombres selon la langue ; `check-i18n` bloquant ; rien ne change à l'écran.
+47. **Planifiés le 02/11/2026** : la suite de la localisation (lots 52 à 55, v2.29.0 à v2.31.1).
+48. **À définir** : journal d'achats en XP (K.6), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
 
 ### Historique des états
 
 Lignes d'état de l'ancien en-tête de `HANDOFF.md`, déplacées telles quelles au lot 44 (annexe 44.2).
+
+**État au 05/11/2026 (lot 50) :** version **v2.28.4**, lot 50 : textes de l'interface regroupés dans un dictionnaire (`src/i18n`), première moitié des composants, sans changement à l'écran (annexe 50).
 
 **État au 05/11/2026 (lot 49) :** version **v2.28.3**, lot 49 : état de l'application découpé par domaine dans `src/ui/store/`, sans changement à l'écran (annexe 49).
 

@@ -1,3 +1,4 @@
+import type { Messages } from "../i18n";
 import { FEET_TO_METERS } from "../rules/l5r4e";
 
 /** Pourcentage de réussite, borné aux extrêmes. */
@@ -12,11 +13,11 @@ export function toMeters(feet: number, intl = "fr-FR"): string {
   return `${decimal(feet * FEET_TO_METERS, intl)} m`;
 }
 
-/** Valeur lisible dans l'aperçu d'un import. */
-export function show(v: unknown): string {
+/** Valeur lisible dans l'aperçu d'un import ; `values` : textes de la langue courante (`t.import.values`). */
+export function show(v: unknown, values: Messages["import"]["values"]): string {
   if (v === undefined || v === null) return "—";
-  if (typeof v === "string") return v === "" ? "(vide)" : `« ${v} »`;
-  if (Array.isArray(v)) return v.length ? v.map(show).join(", ") : "(aucune)";
+  if (typeof v === "string") return v === "" ? values.empty : values.quote(v);
+  if (Array.isArray(v)) return v.length ? v.map((x) => show(x, values)).join(", ") : values.none;
   if (typeof v === "object") return JSON.stringify(v);
   return String(v);
 }

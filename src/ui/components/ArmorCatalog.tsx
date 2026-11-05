@@ -1,4 +1,5 @@
 import { catalogArmor } from "@carnet/core";
+import { useT } from "../../i18n";
 import { ARMOR_CATALOG } from "../../rules/l5r4e";
 import { useCharacter, useStore } from "../store";
 import { NumberField } from "./fields";
@@ -10,6 +11,7 @@ import { RichSelect, type SelectVariant } from "./RichSelect";
  */
 export function ArmorCatalogSelect({ variant = "champ" }: { variant?: SelectVariant }) {
   const { dispatch } = useStore();
+  const t = useT().sheet.armor;
   const c = useCharacter();
   const choose = (id: string) => {
     const a = ARMOR_CATALOG.find((x) => x.id === id);
@@ -20,13 +22,11 @@ export function ArmorCatalogSelect({ variant = "champ" }: { variant?: SelectVari
     });
   };
   return (
-    <label className="field"><span className="label">Armure du livre</span>
+    <label className="field"><span className="label">{t.catalog}</span>
       <RichSelect variant={variant} value={c.armor.catalogId ?? ""} onChange={choose}>
-        <option value="">Personnalisée</option>
+        <option value="">{t.customOption}</option>
         {ARMOR_CATALOG.map((a) => (
-          <option key={a.id} value={a.id}>
-            {a.name} (ND +{a.bonus}{a.bonusMounted !== undefined ? `, +${a.bonusMounted} à cheval` : ""} · réd. {a.reduction})
-          </option>
+          <option key={a.id} value={a.id}>{t.catalogOption(a.name, a.bonus, a.bonusMounted, a.reduction)}</option>
         ))}
       </RichSelect>
     </label>
@@ -39,6 +39,7 @@ export function ArmorCatalogSelect({ variant = "champ" }: { variant?: SelectVari
  */
 export function ArmorFields({ variant }: { variant?: SelectVariant }) {
   const { dispatch } = useStore();
+  const t = useT().sheet.armor;
   const c = useCharacter();
   const setName = (name: string) => dispatch({ type: "set", path: ["armor", "name"], value: name });
   const setValue = (field: "bonus" | "reduction", n: number) => {
@@ -48,13 +49,13 @@ export function ArmorFields({ variant }: { variant?: SelectVariant }) {
   return (
     <>
       <div className="armcat"><ArmorCatalogSelect variant={variant} /></div>
-      <label className="field"><span className="label">Nom</span>
+      <label className="field"><span className="label">{t.name}</span>
         <input className="in" type="text" maxLength={80} value={c.armor.name} onChange={(e) => setName(e.target.value)} />
       </label>
-      <label className="field"><span className="label">Bonus au ND</span>
+      <label className="field"><span className="label">{t.bonus}</span>
         <NumberField className="in mono" min={0} value={c.armor.bonus} onChange={(n) => setValue("bonus", n)} />
       </label>
-      <label className="field"><span className="label">Réduction</span>
+      <label className="field"><span className="label">{t.reduction}</span>
         <NumberField className="in mono" min={0} value={c.armor.reduction} onChange={(n) => setValue("reduction", n)} />
       </label>
     </>
@@ -64,5 +65,6 @@ export function ArmorFields({ variant }: { variant?: SelectVariant }) {
 /** Effet de l'armure du livre portée, en une ligne. */
 export function ArmorEffect() {
   const armor = catalogArmor(useCharacter());
-  return armor?.summary ? <span data-testid="armor-effect">{armor.name} : {armor.summary}</span> : null;
+  const t = useT().sheet.armor;
+  return armor?.summary ? <span data-testid="armor-effect">{t.effect(armor.name, armor.summary)}</span> : null;
 }

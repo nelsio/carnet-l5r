@@ -1,8 +1,10 @@
-/** Localisation, fournisseur de langue (annexe 50) : rendu neutre en français, langue et locale Intl. */
+/** Localisation, fournisseur de langue (annexes 50 et 51) : rendu neutre en français, langue et locale Intl. */
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import type { Character } from "@carnet/core";
 import { useLocale, useT } from "../../src/i18n";
+import { fr } from "../../src/i18n/fr";
+import { show } from "../../src/ui/format";
 import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
@@ -41,5 +43,27 @@ describe("Fournisseur de langue (50.1)", () => {
     expect(screen.getByRole("group", { name: "Vue" })).toHaveTextContent("FicheAssistant L5RStatistiques");
     expect(screen.getByRole("button", { name: "Thème : auto" })).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "Anneaux & Traits" })).toHaveTextContent("Augm. max");
+  });
+});
+
+describe("Formats et valeurs de la langue courante (51.2)", () => {
+  const updatedAt = "2026-11-05T10:00:00.000Z";
+  const dateIn = (intl: string) => new Intl.DateTimeFormat(intl, { dateStyle: "medium", timeStyle: "short" }).format(new Date(updatedAt));
+
+  it.each([["fr", "fr-FR"], ["en", "en-US"]] as const)("Bibliothèque : date de la fiche au format %s", async (locale, intl) => {
+    const storage = memoryStorage();
+    await storage.library.put({ id: "kakita", character: structuredClone(kakita) as Character, mode: "edit", updatedAt });
+    renderApp(<App storage={storage} />, { locale });
+    // La fiche la plus récente s'ouvre : retour à la Bibliothèque par l'en-tête.
+    fireEvent.click(await screen.findByRole("button", { name: "Bibliothèque" }));
+    const time = (await screen.findByRole("list", { name: "Fiches" })).querySelector("time");
+    expect(time).toHaveAttribute("dateTime", updatedAt);
+    expect(time).toHaveTextContent(dateIn(intl));
+  });
+
+  it("aperçu d'import : valeurs écrites avec les textes du dictionnaire", () => {
+    expect(show(["", "Kenjutsu", []], fr.import.values)).toBe("(vide), « Kenjutsu », (aucune)");
+    const values = { empty: "(empty)", none: "(none)", quote: (v: string) => `"${v}"` };
+    expect(show(["", "Kenjutsu", []], values)).toBe(`(empty), "Kenjutsu", (none)`);
   });
 });

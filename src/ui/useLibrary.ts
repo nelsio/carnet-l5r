@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type Dispatch } from "react";
 import { createCharacter, exportFileName, importCharacter, parseCharacterFile, type Character } from "@carnet/core";
+import { useT } from "../i18n";
 import {
   hasWritePermission, pickLinkedFile, readLinkedFile, requestPersistence, supportsLinkedFiles,
   type LibraryEntry, type LinkedFile, type SaveReport, type Storage,
@@ -32,6 +33,8 @@ export function useLibrary(
   opts: LibraryOptions = {},
 ) {
   const { now = () => new Date(), newId = () => crypto.randomUUID(), win = globalThis } = opts;
+  // Messages du fichier lié : figés dans la langue du moment où ils apparaissent.
+  const t = useT();
   const [ready, setReady] = useState(false);
   const [entries, setEntries] = useState<LibraryEntry[]>([]);
   const [saveStatus, setSaveStatus] = useState<LibraryApi["saveStatus"]>("idle");
@@ -173,7 +176,7 @@ export function useLibrary(
       const l = link.current;
       if (!l) return;
       if (await hasWritePermission(l.handle, true)) await save({ always: true });
-      else setFile({ state: "permission", name: l.name, message: "Permission refusée : la fiche reste enregistrée dans ce navigateur." });
+      else setFile({ state: "permission", name: l.name, message: t.file.permissionDenied });
     },
     async loadFileVersion() {
       const l = link.current;
@@ -182,8 +185,8 @@ export function useLibrary(
       const parsed = parseCharacterFile(text);
       const result = parsed.ok ? importCharacter(parsed.json) : parsed;
       if (!result.ok) {
-        const detail = result.errors.map((e) => (e.path ? `${e.path} : ${e.message}` : e.message)).join(" ; ");
-        setFile({ state: "error", name: l.name, message: `Le fichier ne contient pas une fiche valide (${detail}).` });
+        const errors = result.errors.map((e) => (e.path ? t.import.fieldError(e.path, e.message) : e.message));
+        setFile({ state: "error", name: l.name, message: t.file.invalid(errors) });
         return;
       }
       l.lastModified = lastModified;

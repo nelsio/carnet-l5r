@@ -6,7 +6,7 @@
 3. **Le stockage passe par une interface** (`LibraryStore`, §5), indépendante de l'interface utilisateur.
 4. **Un seul schéma Zod** valide la fiche partout : chargement, import, liaison de fichier.
 5. **Un seul livrable** : `dist/carnet-l5r.html`.
-6. **Les textes de l'interface sont dans un dictionnaire** (`src/i18n`), un par langue, le français faisant référence (annexe 50). Les composants n'écrivent aucun texte en dur ; `check-i18n` le vérifie.
+6. **Les textes de l'interface sont dans un dictionnaire** (`src/i18n`), un par langue, le français faisant référence (annexe 50). Les composants n'écrivent aucun texte en dur ; `check-i18n` le vérifie et bloque le lint depuis le lot 51 (annexe 51.3).
 
 ### Structure du dépôt (un seul package, pas de monorepo)
 ```
@@ -33,7 +33,7 @@ carnet-l5r/
 ├─ public-pages/  # manifeste, service worker et icônes, ajoutés à l'adresse GitHub Pages seulement (annexe O.3)
 ├─ .github/workflows/  # ci.yml, pages.yml, release.yml
 ├─ docs/          # GUIDE.md (guide joueur, §9.3), CREDITS.md (licences et crédits), img/ (captures du README)
-├─ scripts/       # check-spec.mjs et check-i18n.mjs (npm run lint, annexes 44.4 et 50.4) ; screenshots.mjs : captures du README (npm run screenshots, hors CI) ; pages-pwa.mjs (pages.yml) ; pwa-icons.mjs (npm run pwa-icons, hors CI)
+├─ scripts/       # check-spec.mjs et check-i18n.mjs (npm run lint, annexes 44.4, 50.4 et 51.3) ; screenshots.mjs : captures du README (npm run screenshots, hors CI) ; pages-pwa.mjs (pages.yml) ; pwa-icons.mjs (npm run pwa-icons, hors CI)
 ├─ README.md      # vitrine : présentation, captures, démarrage (§9.3)
 └─ HANDOFF.md
 ```

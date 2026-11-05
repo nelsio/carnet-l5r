@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useReducer, useState, type DragEvent } from "react";
+import { useT } from "../i18n";
 import type { Storage } from "../storage";
 import { Aid } from "./components/Aid";
 import { AppFooter } from "./components/AppFooter";
@@ -37,6 +38,7 @@ export function App({ storage, rng = d10, ...libraryOptions }: AppProps) {
     [state, rng, api, grimoire, startImport, startPhotoImport],
   );
   const { character: c, ui } = state;
+  const t = useT().app;
   useThemeAndClan(ui.theme, c?.clan);
 
   // Glisser-déposer d'un fichier JSON n'importe où sur la page (HANDOFF §8).
@@ -54,18 +56,18 @@ export function App({ storage, rng = d10, ...libraryOptions }: AppProps) {
     <StoreContext.Provider value={store}>
       <div className="wrap" onDragOver={onDragOver} onDrop={onDrop}>
         {api.degraded && (
-          <p className="banner" role="alert">Sauvegarde impossible dans ce navigateur : exporte ta fiche avant de fermer.</p>
+          <p className="banner" role="alert">{t.degraded}</p>
         )}
         <Header />
         {c && <StatusBar />}
         <main>
-          {!ready ? <div className="empty"><p className="muted">Ouverture du carnet…</p></div>
+          {!ready ? <div className="empty"><p className="muted">{t.opening}</p></div>
             : !c ? <Library />
               : ui.view === "sheet" ? <Sheet /> : ui.view === "stats" ? <Stats /> : <Aid />}
         </main>
         <AppFooter status={<>
-          {c && state.mode === "edit" && api.saveStatus === "saved" && !api.degraded && <span className="saved">Enregistré dans ce navigateur</span>}
-          {api.saveStatus === "error" && <span className="save-error" role="alert">Échec de l'enregistrement dans ce navigateur</span>}
+          {c && state.mode === "edit" && api.saveStatus === "saved" && !api.degraded && <span className="saved">{t.saved}</span>}
+          {api.saveStatus === "error" && <span className="save-error" role="alert">{t.saveError}</span>}
         </>} />
         {pending && <ImportDialog pending={pending} onClose={() => setPending(null)} />}
         {photoImport && <PhotoImportDialog onClose={() => setPhotoImport(false)} />}

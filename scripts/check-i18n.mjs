@@ -1,33 +1,24 @@
-// Contrôle des textes en dur dans l'interface (annexe 50.4), lancé par `npm run lint`.
+// Contrôle des textes en dur dans l'interface (annexes 50.4 et 51.3), lancé par `npm run lint`.
 // Usage : node scripts/check-i18n.mjs [racine]
 // Cherche dans src/ui/**/*.tsx le texte JSX brut contenant une lettre (`>texte<`), hors exceptions.
 // Erreur (code 1) : texte brut dans un fichier migré, ou fichier de PENDING sans texte brut (à retirer
-// de la liste). Rapport (code 0) : occurrences restantes des fichiers de PENDING.
+// de la liste). Rapport (code 0) : occurrences restantes des fichiers de PENDING (liste vide depuis le lot 51).
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
 const root = process.argv[2] ?? process.cwd();
 
-/** Fichiers pas encore migrés vers le dictionnaire : la liste ne fait que diminuer, vide au lot 51. */
-const PENDING = [
-  "src/ui/App.tsx",
-  "src/ui/components/AppFooter.tsx",
-  "src/ui/components/ArmorCatalog.tsx",
-  "src/ui/components/FileActions.tsx",
-  "src/ui/components/ForgePending.tsx",
-  "src/ui/components/Grimoire.tsx",
-  "src/ui/components/ImportDialog.tsx",
-  "src/ui/components/ImportReview.tsx",
-  "src/ui/components/Library.tsx",
-  "src/ui/components/LinkBanner.tsx",
-  "src/ui/components/Modifiers.tsx",
-  "src/ui/components/PhotoImportDialog.tsx",
-  "src/ui/components/ResourcesMenu.tsx",
-  "src/ui/components/Stats.tsx",
-];
+/**
+ * Fichiers pas encore migrés vers le dictionnaire. Vide depuis le lot 51 : le contrôle est bloquant partout
+ * (annexe 51.3). Gardée pour une migration future ; elle ne peut que diminuer.
+ */
+const PENDING = [];
 
-/** Textes qui ne se traduisent pas : sigle, symbole « i » des boutons d'information ; les kanji seuls (sceau, pied de page) aussi. */
-const EXCEPTIONS = new Set(["L5R", "i"]);
+/**
+ * Textes qui ne se traduisent pas : sigle, symbole « i » des boutons d'information, nom de champ du JSON de fiche
+ * (`modifiers`, aide du bloc Bonus de jet) ; les kanji seuls (sceau, pied de page) aussi.
+ */
+const EXCEPTIONS = new Set(["L5R", "i", "modifiers"]);
 const KANJI = /^\p{Script=Han}+$/u;
 
 const JSX_TEXT = />\s*([\p{L}][^<{]*?)\s*</gu;

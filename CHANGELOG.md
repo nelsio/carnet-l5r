@@ -6,6 +6,11 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.28.5] - 2026-11-05
+
+### Technique
+- Tous les textes de l'interface sont regroupés dans un dictionnaire. Rien ne change à l'écran.
+
 ## [2.28.4] - 2026-11-05
 
 ### Technique
@@ -382,7 +387,9 @@ Simples liens ouverts dans un nouvel onglet : le Carnet ne fait toujours aucune 
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.28.3...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.28.5...HEAD
+[2.28.5]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.28.5
+[2.28.4]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.28.4
 [2.28.3]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.28.3
 [2.28.2]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.28.2
 [2.28.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.28.1

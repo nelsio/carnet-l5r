@@ -1,16 +1,18 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { normalize, sameSpell, searchGrimoire, spellTn, type GrimoireDiff, type GrimoireFillField, type GrimoireSpell, type Spell, type SpellElement } from "@carnet/core";
+import { useLocale, useT, type Messages } from "../../i18n";
 import { ELEMENT_LABELS } from "../../rules/l5r4e";
 import { GRIMOIRE_FILES, PORTAL_NAME_OF } from "../../rules/portal";
 import { useStore } from "../store";
 
-const ELEMENT_CHIPS: readonly [SpellElement | "all-elements", string][] = [
-  ["all-elements", "Tous"], ["all", "Universels"], ["air", "Air"], ["earth", "Terre"], ["fire", "Feu"], ["water", "Eau"], ["void", "Vide"],
+/** Filtres d'élément du panneau : tous, universels, puis les cinq Anneaux. */
+const elementChips = (t: Messages["grimoire"]): readonly [SpellElement | "all-elements", string][] => [
+  ["all-elements", t.allElements], ["all", t.universals],
+  ...(["air", "earth", "fire", "water", "void"] as const).map((e): [SpellElement, string] => [e, ELEMENT_LABELS[e]]),
 ];
 
-const elementLabel = (e: SpellElement) => (e === "all" ? "Universel" : ELEMENT_LABELS[e]);
+const elementLabel = (e: SpellElement, t: Messages["grimoire"]) => (e === "all" ? t.universal : ELEMENT_LABELS[e]);
 const ringColor = (e: SpellElement) => ({ ["--rc" as string]: `var(--ring-${e})` });
-const plural = (n: number, word: string) => `${n} ${word}${n > 1 ? "s" : ""}`;
 
 /** Icône de rouleau du bouton « Ajouter depuis le grimoire ». */
 export function ScrollIcon() {
@@ -23,7 +25,8 @@ export function ScrollIcon() {
 
 /** Ligne d'un sort du grimoire : barre de couleur, nom français et anglais, élément · maîtrise · ND · mots-clés. */
 export function GrimoireRow({ g }: { g: GrimoireSpell }) {
-  const meta = [elementLabel(g.element), `Maîtrise ${g.mastery}`, `ND ${spellTn(g.mastery)}`, ...(g.keywords.length ? [g.keywords.join(", ")] : [])];
+  const t = useT().grimoire;
+  const meta = [elementLabel(g.element, t), t.mastery(g.mastery), t.tn(spellTn(g.mastery)), ...(g.keywords.length ? [g.keywords.join(", ")] : [])];
   return (
     <>
       <span className="bar" aria-hidden="true" />
@@ -39,28 +42,30 @@ export function GrimoireRow({ g }: { g: GrimoireSpell }) {
 export function GrimoireStatus() {
   const { grimoire } = useStore();
   const { status, cache, refreshFailed, load } = grimoire;
+  const t = useT().grimoire;
+  const { intl } = useLocale();
   const action = (label: string) => <button type="button" className="linkbtn" onClick={() => void load()}>{label}</button>;
   let tone = "";
   let body;
   if (status === "loading") {
-    body = <><span className="spin" aria-hidden="true" />Chargement du grimoire…</>;
+    body = <><span className="spin" aria-hidden="true" />{t.loading}</>;
   } else if (status === "error") {
     tone = "err";
-    body = <>Grimoire injoignable · {action("Réessayer")}</>;
+    body = <>{t.unreachable}{action(t.retry)}</>;
   } else if (status === "ready" && cache) {
-    const date = new Date(cache.fetchedAt).toLocaleDateString("fr-FR");
+    const date = new Date(cache.fetchedAt).toLocaleDateString(intl);
     if (refreshFailed) {
       tone = "warn";
-      body = <>Actualisation impossible, grimoire du {date} gardé · {action("Réessayer")}</>;
+      body = <>{t.refreshFailed(date)}{action(t.retry)}</>;
     } else if (cache.files < GRIMOIRE_FILES.length) {
       tone = "warn";
-      body = <>Grimoire incomplet ({cache.files} fichiers sur {GRIMOIRE_FILES.length}) · {action("Actualiser")}</>;
+      body = <>{t.incomplete(cache.files, GRIMOIRE_FILES.length)}{action(t.refresh)}</>;
     } else {
       tone = "ok";
-      body = <>Grimoire du {date} · {plural(cache.spells.length, "sort")} · {action("Actualiser")}</>;
+      body = <>{t.ready(date, t.spells(cache.spells.length))}{action(t.refresh)}</>;
     }
   } else {
-    body = <>Grimoire non chargé</>;
+    body = <>{t.notLoaded}</>;
   }
   return (
     <span className={`gstate ${tone}`} role="status" data-testid="grimoire-status">
@@ -98,6 +103,7 @@ interface NameFieldProps {
 export function SpellNameField({ spellId, value, onChange, onPick }: NameFieldProps) {
   const { grimoire } = useStore();
   const { status, cache } = grimoire;
+  const t = useT().grimoire;
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
   const ready = status === "ready" && cache ? cache : undefined;
@@ -140,13 +146,13 @@ export function SpellNameField({ spellId, value, onChange, onPick }: NameFieldPr
   return (
     <div className="field ac">
       <label className="field" htmlFor={`spell-name-${spellId}`}>
-        <span className="label">Nom</span>
+        <span className="label">{t.name}</span>
         <span className={ready ? "combo" : undefined}>
           <input
             id={`spell-name-${spellId}`} className="in" type="text" value={value} maxLength={120} autoComplete="off"
             {...(ready ? {
               role: "combobox", "aria-autocomplete": "list" as const, "aria-expanded": expanded, "aria-controls": listId,
-              "aria-activedescendant": expanded ? optId(current) : undefined, placeholder: "Tape pour chercher dans le grimoire",
+              "aria-activedescendant": expanded ? optId(current) : undefined, placeholder: t.namePlaceholder,
             } : {})}
             onChange={(e) => { onChange(e.target.value); setOpen(true); setActive(0); }}
             onKeyDown={onKeyDown} onBlur={() => setOpen(false)}
@@ -156,7 +162,7 @@ export function SpellNameField({ spellId, value, onChange, onPick }: NameFieldPr
       </label>
       {ready && (
         <div className="sugg" hidden={!expanded}>
-          <ul id={listId} role="listbox" aria-label="Sorts du grimoire">
+          <ul id={listId} role="listbox" aria-label={t.list}>
             {results.map((g, i) => (
               <li
                 key={g.gid} id={optId(i)} role="option" className="gres" style={ringColor(g.element)} aria-selected={i === current}
@@ -164,7 +170,7 @@ export function SpellNameField({ spellId, value, onChange, onPick }: NameFieldPr
               ><GrimoireRow g={g} /></li>
             ))}
           </ul>
-          <p className="foot">Entrée ou clic : remplit le sort (sauf effet et mémorisé)</p>
+          <p className="foot">{t.suggestionsFoot}</p>
         </div>
       )}
     </div>
@@ -175,19 +181,16 @@ export function SpellNameField({ spellId, value, onChange, onPick }: NameFieldPr
 export function GrimoireNameHint() {
   const { grimoire } = useStore();
   const { status, cache, load } = grimoire;
+  const t = useT().grimoire;
   if (status === "ready" && cache) return null;
   return (
     <p className="ac-hint" data-testid="grimoire-name-hint">
       {status === "loading"
-        ? "Chargement…"
-        : <>Autocomplétion depuis le grimoire : <button type="button" className="linkbtn" onClick={() => void load()}>{status === "error" ? "réessayer" : "charger le grimoire"}</button></>}
+        ? t.hintLoading
+        : <>{t.hint}<button type="button" className="linkbtn" onClick={() => void load()}>{status === "error" ? t.hintRetry : t.hintLoad}</button></>}
     </p>
   );
 }
-
-const FIELD_LABELS: Readonly<Record<GrimoireFillField, string>> = {
-  range: "Portée", area: "Zone d'effet", duration: "Durée", raises: "Augmentations", keywords: "Mots-clés", damage: "VD",
-};
 
 interface ConfirmProps {
   g: GrimoireSpell;
@@ -197,21 +200,24 @@ interface ConfirmProps {
 
 /** Confirmation intégrée en haut du sort quand le grimoire remplacerait des valeurs saisies (annexe N.8). */
 export function GrimoireConfirm({ g, diffs, onChoose }: ConfirmProps) {
+  const tc = useT();
+  const t = tc.grimoire;
+  const fields: Readonly<Record<GrimoireFillField, string>> = t.fields;
   const replace = useRef<HTMLButtonElement>(null);
   useEffect(() => replace.current?.focus(), []);
   return (
     <div
-      className="gconfirm" role="alertdialog" aria-label="Remplacer les valeurs saisies ?" aria-describedby={`gconfirm-${g.gid}`}
+      className="gconfirm" role="alertdialog" aria-label={t.confirm} aria-describedby={`gconfirm-${g.gid}`}
       onKeyDown={(e) => { if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); onChoose("cancel"); } }}
     >
-      <p id={`gconfirm-${g.gid}`}><b>« {g.name} »</b> : des valeurs déjà saisies seraient remplacées.</p>
+      <p id={`gconfirm-${g.gid}`}><b>{t.confirmName(g.name)}</b>{t.confirmText}</p>
       <ul className="diff">
-        {diffs.map((d) => <li key={d.field}>{FIELD_LABELS[d.field]} : « {d.from} » → « {d.to} »</li>)}
+        {diffs.map((d) => <li key={d.field}>{t.diff(fields[d.field], d.from, d.to)}</li>)}
       </ul>
       <div className="row">
-        <button ref={replace} type="button" className="btn sm accent" onClick={() => onChoose("all")}>Remplacer</button>
-        <button type="button" className="btn sm" onClick={() => onChoose("empty")}>Compléter les vides</button>
-        <button type="button" className="btn sm" onClick={() => onChoose("cancel")}>Annuler</button>
+        <button ref={replace} type="button" className="btn sm accent" onClick={() => onChoose("all")}>{t.replace}</button>
+        <button type="button" className="btn sm" onClick={() => onChoose("empty")}>{t.fillEmpty}</button>
+        <button type="button" className="btn sm" onClick={() => onChoose("cancel")}>{tc.common.cancel}</button>
       </div>
     </div>
   );
@@ -232,6 +238,8 @@ interface PanelProps {
 export function GrimoirePanel({ spells, onAdd, onClose }: PanelProps) {
   const { grimoire } = useStore();
   const { status, cache, load } = grimoire;
+  const tc = useT();
+  const t = tc.grimoire;
   const [query, setQuery] = useState("");
   const [element, setElement] = useState<SpellElement | "all-elements">("all-elements");
   const [active, setActive] = useState(0);
@@ -284,15 +292,15 @@ export function GrimoirePanel({ spells, onAdd, onClose }: PanelProps) {
   if (status === "ready" && cache) {
     content = (
       <div className="gsearch">
-        <label htmlFor="grimoire-q">Nom du sort</label>
+        <label htmlFor="grimoire-q">{t.search}</label>
         <input
-          ref={input} id="grimoire-q" className="in" type="search" autoComplete="off" placeholder="ex. armure, éteindre, jade"
+          ref={input} id="grimoire-q" className="in" type="search" autoComplete="off" placeholder={t.searchPlaceholder}
           role="combobox" aria-expanded="true" aria-autocomplete="list" aria-controls="grimoire-list"
           aria-activedescendant={results.length ? `grimoire-opt-${current}` : undefined}
           value={query} onChange={(e) => { setQuery(e.target.value); setActive(0); }}
         />
-        <div className="gchips" role="group" aria-label="Élément">
-          {ELEMENT_CHIPS.map(([key, label]) => (
+        <div className="gchips" role="group" aria-label={t.element}>
+          {elementChips(t).map(([key, label]) => (
             <button
               key={key} type="button" className="gchip" aria-pressed={element === key}
               style={key === "all-elements" ? undefined : ringColor(key)}
@@ -301,9 +309,9 @@ export function GrimoirePanel({ spells, onAdd, onClose }: PanelProps) {
           ))}
         </div>
         <div className="gcount" aria-live="polite">
-          {plural(results.length, "sort")}{added && <> · Ajouté : <b>{added}</b></>}
+          {t.spells(results.length)}{added && <>{t.added}<b>{added}</b></>}
         </div>
-        <ul ref={listRef} id="grimoire-list" className="gresults" role="listbox" aria-label="Sorts du grimoire">
+        <ul ref={listRef} id="grimoire-list" className="gresults" role="listbox" aria-label={t.list}>
           {results.map((g, i) => {
             const have = noted(g);
             return (
@@ -313,7 +321,7 @@ export function GrimoirePanel({ spells, onAdd, onClose }: PanelProps) {
                 onMouseDown={(e) => e.preventDefault()} onClick={() => add(g)}
               >
                 <GrimoireRow g={g} />
-                {have ? <span className="have">déjà noté</span> : <span className="add">+ Ajouter</span>}
+                {have ? <span className="have">{t.noted}</span> : <span className="add">{t.add}</span>}
               </li>
             );
           })}
@@ -321,23 +329,23 @@ export function GrimoirePanel({ spells, onAdd, onClose }: PanelProps) {
       </div>
     );
   } else if (status === "loading") {
-    content = <p className="gload"><span className="spin" aria-hidden="true" />Chargement du grimoire…</p>;
+    content = <p className="gload"><span className="spin" aria-hidden="true" />{t.loading}</p>;
   } else if (status === "error") {
     content = (
       <div className="gnote" role="alert">
         <span className="k" aria-hidden="true">待</span>
         <div>
-          <b>Le grimoire ne répond pas.</b> Vérifie ta connexion, puis réessaie. Tu peux toujours saisir le sort à la main avec « + Sort ».
-          <div><button type="button" className="btn sm" onClick={() => void load()}>Réessayer</button></div>
+          <b>{t.errorTitle}</b>{t.errorText}
+          <div><button type="button" className="btn sm" onClick={() => void load()}>{t.retry}</button></div>
         </div>
       </div>
     );
   } else {
     content = (
       <div className="ggate">
-        <p>Pour proposer les sorts, le Carnet télécharge la liste du <b>grimoire {PORTAL_NAME_OF}</b> (environ 110 Ko). Rien n'est envoyé, ta fiche reste dans ce navigateur.</p>
-        <button ref={loadButton} type="button" className="btn accent" onClick={() => void load()}>Charger le grimoire</button>
-        <span className="fine">La liste est gardée dans ce navigateur : elle reste disponible hors ligne. « Actualiser » la recharge.</span>
+        <p>{t.gateBefore}<b>{t.gateName(PORTAL_NAME_OF)}</b>{t.gateAfter}</p>
+        <button ref={loadButton} type="button" className="btn accent" onClick={() => void load()}>{t.load}</button>
+        <span className="fine">{t.gateFine}</span>
       </div>
     );
   }
@@ -345,11 +353,11 @@ export function GrimoirePanel({ spells, onAdd, onClose }: PanelProps) {
   return (
     <>
       <div className="g-scrim" data-testid="grimoire-scrim" onClick={() => onClose(false)} />
-      <section id="grimoire-panel" className="gpanel" aria-label="Ajouter depuis le grimoire" onKeyDown={onKeyDown}>
+      <section id="grimoire-panel" className="gpanel" aria-label={tc.sheet.spells.addFromGrimoire} onKeyDown={onKeyDown}>
         <span className="grip" aria-hidden="true" />
         <div className="gp-h">
-          <h3><span className="kj" aria-hidden="true">巻</span>Ajouter depuis le grimoire</h3>
-          <button type="button" className="gp-x" aria-label="Fermer" onClick={() => onClose(true)}>
+          <h3><span className="kj" aria-hidden="true">巻</span>{tc.sheet.spells.addFromGrimoire}</h3>
+          <button type="button" className="gp-x" aria-label={tc.common.close} onClick={() => onClose(true)}>
             <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
           </button>
         </div>
