@@ -55,12 +55,15 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 44. **v2.28.3 — état découpé par domaine** (**livrée**, écarts en 49.4) : annexe 49, lot 49. `store.ts` (681 lignes) devient le dossier `src/ui/store/` : types, état initial, reducer, logique des jets, contexte ; déplacement pur, mêmes tests.
 45. **v2.28.4 — localisation, infrastructure** (**livrée**, écarts en 50.6) : annexe 50, lot 50. Dictionnaire typé `src/i18n`, messages de validation, fiche, lanceur, Assistant, barre d'état et en-tête migrés ; `check-i18n` en mode rapport ; rien ne change à l'écran.
 46. **v2.28.5 — localisation, seconde moitié des textes** (**livrée**, écarts en 51.5) : annexe 51, lot 51. Bibliothèque, imports, grimoire, bonus de jet, statistiques, ressources et pied de page migrés ; dates et nombres selon la langue ; `check-i18n` bloquant ; rien ne change à l'écran.
-47. **Planifiés le 02/11/2026** : la suite de la localisation (lots 52 à 55, v2.29.0 à v2.31.1).
-48. **À définir** : journal d'achats en XP (K.6), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
+47. **v2.29.0 — interface en anglais** (**livrée**, écarts en 52.6) : annexe 52, lot 52. Dictionnaire anglais complet, bouton FR/EN dans l'en-tête, langue du navigateur au premier lancement, réserves en `XkY` et distances en pieds en anglais ; grimoire et portail signalés en français.
+48. **Planifiés le 02/11/2026** : la suite de la localisation (lots 53 à 55, v2.30.0 à v2.31.1).
+49. **À définir** : journal d'achats en XP (K.6), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
 
 ### Historique des états
 
 Lignes d'état de l'ancien en-tête de `HANDOFF.md`, déplacées telles quelles au lot 44 (annexe 44.2).
+
+**État au 05/11/2026 (lot 51) :** version **v2.28.5**, lot 51 : tous les textes de l'interface dans le dictionnaire (`src/i18n`), contrôle `check-i18n` bloquant, sans changement à l'écran (annexe 51).
 
 **État au 05/11/2026 (lot 50) :** version **v2.28.4**, lot 50 : textes de l'interface regroupés dans un dictionnaire (`src/i18n`), première moitié des composants, sans changement à l'écran (annexe 50).
 

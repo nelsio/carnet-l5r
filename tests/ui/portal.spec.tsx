@@ -57,14 +57,15 @@ describe("W5 : le portail n'est plus présenté comme le site de la campagne", (
 });
 
 describe("O4 : menu Ressources", () => {
-  it("bouton après Thème, fermé par défaut", async () => {
+  it("bouton après Thème et Langue, fermé par défaut", async () => {
     await renderApp();
     const b = resources();
     expect(b).toHaveAttribute("aria-haspopup", "menu");
     expect(b).toHaveAttribute("aria-expanded", "false");
     const labels = [...document.querySelectorAll("header.top .theme-btn")].map((x) => x.getAttribute("title"));
     expect(labels.at(-1)).toBe("Ressources");
-    expect(labels.at(-2)).toMatch(/^Thème/);
+    expect(labels.at(-2)).toBe("Langue : français");
+    expect(labels.at(-3)).toMatch(/^Thème/);
   });
 
   it("fiche Crabe : 7 entrées du portail dont la page du clan, puis les 4 du Carnet", async () => {

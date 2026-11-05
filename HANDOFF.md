@@ -6,7 +6,7 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document et le dossier `spec/` qu'il indexe.
 
-**État actuel :** version **v2.28.5**, lot 51 : tous les textes de l'interface dans le dictionnaire (`src/i18n`), contrôle `check-i18n` bloquant, sans changement à l'écran (annexe 51).
+**État actuel :** version **v2.29.0**, lot 52 : interface en anglais, bouton FR/EN dans l'en-tête, langue du navigateur au premier lancement ; règles et catalogues encore en français (annexe 52).
 
 ---
 
@@ -59,6 +59,7 @@ Fait foi :
 | 49 | État de l'application découpé par domaine | 49 | v2.28.3 | [`49-store-decoupe.md`](spec/annexes/49-store-decoupe.md) |
 | 50 | Localisation : infrastructure, première moitié des textes | 50 | v2.28.4 | [`50-i18n-infra.md`](spec/annexes/50-i18n-infra.md) |
 | 51 | Localisation : seconde moitié des textes, contrôle bloquant | 51 | v2.28.5 | [`51-i18n-extraction.md`](spec/annexes/51-i18n-extraction.md) |
+| 52 | Interface en anglais | 52 | v2.29.0 | [`52-i18n-anglais.md`](spec/annexes/52-i18n-anglais.md) |
 
 ## Lire pour un lot
 

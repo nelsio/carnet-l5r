@@ -4,7 +4,8 @@ import {
   type GrimoireDiff, type GrimoireSpell, type Spell, type SpellElement,
 } from "@carnet/core";
 import { ELEMENT_LABELS, SPELL_KEYWORDS, UNIVERSAL_SPELLS } from "../../../rules/l5r4e";
-import { useT } from "../../../i18n";
+import { useLocale, useT } from "../../../i18n";
+import { DICE_LETTER } from "../../format";
 import { PORTAL, spellUrl } from "../../../rules/portal";
 import { useCharacter, useStore } from "../../store";
 import { ExternalLink } from "../ExternalLink";
@@ -22,6 +23,7 @@ export function Spells() {
   const { c, edit, set, dispatch } = useSheet("magic");
   const { grimoire } = useStore();
   const sp = useT().sheet.spells;
+  const { locale } = useLocale();
   const spells = c.spells ?? [];
   const starting = spellcastingOf(c)?.startingSpells;
   const [panel, setPanel] = useState(false);
@@ -208,7 +210,7 @@ export function Spells() {
               {(s.keywords.length > 0 || s.damage) && (
                 <div className="sp3">
                   {s.keywords.map((k) => <span key={k} className="tag">{k}</span>)}
-                  {s.damage && <span className="tag">{sp.drTag(formatDR(s.damage))}</span>}
+                  {s.damage && <span className="tag">{sp.drTag(formatDR(s.damage, DICE_LETTER[locale]))}</span>}
                 </div>
               )}
               {raises.length > 0 && <div className="sp4"><span className="label">{sp.raisesShort}</span> {raises.join(" · ")}</div>}

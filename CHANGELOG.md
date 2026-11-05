@@ -6,6 +6,15 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.29.0] - 2026-11-06
+
+### Ajouté
+- **Interface en anglais.** Le Carnet s'affiche dans la langue du navigateur ; le bouton **FR/EN** de l'en-tête permet de changer. Les fiches ne sont pas modifiées.
+- En anglais : réserves en notation `XkY`, distances en pieds. Le grimoire du portail reste en français.
+
+### Technique
+- `npm run screenshots -- en` produit les captures anglaises dans `docs/img/en/`.
+
 ## [2.28.5] - 2026-11-05
 
 ### Technique

@@ -1,4 +1,5 @@
-// Captures du README (thème sombre). Usage : npm run build && npm run screenshots
+// Captures du README (thème sombre). Usage : npm run build && npm run screenshots [-- en]
+// Français par défaut → docs/img/ ; `en` → docs/img/en/ (annexe 52.5).
 // Données : modèles intégrés (Kakita Haruto, Tamori Ayane), aucune fiche personnelle.
 // Navigateur : celui de Playwright ; CHROMIUM_PATH pour en imposer un autre.
 import { chromium } from "playwright";
@@ -7,18 +8,24 @@ import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import sharp from "sharp";
 
+const lang = process.argv[2] === "en" ? "en" : "fr";
+// Textes cliqués, par langue. Situations, actions et sorts viennent des règles et du modèle : en français jusqu'au lot 53.
+const L = {
+  fr: { locale: "fr-FR", out: "docs/img", use: "Utiliser", view: "Vue", aid: "Assistant L5R", roll: /^Lancer/ },
+  en: { locale: "en-US", out: "docs/img/en", use: /^Use the /, view: "View", aid: "L5R Assistant", roll: /^Roll/ },
+}[lang];
 const url = pathToFileURL(resolve("dist/carnet-l5r.html")).href;
-const out = resolve("docs/img");
+const out = resolve(L.out);
 const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
 
 async function open(width, height, deviceScaleFactor = 2) {
-  const ctx = await browser.newContext({ viewport: { width, height }, deviceScaleFactor, colorScheme: "dark", locale: "fr-FR" });
+  const ctx = await browser.newContext({ viewport: { width, height }, deviceScaleFactor, colorScheme: "dark", locale: L.locale });
   const page = await ctx.newPage();
   await page.goto(url);
   await page.evaluate(() => document.fonts.ready);
   return page;
 }
-const tab = (p, name) => p.getByRole("group", { name: "Vue" }).getByRole("button", { name });
+const tab = (p, name) => p.getByRole("group", { name: L.view }).getByRole("button", { name });
 const situation = (p, name) => p.getByRole("group", { name: "Situation" }).getByRole("button", { name, exact: true });
 // Pauses courtes : laissent finir le rendu et les transitions avant chaque capture.
 const settle = (p) => p.waitForTimeout(400);
@@ -28,23 +35,23 @@ const shots = {};
 
 // Bureau : fiche, puis escarmouche avec un jet lancé.
 const d = await open(1280, 720);
-await d.getByRole("button", { name: "Utiliser" }).first().click(); await settle(d);
+await d.getByRole("button", { name: L.use }).first().click(); await settle(d);
 await d.evaluate(() => window.scrollTo(0, 0)); await settle(d);
 shots.fiche = await d.screenshot();
-await tab(d, "Assistant L5R").click();
+await tab(d, L.aid).click();
 await situation(d, "Combat").click();
 await d.getByRole("button", { name: "Escarmouche", exact: true }).click();
 await d.getByRole("button", { name: /Attaque · Katana/ }).first().click(); await settle(d);
-await d.getByRole("button", { name: /^Lancer/ }).last().click(); await settle(d);
+await d.getByRole("button", { name: L.roll }).last().click(); await settle(d);
 await d.getByRole("button", { name: /Attaque · Katana/ }).first().evaluate((e) => e.scrollIntoView({ block: "center" })); await settle(d);
 shots.combat = await d.screenshot();
 
 // Mobile : fiche, Assistant L5R en Magie, lanceur d'un sort.
 const m = await open(390, 844);
-await m.getByRole("button", { name: "Utiliser" }).nth(1).click(); await settle(m);
+await m.getByRole("button", { name: L.use }).nth(1).click(); await settle(m);
 await m.evaluate(() => window.scrollTo(0, 0)); await settle(m);
 const phones = [await m.screenshot()];
-await tab(m, "Assistant L5R").click();
+await tab(m, L.aid).click();
 await situation(m, "Magie").click(); await settle(m);
 phones.push(await m.screenshot());
 await m.getByRole("button", { name: /Lancer · Frappe de jade/ }).click(); await settle(m);
@@ -62,4 +69,4 @@ const strip = await sharp({ create: { width: w * 3 + gap * 2, height: h, channel
   .composite(phones.map((input, i) => ({ input, left: i * (w + gap), top: 0 })))
   .png().toBuffer();
 await png(sharp(strip).resize({ width: 1600 })).toFile(`${out}/mobile.png`);
-console.log("Captures écrites dans docs/img/ : fiche.png, combat.png, mobile.png");
+console.log(`Captures écrites dans ${L.out}/ : fiche.png, combat.png, mobile.png`);

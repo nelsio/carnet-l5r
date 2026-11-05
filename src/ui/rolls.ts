@@ -6,6 +6,8 @@ import {
   rollStance, type CombatSub, type Situation, type SpellRing, type Stance,
 } from "@carnet/core";
 import { CALLED_ZONES, CONCENTRATE_ACTION_ID, KNOCKDOWN_QUADRUPED_COST, shownWoundMultiplier, TN_PER_RAISE, type CalledZone } from "../rules/l5r4e";
+import type { Locale } from "../i18n";
+import { formatPool } from "./format";
 
 export interface RollOptions {
   /** ND de base choisi dans l'échelle. */
@@ -196,9 +198,9 @@ export function poolFor(
   });
 }
 
-/** Réserve affichée : « 4g3 +6 ». */
-export function poolLabel(p: Pool): string {
-  return `${p.rolled}g${p.kept}${p.bonus ? ` ${p.bonus > 0 ? "+" : ""}${p.bonus}` : ""}`;
+/** Réserve affichée : « 4g3 +6 », « 4k3 +6 » en anglais (annexe 52.3). */
+export function poolLabel(p: Pool, locale: Locale = "fr"): string {
+  return `${formatPool(p.rolled, p.kept, locale)}${p.bonus ? ` ${p.bonus > 0 ? "+" : ""}${p.bonus}` : ""}`;
 }
 
 /** Manœuvres de la fiche, ou celles par défaut si la liste est vide. */

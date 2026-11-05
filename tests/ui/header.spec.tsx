@@ -31,8 +31,8 @@ describe("Sceau et surtitre (G.3)", () => {
     expect(header().querySelector(".eyebrow")).toHaveTextContent(/^Carnet de RokuganClan de la Grue$/);
     expect(header().querySelector(".eyebrow .sep")).toHaveAttribute("aria-hidden", "true");
     expect(screen.getByRole("button", { name: "Bibliothèque" })).toHaveClass("theme-btn");
-    // Bibliothèque, Lanceur, Thème et Ressources (annexe L.2)
-    expect(header().querySelectorAll(".theme-btn")).toHaveLength(4);
+    // Bibliothèque, Lanceur, Thème, Langue (annexe 52.2) et Ressources (annexe L.2)
+    expect(header().querySelectorAll(".theme-btn")).toHaveLength(5);
   });
 
   it.each([SEAL, "Bibliothèque"])("H2 : « %s » ouvre la Bibliothèque", async (name) => {

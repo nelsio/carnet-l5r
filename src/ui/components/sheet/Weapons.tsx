@@ -1,6 +1,7 @@
 import { attackTrait, catalogGap, catalogWeapon, formatDR, isRanged, parseDR, parseWeaponKeywords, weaponKeywords } from "@carnet/core";
 import { WEAPON_KEYWORD_LABELS } from "../../../rules/ecoles";
-import { useT } from "../../../i18n";
+import { useLocale, useT } from "../../../i18n";
+import { DICE_LETTER } from "../../format";
 import { poolLabel } from "../../rolls";
 import { useStore } from "../../store";
 import { TextListField } from "../fields";
@@ -11,13 +12,14 @@ import { AddButton, Field, OptionalNumber, RemoveButton } from "./shared";
 function CatalogGap({ index }: { index: number }) {
   const { c, set } = useSheet();
   const s = useT().sheet.weapons;
+  const { locale } = useLocale();
   const w = c.weapons[index];
   const gap = w && catalogGap(w);
   if (!w || !gap) return null;
   const [own, book] = [parseDR(w.dr), parseDR(gap.dr)];
   const sameKeywords = [...(w.keywords ?? [])].sort().join() === [...gap.keywords].sort().join();
   const parts = [
-    own.rolled !== book.rolled || own.kept !== book.kept ? formatDR(gap.dr) : "",
+    own.rolled !== book.rolled || own.kept !== book.kept ? formatDR(gap.dr, DICE_LETTER[locale]) : "",
     sameKeywords ? "" : gap.keywords.map((k) => WEAPON_KEYWORD_LABELS[k]).join(", "),
   ].filter(Boolean);
   return (
@@ -34,6 +36,7 @@ function CatalogGap({ index }: { index: number }) {
 export function Weapons() {
   const { c, edit, set } = useSheet("weapons");
   const s = useT().sheet.weapons;
+  const { locale } = useLocale();
   const { state } = useStore();
   if (edit) {
     // Une carte par arme, comme les sorts (annexe J.1) : champs lisibles en entier sur mobile.
@@ -83,12 +86,12 @@ export function Weapons() {
               <tr key={i}>
                 <td>
                   <b>{w.name}</b>
-                  <div className="muted" style={{ fontSize: 12.5 }}>{s.summary(w.skill, formatDR(w.dr), isRanged(w) ? w.bowStrength ?? 0 : undefined)}</div>
+                  <div className="muted" style={{ fontSize: 12.5 }}>{s.summary(w.skill, formatDR(w.dr, DICE_LETTER[locale]), isRanged(w) ? w.bowStrength ?? 0 : undefined)}</div>
                   {keywords.length > 0 && <div>{keywords.map((k) => <span key={k} className="tag">{WEAPON_KEYWORD_LABELS[k]}</span>)}</div>}
                   {state.mode === "edit" && <CatalogGap index={i} />}
                 </td>
-                <td className="pool" data-testid={`attack-pool-${w.name}`}>{poolLabel(atk)}</td>
-                <td className="pool" data-testid={`damage-pool-${w.name}`}>{poolLabel(dmg)}</td>
+                <td className="pool" data-testid={`attack-pool-${w.name}`}>{poolLabel(atk, locale)}</td>
+                <td className="pool" data-testid={`damage-pool-${w.name}`}>{poolLabel(dmg, locale)}</td>
               </tr>
             );
           }) : <tr><td colSpan={3} className="muted">{s.empty}</td></tr>}

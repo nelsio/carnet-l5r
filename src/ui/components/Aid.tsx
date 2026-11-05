@@ -1,6 +1,6 @@
 import { Fragment, useEffect } from "react";
 import {
-  armorEffects, armyStatus, formatDice, battleOutcome, battleRollBonus, battleRollTotal, describeEffect, describeModifier, rollBattleDice, stanceEffects, fullAttackAllowed, guardRule, initiativeScore, isSimpleAttack, stanceRestriction, modifiersOf, movement, movementBonus, movementWater, resolveValue,
+  armorEffects, armyStatus, battleOutcome, battleRollBonus, battleRollTotal, describeEffect, describeModifier, rollBattleDice, stanceEffects, fullAttackAllowed, guardRule, initiativeScore, isSimpleAttack, stanceRestriction, modifiersOf, movement, movementBonus, movementWater, resolveValue,
   isShugenja, reminderText, rings, schoolOf, schoolReminders, spellRestriction, stackCount, stackEffects, stackMax, terrainWaiver, voidMultiplier,
   type ActionDef, type ActiveEffect,
 } from "@carnet/core";
@@ -11,7 +11,7 @@ import {
 import type { ReminderContext } from "../../rules/ecoles";
 import { SITUATION_LINKS } from "../../rules/portal";
 import { useLocale, useT } from "../../i18n";
-import { toMeters } from "../format";
+import { formatDistance, formatPool } from "../format";
 import { contextOf, currentArmorTN, DEFAULT_ROLL_OPTIONS, isActive, isRollable, poolFor, poolLabel, toPoolAction, uiRollStance } from "../rolls";
 import { currentActions, useCharacter, useStore, type AidSituation, type BattleState, type InfoPanel, type VoidChoice } from "../store";
 import { ExtIcon } from "./ExternalLink";
@@ -117,10 +117,11 @@ export function Aid() {
 function InitiativeCard({ action }: { action: ActionDef }) {
   const { state, dispatch } = useStore();
   const tx = useT().aid;
+  const { locale } = useLocale();
   const c = useCharacter();
   const { ui } = state;
   const p = poolFor(c, action, DEFAULT_ROLL_OPTIONS, "attack");
-  const dice = poolLabel(p);
+  const dice = poolLabel(p, locale);
   // Centre au round précédent : +10 ce round (F1) ; Vide : +10 pour l'escarmouche (F3).
   const center = ui.centerLastRound && ui.sub !== "duel";
   const value = ui.initiative === null ? null : initiativeScore(c, ui.initiative, { centerLastRound: center, voidPoints: ui.voidInitiative });
@@ -473,14 +474,15 @@ interface VoidOption {
 function VoidPanel() {
   const { state, dispatch } = useStore();
   const t = useT();
+  const { locale } = useLocale();
   const tv = t.aid.void;
   const c = useCharacter();
   const { ui } = state;
   const m = voidMultiplier(c);
   const toggle = (patch: Partial<typeof ui.opts>) => () => dispatch({ type: "option", patch });
   const atRoll: VoidOption = {
-    id: "roll", label: tv.roll, tags: [{ label: `+${formatDice(m, m)}`, up: true }], description: tv.rollHint,
-    active: tv.rollActive(`+${formatDice(m, m)}`), on: ui.opts.voidPoint, spend: toggle({ voidPoint: !ui.opts.voidPoint }),
+    id: "roll", label: tv.roll, tags: [{ label: `+${formatPool(m, m, locale)}`, up: true }], description: tv.rollHint,
+    active: tv.rollActive(`+${formatPool(m, m, locale)}`), on: ui.opts.voidPoint, spend: toggle({ voidPoint: !ui.opts.voidPoint }),
   };
   const options: VoidOption[] = [
     atRoll,
@@ -553,7 +555,7 @@ function VoidPanel() {
 function MovePanel() {
   const { state, dispatch } = useStore();
   const tm = useT().aid.move;
-  const { intl } = useLocale();
+  const { locale } = useLocale();
   const details = !!state.ui.info.move;
   const c = useCharacter();
   const { terrain } = state.ui;
@@ -590,7 +592,8 @@ function MovePanel() {
           <div key={t.label}>
             <span className="label">{t.label}</span>
             <b className="mono">{tm.feet(t.ft)}</b>
-            {details && <span className="muted">{toMeters(t.ft, intl)} · {t.note}</span>}
+            {/* Conversion en mètres en français seulement : en anglais, les pieds sont l'unité affichée (annexe 52.3). */}
+            {details && <span className="muted">{locale === "fr" && `${formatDistance(t.ft, locale)} · `}{t.note}</span>}
           </div>
         ))}
       </div>
@@ -637,6 +640,7 @@ function ActionCard({ action: a }: { action: ActionDef }) {
   const { state, dispatch } = useStore();
   const tx = useT().aid;
   const c = useCharacter();
+  const { locale } = useLocale();
   const { ui } = state;
   if (a.kind === "move") return <MovePanel />;
   if (a.kind === "info") {
@@ -659,7 +663,7 @@ function ActionCard({ action: a }: { action: ActionDef }) {
     return (
       <div className={["act", "blocked", child ? "child" : ""].filter(Boolean).join(" ")} data-testid={`blocked-${a.id}`}>
         <span className="t">{a.label}</span>
-        <span className="p">{p ? poolLabel(p) : ""}</span>
+        <span className="p">{p ? poolLabel(p, locale) : ""}</span>
         <span className="d">
           <span className="reason">{blocked}</span>{" "}
           <button type="button" className="linkbtn" aria-label={tx.rollAnywayLabel(a.label)} onClick={() => dispatch({ type: "select", id: a.id })}>{tx.rollAnyway}</button>
@@ -678,8 +682,8 @@ function ActionCard({ action: a }: { action: ActionDef }) {
       aria-pressed={selected}
       onClick={() => dispatch({ type: "select", id: a.id })}
     >
-      <span className="t">{a.label}{pending > 0 && <> <span className="pend">{tx.pending(`+${formatDice(pending, 0)}`)}</span></>}{!showDesc && tag}</span>
-      <span className="p">{p ? poolLabel(p) : ""}</span>
+      <span className="t">{a.label}{pending > 0 && <> <span className="pend">{tx.pending(`+${formatPool(pending, 0, locale)}`)}</span></>}{!showDesc && tag}</span>
+      <span className="p">{p ? poolLabel(p, locale) : ""}</span>
       {showDesc && <span className="d">{tag && <>{tag}{" "}</>}{a.description}</span>}
     </button>
   );

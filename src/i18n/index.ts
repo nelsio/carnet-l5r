@@ -22,6 +22,28 @@ export function detectLocale(language: string | undefined): Locale {
   return language?.toLowerCase().startsWith("en") ? "en" : "fr";
 }
 
+/** Langue choisie avec le bouton FR/EN, même modèle que `carnet-theme` (annexe 52.2). */
+export const LOCALE_KEY = "carnet-lang";
+
+/** Langue au lancement : le choix mémorisé, sinon celle du navigateur ; stockage illisible → langue détectée. */
+export function initialLocale(language: string | undefined = globalThis.navigator?.language): Locale {
+  try {
+    const saved = localStorage.getItem(LOCALE_KEY);
+    if (saved === "fr" || saved === "en") return saved;
+  } catch {
+    // Stockage bloqué : la langue du navigateur suffit.
+  }
+  return detectLocale(language);
+}
+
+function saveLocale(locale: Locale): void {
+  try {
+    localStorage.setItem(LOCALE_KEY, locale);
+  } catch {
+    // Stockage bloqué : le choix vaut pour la session.
+  }
+}
+
 interface I18n {
   locale: Locale;
   setLocale: (locale: Locale) => void;
@@ -32,11 +54,26 @@ interface I18n {
 // Sans fournisseur (composants rendus seuls dans les tests) : français, langue figée.
 const I18nContext = createContext<I18n>({ locale: "fr", setLocale: () => undefined, intl: INTL.fr, t: fr });
 
-/** Fournit la langue à l'interface ; garde les messages de validation du schéma dans la même langue. */
+/**
+ * Fournit la langue à l'interface ; garde dans la même langue les messages de validation du schéma,
+ * `<html lang>` et la description de la page. Un changement de langue est mémorisé (annexe 52.2).
+ */
 export function I18nProvider({ locale: initial = "fr", children }: { locale?: Locale; children: ReactNode }) {
   const [locale, setLocale] = useState<Locale>(initial);
-  const value = useMemo<I18n>(() => ({ locale, setLocale, intl: INTL[locale], t: DICTIONARIES[locale] }), [locale]);
-  useEffect(() => setValidationMessages(value.t.validation), [value]);
+  const value = useMemo<I18n>(() => ({
+    locale,
+    setLocale: (next: Locale) => {
+      saveLocale(next);
+      setLocale(next);
+    },
+    intl: INTL[locale],
+    t: DICTIONARIES[locale],
+  }), [locale]);
+  useEffect(() => {
+    setValidationMessages(value.t.validation);
+    document.documentElement.lang = value.locale;
+    document.querySelector('meta[name="description"]')?.setAttribute("content", value.t.header.metaDescription);
+  }, [value]);
   return createElement(I18nContext.Provider, { value }, children);
 }
 

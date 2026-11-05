@@ -361,6 +361,8 @@ export function GrimoirePanel({ spells, onAdd, onClose }: PanelProps) {
             <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
           </button>
         </div>
+        {/* Contenu externe en français : signalé quand l'interface est dans une autre langue (annexe 52.4). */}
+        {t.frenchNotice && <p className="gfr">{t.frenchNotice}</p>}
         {content}
       </section>
     </>

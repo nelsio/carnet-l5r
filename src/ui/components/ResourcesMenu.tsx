@@ -7,21 +7,24 @@ import { useStore } from "../store";
 import { ExtIcon } from "./ExternalLink";
 import { ForgePending } from "./ForgePending";
 
-/** `pending` : pastille « JSON pas encore compatible » après le titre (lot 27). */
-interface Entry { href: string; kanji: string; title: string; desc: string; pending?: boolean }
+/**
+ * `pending` : pastille « JSON pas encore compatible » après le titre (lot 27).
+ * `french` : contenu en français, suffixe `t.french` après le titre (« (FR) » en anglais, annexe 52.4).
+ */
+interface Entry { href: string; kanji: string; title: string; desc: string; pending?: boolean; french?: boolean }
 
 const create = (t: Messages["resources"]): Entry[] => [FORGE_JSON_OK
-  ? { href: PORTAL.forge, kanji: "鍛", title: t.forge, desc: t.forgeReady }
-  : { href: PORTAL.forge, kanji: "鍛", title: t.forge, desc: t.forgePending, pending: true }];
+  ? { href: PORTAL.forge, kanji: "鍛", title: t.forge, desc: t.forgeReady, french: true }
+  : { href: PORTAL.forge, kanji: "鍛", title: t.forge, desc: t.forgePending, pending: true, french: true }];
 const references = (t: Messages["resources"]): Entry[] => [
-  { href: PORTAL.grimoire, kanji: "巻", ...t.grimoire },
-  { href: PORTAL.combat, kanji: "刀", ...t.combat },
-  { href: PORTAL.bushido, kanji: "義", ...t.bushido },
-  { href: PORTAL.etiquette, kanji: "茶", ...t.etiquette },
+  { href: PORTAL.grimoire, kanji: "巻", ...t.grimoire, french: true },
+  { href: PORTAL.combat, kanji: "刀", ...t.combat, french: true },
+  { href: PORTAL.bushido, kanji: "義", ...t.bushido, french: true },
+  { href: PORTAL.etiquette, kanji: "茶", ...t.etiquette, french: true },
 ];
 /** Liens vers le dépôt du Carnet (annexe M.3), kanji sur fond sceau. */
 const carnet = (t: Messages["resources"]): Entry[] => [
-  { href: CARNET_LINKS.guide, kanji: "帳", ...t.guide },
+  { href: CARNET_LINKS.guide, kanji: "帳", ...t.guide, french: true },
   { href: CARNET_LINKS.releases, kanji: "新", ...t.releases },
   { href: CARNET_LINKS.bug, kanji: "報", ...t.bug },
   { href: CARNET_LINKS.code, kanji: "源", ...t.code },
@@ -42,9 +45,9 @@ export function ResourcesMenu() {
   const c = state.character;
   const clan = c ? clanAccent(c.clan) : null;
   const clanHref = clanUrl(clan?.id ?? null);
-  const portal: Entry[] = [{ href: PORTAL.home, kanji: "帝", title: PORTAL_NAME, desc: t.portal }];
+  const portal: Entry[] = [{ href: PORTAL.home, kanji: "帝", title: PORTAL_NAME, desc: t.portal, french: true }];
   if (clan?.id && clan.label && clanHref) {
-    portal.push({ href: clanHref, kanji: PORTAL_CLAN_KANJI[clan.id], title: clan.label, desc: t.clan });
+    portal.push({ href: clanHref, kanji: PORTAL_CLAN_KANJI[clan.id], title: clan.label, desc: t.clan, french: true });
   }
 
   const close = (focusButton = false) => {
@@ -90,9 +93,9 @@ export function ResourcesMenu() {
       <div className="res-group" aria-hidden="true">{title}{extra && <span className="v">v{extra.version}</span>}</div>
       {entries.map((x) => (
         <a key={x.href} role="menuitem" href={x.href} target="_blank" rel="noopener noreferrer"
-          aria-label={t.item(x.title, !!x.pending, x.desc)} onClick={() => close()}>
+          aria-label={t.item(`${x.title}${x.french ? t.french : ""}`, !!x.pending, x.desc)} onClick={() => close()}>
           <span className="kj" aria-hidden="true">{x.kanji}</span>
-          <span className="t">{x.title}{x.pending && <> <ForgePending /></>}<span className="d">{x.desc}</span></span>
+          <span className="t">{x.title}{x.french && t.french}{x.pending && <> <ForgePending /></>}<span className="d">{x.desc}</span></span>
           <ExtIcon />
         </a>
       ))}

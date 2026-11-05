@@ -1,4 +1,5 @@
 import { computePool, defaultModifiers, findSchool, type Character, type PoolAction, type RollTrait } from "@carnet/core";
+import type { Locale } from "../../../i18n";
 import { poolLabel } from "../../rolls";
 import { useCharacter, useStore, type BlockId } from "../../store";
 
@@ -14,7 +15,7 @@ export function useSheet(block?: BlockId) {
 /** Réserve affichée sur la fiche : bonus et techniques d'office, posture Attaque (annexe C.4). */
 export const poolOf = (c: Character, action: PoolAction) => computePool(c, action, { modifiers: defaultModifiers(c, action) });
 
-export const pool = (c: Character, trait: RollTrait, skill: string) => poolLabel(poolOf(c, { kind: "skill", skill, trait }));
+export const pool = (c: Character, trait: RollTrait, skill: string, locale: Locale) => poolLabel(poolOf(c, { kind: "skill", skill, trait }), locale);
 
 /**
  * Choix des techniques d'école : remplit aussi « École (nom affiché) » avec le nom du catalogue, modifiable ensuite ;

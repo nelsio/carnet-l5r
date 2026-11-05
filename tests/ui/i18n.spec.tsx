@@ -3,6 +3,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import type { Character } from "@carnet/core";
 import { useLocale, useT } from "../../src/i18n";
+import { en } from "../../src/i18n/en";
 import { fr } from "../../src/i18n/fr";
 import { show } from "../../src/ui/format";
 import { memoryStorage } from "../../src/storage";
@@ -55,8 +56,9 @@ describe("Formats et valeurs de la langue courante (51.2)", () => {
     await storage.library.put({ id: "kakita", character: structuredClone(kakita) as Character, mode: "edit", updatedAt });
     renderApp(<App storage={storage} />, { locale });
     // La fiche la plus récente s'ouvre : retour à la Bibliothèque par l'en-tête.
-    fireEvent.click(await screen.findByRole("button", { name: "Bibliothèque" }));
-    const time = (await screen.findByRole("list", { name: "Fiches" })).querySelector("time");
+    const t = { fr, en }[locale];
+    fireEvent.click(await screen.findByRole("button", { name: t.header.library }));
+    const time = (await screen.findByRole("list", { name: t.library.entries })).querySelector("time");
     expect(time).toHaveAttribute("dateTime", updatedAt);
     expect(time).toHaveTextContent(dateIn(intl));
   });
