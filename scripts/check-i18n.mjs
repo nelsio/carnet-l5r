@@ -49,9 +49,9 @@ function occurrences(src) {
   const code = stripComments(src);
   const found = [];
   for (const m of code.matchAll(JSX_TEXT)) {
-    // `=>` et `>=` ne sont pas des fins de balise.
+    // `=>`, `>=` et la comparaison `a > b` ne sont pas des fins de balise.
     const before = code[m.index - 1];
-    if (before === "=" || code[m.index + 1] === "=") continue;
+    if (before === "=" || /\s/.test(before) || code[m.index + 1] === "=") continue;
     const text = m[1].replace(/\s+/g, " ").trim();
     if (EXCEPTIONS.has(text) || KANJI.test(text)) continue;
     found.push({ line: code.slice(0, m.index).split("\n").length, text });
