@@ -3,32 +3,34 @@ import { clanAccent, schoolRankOf } from "@carnet/core";
 import { SHOW_WOUND_MULTIPLIER, WOUND_MULTIPLIERS } from "../../rules/l5r4e";
 import { useStore } from "../store";
 import { clanUrl } from "../../rules/portal";
-import { NEXT_THEME, THEME_LABELS } from "../theme";
+import { useT } from "../../i18n";
+import { NEXT_THEME } from "../theme";
 import { ExternalLink } from "./ExternalLink";
 import { ResourcesMenu } from "./ResourcesMenu";
 
 export function Header() {
   const { state, dispatch, library } = useStore();
+  const t = useT();
   const { character: c, ui } = state;
   const readonly = state.mode === "readonly";
   const clan = c?.clan.trim() ? clanAccent(c.clan) : null;
   const clanHref = clanUrl(clan?.id ?? null);
   // Sous le nom : école affichée et rang d'école, plus de famille (annexe E.19 S8).
-  const sub = c ? [c.school.trim(), `Rang\u00a0${schoolRankOf(c)}`].filter(Boolean).join(" · ") : "";
+  const sub = c ? [c.school.trim(), t.header.rank(schoolRankOf(c))].filter(Boolean).join(" · ") : "";
 
   // Titre d'onglet : nom du personnage, puis l'outil (annexe G.3) ; sans fiche, le titre référencé de index.html (annexe P).
   const name = c?.name.trim();
   useEffect(() => {
-    document.title = name ? `${name} · ${APP_NAME}` : HOME_TITLE;
-  }, [name]);
+    document.title = name ? `${name} · ${APP_NAME}` : t.header.homeTitle(APP_NAME);
+  }, [name, t]);
 
   return (
     <header className="top">
       <div className="who">
         {/* Sceau 帳 : marque de l'outil ; avec une fiche ouverte, il ouvre la Bibliothèque (annexe G.3). */}
         {c ? (
-          <button type="button" className="seal" title={`${APP_NAME} — Bibliothèque`}
-            aria-label={`${APP_NAME} — ouvrir la bibliothèque`} onClick={() => void library.showLibrary()}>帳</button>
+          <button type="button" className="seal" title={t.header.sealTitle(APP_NAME)}
+            aria-label={t.header.sealLabel(APP_NAME)} onClick={() => void library.showLibrary()}>帳</button>
         ) : (
           <span className="seal" aria-hidden="true">帳</span>
         )}
@@ -39,42 +41,42 @@ export function Header() {
                 <span className="brand">{APP_NAME}</span>
                 {clan && <><span className="sep" aria-hidden="true" />{clan.label && clanHref ? (
                   // Page du clan sur le portail (annexe L.7).
-                  <ExternalLink href={clanHref} className="mon" label={`${clan.label} : page du clan sur le portail (nouvel onglet)`}>{clan.label}</ExternalLink>
-                ) : <div className="mon">{clan.label ?? `Clan ${c.clan}`}</div>}</>}
+                  <ExternalLink href={clanHref} className="mon" label={t.header.clanPage(clan.label)}>{clan.label}</ExternalLink>
+                ) : <div className="mon">{clan.label ?? t.header.clan(c.clan)}</div>}</>}
               </div>
-              <FitName name={c.name}>{readonly && <> <span className="badge">Consultation</span></>}</FitName>
+              <FitName name={c.name}>{readonly && <> <span className="badge">{t.header.readonly}</span></>}</FitName>
               <div className="sub">{sub}</div>
             </>
           ) : (
             <>
               <h1>{APP_NAME}</h1>
-              <div className="sub">Compagnon de campagne · L5R 4e</div>
+              <div className="sub">{t.header.tagline}</div>
             </>
           )}
         </div>
       </div>
       <div className="top-right">
         {/* Gardé à côté du sceau : plus visible, surtout sur mobile (annexe G.6, v2.13.1). */}
-        {c && <HeaderButton icon={ICONS.library} label="Bibliothèque" onClick={() => void library.showLibrary()} />}
+        {c && <HeaderButton icon={ICONS.library} label={t.header.library} onClick={() => void library.showLibrary()} />}
         <HeaderButton
-          icon={ICONS.dice} label={`Lanceur de dés : ${ui.showDiceRoller ? "affiché" : "masqué"}`} pressed={ui.showDiceRoller}
+          icon={ICONS.dice} label={t.header.diceRoller(ui.showDiceRoller)} pressed={ui.showDiceRoller}
           onClick={() => dispatch({ type: "diceRoller", show: !ui.showDiceRoller })}
         />
-        <HeaderButton icon={ICONS.theme} label={`Thème : ${THEME_LABELS[ui.theme]}`} onClick={() => dispatch({ type: "theme", theme: NEXT_THEME[ui.theme] })} />
+        <HeaderButton icon={ICONS.theme} label={t.header.theme(t.header.themes[ui.theme])} onClick={() => dispatch({ type: "theme", theme: NEXT_THEME[ui.theme] })} />
         <ResourcesMenu />
         {SHOW_WOUND_MULTIPLIER && (
           <HeaderButton
-            icon={ICONS.wounds} label={`Blessures : Terre × ${ui.woundMultiplier}`}
+            icon={ICONS.wounds} label={t.header.woundMultiplier(ui.woundMultiplier)}
             onClick={() => dispatch({ type: "woundMultiplier", value: nextWoundMultiplier(ui.woundMultiplier) })}
           />
         )}
         {c && (
-          <div className="tabs" role="group" aria-label="Vue">
-            <button type="button" aria-pressed={ui.view === "sheet"} onClick={() => dispatch({ type: "view", view: "sheet" })}>Fiche</button>
-            <button type="button" aria-label="Assistant L5R" aria-pressed={ui.view === "aid"} onClick={() => dispatch({ type: "view", view: "aid" })}>
-              Assistant<span className="tab-suffix"> L5R</span>
+          <div className="tabs" role="group" aria-label={t.nav.label}>
+            <button type="button" aria-pressed={ui.view === "sheet"} onClick={() => dispatch({ type: "view", view: "sheet" })}>{t.nav.sheet}</button>
+            <button type="button" aria-label={t.nav.aid} aria-pressed={ui.view === "aid"} onClick={() => dispatch({ type: "view", view: "aid" })}>
+              {t.nav.aidShort}<span className="tab-suffix"> L5R</span>
             </button>
-            <button type="button" aria-pressed={ui.view === "stats"} onClick={() => dispatch({ type: "view", view: "stats" })}>Statistiques</button>
+            <button type="button" aria-pressed={ui.view === "stats"} onClick={() => dispatch({ type: "view", view: "stats" })}>{t.nav.stats}</button>
           </div>
         )}
       </div>
@@ -82,8 +84,8 @@ export function Header() {
   );
 }
 
+/** Nom propre de l'outil : identique dans toutes les langues. */
 const APP_NAME = "Carnet de Rokugan";
-const HOME_TITLE = `${APP_NAME} – Fiche de personnage et assistant de jets L5R 4e édition`;
 
 const ICONS = {
   library: <path d="M4 4h4v16H4zM10 4h4v16h-4zM16.2 5.2l3.8-1 3 15.6-3.8 1z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />,

@@ -5,6 +5,7 @@ import {
   type Character,
 } from "@carnet/core";
 import { ARMOR_TN, ELEMENT_LABELS, VOID_COMBAT, WOUND_LEVELS } from "../../rules/l5r4e";
+import { useT, type Messages } from "../../i18n";
 import { contextOf, currentArmorTN, selectedKeys } from "../rolls";
 import { useCharacter, useStore } from "../store";
 import { ArmorEffect, ArmorFields } from "./ArmorCatalog";
@@ -14,6 +15,8 @@ import { LinkBanner } from "./LinkBanner";
 /** Barre d'état collante : blessures, Vide et tuiles de combat (HANDOFF §6.2). */
 export function StatusBar() {
   const { state, dispatch } = useStore();
+  const t = useT();
+  const s = t.statusBar;
   const c = useCharacter();
   const { ui } = state;
   const ws = woundState(c, contextOf(ui));
@@ -44,13 +47,13 @@ export function StatusBar() {
       <div className="status-in">
         <button type="button" className={`wsum${hurt ? " hurt" : ""}`} aria-expanded={ui.woundsExpanded} onClick={() => dispatch({ type: "toggleWounds" })}>
           <span>
-            <b>{ws.label}</b> <span className="muted">{ws.penalty === null ? "" : `· pénalité +${ws.penalty}`}</span>
+            <b>{ws.label}</b> <span className="muted">{ws.penalty === null ? "" : s.penaltySummary(ws.penalty)}</span>
           </span>
           <span className="muted mono">{c.wounds} / {maxWounds} {ui.woundsExpanded ? "▴" : "▾"}</span>
         </button>
-        <div className="wtrack" aria-label="Niveaux de blessure">
+        <div className="wtrack" aria-label={s.woundLevels}>
           {levels.map((l) => (
-            <div key={l.label} className={l.cls("wl")} title={`${l.label} jusqu'à ${l.max} blessures`} aria-current={l.current ? "step" : undefined}>
+            <div key={l.label} className={l.cls("wl")} title={s.levelTitle(l.label, l.max)} aria-current={l.current ? "step" : undefined}>
               <b>{l.penaltyText}</b>
               {/* Abréviation à l'écran, libellé complet pour les lecteurs d'écran (annexe 45.2). */}
               <span aria-hidden="true">{l.short}</span>
@@ -60,7 +63,7 @@ export function StatusBar() {
         </div>
         {/* Mobile : une ligne par niveau sous la barre, à l'appui sur le résumé (annexe E.9 S3). */}
         {ui.woundsExpanded && (
-          <ol className="wdetail" aria-label="Détail des blessures" data-testid="wound-detail">
+          <ol className="wdetail" aria-label={s.woundDetail} data-testid="wound-detail">
             {levels.map((l) => (
               <li key={l.label} className={l.cls("wdl")} aria-current={l.current ? "step" : undefined}>
                 <span className="wn">{l.label}</span>
@@ -71,44 +74,44 @@ export function StatusBar() {
           </ol>
         )}
         {readonly ? (
-          <div><span className="label">Blessures</span> <b className="stat-big" aria-label="Blessures subies">{c.wounds}</b></div>
+          <div><span className="label">{s.wounds}</span> <b className="stat-big" aria-label={s.woundsTaken}>{c.wounds}</b></div>
         ) : (
           // Tuile « Blessures » : ouvre Ajuster / Encaisser sous la barre (annexe E.19 S14).
           <button
             type="button" className={`wtile${damageOpen ? " on" : ""}`} aria-expanded={damageOpen}
-            aria-label="Blessures : ajuster ou encaisser des dégâts" onClick={() => setDamageOpen(!damageOpen)}
+            aria-label={s.woundsTile} onClick={() => setDamageOpen(!damageOpen)}
           >
-            <span className="wt1"><span className="label">Blessures</span><b className="mono">{c.wounds}/{maxWounds}</b></span>
-            <span className="wt2">Ajuster / Encaisser {damageOpen ? "▴" : "▾"}</span>
+            <span className="wt1"><span className="label">{s.wounds}</span><b className="mono">{c.wounds}/{maxWounds}</b></span>
+            <span className="wt2">{s.adjustOrTake} {damageOpen ? "▴" : "▾"}</span>
           </button>
         )}
         <div className="vblock">
-          <div className="label"><span className="vlong">Points de Vide {c.voidPoints}/{c.voidRing}</span><span className="vshort">Vide {c.voidPoints}/{c.voidRing}</span></div>
+          <div className="label"><span className="vlong">{s.voidPoints(c.voidPoints, c.voidRing)}</span><span className="vshort">{s.voidShort(c.voidPoints, c.voidRing)}</span></div>
           <div className="voidpips" style={{ ["--n" as string]: c.voidRing }}>
             {Array.from({ length: c.voidRing }, (_, i) => (
               <button
                 key={i} type="button" className={`pip${i < c.voidPoints ? " on" : ""}`}
-                aria-label={`Point de Vide ${i + 1}`} aria-pressed={i < c.voidPoints} disabled={readonly}
+                aria-label={s.voidPip(i + 1)} aria-pressed={i < c.voidPoints} disabled={readonly}
                 onClick={() => dispatch({ type: "pip", index: i })}
               />
             ))}
           </div>
         </div>
         <div className="cstats">
-          <div><span className="label">Dépl.</span><b>{move.free}/{move.simple}<small> pi</small></b></div>
-          <ArmorTile label="ND armure" value={tn} testId="armor-tn" readonly={readonly} />
-          <ArmorTile label="Réduction" value={reduction} testId="armor-reduction" readonly={readonly} />
-          <div className={ws.penalty ? "pen" : ""}><span className="label">Pénalité</span><b>{ws.penalty === null ? "—" : `+${ws.penalty}`}</b></div>
+          <div><span className="label">{s.move}</span><b>{move.free}/{move.simple}<small> {s.feet}</small></b></div>
+          <ArmorTile label={s.armorTn} value={tn} testId="armor-tn" readonly={readonly} />
+          <ArmorTile label={s.reduction} value={reduction} testId="armor-reduction" readonly={readonly} />
+          <div className={ws.penalty ? "pen" : ""}><span className="label">{s.penalty}</span><b>{ws.penalty === null ? "—" : `+${ws.penalty}`}</b></div>
         </div>
         {isShugenja(c) && <SpellSlots readonly={readonly} />}
-        {damageOpen && !readonly && <TakeDamage counter label="Dégâts de l'attaque" onDone={() => setDamageOpen(false)} />}
+        {damageOpen && !readonly && <TakeDamage counter label={s.attackDamage} onDone={() => setDamageOpen(false)} />}
         {ui.armorEdit && !readonly && <ArmorEditor tn={tn} />}
       </div>
     </div>
   );
 }
 
-const slotLabel = (k: SpellSlotKey) => (k === "free" ? "Libres" : ELEMENT_LABELS[k]);
+const slotLabel = (k: SpellSlotKey, s: Messages["statusBar"]) => (k === "free" ? s.freeSlots : ELEMENT_LABELS[k]);
 
 /**
  * Ligne « Sorts » (annexe F.5) : six mini-tuiles restants/max, à la couleur de l'Anneau ;
@@ -116,6 +119,7 @@ const slotLabel = (k: SpellSlotKey) => (k === "free" ? "Libres" : ELEMENT_LABELS
  */
 function SpellSlots({ readonly }: { readonly: boolean }) {
   const { dispatch } = useStore();
+  const s = useT().statusBar;
   const c = useCharacter();
   const [open, setOpen] = useState(false);
   const slots = spellSlots(c);
@@ -124,29 +128,29 @@ function SpellSlots({ readonly }: { readonly: boolean }) {
     <>
       <button
         type="button" className={`slots${open ? " on" : ""}`} aria-expanded={open} disabled={readonly}
-        aria-label="Emplacements de sorts restants" onClick={() => setOpen(!open)}
+        aria-label={s.slotsLeft} onClick={() => setOpen(!open)}
       >
-        <span className="label slotlabel">Sorts</span>
+        <span className="label slotlabel">{s.spells}</span>
         {SPELL_SLOT_KEYS.map((k) => (
           <span key={k} className={`slot s-${k}${slots[k].left === 0 ? " empty" : ""}`} data-testid={`slot-${k}`}>
-            <span className="label">{slotLabel(k)}</span>
+            <span className="label">{slotLabel(k, s)}</span>
             <b className="mono">{slots[k].left}/{slots[k].max}</b>
           </span>
         ))}
       </button>
       {open && !readonly && (
-        <div className="slotedit" role="group" aria-label="Emplacements de sorts">
+        <div className="slotedit" role="group" aria-label={s.slots}>
           {SPELL_SLOT_KEYS.map((k) => (
             <div key={k} className="slotrow">
-              <span>{slotLabel(k)} <span className="muted">· {slots[k].left} restant{slots[k].left > 1 ? "s" : ""} sur {slots[k].max}</span></span>
+              <span>{slotLabel(k, s)} <span className="muted">{s.slotsRemaining(slots[k].left, slots[k].max)}</span></span>
               <span className="stepper">
-                <button type="button" aria-label={`Dépenser un emplacement ${slotLabel(k)}`} onClick={() => setUsed(k, slots[k].used + 1)}>−</button>
-                <button type="button" aria-label={`Rendre un emplacement ${slotLabel(k)}`} onClick={() => setUsed(k, slots[k].used - 1)}>+</button>
+                <button type="button" aria-label={s.spendSlot(slotLabel(k, s))} onClick={() => setUsed(k, slots[k].used + 1)}>−</button>
+                <button type="button" aria-label={s.refundSlot(slotLabel(k, s))} onClick={() => setUsed(k, slots[k].used - 1)}>+</button>
               </span>
             </div>
           ))}
           <p className="hint" style={{ margin: 0 }}>
-            Un emplacement par point d'Anneau, plus des emplacements libres égaux à l'Anneau de Vide. « Nouvelle journée » les recharge.
+            {s.slotsHint}
           </p>
         </div>
       )}
@@ -159,43 +163,44 @@ function SpellSlots({ readonly }: { readonly: boolean }) {
  * Repris par la bataille de masse pour ses dés de blessures (E.8), pré-remplis par `initial`.
  * `counter` : ligne « Ajuster » en tête (−, champ, +), pour la tuile Blessures de la barre d'état (annexe E.19 S14).
  */
-export function TakeDamage({ onDone, initial = 0, label = "Dégâts reçus", counter = false }: {
+export function TakeDamage({ onDone, initial = 0, label, counter = false }: {
   onDone: () => void; initial?: number; label?: string; counter?: boolean;
 }) {
   const { dispatch } = useStore();
+  const s = useT().statusBar;
   const c = useCharacter();
   const [damage, setDamage] = useState(initial);
   const [voidSpent, setVoidSpent] = useState(false);
   const added = woundsFromDamage(c, damage, voidSpent && c.voidPoints >= 1);
   return (
-    <div className={`dmgedit${counter ? " withcounter" : ""}`} role="group" aria-label="Encaisser des dégâts">
+    <div className={`dmgedit${counter ? " withcounter" : ""}`} role="group" aria-label={s.takeDamage}>
       {counter && (
         <div className="adjust">
-          <span className="label">Ajuster</span>
+          <span className="label">{s.adjust}</span>
           <div className="stepper">
-            <button type="button" aria-label="Retirer 1 blessure" onClick={() => dispatch({ type: "wounds", value: c.wounds - 1 })}>−</button>
+            <button type="button" aria-label={s.removeWound} onClick={() => dispatch({ type: "wounds", value: c.wounds - 1 })}>−</button>
             <NumberField
-              className="in mono" style={{ width: 56, textAlign: "center" }} min={0} aria-label="Blessures subies"
+              className="in mono" style={{ width: 56, textAlign: "center" }} min={0} aria-label={s.woundsTaken}
               value={c.wounds} onChange={(n) => dispatch({ type: "wounds", value: n })}
             />
-            <button type="button" aria-label="Ajouter 1 blessure" onClick={() => dispatch({ type: "wounds", value: c.wounds + 1 })}>+</button>
+            <button type="button" aria-label={s.addWound} onClick={() => dispatch({ type: "wounds", value: c.wounds + 1 })}>+</button>
           </div>
         </div>
       )}
-      <label className="field"><span className="label">{label}</span>
+      <label className="field"><span className="label">{label ?? s.damageTaken}</span>
         <NumberField className="in mono" min={0} value={damage} onChange={setDamage} />
       </label>
       <label className="chk">
         <input type="checkbox" checked={voidSpent} disabled={c.voidPoints < 1} onChange={(e) => setVoidSpent(e.target.checked)} />
-        {" "}Vide : −{VOID_COMBAT.wounds * voidMultiplier(c)} blessures
+        {" "}{s.voidWounds(VOID_COMBAT.wounds * voidMultiplier(c))}
       </label>
       <span className="muted" data-testid="damage-preview">
-        Réduction {totalReduction(c)} → <b className="mono" style={{ color: "var(--ink)" }}>+{added}</b> blessure(s)
+        {s.reductionArrow(totalReduction(c))} <b className="mono" style={{ color: "var(--ink)" }}>+{added}</b> {s.woundsSuffix}
       </span>
       <button
         type="button" className="btn sm accent" disabled={damage <= 0}
         onClick={() => { dispatch({ type: "takeDamage", damage, voidSpent }); onDone(); }}
-      >Encaisser</button>
+      >{s.take}</button>
     </div>
   );
 }
@@ -203,10 +208,11 @@ export function TakeDamage({ onDone, initial = 0, label = "Dégâts reçus", cou
 /** Tuile de combat qui ouvre l'éditeur d'armure ; simple affichage en consultation. */
 function ArmorTile({ label, value, testId, readonly }: { label: string; value: number; testId: string; readonly: boolean }) {
   const { state, dispatch } = useStore();
+  const t = useT();
   if (readonly) return <div><span className="label">{label}</span><b data-testid={testId}>{value}</b></div>;
   const open = state.ui.armorEdit;
   return (
-    <button type="button" className={`ct${open ? " on" : ""}`} aria-expanded={open} title="Modifier l'armure" onClick={() => dispatch({ type: "toggleArmorEdit" })}>
+    <button type="button" className={`ct${open ? " on" : ""}`} aria-expanded={open} title={t.statusBar.editArmor} onClick={() => dispatch({ type: "toggleArmorEdit" })}>
       <span className="label">{label}</span><b data-testid={testId}>{value}</b>
     </button>
   );
@@ -215,22 +221,24 @@ function ArmorTile({ label, value, testId, readonly }: { label: string; value: n
 /** Armure, bonus au ND et réduction ; le ND d'armure reste calculé (HANDOFF §6.2). */
 function ArmorEditor({ tn }: { tn: number }) {
   const { state, dispatch } = useStore();
+  const t = useT();
+  const s = t.statusBar;
   const c = useCharacter();
   const { ui } = state;
   const techReduction = schoolReduction(c);
   const techArmor = schoolArmorBonus(c, contextOf(ui), selectedKeys(ui.schoolArmor), ui.stacks);
   const techAuto = armorEffects(c, contextOf(ui)).filter((e) => e.kind === "armor" && e.mode === "auto" && !e.stack);
   return (
-    <div className="armedit" role="group" aria-label="Armure">
+    <div className="armedit" role="group" aria-label={s.armor}>
       <ArmorFields variant="ligne" />
       <p className="hint" style={{ gridColumn: "1/-1", margin: 0 }}>
-        ND d'armure = 5 × Réflexes {c.traits.reflexes} + 5 + bonus {c.armor.bonus}{tn !== armorBase(c) ? " ± posture, Vide et bonus" : ""} = <b className="mono">{tn}</b>.
-        {" "}La réduction se retire de chaque jet de dégâts reçu.
+        {s.armorFormula(c.traits.reflexes, c.armor.bonus, tn !== armorBase(c))} <b className="mono">{tn}</b>.
+        {" "}{s.reductionHint}
         {catalogArmor(c)?.summary && <> <ArmorEffect /></>}
-        {techArmor !== 0 && <> Techniques et maîtrises : +{techArmor} au ND d'armure{techAuto.length ? ` (dont ${techAuto.map((e) => e.kind === "armor" ? `+${resolveValue(e.value, c)} · ${e.source}` : "").join(", ")})` : ""}.</>}
-        {techReduction !== 0 && <> Techniques d'école : +{techReduction} de Réduction (total {c.armor.reduction + techReduction}).</>}
+        {techArmor !== 0 && <> {s.techArmor(techArmor, techAuto.map((e) => e.kind === "armor" ? `+${resolveValue(e.value, c)} · ${e.source}` : "").join(", "))}</>}
+        {techReduction !== 0 && <> {s.techReduction(techReduction, c.armor.reduction + techReduction)}</>}
       </p>
-      <button type="button" className="btn sm" style={{ justifySelf: "end", gridColumn: "1/-1" }} onClick={() => dispatch({ type: "toggleArmorEdit" })}>Fermer</button>
+      <button type="button" className="btn sm" style={{ justifySelf: "end", gridColumn: "1/-1" }} onClick={() => dispatch({ type: "toggleArmorEdit" })}>{t.common.close}</button>
     </div>
   );
 }
