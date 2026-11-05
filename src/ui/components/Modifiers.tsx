@@ -3,6 +3,7 @@ import { describeModifier, modifiersOf, ROLL_TRAITS, type Modifier } from "@carn
 import {
   MODIFIER_NAME_PLACEHOLDERS, MODIFIER_SOURCE_LABELS, MODIFIER_TARGET_LABELS, MODIFIER_TEMPLATES, STANCES, TRAIT_LABELS, type ModifierTemplate,
 } from "../../rules/l5r4e";
+import { useT, type Messages } from "../../i18n";
 import { useCharacter, useStore } from "../store";
 import { RichSelect } from "./RichSelect";
 import { NumberField } from "./fields";
@@ -14,11 +15,11 @@ const TEMPLATE_GROUPS = (["other", "advantage", "disadvantage", "technique"] as 
 
 const stanceLabel = (id: Modifier["stance"]) => STANCES.find((s) => s.id === id)?.label;
 
-function targetLabel(m: Modifier): string {
-  const base = m.appliesTo === "skill" ? (m.skill ? `Compétence : ${m.skill}` : "Compétence à choisir")
-    : m.appliesTo === "trait" ? (m.trait ? `Trait : ${TRAIT_LABELS[m.trait]}` : "Trait à choisir")
+function targetLabel(m: Modifier, t: Messages["sheet"]["modifiers"]): string {
+  const base = m.appliesTo === "skill" ? (m.skill ? t.skillTarget(m.skill) : t.skillToChoose)
+    : m.appliesTo === "trait" ? (m.trait ? t.traitTarget(TRAIT_LABELS[m.trait]) : t.traitToChoose)
       : MODIFIER_TARGET_LABELS[m.appliesTo];
-  return m.stance ? `${base}, en posture ${stanceLabel(m.stance)}` : base;
+  return m.stance ? t.inStance(base, stanceLabel(m.stance)) : base;
 }
 
 /** Bonus créé depuis un modèle : nom vide, à écrire par le joueur (annexe J.4). */
@@ -33,6 +34,7 @@ function fromTemplate(t: ModifierTemplate): Modifier {
 /** Bonus de jet des techniques, avantages et désavantages (HANDOFF annexe B). */
 export function Modifiers() {
   const { state, dispatch } = useStore();
+  const t = useT().sheet.modifiers;
   const c = useCharacter();
   const list = modifiersOf(c);
   const set = (i: number, patch: Partial<Modifier>) =>
@@ -47,25 +49,21 @@ export function Modifiers() {
             <div className="mod-name"><b>{m.name}</b>{" "}<span className="tag">{MODIFIER_SOURCE_LABELS[m.source]}</span></div>
             <div className="mod-effect">
               <span className="mono">{describeModifier(m)}</span>
-              <span className="muted"> · {m.mode === "always" ? "d'office" : "au choix"}</span>
+              <span className="muted"> · {m.mode === "always" ? t.always : t.optional}</span>
             </div>
-            <div className="mod-target muted">{targetLabel(m)}{m.note ? ` · ${m.note}` : ""}</div>
+            <div className="mod-target muted">{targetLabel(m, t)}{m.note ? ` · ${m.note}` : ""}</div>
           </li>
         ))}
       </ul>
     ) : (
-      <p className="muted">Aucun bonus. Avec « Edit », ajoute ceux de tes techniques, avantages et désavantages : ils s'appliquent aux jets concernés.</p>
+      <p className="muted">{t.empty}</p>
     );
   }
 
   return (
     <>
-      <p className="hint" style={{ marginTop: 0 }}>
-        « D'office » : appliqué à chaque jet concerné (décochable au moment du jet). « Au choix » : situationnel, à cocher dans le lanceur.
-      </p>
-      <p className="hint">
-        Tu peux aussi les écrire dans le JSON de ta fiche (champ <code>modifiers</code>) : voir les modèles de fiche de la Bibliothèque.
-      </p>
+      <p className="hint" style={{ marginTop: 0 }}>{t.modeHint}</p>
+      <p className="hint">{t.jsonBefore}<code>modifiers</code>{t.jsonAfter}</p>
       {list.map((m, i) => <ModifierEditor key={m.id} m={m} index={i} set={set} />)}
       <AddModifier />
     </>
@@ -74,80 +72,81 @@ export function Modifiers() {
 
 function ModifierEditor({ m, index: i, set }: { m: Modifier; index: number; set: (i: number, patch: Partial<Modifier>) => void }) {
   const { dispatch } = useStore();
+  const t = useT().sheet.modifiers;
   const c = useCharacter();
   const listId = `skills-${m.id}`;
   return (
-    <fieldset className="modifier" aria-label={`Bonus ${m.name || i + 1}`}>
+    <fieldset className="modifier" aria-label={t.label(m.name || String(i + 1))}>
       <div style={{ display: "flex", gap: 6 }}>
-        <input className="in" type="text" aria-label="Nom du bonus" placeholder={MODIFIER_NAME_PLACEHOLDERS[m.source]} maxLength={120} value={m.name} onChange={(e) => set(i, { name: e.target.value })} />
-        <button type="button" className="x" aria-label={`Supprimer ${m.name || "le bonus"}`} onClick={() => dispatch({ type: "remove", list: "modifiers", index: i })}>×</button>
+        <input className="in" type="text" aria-label={t.name} placeholder={MODIFIER_NAME_PLACEHOLDERS[m.source]} maxLength={120} value={m.name} onChange={(e) => set(i, { name: e.target.value })} />
+        <button type="button" className="x" aria-label={t.remove(m.name)} onClick={() => dispatch({ type: "remove", list: "modifiers", index: i })}>×</button>
       </div>
       <div className="form-grid">
-        <label className="field"><span className="label">Source</span>
+        <label className="field"><span className="label">{t.source}</span>
           <RichSelect variant="champ" value={m.source} onChange={(v) => set(i, { source: v as Modifier["source"] })}>
             {Object.entries(MODIFIER_SOURCE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
           </RichSelect>
         </label>
-        <label className="field"><span className="label">S'applique à</span>
+        <label className="field"><span className="label">{t.appliesTo}</span>
           <RichSelect variant="champ" value={m.appliesTo} onChange={(v) => set(i, { appliesTo: v as Modifier["appliesTo"] })}>
             {Object.entries(MODIFIER_TARGET_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
           </RichSelect>
         </label>
         {m.appliesTo === "skill" && (
-          <label className="field"><span className="label">Compétence</span>
+          <label className="field"><span className="label">{t.skill}</span>
             <input className="in" type="text" list={listId} value={m.skill ?? ""} maxLength={80} onChange={(e) => set(i, { skill: e.target.value })} />
             <datalist id={listId}>{c.skills.map((s) => <option key={s.name} value={s.name} />)}</datalist>
           </label>
         )}
         {m.appliesTo === "trait" && (
-          <label className="field"><span className="label">Trait</span>
+          <label className="field"><span className="label">{t.trait}</span>
             <RichSelect variant="champ" value={m.trait ?? ""} onChange={(v) => set(i, { trait: v as Modifier["trait"] })}>
-              <option value="" disabled>Choisir…</option>
+              <option value="" disabled>{t.choose}</option>
               {ROLL_TRAITS.map((t) => <option key={t} value={t}>{TRAIT_LABELS[t]}</option>)}
             </RichSelect>
           </label>
         )}
         {m.appliesTo !== "armor" && m.appliesTo !== "wounds" && (
           <>
-            <label className="field"><span className="label">Dés lancés</span>
+            <label className="field"><span className="label">{t.rolled}</span>
               <NumberField min={-10} max={10} value={m.rolled} onChange={(n) => set(i, { rolled: n })} />
             </label>
-            <label className="field"><span className="label">Dés gardés</span>
+            <label className="field"><span className="label">{t.kept}</span>
               <NumberField min={-10} max={10} value={m.kept} onChange={(n) => set(i, { kept: n })} />
             </label>
-            <label className="field"><span className="label">Augm. gratuites</span>
+            <label className="field"><span className="label">{t.freeRaises}</span>
               <NumberField min={0} max={10} value={m.freeRaises} onChange={(n) => set(i, { freeRaises: n })} />
             </label>
-            <label className="field"><span className="label">Modifie le ND</span>
+            <label className="field"><span className="label">{t.tn}</span>
               <NumberField min={-50} max={50} value={m.tn} onChange={(n) => set(i, { tn: n })} />
             </label>
           </>
         )}
         <label className="field">
           <span className="label">
-            {m.appliesTo === "armor" ? "Bonus au ND d'armure" : m.appliesTo === "wounds" ? "Réduction de la pénalité" : "Bonus fixe au total"}
+            {m.appliesTo === "armor" ? t.armor : m.appliesTo === "wounds" ? t.wounds : t.flat}
           </span>
           <NumberField min={-50} max={50} value={m.flat} onChange={(n) => set(i, { flat: n })} />
         </label>
         {m.appliesTo !== "wounds" && (
-          <label className="field"><span className="label">Posture requise</span>
+          <label className="field"><span className="label">{t.stance}</span>
             <RichSelect variant="champ" value={m.stance ?? ""} onChange={(v) => set(i, { stance: (v || undefined) as Modifier["stance"] })}>
-              <option value="">Toutes</option>
+              <option value="">{t.allStances}</option>
               {STANCES.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
             </RichSelect>
           </label>
         )}
-        <label className="field"><span className="label">Application</span>
+        <label className="field"><span className="label">{t.mode}</span>
           <RichSelect variant="champ" value={m.mode} onChange={(v) => set(i, { mode: v as Modifier["mode"] })}>
-            <option value="always">D'office</option>
-            <option value="optional">Au choix (situationnel)</option>
+            <option value="always">{t.modeAlways}</option>
+            <option value="optional">{t.modeOptional}</option>
           </RichSelect>
         </label>
       </div>
-      <label className="field"><span className="label">Condition, précision</span>
-        <input className="in" type="text" placeholder="ex. seulement en duel, contre un Scorpion…" value={m.note} onChange={(e) => set(i, { note: e.target.value })} />
+      <label className="field"><span className="label">{t.note}</span>
+        <input className="in" type="text" placeholder={t.notePlaceholder} value={m.note} onChange={(e) => set(i, { note: e.target.value })} />
       </label>
-      <div className="muted" style={{ fontSize: 13 }}>Effet : {describeModifier(m)}</div>
+      <div className="muted" style={{ fontSize: 13 }}>{t.effect(describeModifier(m))}</div>
     </fieldset>
   );
 }
@@ -155,6 +154,7 @@ function ModifierEditor({ m, index: i, set }: { m: Modifier; index: number; set:
 /** Ajout d'un bonus à partir d'une forme d'effet, groupée par source ; « Bonus libre » par défaut (annexe J.4). */
 function AddModifier() {
   const { dispatch } = useStore();
+  const tm = useT().sheet.modifiers;
   const [choice, setChoice] = useState("free");
   const add = () => {
     const t = MODIFIER_TEMPLATES.find((x) => x.id === choice);
@@ -164,20 +164,20 @@ function AddModifier() {
   };
   return (
     <div className="file-actions" style={{ marginTop: 8 }}>
-      <RichSelect variant="catalogue" style={{ flex: "1 1 220px" }} aria-label="Modèle de bonus" value={choice} onChange={setChoice}>
+      <RichSelect variant="catalogue" style={{ flex: "1 1 220px" }} aria-label={tm.template} value={choice} onChange={setChoice}>
         {TEMPLATE_GROUPS.map((g) => (
           <optgroup key={g.source} label={MODIFIER_SOURCE_LABELS[g.source]}>
             <legend>{MODIFIER_SOURCE_LABELS[g.source]}</legend>
             {g.templates.map((t) => (
               <option key={t.id} value={t.id}>
                 <span className="n">{t.label}</span>
-                <span className="d">{describeModifier(t)}{t.mode === "optional" ? " · au choix" : ""}</span>
+                <span className="d">{describeModifier(t)}{t.mode === "optional" ? tm.optionalTag : ""}</span>
               </option>
             ))}
           </optgroup>
         ))}
       </RichSelect>
-      <button type="button" className="btn sm" onClick={add}>+ Bonus</button>
+      <button type="button" className="btn sm" onClick={add}>{tm.add}</button>
     </div>
   );
 }

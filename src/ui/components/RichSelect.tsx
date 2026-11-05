@@ -1,4 +1,5 @@
 import { Children, cloneElement, isValidElement, type CSSProperties, type ReactElement, type ReactNode, type SelectHTMLAttributes } from "react";
+import { useT } from "../../i18n";
 import { RINGS, TRAIT_LABELS, type RingKey, type StanceTag } from "../../rules/l5r4e";
 
 // <selectedcontent> (sélecteur `appearance: base-select`) : absent des types de React 18.
@@ -84,6 +85,7 @@ const RING_KANJI: Record<RingKey, string> = { earth: "土", water: "水", fire: 
 
 /** Option du sélecteur Anneau : kanji dans l'ensō, nom, Traits de l'Anneau (I.3.3). Sans `ring` : option sans Anneau (« Tous »). */
 export function RingOption(props: { ring: RingKey } | { value: string; label: string }) {
+  const voidPoints = useT().aid.void.points;
   if (!("ring" in props)) {
     if (!supportsBaseSelect()) return <option value={props.value}>{props.label}</option>;
     return <option value={props.value}><span className="k" /><span className="n">{props.label}</span></option>;
@@ -95,7 +97,7 @@ export function RingOption(props: { ring: RingKey } | { value: string; label: st
     <option value={ring} style={{ "--rc": `var(--ring-${ring})` } as CSSProperties}>
       <span className="k">{RING_KANJI[ring]}</span>
       <span className="n">{r.label}</span>
-      <span className="d">{"traits" in r ? r.traits.map((t) => TRAIT_LABELS[t]).join(" · ") : "Points de Vide"}</span>
+      <span className="d">{"traits" in r ? r.traits.map((t) => TRAIT_LABELS[t]).join(" · ") : voidPoints}</span>
     </option>
   );
 }

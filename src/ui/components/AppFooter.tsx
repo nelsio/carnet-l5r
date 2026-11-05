@@ -1,6 +1,8 @@
 import { useState, type ReactNode } from "react";
 import { CARNET_LINKS } from "../../rules/links";
+import { useT } from "../../i18n";
 import { ExternalLink } from "./ExternalLink";
+import { APP_NAME } from "./Header";
 
 function Chevron() {
   return (
@@ -16,29 +18,28 @@ function Chevron() {
  */
 export function AppFooter({ status }: { status?: ReactNode }) {
   const [open, setOpen] = useState(false);
+  const t = useT().footer;
+  const [cautionTerm, cautionText] = t.caution;
   return (
     <footer className="appfoot">
-      <span className="id"><span className="mini" aria-hidden="true">帳</span>Carnet de Rokugan</span>
+      <span className="id"><span className="mini" aria-hidden="true">帳</span>{APP_NAME}</span>
       <a className="ver" href={CARNET_LINKS.releases} target="_blank" rel="noopener noreferrer"
-        aria-label={`Version ${__APP_VERSION__} : nouveautés (nouvel onglet)`}>v{__APP_VERSION__}</a>
+        aria-label={t.version(__APP_VERSION__)}>v{__APP_VERSION__}</a>
       <button type="button" className="rulesbtn" aria-expanded={open} aria-controls="rules-memo"
         onClick={() => setOpen((o) => !o)}>
-        <span className="kj" aria-hidden="true">規</span>Règles L5R 4e<Chevron />
+        <span className="kj" aria-hidden="true">規</span>{t.rules}<Chevron />
       </button>
       {status}
-      <nav aria-label="Liens du Carnet">
-        <ExternalLink href={CARNET_LINKS.guide}>Guide</ExternalLink>
-        <ExternalLink href={CARNET_LINKS.bug}>Signaler un bug</ExternalLink>
-        <ExternalLink href={CARNET_LINKS.code}>Projet</ExternalLink>
+      <nav aria-label={t.links}>
+        <ExternalLink href={CARNET_LINKS.guide}>{t.guide}</ExternalLink>
+        <ExternalLink href={CARNET_LINKS.bug}>{t.bug}</ExternalLink>
+        <ExternalLink href={CARNET_LINKS.code}>{t.project}</ExternalLink>
       </nav>
       {open && (
         <div className="rulespanel" id="rules-memo">
           <ul className="memo">
-            <li><b>Système</b><span>Roll &amp; Keep, L5R 4e édition</span></li>
-            <li><b>Explosion</b><span>sur 10 ; dégâts sur 9 et 10 avec Kenjutsu ou Armes lourdes au rang 7</span></li>
-            <li><b>Augmentations</b><span>+5 au ND chacune, maximum = Anneau de Vide</span></li>
-            <li><b>Blessures</b><span>la pénalité s'ajoute au ND</span></li>
-            <li><b>Duel, bataille</b><span className="warn">procédures résumées : vérifie le détail dans ton livre de base</span></li>
+            {t.memo.map(([term, text]) => <li key={term}><b>{term}</b><span>{text}</span></li>)}
+            <li><b>{cautionTerm}</b><span className="warn">{cautionText}</span></li>
           </ul>
         </div>
       )}

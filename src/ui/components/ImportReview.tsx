@@ -3,25 +3,24 @@ import {
   importCharacter, mergeCharacter,
   type Change, type Character, type FieldError, type ParsedFile,
 } from "@carnet/core";
+import { useT, type Messages } from "../../i18n";
 import { show } from "../format";
 import { useStore } from "../store";
 
 type Destination = "new" | "readonly" | "merge";
 
-const LIST_LABELS: Record<string, string> = {
-  skills: "Compétence", weapons: "Arme", techniques: "Technique", maneuvers: "Manœuvre", spells: "Sort",
-};
-
-function addedLabel(c: Change): string {
+function addedLabel(c: Change, t: Messages["import"]): string {
   const m = /^(?<list>\w+)\[(?<name>.*)\]$/.exec(c.path)?.groups;
-  return m ? `${LIST_LABELS[m.list] ?? m.list} : ${m.name}` : c.path;
+  const lists: Readonly<Record<string, string | undefined>> = t.lists;
+  return m ? t.added(lists[m.list] ?? m.list, m.name) : c.path;
 }
 
 function Errors({ errors }: { errors: FieldError[] }) {
+  const t = useT().import;
   return (
     <div className="import-errors" role="alert">
-      <b>Import refusé : rien n'a été modifié.</b>
-      <ul>{errors.map((e, i) => <li key={i}>{e.path ? `${e.path} : ${e.message}` : e.message}</li>)}</ul>
+      <b>{t.refused}</b>
+      <ul>{errors.map((e, i) => <li key={i}>{e.path ? t.fieldError(e.path, e.message) : e.message}</li>)}</ul>
     </div>
   );
 }
@@ -51,6 +50,8 @@ export function ImportReview({ parsed, mergeOnly: mergeOnlyAsked, notice, onAppl
   parsed: ParsedFile | null; mergeOnly?: boolean; notice?: ReactNode; onApplied?: () => void; onClose: () => void;
 }) {
   const { state, dispatch, library } = useStore();
+  const tc = useT();
+  const t = tc.import;
   const current = state.character && state.mode === "edit" ? state.character : null;
   const [destination, setDestination] = useState<Destination>(current ? "merge" : "new");
   const mergeOnly = !!mergeOnlyAsked && !!current;
@@ -85,26 +86,28 @@ export function ImportReview({ parsed, mergeOnly: mergeOnlyAsked, notice, onAppl
       const adds = merge.changes.filter((c) => c.kind === "add");
       body = (
         <div className="import-preview">
-          {!merge.changes.length && <p className="muted">Aucun changement : la fiche est déjà à jour.</p>}
+          {!merge.changes.length && <p className="muted">{t.noChange}</p>}
           {updates.length > 0 && (
-            <section aria-label="Modifications">
-              <h3>Modifications ({updates.length})</h3>
-              <ul>{updates.map((c) => <li key={c.path}><code>{c.path}</code> : {show(c.before)} → <b>{show(c.after)}</b></li>)}</ul>
+            <section aria-label={t.changes}>
+              <h3>{t.changesCount(updates.length)}</h3>
+              <ul>{updates.map((c) => (
+                <li key={c.path}><code>{c.path}</code>{tc.common.colon}{show(c.before, t.values)} → <b>{show(c.after, t.values)}</b></li>
+              ))}</ul>
             </section>
           )}
           {adds.length > 0 && (
-            <section aria-label="Ajouts">
-              <h3>Ajouts ({adds.length})</h3>
-              <ul>{adds.map((c) => <li key={c.path}>{addedLabel(c)}</li>)}</ul>
+            <section aria-label={t.adds}>
+              <h3>{t.addsCount(adds.length)}</h3>
+              <ul>{adds.map((c) => <li key={c.path}>{addedLabel(c, t)}</li>)}</ul>
             </section>
           )}
           {merge.warnings.length > 0 && (
-            <section aria-label="Avertissements">
-              <h3>Avertissements ({merge.warnings.length})</h3>
-              <ul>{merge.warnings.map((w) => <li key={w}>Clé inconnue ignorée : <code>{w}</code></li>)}</ul>
+            <section aria-label={t.warnings}>
+              <h3>{t.warningsCount(merge.warnings.length)}</h3>
+              <ul>{merge.warnings.map((w) => <li key={w}>{t.unknownKey}<code>{w}</code></li>)}</ul>
             </section>
           )}
-          <p className="hint">Rien n'est supprimé : les éléments absents du fichier restent dans la fiche.</p>
+          <p className="hint">{t.nothingRemoved}</p>
         </div>
       );
     }
@@ -116,29 +119,25 @@ export function ImportReview({ parsed, mergeOnly: mergeOnlyAsked, notice, onAppl
       const c = full.character;
       body = (
         <p>
-          <b>{c.name}</b> <span className="muted">· {[c.clan, c.school].filter(Boolean).join(" · ") || "—"} · Rang {c.insightRank}</span>
+          <b>{c.name}</b> <span className="muted">{t.summary([c.clan, c.school].filter(Boolean).join(" · ") || "—", c.insightRank)}</span>
           <br />
-          <span className="hint">
-            {destination === "readonly"
-              ? "La fiche sera ajoutée à ta bibliothèque en consultation : lecture seule, rien ne pourra y être modifié."
-              : "La fiche sera ajoutée à ta bibliothèque comme une nouvelle fiche modifiable."}
-          </span>
+          <span className="hint">{destination === "readonly" ? t.readonlyHint : t.newHint}</span>
         </p>
       );
     }
   }
 
   const choices: { id: Destination; label: string }[] = [
-    { id: "new", label: "Nouvelle fiche" },
-    { id: "readonly", label: "Consultation (MJ)" },
-    ...(current ? [{ id: "merge" as const, label: `Fusionner dans « ${current.name} »` }] : []),
+    { id: "new", label: t.destinations.new },
+    { id: "readonly", label: t.destinations.readonly },
+    ...(current ? [{ id: "merge" as const, label: t.mergeInto(current.name) }] : []),
   ];
 
   return (
     <>
       {parsed?.ok && !mergeOnly && (
         <fieldset className="dest">
-          <legend className="label">Destination</legend>
+          <legend className="label">{t.destination}</legend>
           {choices.map((ch) => (
             <label key={ch.id} className="chk">
               <input type="radio" name="destination" value={ch.id} checked={destination === ch.id} onChange={() => setDestination(ch.id)} />
@@ -150,10 +149,10 @@ export function ImportReview({ parsed, mergeOnly: mergeOnlyAsked, notice, onAppl
       {parsed?.ok && notice}
       {body}
       <div className="modal-actions">
-        <button type="button" className="btn" onClick={onClose}>Annuler</button>
+        <button type="button" className="btn" onClick={onClose}>{tc.common.cancel}</button>
         {ready && (
           <button type="button" className="btn primary" disabled={busy} onClick={() => ready && void apply(ready)}>
-            {destination === "merge" ? "Appliquer" : "Importer"}
+            {destination === "merge" ? t.apply : t.import}
           </button>
         )}
       </div>

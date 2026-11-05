@@ -85,7 +85,7 @@ export function Header() {
 }
 
 /** Nom propre de l'outil : identique dans toutes les langues. */
-const APP_NAME = "Carnet de Rokugan";
+export const APP_NAME = "Carnet de Rokugan";
 
 const ICONS = {
   library: <path d="M4 4h4v16H4zM10 4h4v16h-4zM16.2 5.2l3.8-1 3 15.6-3.8 1z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />,

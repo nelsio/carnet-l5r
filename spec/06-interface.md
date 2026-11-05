@@ -85,7 +85,7 @@
 
 ### 6.3 Qualité
 - Aucun texte saisi n'est rendu en HTML (pas de `dangerouslySetInnerHTML`).
-- Aucun texte d'interface en dur dans un composant : libellés, `aria-label`, `title`, `placeholder` viennent de `useT()` (annexe 50). Dates et nombres suivent `useLocale().intl`. Les fichiers pas encore migrés sont listés dans `scripts/check-i18n.mjs` (vide au lot 51).
+- Aucun texte d'interface en dur dans un composant : libellés, `aria-label`, `title`, `placeholder` viennent de `useT()` (annexe 50). Dates et nombres suivent `useLocale().intl`. `scripts/check-i18n.mjs` refuse tout texte JSX brut dans `src/ui` depuis le lot 51 (annexe 51.3).
 - Focus clavier visible, Échap ferme le panneau mobile, `prefers-reduced-motion` respecté.
 - Aucun appel réseau : polices embarquées, aucune bibliothèque chargée depuis un CDN.
 

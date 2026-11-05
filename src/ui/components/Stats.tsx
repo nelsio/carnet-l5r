@@ -2,6 +2,7 @@ import {
   attackTrait, computePool, DEFAULT_SAMPLES, defaultModifiers, defaultSpellElement, emphasisMatches, poolStats, schoolOf, sortSpells, woundState,
   type Character, type Pool, type PoolAction,
 } from "@carnet/core";
+import { useLocale, useT, type Messages } from "../../i18n";
 import { ELEMENT_LABELS, shownWoundMultiplier, TRAIT_LABELS } from "../../rules/l5r4e";
 import { pct } from "../format";
 import { poolLabel } from "../rolls";
@@ -18,23 +19,23 @@ interface Row {
   hasTN: boolean;
 }
 
-function buildRows(c: Character, voidPoint: boolean, emphasis: boolean): Row[] {
+function buildRows(c: Character, voidPoint: boolean, emphasis: boolean, t: Messages["stats"], intl: string): Row[] {
   const row = (label: string, action: PoolAction, child = false, emph = false): Row => ({
     label, child, pool: computePool(c, action, { voidPoint, modifiers: defaultModifiers(c, action) }),
     emphasis: emphasis && emph, hasTN: action.kind === "skill" || action.kind === "trait" || action.kind === "spell",
   });
   return [
-    row("Initiative", { kind: "initiative" }),
+    row(t.initiative, { kind: "initiative" }),
     ...c.weapons.flatMap((w) => [
-      row(`Attaque · ${w.name}`, { kind: "skill", skill: w.skill, trait: attackTrait(w), attack: true, weapon: w }, false, emphasisMatches(c, w.skill, w.name)),
-      row(`Dégâts · ${w.name}`, { kind: "damage", weapon: w }, true),
+      row(t.attack(w.name), { kind: "skill", skill: w.skill, trait: attackTrait(w), attack: true, weapon: w }, false, emphasisMatches(c, w.skill, w.name)),
+      row(t.damage(w.name), { kind: "damage", weapon: w }, true),
     ]),
-    ...[...c.skills].sort((a, b) => a.name.localeCompare(b.name, "fr")).map((s) =>
-      row(`${s.name} (${TRAIT_LABELS[s.trait]})`, { kind: "skill", skill: s.name, trait: s.trait }, false, s.emphases.length > 0)),
+    ...[...c.skills].sort((a, b) => a.name.localeCompare(b.name, intl)).map((s) =>
+      row(t.skill(s.name, TRAIT_LABELS[s.trait]), { kind: "skill", skill: s.name, trait: s.trait }, false, s.emphases.length > 0)),
     // Une ligne par sort du Rouleaux & invocations (annexe F.5), élément de lancement par défaut.
     ...sortSpells(c.spells ?? []).flatMap((spell) => [
-      row(`Sort · ${spell.name} (${ELEMENT_LABELS[defaultSpellElement(c, spell)]})`, { kind: "spell", spell }),
-      ...(spell.damage?.trim() ? [row(`Dégâts · ${spell.name}`, { kind: "spellDamage", spell }, true)] : []),
+      row(t.spell(spell.name, ELEMENT_LABELS[defaultSpellElement(c, spell)]), { kind: "spell", spell }),
+      ...(spell.damage?.trim() ? [row(t.damage(spell.name), { kind: "spellDamage", spell }, true)] : []),
     ]),
   ];
 }
@@ -43,43 +44,45 @@ function buildRows(c: Character, voidPoint: boolean, emphasis: boolean): Row[] {
 export function Stats() {
   const { state, dispatch } = useStore();
   const c = useCharacter();
+  const { stats: ts, roller: r } = useT();
+  const { intl } = useLocale();
   const opts = state.ui.stats;
   const currentPenalty = woundState(c, { woundMultiplier: shownWoundMultiplier(state.ui.woundMultiplier) }).penalty ?? 0;
   const penalty = opts.penalty ? currentPenalty : 0;
-  const rows = buildRows(c, opts.voidPoint, opts.emphasis);
+  const rows = buildRows(c, opts.voidPoint, opts.emphasis, ts, intl);
   const set = (patch: Partial<typeof opts>) => dispatch({ type: "statsOption", patch });
 
   return (
     <div className="panel">
       <div className="panel-head">
-        <h2>Statistiques de tes jets</h2>
-        <span className="muted" style={{ fontSize: 13 }}>{DEFAULT_SAMPLES.toLocaleString("fr-FR")} lancers simulés par réserve</span>
+        <h2>{ts.title}</h2>
+        <span className="muted" style={{ fontSize: 13 }}>{ts.samples(DEFAULT_SAMPLES.toLocaleString(intl))}</span>
       </div>
       <div className="statopts">
-        <label className="chk"><input type="checkbox" checked={opts.voidPoint} onChange={(e) => set({ voidPoint: e.target.checked })} /> Avec un point de Vide (+1g1)</label>
-        <label className="chk"><input type="checkbox" checked={opts.emphasis} onChange={(e) => set({ emphasis: e.target.checked })} /> Spécialisations appliquées</label>
-        <label className="chk"><input type="checkbox" checked={opts.penalty} onChange={(e) => set({ penalty: e.target.checked })} /> Pénalité de blessure actuelle (+{currentPenalty})</label>
+        <label className="chk"><input type="checkbox" checked={opts.voidPoint} onChange={(e) => set({ voidPoint: e.target.checked })} /> {ts.voidPoint}</label>
+        <label className="chk"><input type="checkbox" checked={opts.emphasis} onChange={(e) => set({ emphasis: e.target.checked })} /> {ts.emphasis}</label>
+        <label className="chk"><input type="checkbox" checked={opts.penalty} onChange={(e) => set({ penalty: e.target.checked })} /> {ts.penalty(currentPenalty)}</label>
       </div>
       <div className="tbl">
         <table className="stats">
           <thead>
-            <tr><th>Jet</th><th>Réserve</th><th>Min</th><th>Moy.</th><th>Max</th>{TNS.map((t) => <th key={t}>ND {t}</th>)}</tr>
+            <tr><th>{ts.roll}</th><th>{ts.pool}</th><th>{r.min}</th><th>{r.mean}</th><th>{r.max}</th>{TNS.map((tn) => <th key={tn}>{ts.tn(tn)}</th>)}</tr>
           </thead>
           <tbody>
-            {rows.map((r) => {
-              if (r.pool.rolled < 1) return null;
-              const st = poolStats(r.pool, { emphasis: r.emphasis && r.pool.canRaise });
+            {rows.map((row) => {
+              if (row.pool.rolled < 1) return null;
+              const st = poolStats(row.pool, { emphasis: row.emphasis && row.pool.canRaise });
               return (
-                <tr key={r.label} className={r.child ? "child" : undefined}>
-                  <td className="jl">{r.child ? "└ " : ""}{r.label}</td>
-                  <td className="pool">{poolLabel(r.pool)}</td>
+                <tr key={row.label} className={row.child ? "child" : undefined}>
+                  <td className="jl">{row.child ? "└ " : ""}{row.label}</td>
+                  <td className="pool">{poolLabel(row.pool)}</td>
                   <td className="mono">{st.min}</td>
                   <td className="mono"><b>{Math.round(st.mean)}</b></td>
-                  <td className="mono">{st.max}{st.open ? "+" : ""}{r.pool.explodeOn === 9 && <> <span className="tag" title="Explose sur 9">9+</span></>}</td>
-                  {r.hasTN ? TNS.map((t) => {
-                    const p = st.chance(t + penalty);
-                    return <td key={t} className="pc" style={{ ["--p" as string]: `${Math.round(p * 60)}%` }}>{pct(p)}</td>;
-                  }) : <td className="muted" style={{ textAlign: "center" }} colSpan={TNS.length}>sans ND</td>}
+                  <td className="mono">{st.max}{st.open ? "+" : ""}{row.pool.explodeOn === 9 && <> <span className="tag" title={r.explodesOn9}>9+</span></>}</td>
+                  {row.hasTN ? TNS.map((tn) => {
+                    const p = st.chance(tn + penalty);
+                    return <td key={tn} className="pc" style={{ ["--p" as string]: `${Math.round(p * 60)}%` }}>{pct(p)}</td>;
+                  }) : <td className="muted" style={{ textAlign: "center" }} colSpan={TNS.length}>{ts.noTn}</td>}
                 </tr>
               );
             })}
@@ -87,9 +90,8 @@ export function Stats() {
         </table>
       </div>
       <p className="hint">
-        {schoolOf(c) && "Techniques automatiques de ton école incluses (posture de référence : Attaque). "}
-        Chances de réussite sans augmentation. Chaque augmentation annoncée ajoute +5 au ND : décale-toi d'une colonne vers la droite.
-        Un maximum suivi de « + » peut être dépassé grâce aux explosions.
+        {schoolOf(c) && ts.schoolIncluded}
+        {ts.hint}
       </p>
     </div>
   );

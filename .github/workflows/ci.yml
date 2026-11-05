@@ -1,7 +1,10 @@
 name: CI
 
 on:
+  # Branches de lot : testées par le run de la PR seulement (pas de doublon push + pull_request, annexe 51.6).
   push:
+    branches: [main]
+    tags: ["v*"]
   pull_request:
 
 permissions:
@@ -10,6 +13,8 @@ permissions:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    # Un run normal dure environ 6 min ; un blocage (installation de Playwright) échoue au lieu d'attendre 6 h.
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
