@@ -24,11 +24,10 @@ const PENDING = [
   "src/ui/components/PhotoImportDialog.tsx",
   "src/ui/components/ResourcesMenu.tsx",
   "src/ui/components/Stats.tsx",
-  "src/ui/components/fields.tsx",
 ];
 
-/** Textes qui ne se traduisent pas : sigle ; les kanji seuls (sceau, pied de page) aussi. */
-const EXCEPTIONS = new Set(["L5R"]);
+/** Textes qui ne se traduisent pas : sigle, symbole « i » des boutons d'information ; les kanji seuls (sceau, pied de page) aussi. */
+const EXCEPTIONS = new Set(["L5R", "i"]);
 const KANJI = /^\p{Script=Han}+$/u;
 
 const JSX_TEXT = />\s*([\p{L}][^<{]*?)\s*</gu;
@@ -51,7 +50,7 @@ function occurrences(src) {
   for (const m of code.matchAll(JSX_TEXT)) {
     // `=>`, `>=` et la comparaison `a > b` ne sont pas des fins de balise.
     const before = code[m.index - 1];
-    if (before === "=" || /\s/.test(before) || code[m.index + 1] === "=") continue;
+    if (before === "=" || code[m.index + 1] === "=" || (/\s/.test(before) && /\s/.test(code[m.index + 1]))) continue;
     const text = m[1].replace(/\s+/g, " ").trim();
     if (EXCEPTIONS.has(text) || KANJI.test(text)) continue;
     found.push({ line: code.slice(0, m.index).split("\n").length, text });
