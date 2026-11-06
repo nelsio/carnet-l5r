@@ -1,6 +1,6 @@
 # Licences et crédits
 
-[← Retour au README](../README-fr.md)
+[← Retour au README](../README.md)
 
 ## Licences et mentions
 

@@ -34,9 +34,9 @@ carnet-l5r/
 ├─ public/fonts/  # polices embarquées dans le build
 ├─ public-pages/  # manifeste, service worker et icônes, ajoutés à l'adresse GitHub Pages seulement (annexe O.3)
 ├─ .github/workflows/  # ci.yml, pages.yml, release.yml
-├─ docs/          # GUIDE.md (guide joueur, §9.3), CREDITS.md (licences et crédits), img/ (captures du README)
-├─ scripts/       # check-spec.mjs et check-i18n.mjs (npm run lint, annexes 44.4, 50.4 et 51.3) ; screenshots.mjs : captures du README, `-- en` pour docs/img/en/ (npm run screenshots, hors CI, annexe 52.5) ; pages-pwa.mjs (pages.yml) ; pwa-icons.mjs (npm run pwa-icons, hors CI)
-├─ README.md      # vitrine en anglais : présentation, captures, démarrage (§9.3) ; README-fr.md en français
+├─ docs/          # GUIDE.md (guide joueur, §9.3), CREDITS.md (licences et crédits), img/ (captures du README ; guide/ : captures annotées du guide)
+├─ scripts/       # check-spec.mjs et check-i18n.mjs (npm run lint, annexes 44.4, 50.4 et 51.3) ; screenshots.mjs : captures du README, `-- en` pour docs/img/en/ (npm run screenshots, hors CI, annexe 52.5) ; guide-shots.mjs : captures annotées de docs/img/guide/ (npm run guide-shots, hors CI, annexe 57.6) ; pages-pwa.mjs (pages.yml) ; pwa-icons.mjs (npm run pwa-icons, hors CI)
+├─ README.md      # vitrine en français : présentation, captures, démarrage (§9.3) ; README-en.md en anglais
 └─ HANDOFF.md
 ```
 Dans les tests fournis, `@carnet/core` est un alias de `src/core` (à déclarer dans `vite.config.ts` et `tsconfig.json`).

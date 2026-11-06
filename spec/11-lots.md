@@ -62,11 +62,14 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 50. **v2.31.1 — README anglais** (**livrée**, écarts en 55.3) : annexe 55, lot 55. `README.md` en anglais avec les captures `docs/img/en/`, version française dans `README-fr.md`, liens des documents français vers `README-fr.md` ; toute modification de la vitrine se fait dans les deux README (§9.3). Localisation (lots 50 à 55) terminée.
 51. **v2.32.0 — formulaire de contact** (**livrée**, écarts en 56.6) : annexe 56, lot 56. Bouton Contact du pied de page, fenêtre « Contacter l'auteur » envoyée par Web3Forms, validation, piège à robots, délais de 3 s et 60 s, mode hors ligne ; bugs toujours vers les Issues.
    - **v2.32.1** (patch, 56.7) : clé Web3Forms renseignée, formulaire actif.
-52. **À définir** : journal d'achats en XP (K.6), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
+52. **v2.32.2 — README français par défaut, guide plus digeste** (**livrée**, écarts en 57.4) : annexe 57, lot 57. `README.md` en français, version anglaise dans `README-en.md` ; `docs/GUIDE.md` réorganisé par tâche, parcours « Le Carnet en 5 minutes », détail replié, magie regroupée ; guide illustré de 15 captures annotées (`npm run guide-shots`) au style « rouleau de Rokugan » (§9.3).
+53. **À définir** : journal d'achats en XP (K.6), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
 
 ### Historique des états
 
 Lignes d'état de l'ancien en-tête de `HANDOFF.md`, déplacées telles quelles au lot 44 (annexe 44.2).
+
+**État au 06/11/2026 (lot 56) :** version **v2.32.1**, lot 56 : formulaire « Contacter l'auteur » depuis le bouton Contact du pied de page, envoyé par Web3Forms sans adresse mail dans le code ; clé renseignée en v2.32.1, formulaire actif (annexes 56 et 56.7). Bugs toujours vers les Issues GitHub.
 
 **État au 06/11/2026 (lot 55) :** version **v2.31.1**, lot 55 : `README.md` en anglais, version française dans `README-fr.md` (annexe 55) ; localisation (lots 50 à 55) livrée.
 
