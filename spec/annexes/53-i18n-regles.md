@@ -58,6 +58,6 @@ Quatrième des six lots de la localisation (50 à 55). Un seul lot, une PR, une 
 ### 53.5 Écarts
 
 - **Libellés français gardés dans `src/rules`** au lieu d'être sortis vers le dictionnaire (53.1) : la spécification fournie et le prompt photo les lisent ; `rules-fr.ts` les reprend sans les recopier.
-- **Noms français des compétences absentes des données** (Artisanat, Jeux, Dressage, Métier, Ingénierie, Navigation, Contrefaçon, Escamotage, Éventail de guerre, Armes paysannes…) : choisis pour l'outil, à confirmer sur le livre français (P14). Le handoff associait « Artisanat » à `Craft` ; la 4e a deux compétences, Artisan (noble) et Craft (marchande) : la table les sépare, Artisanat / Artisan et Métier / Craft.
+- **Noms français des compétences absentes des données** (Artisanat, Jeux, Dressage, Métier, Ingénierie, Navigation, Contrefaçon, Escamotage, Éventail de guerre, Armes paysannes…) : choisis pour l'outil, acceptés par Nelson le 06/11/2026 (P14). Le handoff associait « Artisanat » à `Craft` ; la 4e a deux compétences, Artisan (noble) et Craft (marchande) : la table les sépare, Artisanat / Artisan et Métier / Craft.
 - **Restent en français jusqu'au lot 54** : noms et résumés des écoles, techniques et maîtrises, libellés des cases à cocher et rappels d'école, événements de la table de bataille, armes du catalogue, mots-clés de sort proposés et sorts universels (des saisies de la fiche), prompt d'import photo.
 - **Onglet de l'Assistant sur ordinateur** : inchangé (annexe 52.6).
