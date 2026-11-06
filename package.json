@@ -21,6 +21,7 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "screenshots": "node scripts/screenshots.mjs",
+    "guide-shots": "node scripts/guide-shots.mjs",
     "pwa-icons": "node scripts/pwa-icons.mjs",
     "og-image": "node scripts/og-image.mjs"
   },

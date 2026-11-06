@@ -10,7 +10,11 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ### Documentation
 - Le README est de nouveau en français par défaut ; la version anglaise est dans `README-en.md`.
-- Guide d'utilisation réorganisé : « Le Carnet en 5 minutes » en tête, une section par tâche, le détail des règles replié sous « En détail », toute la magie dans une section Shugenja.
+- Guide d'utilisation réorganisé : « Le Carnet en 5 minutes » en tête, une section par tâche, le détail des règles replié, toute la magie dans une section Shugenja.
+- Le guide prend l'allure d'un rouleau de Rokugan : illustrations sur papier washi, sceaux numérotés en kanji expliqués sous chaque image, titres et épigraphes dans l'esprit de l'Empire d'émeraude.
+
+### Technique
+- Script `npm run guide-shots` : captures annotées du guide, générées depuis le build (hors CI).
 
 ## [2.32.1] - 2026-11-06
 

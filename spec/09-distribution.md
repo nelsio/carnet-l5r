@@ -18,9 +18,11 @@ Depuis v2.20.2 (annexe M.1), le guide joueur est **`docs/GUIDE.md`**, en frança
 
 Depuis v2.31.1 (annexe 55.1), la vitrine existe en deux langues, reliées par une ligne `English · Français` sous les badges. Depuis v2.32.2 (annexe 57.1), **`README.md` est en français** (page d'accueil du dépôt, captures `docs/img/`) et **`README-en.md` en anglais** (captures `docs/img/en/`). Les documents en français (`CONTRIBUTING.md`, guide, crédits) pointent vers `README.md`.
 
-Règle pour chaque lot : **mettre à jour `docs/GUIDE.md`**. Ne toucher aux README que si une fonction listée dans « Ce que fait le Carnet » change, et alors **toujours dans les deux README** ; relancer `npm run build && npm run screenshots && npm run screenshots -- en` (hors CI) et committer `docs/img/` si un écran capturé change visiblement.
+Règle pour chaque lot : **mettre à jour `docs/GUIDE.md`**. Ne toucher aux README que si une fonction listée dans « Ce que fait le Carnet » change, et alors **toujours dans les deux README** ; relancer `npm run build && npm run screenshots && npm run screenshots -- en` (hors CI) et committer `docs/img/` si un écran capturé change visiblement. Si un écran montré dans le guide change : `npm run guide-shots` (hors CI, annexe 57.6), puis committer `docs/img/guide/`.
 
 Forme du guide depuis v2.32.2 (annexe 57.2) : un parcours **« Le Carnet en 5 minutes »** en tête, puis une section par tâche qui commence par l'essentiel (listes courtes, tableaux) ; le détail des règles est replié dans des blocs `<details>` « En détail ». Toute la magie est regroupée dans une section **Shugenja**. Une nouvelle fonction s'ajoute à la section de sa tâche : l'essentiel visible, le détail replié. Les ancres citées par les README (`#installer-sur-ton-téléphone-ou-ton-ordinateur`, `#11-pour-le-mj`) ne changent pas.
+
+Style « rouleau de Rokugan » (annexe 57.8) : titres de section `## 四 · Titre évocateur : tâche en clair`, précédés d'un `<a id="…">` qui garde l'ancre d'origine ; une épigraphe en italique par section, écrite pour l'outil ; sommaire en trois parties 天 · Le seuil, 地 · La voie, 人 · La mémoire ; blocs repliés « 詳 · Pour aller plus loin ». Les sections clés portent une capture annotée de `docs/img/guide/` (sceaux numérotés en kanji, cadre washi, thème clair), suivie d'une liste qui explique chaque sceau : `- **一** (1) **Libellé exact de l'écran** : à quoi il sert.` Au plus six sceaux par capture.
 
 Contenu du guide :
 1. **Le Carnet en 5 minutes** : ouvrir, créer, remplir, jouer, lancer, exporter.

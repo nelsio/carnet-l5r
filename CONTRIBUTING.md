@@ -23,6 +23,11 @@ Ouvre une issue **Idée d'évolution** avant de coder. Les évolutions important
 
 Prérequis et commandes : section [Développement du README](README.md#développement).
 
+Captures, hors CI, après `npm run build` :
+
+- `npm run screenshots` (et `-- en`) : captures du README, dans `docs/img/` ; à relancer quand un écran capturé change visiblement ;
+- `npm run guide-shots` : captures annotées du guide, dans `docs/img/guide/` ; à relancer dès qu'un écran montré dans le guide change.
+
 ## 5. Règles du code
 
 - TypeScript **strict**.
