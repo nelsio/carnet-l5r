@@ -1,5 +1,6 @@
 import { armorSheet, type ArmorPart } from "@carnet/core";
 import { useLocale, useT } from "../../../i18n";
+import { useCatalog } from "../../../i18n/catalog";
 import { skillLabel } from "../../format";
 import { ArmorFields } from "../ArmorCatalog";
 import { useSheet } from "./hooks";
@@ -10,6 +11,7 @@ export function Armor() {
   const s = useT().sheet.armor;
   const armors = useT().rules.armors;
   const { locale } = useLocale();
+  const cat = useCatalog();
   if (edit) {
     return (
       <div className="armform">
@@ -52,9 +54,15 @@ export function Armor() {
           {a.waiver && <> {s.waiver(a.waiver.source, a.waiver.except.map((x) => skillLabel(x, locale)).join(", "))}</>}
         </p>
       )}
-      {a.optional.length > 0 && <p className="hint">{s.optional(a.optional.map((o) => (o.source
-        ? `${o.label} (+${o.value}${o.stack ? ` × ${o.stack}` : ""}, ${o.source})`
-        : `${o.label} (${o.value >= 0 ? "+" : ""}${o.value})`)).join(" ; "))}</p>}
+      {a.optional.length > 0 && <p className="hint">{s.optional(a.optional.map((o) => {
+        // Case d'une technique : textes du catalogue dans la langue de l'interface (annexe 54.2).
+        const tx = o.effect && cat.effect(o.effect);
+        const label = tx ? (tx.label ?? tx.technique) : o.label;
+        const stack = tx?.stackLabel ?? o.stack;
+        return o.source
+          ? `${label} (+${o.value}${stack ? ` × ${stack}` : ""}, ${o.source})`
+          : `${label} (${o.value >= 0 ? "+" : ""}${o.value})`;
+      }).join(" ; "))}</p>}
       <p className="hint" style={{ margin: 0 }}>{s.referenceStance}</p>
     </div>
   );

@@ -69,7 +69,7 @@ export type CoreText =
   // Augmentations gratuites d'un sort (`spellCast`) ; `label` : case de l'école, texte du catalogue
   | { key: "spell.keyword"; keyword: string }
   | { key: "spell.affinity" }
-  | { key: "spell.option"; label: string }
+  | { key: "spell.option"; label: string; school: string; id: string }
   | { key: "spell.castTime"; n: number }
   // Actions de l'Assistant : titres et descriptions
   | { key: "action.label"; id: string }

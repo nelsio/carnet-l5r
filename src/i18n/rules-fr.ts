@@ -51,6 +51,8 @@ export const rulesFr = {
   clans: byId(CLANS, (c) => c.label),
   /** Badges des rangs d'école (`techniqueCategories`). */
   techniqueCategories: { auto: "auto", optional: "à cocher", reminder: "rappel", text: "texte" },
+  /** Titre d'une maîtrise de compétence (annexe 54.2) : nom de la compétence de la fiche et rang. */
+  masteryTitle: (skill: string, rank: number) => `Maîtrise ${skill} ${rank}`,
 };
 
 const signed = (n: number) => (n >= 0 ? `+${n}` : `${n}`);

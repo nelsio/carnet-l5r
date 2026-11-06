@@ -10,6 +10,7 @@ import bushi from "./ecoles-bushi.json";
 import courtiers from "./ecoles-courtisans.json";
 import shugenja from "./ecoles-shugenja.json";
 import masteries from "./maitrises.json";
+import schoolsEn from "./en/ecoles.json";
 import type { RingKey, Stance, Terrain } from "./l5r4e";
 
 /**
@@ -182,6 +183,11 @@ export const WEAPON_KEYWORD_LABELS: Readonly<Record<WeaponKeyword, string>> = {
   samourai: "Samouraï", lourde: "Lourde", paysan: "Paysan", ninja: "Ninja", arc: "Arc", hast: "Hast", lance: "Lance",
   "deux-mains": "Deux mains", petite: "Petite", moyenne: "Moyenne", grande: "Grande", distance: "Distance", cimeterre: "Cimeterre",
 };
+
+/** Mots-clés de sort saisis en anglais (annexe 54.2) → nom français du catalogue : « Craft » → « Artisanat ». */
+export const SPELL_KEYWORD_ALIASES: Readonly<Record<string, string>> = Object.fromEntries(
+  Object.entries(schoolsEn.spellKeywords).map(([fr, en]) => [en, fr]),
+);
 
 /** Mots-clés d'arme saisis en anglais (annexe 53.3) → identifiant ; libellés anglais dans le dictionnaire. */
 export const WEAPON_KEYWORD_ALIASES: Readonly<Record<string, WeaponKeyword>> = {

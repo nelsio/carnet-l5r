@@ -58,12 +58,15 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 47. **v2.29.0 — interface en anglais** (**livrée**, écarts en 52.6) : annexe 52, lot 52. Dictionnaire anglais complet, bouton FR/EN dans l'en-tête, langue du navigateur au premier lancement, réserves en `XkY` et distances en pieds en anglais ; grimoire et portail signalés en français.
 48. **v2.30.0 — règles en anglais** (**livrée**, écarts en 53.5) : annexe 53, lot 53. Vocabulaire de règles dans le dictionnaire, textes du moteur en codes formatés par l'interface (option A), table des compétences française et anglaise : une fiche saisie en anglais reçoit ses techniques et maîtrises.
    - **v2.30.1** (patch, 53.6) : `minimatch` 11 forcé par `overrides` (alerte Dependabot), outils de développement seulement.
-49. **Planifiés le 02/11/2026** : la fin de la localisation (lots 54 et 55, v2.31.0 et v2.31.1).
-50. **À définir** : journal d'achats en XP (K.6), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
+49. **v2.31.0 — catalogues en anglais** (**livrée**, écarts en 54.5) : annexe 54, lot 54. Surcouches `src/rules/en/*.json` (écoles, techniques, maîtrises, table de bataille), lues par `src/i18n/catalog.ts` avec repli sur le français ; modèles de fiche anglais dans la Bibliothèque ; mots-clés de sort anglais reconnus.
+50. **Planifié le 02/11/2026** : README anglais et `README-fr.md` (lot 55, v2.31.1).
+51. **À définir** : journal d'achats en XP (K.6), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
 
 ### Historique des états
 
 Lignes d'état de l'ancien en-tête de `HANDOFF.md`, déplacées telles quelles au lot 44 (annexe 44.2).
+
+**État au 06/11/2026 (lot 53) :** version **v2.30.1** (`minimatch` 11, annexe 53.6), lot 53 : règles et explications de l'Assistant en anglais, textes du moteur en codes formatés par l'interface, fiche saisie en anglais reconnue ; catalogues (écoles, maîtrises, modèles) encore en français (annexe 53).
 
 **État au 05/11/2026 (lot 51) :** version **v2.28.5**, lot 51 : tous les textes de l'interface dans le dictionnaire (`src/i18n`), contrôle `check-i18n` bloquant, sans changement à l'écran (annexe 51).
 

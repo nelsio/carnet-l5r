@@ -1,0 +1,578 @@
+{
+  "note": "Textes anglais des écoles (annexe 54), clés par id : surcouche d'affichage des fichiers ecoles-*.json, sans effet. Résumés traduits de ceux de l'outil, aucun texte du livre. Effets : textes par index d'effet (label, stackLabel, text).",
+  "clans": {
+    "Crabe": "Crab", "Grue": "Crane", "Dragon": "Dragon", "Lion": "Lion", "Mante": "Mantis", "Phénix": "Phoenix",
+    "Scorpion": "Scorpion", "Licorne": "Unicorn", "Impérial": "Imperial", "Clans mineurs": "Minor Clans"
+  },
+  "classes": { "Bushi": "Bushi", "Moine": "Monk", "Courtisan": "Courtier", "Ninja": "Ninja", "Shugenja": "Shugenja" },
+  "spellKeywords": {
+    "Jade": "Jade", "Défense": "Defense", "Artisanat": "Craft", "Bataille": "Battle", "Tonnerre": "Thunder",
+    "Illusion": "Illusion", "Voyage": "Travel", "Divination": "Divination"
+  },
+  "schools": {
+    "hida-bushi": {
+      "name": "Hida Bushi School",
+      "ranks": {
+        "1": { "name": "The Way of the Crab", "summary": "No Armor TN penalty from heavy armor (except Stealth). +1k0 damage with a Heavy weapon." },
+        "2": { "name": "The Mountain Does Not Move", "summary": "Reduction increased by your Earth Ring." },
+        "3": { "name": "Two Pincers, One Mind", "summary": "Attack as a Simple Action with a Heavy or Samurai weapon." },
+        "4": { "name": "Devastating Blow", "summary": "Once per encounter, Heavy weapon: target's Reduction −4; if the attack hits, the target is Dazed (Earth roll against your damage, TN −5 per failure)." },
+        "5": { "name": "The Mountain Does Not Fall", "summary": "1 Void Point (Reactions stage): until your next Reactions, you act as Healthy and ignore Dazed, Fatigued, Stunned.",
+               "effects": { "0": { "label": "Mountain Does Not Fall (act as Healthy)" } } }
+      }
+    },
+    "hiruma-bushi": {
+      "name": "Hiruma Bushi School",
+      "ranks": {
+        "1": { "name": "The Torch's Flame Flickers", "summary": "+1k0 to attacks in the Attack Stance. Food, water and jade last twice as long (people = Hunting rank)." },
+        "2": { "name": "The Wolf's Lesson", "summary": "In the Attack Stance, +5 Armor TN per melee hit, stacking up to your School Rank, until the end of the skirmish.",
+               "effects": { "0": { "stackLabel": "Melee hits" } } },
+        "3": { "name": "Hummingbird Wings", "summary": "Once per round, when you are targeted: + 2 × School Rank to your Armor TN against that attack (stacks with Void).",
+               "effects": { "0": { "label": "Hummingbird Wings (once per round)" } } },
+        "4": { "name": "The Shark Smells Blood", "summary": "Attack as a Simple Action with a Samurai weapon." },
+        "5": { "name": "Daylight Wastes No Movement", "summary": "Excess wounds on a slain target carry over to the next target you hit (not two attacks in a row, until the end of the skirmish)." }
+      }
+    },
+    "kakita-bushi": {
+      "name": "Kakita Bushi School",
+      "ranks": {
+        "1": { "name": "The Way of the Crane", "summary": "Initiative + 2 × Iaijutsu rank. In the Center Stance (and the next round): +1k1 and + School Rank to attacks and Focus." },
+        "2": { "name": "The Speed of Lightning", "summary": "+2k0 to attacks against an opponent with lower Initiative.",
+               "effects": { "0": { "label": "Target with lower Initiative" } } },
+        "3": { "name": "The First and Last Strike", "summary": "In a duel, you strike first with a Focus margin of 3, and gain one Free Raise per 3 (instead of 5)." },
+        "4": { "name": "One Strike, Two Cuts", "summary": "Attack as a Simple Action with a Samurai weapon." },
+        "5": { "name": "Strike Without Thought", "summary": "In the Center Stance: one Simple Action per turn (movement included), immediate benefits, Center can be held for several turns." }
+      }
+    },
+    "daidoji-bushi": {
+      "name": "Daidoji Iron Warriors",
+      "ranks": {
+        "1": { "name": "The Force of Honor", "summary": "+ (rounded Honor − 4, minimum 1) Wounds per Wound Rank. +1k0 to attacks in the Attack Stance." },
+        "2": { "name": "The Shield of Faith", "summary": "Guard maneuver: lasts one more round, +5 to the TN bonus (your charge +15, no penalty for you)." },
+        "3": { "name": "Strike Beneath the Veil", "summary": "Melee attack as a Simple Action in the Attack Stance." },
+        "4": { "name": "Vigilance of the Spirit", "summary": "1 Void Point (reaction): +2k1 to attacks and damage next round against an opponent who attacked you or your charge.",
+               "effects": { "0": { "label": "Vigilance of the Spirit (designated target)" } } },
+        "5": { "name": "Walk Upon the Blade", "summary": "2 Void Points (free action): you become the target of an action aimed at your charge and may move to them." }
+      }
+    },
+    "mirumoto-bushi": {
+      "name": "Mirumoto Bushi School",
+      "ranks": {
+        "1": { "name": "The Way of the Dragon", "summary": "Katana + wakizashi: no two-weapon fighting penalty and + School Rank to Armor TN. Targeted by a spell: spell TN ±5.",
+               "effects": { "0": { "label": "Katana and wakizashi in hand" } } },
+        "2": { "name": "The Calm Within the Thunder", "summary": "In the Center Stance: + Kenjutsu rank to the total of Iaijutsu rolls.",
+               "effects": { "0": { "label": "In the Center Stance" } } },
+        "3": { "name": "Strong and Swift", "summary": "Attack as a Simple Action with a Samurai weapon." },
+        "4": { "name": "Furious Retaliation", "summary": "+3k0 to attacks against an opponent who attacked you the previous round.",
+               "effects": { "0": { "label": "Retaliation (they attacked you this round)" } } },
+        "5": { "name": "The Heart of the Dragon", "summary": "Two attacks in the turn with two weapons: one more attack with the off hand (free action)." }
+      }
+    },
+    "togashi-moine": {
+      "name": "Togashi Tattooed Order",
+      "ranks": {
+        "1": { "name": "The Blood of the Kami", "summary": "Two tattoos." },
+        "2": { "name": "Body of Stone", "summary": "+1k1 to unarmed attacks and damage." },
+        "3": { "name": "The Blessing of the Kami", "summary": "Two more tattoos." },
+        "4": { "name": "Will of Stone", "summary": "Unarmed attack as a Simple Action." },
+        "5": { "name": "The Touch of the Kami", "summary": "Two more tattoos." }
+      }
+    },
+    "akodo-bushi": {
+      "name": "Akodo Bushi School",
+      "ranks": {
+        "1": { "name": "The Way of the Lion", "summary": "When attacking: ignore the Armor part of the opponent's TN (not its Reduction) or gain a Free Raise. +1k0 to your first melee attack against an opponent, or against one who called Raises against you.",
+               "effects": {
+                 "0": { "label": "Free Raise (instead of ignoring armor)" },
+                 "1": { "label": "First attack on this opponent / they called Raises" },
+                 "2": { "text": "Option: ignore the Armor part of the target's TN (not its Reduction)." }
+               } },
+        "2": { "name": "The Strength of Purity", "summary": "In a skirmish, once per turn: + Honor Rank to a roll's total (not damage, not in the Center Stance).",
+               "effects": { "0": { "label": "Strength of Purity (once per turn)" } } },
+        "3": { "name": "The Strength of My Ancestors", "summary": "Attack as a Simple Action with a Samurai weapon." },
+        "4": { "name": "Triumph Before Battle", "summary": "Once per skirmish (reaction): next round, ignore the stance Armor TN bonuses of the designated target." },
+        "5": { "name": "Akodo's Final Lesson", "summary": "Bugei skills: if you reach the TN without your Raises, you still succeed, without their effects." }
+      }
+    },
+    "matsu-berserker": {
+      "name": "Matsu Berserker School",
+      "ranks": {
+        "1": { "name": "The Lion's Roar", "summary": "+ Honor Rank to all damage. In the Full Attack Stance, +5 feet of movement per turn (not beyond the maximum)." },
+        "2": { "name": "The Fury of the Matsu", "summary": "In Full Attack, a target within 30 feet hit this turn can no longer leave its position (Willpower roll against your last damage to break free)." },
+        "3": { "name": "The Lion's Charge", "summary": "Melee attack as a Simple Action." },
+        "4": { "name": "The Courage of the Matsu", "summary": "Wound penalties ignored up to your Honor Rank, double in the Full Attack Stance." },
+        "5": { "name": "The Lion's Victory", "summary": "Once per encounter, after damage, 1 Void Point: kept dice explode (reroll and add)." }
+      }
+    },
+    "yoritomo-bushi": {
+      "name": "Yoritomo Bushi School",
+      "ranks": {
+        "1": { "name": "The Way of the Mantis", "summary": "+1k0 to all attacks. No terrain penalty. Improvised and Peasant weapons without loss of Honor or Glory, Peasant weapon in the off hand without penalty." },
+        "2": { "name": "Voice of the Storm", "summary": "Each melee hit lowers the target's Armor TN by 5 for your attacks (2 rounds, stacking up to your School Rank).",
+               "effects": { "0": { "stackLabel": "Hits on the target" } } },
+        "3": { "name": "The Mantis Strikes", "summary": "Attack as a Simple Action with a Samurai or Peasant weapon." },
+        "4": { "name": "The Crashing Wave", "summary": "After moving at least 5 feet: +10 Armor TN until your next turn, or give it up for 2 Free Raises reserved for Knockdown.",
+               "effects": {
+                 "0": { "label": "Crashing Wave (moved at least 5 feet)" },
+                 "1": { "label": "Wave given up: 2 Free Raises for Knockdown" }
+               } },
+        "5": { "name": "The Hand of Osano-Wo", "summary": "1 Void Point: you keep as many extra damage dice as your Strength; +0k2 against a Prone target.",
+               "effects": {
+                 "0": { "label": "Hand of Osano-Wo" },
+                 "1": { "label": "Prone target (with Osano-Wo)" }
+               } }
+      }
+    },
+    "tsuruchi-archer": {
+      "name": "Tsuruchi Archer School",
+      "ranks": {
+        "1": { "name": "Always Prepared", "summary": "+1k0 to bow attacks. +3 to Initiative." },
+        "2": { "name": "The Arrow Knows the Way", "summary": "One Free Raise reserved for Called Shot. +2k0 to bow damage." },
+        "3": { "name": "The Wasp's Sting", "summary": "Bow attack as a Simple Action." },
+        "4": { "name": "Flight of the No-Mind", "summary": "Once per skirmish, 1 Void Point, Complex Action: the shot ignores armor, wound and visibility penalties; no Extra Attack, normal range.",
+               "effects": {
+                 "0": { "label": "Flight of the No-Mind" },
+                 "1": { "text": "Flight of the No-Mind: the target's TN does not count its armor." }
+               } },
+        "5": { "name": "The Eye of Tsuruchi", "summary": "Ranged attack as a Complex Action: +4k1 to the attack and damage (not with Flight of the No-Mind).",
+               "effects": { "0": { "label": "Eye of Tsuruchi (Complex Action)" } } }
+      }
+    },
+    "shiba-bushi": {
+      "name": "Shiba Bushi School",
+      "ranks": {
+        "1": { "name": "The Way of the Phoenix", "summary": "You may spend 2 Void Points for +2k2 on a roll. Guard as a free action (your charge only gets +5 to the TN).",
+               "effects": { "0": { "label": "+2k2 to the roll (2 points)" } } },
+        "2": { "name": "Dance With the Elements", "summary": "A target within 30 feet: TN of its spells (cast or received) ±5; the same for spells targeting you." },
+        "3": { "name": "Become One With the Void", "summary": "When another character spends Void during the round, you regain one (beyond your maximum until the end of combat), 2 times per skirmish." },
+        "4": { "name": "Move With the World", "summary": "Attack as a Simple Action with a polearm, a spear or a Samurai weapon." },
+        "5": { "name": "The Touch of the Void", "summary": "Each Void Point counts double where applicable; Void enhancements twice per turn." }
+      }
+    },
+    "bayushi-bushi": {
+      "name": "Bayushi Bushi School",
+      "ranks": {
+        "1": { "name": "The Way of the Scorpion", "summary": "+1k1 to Initiative. +5 Armor TN against an opponent with lower Initiative.",
+               "effects": { "1": { "label": "Opponent with lower Initiative" } } },
+        "2": { "name": "Pincers and Tail", "summary": "Feint costs 1 Raise instead of 2." },
+        "3": { "name": "Strike at the Tail", "summary": "Target chosen at the start of the turn (30 feet): if you hit it, it is Fatigued (Earth roll TN 25 as a reaction to break free)." },
+        "4": { "name": "Strike From Above, Strike From Below", "summary": "Melee attack as a Simple Action." },
+        "5": { "name": "The Pincers Hold, the Tail Strikes", "summary": "Once per encounter, 1 Void Point, melee Complex Action: if it hits, the target is Stunned (Earth roll against your damage)." }
+      }
+    },
+    "moto-bushi": {
+      "name": "Moto Bushi School",
+      "ranks": {
+        "1": { "name": "The Way of the Unicorn", "summary": "Two-handed weapons usable in one hand (except bows). +1k0 to damage when mounted, with a scimitar or with a two-handed melee weapon (does not stack). The scimitar counts as Samurai." },
+        "2": { "name": "Shinsei's Smile", "summary": "+ half (rounded down) of the opponent's wound penalty to your attack totals.",
+               "effects": { "0": { "label": "Shinsei's Smile" } } },
+        "3": { "name": "Strike of the Desert Wind", "summary": "Melee attack as a Simple Action." },
+        "4": { "name": "The Charge of Madness", "summary": "Once per skirmish, when you put a target Out: free attack on another target, without Raises." },
+        "5": { "name": "A Moto Never Surrenders", "summary": "Mounted or in the Full Attack Stance, with a two-handed or Samurai weapon: + half your Strength (rounded down) in kept damage dice." }
+      }
+    },
+    "utaku-battle-maiden": {
+      "name": "Utaku Battle Maidens",
+      "ranks": {
+        "1": { "name": "Ride in Harmony", "summary": "+ Honor Rank to one attack roll per round (or to one damage roll if mounted). + Honor Rank to all Horsemanship rolls.",
+               "effects": {
+                 "0": { "label": "Ride in Harmony (1 attack per round)" },
+                 "1": { "label": "Ride in Harmony on damage (mounted)" }
+               } },
+        "2": { "name": "The Void of War", "summary": "In phase 1 of each round: +5 to Initiative or Armor TN, until the next use or the end of the skirmish.",
+               "effects": {
+                 "0": { "label": "Void of War: +5 Initiative" },
+                 "1": { "label": "Void of War: +5 Armor TN" }
+               } },
+        "3": { "name": "Feel the Breeze", "summary": "Mounted: attack as a Simple Action." },
+        "4": { "name": "The Wind Never Stops", "summary": "Mounted, 1 Void Point: charge and attack in the same Simple Action; if it hits, +2k1 to damage this turn.",
+               "effects": { "0": { "label": "Successful charge (The Wind Never Stops)" } } },
+        "5": { "name": "Otaku's Blessing", "summary": "1 Void Point at the start of the turn: + Honor Rank to damage and Bugei skills this turn (stacks with rank 1).",
+               "effects": { "0": { "label": "Otaku's Blessing (this turn)" } } }
+      }
+    },
+    "yasuki-courtisan": {
+      "name": "Yasuki Courtier School",
+      "ranks": {
+        "1": { "name": "The Way of the Carp", "summary": "1 Free Raise on Commerce, with no loss of Honor or Glory in public. Commerce/Perception against Etiquette/Awareness: guess what someone wants.",
+               "effects": { "1": { "text": "Commerce in public without loss of Honor or Glory; Commerce/Perception against Etiquette/Awareness to guess what someone wants." } } },
+        "2": { "name": "Do As We Say", "summary": "Reroll a failed Sincerity or Intimidation roll, School Rank times per session (the second result stands).",
+               "effects": { "0": { "text": "Reroll a failed Sincerity or Intimidation roll: {n} times per session, the second result stands." } } },
+        "3": { "name": "The Treasures of the Carp", "summary": "Commerce/Awareness TN 20 to find a rare item; Raises improve its quality.",
+               "effects": { "0": { "text": "Find a rare item: Commerce/Awareness TN 20, Raises improve its quality." } } },
+        "4": { "name": "The Wiles of the Carp", "summary": "+5 × School Rank to the TN of social rolls that try to deceive you.",
+               "effects": { "0": { "text": "+{n} to the TN of anyone trying to deceive you." } } },
+        "5": { "name": "What Is Yours Is Mine", "summary": "+5k0 to contested social rolls against someone you supplied with an item they needed, for 24 hours.",
+               "effects": { "0": { "label": "Target you supplied with a useful item" } } }
+      }
+    },
+    "doji-courtisan": {
+      "name": "Doji Courtier School",
+      "ranks": {
+        "1": { "name": "The Soul of Honor", "summary": "Honor 6.0 or higher: 1 Free Raise on Courtier, Sincerity and Etiquette. Courtier (Manipulation)/Awareness against Etiquette (Courtesy)/Awareness: guess the favor someone needs.",
+               "effects": { "1": { "text": "Courtier (Manipulation)/Awareness against Etiquette (Courtesy)/Awareness: guess the favor someone needs." } } },
+        "2": { "name": "Speaking Without Words", "summary": "Courtier/Intelligence TN 15: convey a simple idea without speaking to a trained Doji or a rank 5 courtier; Raises for complex ideas.",
+               "effects": { "0": { "text": "Silent speech: Courtier/Intelligence TN 15, Raises for a complex idea." } } },
+        "3": { "name": "The Perfect Gift", "summary": "At court or in a city, Courtier/Awareness TN 20: find the right gift or favor; once accepted, it grants an Ally (Devotion 1) at no XP cost.",
+               "effects": { "0": { "text": "Perfect gift: Courtier/Awareness TN 20, each Raise makes it rarer." } } },
+        "4": { "name": "The Voice of Honor", "summary": "Courtier (Manipulation)/Awareness against Etiquette (Courtesy)/Awareness: the opponent must admit their position offends Honor, or commit a faux pas.",
+               "effects": { "0": { "text": "Voice of Honor: Courtier (Manipulation)/Awareness against Etiquette (Courtesy)/Awareness." } } },
+        "5": { "name": "The Lady's Gift", "summary": "Courtier (Manipulation)/Awareness against Etiquette (Courtesy)/Willpower, +5k0 if the target is an ally: they follow your advice if it respects their loyalties.",
+               "effects": {
+                 "0": { "label": "Advice to an ally" },
+                 "1": { "text": "The Lady's Gift: Courtier (Manipulation)/Awareness against Etiquette (Courtesy)/Willpower." }
+               } }
+      }
+    },
+    "kitsuki-enqueteur": {
+      "name": "Kitsuki Investigator School",
+      "ranks": {
+        "1": { "name": "The Kitsuki Method", "summary": "1 Free Raise on Investigation. + Perception to your Armor TN in a skirmish." },
+        "2": { "name": "The Wisdom the Wind Brings", "summary": "+5 × School Rank to the TN of anyone who lies to you, feints or disarms you.",
+               "effects": {
+                 "0": { "text": "+{n} to the TN of anyone lying to you." },
+                 "1": { "text": "+{n} to the TN of anyone feinting or disarming you." }
+               } },
+        "3": { "name": "Know the Rhythm of the Heart", "summary": "After a short conversation, Investigation (Notice)/Perception against the target's Intelligence × 5: their personality and motivations.",
+               "effects": { "0": { "text": "Read someone: Investigation (Notice)/Perception, TN = target's Intelligence × 5." } } },
+        "4": { "name": "Find the Path", "summary": "Investigation (Interrogation)/Intelligence against Etiquette (Courtesy)/Intelligence: one ally or enemy of the target, one more per Raise; once per day per target.",
+               "effects": { "0": { "text": "Find the ties: Investigation (Interrogation)/Intelligence against Etiquette (Courtesy)/Intelligence, once per day per target." } } },
+        "5": { "name": "The Eyes Betray the Heart", "summary": "Automatic Investigation (Interrogation)/Perception roll against Sincerity (Deceit)/Willpower when someone lies to you; +5k0 if you already know they are lying.",
+               "effects": {
+                 "0": { "label": "You already know they are lying" },
+                 "1": { "text": "Lie detected: Investigation (Interrogation)/Perception against Sincerity (Deceit)/Willpower, automatically." }
+               } }
+      }
+    },
+    "ikoma-barde": {
+      "name": "Ikoma Bard School",
+      "ranks": {
+        "1": { "name": "The Herald of Glory", "summary": "Precise Memory for free. Perform: Storytelling/Awareness TN 20 to praise someone in public: they gain School Rank points of Glory (once per month per person).",
+               "effects": { "0": { "text": "Praise someone: Perform: Storytelling/Awareness TN 20, +{n} Glory points." } } },
+        "2": { "name": "The Heart of the Lion", "summary": "Showing emotion for a Lion or an honorable cause costs nothing. +5 × School Rank to the TN of Intimidation and Temptation against you.",
+               "effects": { "0": { "text": "+{n} to the TN of Intimidation and Temptation against you." } } },
+        "3": { "name": "The Voice of the Ancestors", "summary": "Before a battle, Perform: Oratory/Awareness TN 15 + 5 per person (+5 per non-Lion): each adds their Honor Rank to one skill roll.",
+               "effects": { "0": { "text": "Before the battle: Perform: Oratory/Awareness, TN 15 + 5 per inspired person (+5 per non-Lion)." } } },
+        "4": { "name": "The Strength of Tradition", "summary": "School Rank times per session, Simple Action, Perform: Storytelling/Awareness TN 25: an ally rerolls their next failure of the day with your Honor Rank in extra dice; failure: −2 Honor.",
+               "effects": { "0": { "text": "Encourage an ally: {n} times per session, Perform: Storytelling/Awareness TN 25." } } },
+        "5": { "name": "Every Lion Is Your Brother", "summary": "Five times per session, on a contested social roll, cite a historical precedent: + Perform: Storytelling rank in rolled dice.",
+               "effects": { "0": { "label": "Historical precedent" } } }
+      }
+    },
+    "yoritomo-courtisan": {
+      "name": "Yoritomo Courtier School",
+      "ranks": {
+        "1": { "name": "Duty Before Honor", "summary": "Commerce and Intimidation (Control) without loss of Honor. + School Rank Free Raises to social rolls against a criminal or an outlaw.",
+               "effects": { "0": { "label": "Criminal or outlaw target" } } },
+        "2": { "name": "The Heart of the Storm", "summary": "Willpower counts as one rank higher for Intimidation (Control); two ranks against a samurai of lower Status.",
+               "effects": { "1": { "label": "Target of lower Status" } } },
+        "3": { "name": "Command the Winds", "summary": "School Rank times per session, reroll a failed Sincerity roll as Intimidation (Control).",
+               "effects": { "0": { "text": "Failed Sincerity rerolled as Intimidation (Control): {n} times per session." } } },
+        "4": { "name": "The Will of the Storm", "summary": "Intimidation (Control)/Willpower against Etiquette (Courtesy)/Willpower: the opponent can no longer spend Void for an hour and suffers −3k0 to social rolls.",
+               "effects": { "0": { "text": "Intimidation (Control)/Willpower against Etiquette (Courtesy)/Willpower: no Void for an hour, −3k0 to the target's social rolls." } } },
+        "5": { "name": "Strength in All Things", "summary": "+5k0 on Intimidation, and to resist Intimidation, Temptation and Fear.",
+               "effects": { "1": { "text": "+5k0 to resist Intimidation, Temptation and Fear." } } }
+      }
+    },
+    "asako-maitre-du-savoir": {
+      "name": "Asako Loremaster School",
+      "ranks": {
+        "1": { "name": "The Temple of the Soul", "summary": "1 Free Raise on Lore rolls. A Void Point spent on Etiquette gives +3k1 instead of +1k1." },
+        "2": { "name": "From the Ashes", "summary": "After a day observing a court, Lore: History/Perception TN 20: +2k0 to social rolls for two days at that court.",
+               "effects": { "0": { "label": "Court observed (Lore: History succeeded)" } } },
+        "3": { "name": "The Voice of the Universe", "summary": "One hour of conversation, Lore: History/Intelligence TN 25: an ally adds your Lore: History ranks to their social rolls for 24 hours.",
+               "effects": { "0": { "text": "Advise an ally: Lore: History/Intelligence TN 25 (two Raises per extra ally)." } } },
+        "4": { "name": "The Unconquerable Mind", "summary": "Failed contested social roll to resist an emotional influence: reroll with Intelligence, the second result stands.",
+               "effects": { "0": { "text": "Failed resistance to an emotional influence: reroll with Intelligence." } } },
+        "5": { "name": "The Wisdom of Ages", "summary": "+5k0 to Lore rolls." }
+      }
+    },
+    "bayushi-courtisan": {
+      "name": "Bayushi Courtier School",
+      "ranks": {
+        "1": { "name": "Your Weakness Is My Strength", "summary": "1 Free Raise per 3 points of the target's mental and social Disadvantages (rounded to the nearest, 5 at most) on contested social rolls; 1 Free Raise on Courtier to spread a rumor.",
+               "effects": {
+                 "0": { "label": "Target's weaknesses" },
+                 "1": { "label": "Spread a rumor" }
+               } },
+        "2": { "name": "Shallow Waters", "summary": "Investigation/Awareness against Etiquette/Awareness: the target's weakest mental and social skills; a Void Point for the next ones.",
+               "effects": { "0": { "text": "Probe: Investigation/Awareness against Etiquette/Awareness (Void: one more skill)." } } },
+        "3": { "name": "Secrets Are Birthmarks", "summary": "Courtier (Manipulation)/Awareness against Etiquette (Courtesy)/Awareness: one mental or social Disadvantage of the target; Blackmail (2 points) possible.",
+               "effects": { "0": { "text": "Reveal a secret: Courtier (Manipulation)/Awareness against Etiquette (Courtesy)/Awareness." } } },
+        "4": { "name": "The Sweet Sting of Scrutiny", "summary": "Against a target you are blackmailing, their dice do not explode on contested social rolls; a Void Point to impose the mental Trait of your choice.",
+               "effects": { "0": { "text": "Target under Blackmail: their dice do not explode; Void: you choose their mental Trait." } } },
+        "5": { "name": "No More Masks", "summary": "School Rank times per session, Courtier (Gossip)/Awareness against Etiquette (Courtesy)/Awareness, +5k0 if you are blackmailing the target: a social Disadvantage for a month.",
+               "effects": {
+                 "0": { "label": "Target under Blackmail" },
+                 "1": { "text": "No More Masks: {n} times per session, Courtier (Gossip)/Awareness against Etiquette (Courtesy)/Awareness." }
+               } }
+      }
+    },
+    "ide-emissaire": {
+      "name": "Ide Emissary School",
+      "ranks": {
+        "1": { "name": "The Heart Speaks", "summary": "Etiquette (Courtesy)/Awareness TN 20 to avoid giving offense by accident. 1 Free Raise on Sincerity (Honesty); +5 to the TN on Sincerity (Deceit)." },
+        "2": { "name": "Pierce the Veils", "summary": "Etiquette/Awareness against Etiquette/Willpower: the target's true emotions, one more detail per Raise.",
+               "effects": { "0": { "text": "Pierce the Veils: Etiquette/Awareness against Etiquette/Willpower." } } },
+        "3": { "name": "The Heart Listens", "summary": "Ten minutes of conversation, Sincerity (Honesty)/Awareness against Etiquette (Courtesy)/Willpower: the target is better disposed toward you; two Raises: an ally for the day.",
+               "effects": { "0": { "text": "The Heart Listens: Sincerity (Honesty)/Awareness against Etiquette (Courtesy)/Willpower (two Raises: an ally for the day)." } } },
+        "4": { "name": "Answer the Heart", "summary": "+ School Rank in rolled dice to the rolls of the rank 2 and 3 techniques.",
+               "effects": { "0": { "label": "Rank 2 or 3 technique" } } },
+        "5": { "name": "The Still Hand of Peace", "summary": "One Void Point, Sincerity (Honesty)/Awareness against Etiquette (Courtesy)/Awareness: the target cannot harm you for 2 × School Rank hours if you stay peaceful (Honor 2.0 or higher).",
+               "effects": { "0": { "text": "Hand of Peace: Void, Sincerity (Honesty)/Awareness against Etiquette (Courtesy)/Awareness, {n} hours without hostility." } } }
+      }
+    },
+    "otomo-courtisan": {
+      "name": "Otomo Courtier School",
+      "ranks": {
+        "1": { "name": "The Voice of Heaven", "summary": "Intimidation (Control) without loss of Honor. Courtier (Manipulation)/Awareness against Etiquette (Courtesy)/Awareness: provoke a quarrel between clans.",
+               "effects": { "0": { "text": "Sow discord: Courtier (Manipulation)/Awareness against Etiquette (Courtesy)/Awareness." } } },
+        "2": { "name": "Destiny Has No Secrets", "summary": "One Void Point, Courtier/Awareness TN 25: learn a crucial piece of information.",
+               "effects": { "0": { "text": "Void, Courtier/Awareness TN 25: a crucial piece of information." } } },
+        "3": { "name": "My Master's Voice", "summary": "Complex Action, Intimidation (Control)/Willpower against the Etiquette (Courtesy)/Willpower of a samurai with Honor 1.0 or higher: they neither move, attack nor cast a spell next turn.",
+               "effects": { "0": { "text": "Complex Action: Intimidation (Control)/Willpower against Etiquette (Courtesy)/Willpower, the target is held in place next turn." } } },
+        "4": { "name": "The Emperor's Protection", "summary": "During a debate, one Void Point, Courtier (Manipulation)/Awareness against Etiquette (Courtesy)/Awareness: the opponent yields or loses 5 points of Honor.",
+               "effects": { "0": { "text": "Void, Courtier (Manipulation)/Awareness against Etiquette (Courtesy)/Awareness: yield or lose 5 Honor." } } },
+        "5": { "name": "The Virtues of Command", "summary": "+5k0 to contested social rolls against someone who reveres Imperial authority.",
+               "effects": { "0": { "label": "Target who reveres Imperial authority" } } }
+      }
+    },
+    "miya-heraut": {
+      "name": "Miya Herald School",
+      "ranks": {
+        "1": { "name": "The Voice of the Emperor", "summary": "One Void Point: Way of the Land for the province until your next sleep. Anyone who attacks you while revering the Emperor loses 2 × School Rank points of Honor.",
+               "effects": { "0": { "text": "Anyone who attacks you while revering the Emperor loses {n} points of Honor." } } },
+        "2": { "name": "The Eyes of the Emperor", "summary": "+ Honor Rank to Etiquette (Courtesy) rolls to resist an influence.",
+               "effects": { "0": { "label": "Resist an influence" } } },
+        "3": { "name": "The Hand of the Emperor", "summary": "One Void Point, free action: anyone who reveres the Emperor cannot harm you until the next Reactions, as long as you do not fight.",
+               "effects": { "0": { "text": "Void, free action: protected until the next Reactions if you do not fight." } } },
+        "4": { "name": "The Blessing of the Emperor", "summary": "School Rank times per session, Complex Action, Courtier (Rhetoric)/Awareness against the Etiquette (Courtesy)/Willpower of a samurai with Honor 1.0 or higher: they stop attacking for one minute.",
+               "effects": { "0": { "text": "{n} times per session, Complex Action: Courtier (Rhetoric)/Awareness against Etiquette (Courtesy)/Willpower, the target stops attacking for one minute." } } },
+        "5": { "name": "The Glory of the Emperor", "summary": "+5k0 on Courtier and Etiquette against a target with Honor 1.0 or higher.",
+               "effects": { "0": { "label": "Target with Honor 1.0 or higher" } } }
+      }
+    },
+    "shosuro-infiltre": {
+      "name": "Shosuro Infiltrator School",
+      "ranks": {
+        "1": { "name": "The Way of Shadows", "summary": "Low Skills and Ninjutsu without loss of Honor. +2k0 on Stealth.",
+               "effects": { "1": { "text": "Low Skills and Ninjutsu without loss of Honor." } } },
+        "2": { "name": "Strike From the Shadows", "summary": "Against a target that cannot see you: unlimited Raises and + School Rank in rolled dice to the attack.",
+               "effects": { "0": { "label": "Target that cannot see you" } } },
+        "3": { "name": "Steel Beneath Silk", "summary": "Attack as a Simple Action from an ambush or with a Ninja weapon.",
+               "effects": { "1": { "text": "Attack as a Simple Action from an ambush, whatever the weapon." } } },
+        "4": { "name": "The Whisper of Steel", "summary": "After your attack, an Investigation roll is needed to spot you.",
+               "effects": { "0": { "text": "After your attack, Investigation is needed to spot you." } } },
+        "5": { "name": "The Final Silence", "summary": "One Void Point: two damage dice count as 10 (no explosion).",
+               "effects": { "0": { "text": "Void: two damage dice count as 10, no explosion." } } }
+      }
+    },
+    "shosuro-acteur": {
+      "name": "Shosuro Actor School",
+      "ranks": {
+        "1": { "name": "The First Face", "summary": "One persona. A Void Point spent on Acting or Sincerity (Deceit) gives +3k1 instead of +1k1." },
+        "2": { "name": "The Subtle Sting", "summary": "+2k0 to attacks with a Small weapon." },
+        "3": { "name": "The Second Face", "summary": "A second persona. Up to 2 Void Points on school skills (stacks with rank 1).",
+               "effects": { "0": { "label": "2 Void Points (school skill)" } } },
+        "4": { "name": "The Viper's Kiss", "summary": "Attack as a Simple Action with a Small weapon." },
+        "5": { "name": "The Third Face", "summary": "A third persona. Against a target that cannot see you, Raises not limited by Void.",
+               "effects": { "0": { "label": "Target that cannot see you" } } }
+      }
+    },
+    "kuni-shugenja": {
+      "name": "Kuni Shugenja School",
+      "ranks": {
+        "1": { "name": "The Gaze Into Shadow", "summary": "+1k0 to spell rolls against a non-human creature; spell damage +1k1 against a Tainted target. Free Raise on Jade spells." },
+        "2": { "name": "New Spells", "summary": "Rank 2: new spells." },
+        "3": { "name": "New Spells", "summary": "Rank 3: new spells." },
+        "4": { "name": "New Spells", "summary": "Rank 4: new spells." },
+        "5": { "name": "New Spells", "summary": "Rank 5: new spells." }
+      },
+      "spellcasting": {
+        "options": { "nonhuman": "Non-human target", "tainted": "Tainted target (spell damage)" },
+        "startingSpells": "universal, 3 Earth, 2 Fire, 1 Water"
+      }
+    },
+    "asahina-shugenja": {
+      "name": "Asahina Shugenja School",
+      "ranks": {
+        "1": { "name": "The Grace of the Soul", "summary": "1 Void Point: enemy damage within 20 feet loses 0k1 for as many rounds as your school rank. Free Raise on Defense spells." },
+        "2": { "name": "New Spells", "summary": "Rank 2: new spells." },
+        "3": { "name": "New Spells", "summary": "Rank 3: new spells." },
+        "4": { "name": "New Spells", "summary": "Rank 4: new spells." },
+        "5": { "name": "New Spells", "summary": "Rank 5: new spells." }
+      },
+      "spellcasting": {
+        "reminders": ["1 Void Point: enemy damage −0k1 within 20 feet, school rank in rounds."],
+        "startingSpells": "universal, 3 Air, 2 Water, 1 Earth"
+      }
+    },
+    "tamori-shugenja": {
+      "name": "Tamori Shugenja School",
+      "ranks": {
+        "1": { "name": "The Flesh of the Elements", "summary": "A spell slot to seal a single-target spell in a potion. Free Raise on Craft spells." },
+        "2": { "name": "New Spells", "summary": "Rank 2: new spells." },
+        "3": { "name": "New Spells", "summary": "Rank 3: new spells." },
+        "4": { "name": "New Spells", "summary": "Rank 4: new spells." },
+        "5": { "name": "New Spells", "summary": "Rank 5: new spells." }
+      },
+      "spellcasting": {
+        "reminders": ["Potion: one slot per day of waiting, as many hours as the spell's Mastery Level to prepare it."],
+        "startingSpells": "universal, 3 Earth, 2 Fire, 1 Water"
+      }
+    },
+    "kitsu-shugenja": {
+      "name": "Kitsu Shugenja School",
+      "ranks": {
+        "1": { "name": "The Eyes of the Ancestors", "summary": "Spell roll (Water) against the target's Willpower × 5: you learn their spiritual Advantages and Disadvantages. Free Raise on Battle spells." },
+        "2": { "name": "New Spells", "summary": "Rank 2: new spells." },
+        "3": { "name": "New Spells", "summary": "Rank 3: new spells." },
+        "4": { "name": "New Spells", "summary": "Rank 4: new spells." },
+        "5": { "name": "New Spells", "summary": "Rank 5: new spells." }
+      },
+      "spellcasting": {
+        "reminders": ["Eyes of the Ancestors: spell roll (Water) against the target's Willpower × 5."],
+        "startingSpells": "universal, 3 Water, 2 Air, 1 Earth"
+      }
+    },
+    "moshi-shugenja": {
+      "name": "Moshi Shugenja School",
+      "ranks": {
+        "1": { "name": "The Favor of the Sun", "summary": "By day, an extra affinity for Fire. Free Raise on Thunder spells." },
+        "2": { "name": "New Spells", "summary": "Rank 2: new spells." },
+        "3": { "name": "New Spells", "summary": "Rank 3: new spells." },
+        "4": { "name": "New Spells", "summary": "Rank 4: new spells." },
+        "5": { "name": "New Spells", "summary": "Rank 5: new spells." }
+      },
+      "spellcasting": {
+        "options": { "day": "Daytime (Fire affinity)" },
+        "startingSpells": "universal, 3 Air, 3 Fire"
+      }
+    },
+    "isawa-shugenja": {
+      "name": "Isawa Shugenja School",
+      "ranks": {
+        "1": { "name": "The Gift of Isawa", "summary": "Affinity of your choice (Void included), no deficiency. Free Raise on all spells of that element." },
+        "2": { "name": "New Spells", "summary": "Rank 2: new spells." },
+        "3": { "name": "New Spells", "summary": "Rank 3: new spells." },
+        "4": { "name": "New Spells", "summary": "Rank 4: new spells." },
+        "5": { "name": "New Spells", "summary": "Rank 5: new spells." }
+      },
+      "spellcasting": {
+        "startingSpells": "universal, 3 of one element, 2 of another, 1 of a third, 1 of a fourth"
+      }
+    },
+    "agasha-shugenja": {
+      "name": "Agasha Shugenja School",
+      "ranks": {
+        "1": { "name": "The Elements of All Things", "summary": "1 Void Point: cast a spell with another Ring, using that Ring's slot. Free Raise on Craft spells." },
+        "2": { "name": "New Spells", "summary": "Rank 2: new spells." },
+        "3": { "name": "New Spells", "summary": "Rank 3: new spells." },
+        "4": { "name": "New Spells", "summary": "Rank 4: new spells." },
+        "5": { "name": "New Spells", "summary": "Rank 5: new spells." }
+      },
+      "spellcasting": {
+        "startingSpells": "universal, 3 Fire, 2 Earth, 1 Air"
+      }
+    },
+    "soshi-shugenja": {
+      "name": "Soshi Shugenja School",
+      "ranks": {
+        "1": { "name": "The Whispers of the Kami", "summary": "One extra slot of the same element: a non-offensive spell leaves no visible sign. Free Raise on Illusion spells." },
+        "2": { "name": "New Spells", "summary": "Rank 2: new spells." },
+        "3": { "name": "New Spells", "summary": "Rank 3: new spells." },
+        "4": { "name": "New Spells", "summary": "Rank 4: new spells." },
+        "5": { "name": "New Spells", "summary": "Rank 5: new spells." }
+      },
+      "spellcasting": {
+        "options": { "silent": "No visible sign (1 extra slot)" },
+        "startingSpells": "universal, 3 Air, 2 Fire, 1 Water"
+      }
+    },
+    "iuchi-shugenja": {
+      "name": "Iuchi Shugenja School",
+      "ranks": {
+        "1": { "name": "The Spirit of the Wind", "summary": "Complex Action and one slot: a target gains a Simple move action on its next turn. Free Raise on Travel spells." },
+        "2": { "name": "New Spells", "summary": "Rank 2: new spells." },
+        "3": { "name": "New Spells", "summary": "Rank 3: new spells." },
+        "4": { "name": "New Spells", "summary": "Rank 4: new spells." },
+        "5": { "name": "New Spells", "summary": "Rank 5: new spells." }
+      },
+      "spellcasting": {
+        "reminders": ["Spirit of the Wind: one slot (Complex Action) → a Simple move action for a target."],
+        "startingSpells": "universal, 3 Water, 2 Earth, 1 Air"
+      }
+    },
+    "komori-shugenja": {
+      "name": "Komori Shugenja School (Bat)",
+      "ranks": {
+        "1": { "name": "The Whispers of the Kami", "summary": "A slot to carry a whispered message to a person you know: 30 seconds and 100 miles per school rank." },
+        "2": { "name": "New Spells", "summary": "Rank 2: new spells." },
+        "3": { "name": "New Spells", "summary": "Rank 3: new spells." },
+        "4": { "name": "New Spells", "summary": "Rank 4: new spells." },
+        "5": { "name": "New Spells", "summary": "Rank 5: new spells." }
+      },
+      "spellcasting": {
+        "reminders": ["Whispered message: one slot, 30 s and 100 miles per school rank."],
+        "startingSpells": "universal, 3 Air, 2 Water, 1 Fire"
+      }
+    },
+    "tonbo-shugenja": {
+      "name": "Tonbo Shugenja School (Dragonfly)",
+      "ranks": {
+        "1": { "name": "Guided by Fate", "summary": "One slot per +1k0 to a social roll, up to your school rank. Free Raise on Divination spells." },
+        "2": { "name": "New Spells", "summary": "Rank 2: new spells." },
+        "3": { "name": "New Spells", "summary": "Rank 3: new spells." },
+        "4": { "name": "New Spells", "summary": "Rank 4: new spells." },
+        "5": { "name": "New Spells", "summary": "Rank 5: new spells." }
+      },
+      "spellcasting": {
+        "reminders": ["Social roll: one slot per +1k0 (at most your school rank)."],
+        "startingSpells": "universal, 3 Water, 2 Air, 1 Earth"
+      }
+    },
+    "kitsune-shugenja": {
+      "name": "Kitsune Shugenja School (Fox)",
+      "ranks": {
+        "1": { "name": "The Essence of Chikushudo", "summary": "Universal spells also affect animal spirits. Free Raise on a non-offensive spell cast on an animal." },
+        "2": { "name": "New Spells", "summary": "Rank 2: new spells." },
+        "3": { "name": "New Spells", "summary": "Rank 3: new spells." },
+        "4": { "name": "New Spells", "summary": "Rank 4: new spells." },
+        "5": { "name": "New Spells", "summary": "Rank 5: new spells." }
+      },
+      "spellcasting": {
+        "options": { "animal": "Non-offensive spell on an animal" },
+        "startingSpells": "universal, 3 Earth, 2 Water, 1 Fire"
+      }
+    },
+    "chuda-shugenja": {
+      "name": "Chuda Shugenja School (original)",
+      "ranks": {
+        "1": { "name": "Punish the Impure", "summary": "1 Void Point: an opponent's Reduction drops by your school rank. + school rank to your spell damage against a Tainted target." },
+        "2": { "name": "New Spells", "summary": "Rank 2: new spells." },
+        "3": { "name": "New Spells", "summary": "Rank 3: new spells." },
+        "4": { "name": "New Spells", "summary": "Rank 4: new spells." },
+        "5": { "name": "New Spells", "summary": "Rank 5: new spells." }
+      },
+      "spellcasting": {
+        "options": { "tainted": "Tainted target (spell damage)" },
+        "reminders": ["1 Void Point: an opponent's Reduction −school rank."],
+        "startingSpells": "universal, 3 Earth, 2 Fire, 1 Water"
+      }
+    },
+    "seppun-shugenja": {
+      "name": "Seppun Shugenja School",
+      "ranks": {
+        "1": { "name": "In Defense of the Throne", "summary": "Free Raise on a spell that protects the Emperor or his family, and on spells unique to the Imperial families." },
+        "2": { "name": "New Spells", "summary": "Rank 2: new spells." },
+        "3": { "name": "New Spells", "summary": "Rank 3: new spells." },
+        "4": { "name": "New Spells", "summary": "Rank 4: new spells." },
+        "5": { "name": "New Spells", "summary": "Rank 5: new spells." }
+      },
+      "spellcasting": {
+        "options": { "emperor": "Protect the Emperor or his family", "imperial": "Spell unique to the Imperial families" },
+        "startingSpells": "universal, 3 Fire, 2 Earth, 1 Air"
+      }
+    }
+  }
+}

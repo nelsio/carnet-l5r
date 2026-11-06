@@ -3,7 +3,7 @@ import { ARMOR_TN, type CatalogArmor } from "../rules/l5r4e";
 import { catalogArmor, mountedArmorBonus } from "./engine";
 import { modifiersOf } from "./modifiers";
 import type { Character } from "./schema";
-import { activeEffects, armorEffects, effectOn, resolveValue, schoolContext } from "./schools";
+import { activeEffects, armorEffects, effectOn, resolveValue, schoolContext, type ActiveEffect } from "./schools";
 
 /** Terme d'une somme affichée : « + 3 Défense 5 », « Hida R2 2 ». */
 export interface ArmorPart { value: number; source: string }
@@ -18,7 +18,7 @@ export interface ArmorSheet {
   /** Technique qui lève le malus d'armure lourde (Hida R1), quand l'armure portée en a un. */
   waiver?: { source: string; except: string[] };
   /** Bonus au ND d'armure à cocher en combat (panneau Posture) ; `stack` : nom du compteur, formaté par l'interface. */
-  optional: { label: string; value: number; stack?: string; source?: string }[];
+  optional: { label: string; value: number; stack?: string; source?: string; effect?: ActiveEffect }[];
 }
 
 export function armorSheet(c: Character): ArmorSheet {
@@ -44,7 +44,7 @@ export function armorSheet(c: Character): ArmorSheet {
   const optional = [
     ...activeEffects(c).flatMap((e) => {
       if (e.kind !== "armor" || effectOn(e)) return [];
-      return [{ label: e.label ?? e.technique, value: resolveValue(e.value, c), ...(e.stack ? { stack: e.stack.label } : {}), source: e.source }];
+      return [{ label: e.label ?? e.technique, value: resolveValue(e.value, c), ...(e.stack ? { stack: e.stack.label } : {}), source: e.source, effect: e }];
     }),
     ...modifiersOf(c)
       .filter((m) => m.appliesTo === "armor" && m.mode === "optional")

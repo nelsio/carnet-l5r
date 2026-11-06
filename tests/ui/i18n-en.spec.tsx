@@ -9,6 +9,7 @@ import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
 import { renderApp } from "../helpers/render";
+import { chooseSchool } from "../../src/ui/components/sheet/hooks";
 
 afterEach(() => {
   localStorage.clear();
@@ -191,5 +192,71 @@ describe("Contenu en français (52.4)", () => {
     await openKakita("fr");
     fireEvent.click(screen.getByRole("button", { name: "Ressources" }));
     expect(screen.getByRole("menu").textContent).not.toContain("(FR)");
+  });
+});
+
+describe("Catalogues en anglais (annexe 54)", () => {
+  it("fiche : école, rangs, résumés et rappel chiffré en anglais ; en français, les textes d'avant", async () => {
+    await openKakita("en", { schoolId: "kitsuki-enqueteur", insightRank: 2 });
+    const block = within(screen.getByTestId("school-techniques"));
+    expect(block.getByText("Kitsuki Investigator School")).toBeInTheDocument();
+    expect(block.getByText(/· Dragon · School Rank 2/)).toBeInTheDocument();
+    expect(block.getByText("R1 · The Kitsuki Method")).toBeInTheDocument();
+    expect(block.getByText("1 Free Raise on Investigation. + Perception to your Armor TN in a skirmish.")).toBeInTheDocument();
+    expect(block.getByText("→ +10 to the TN of anyone lying to you.")).toBeInTheDocument();
+    expect(block.getByText("R5 · The Eyes Betray the Heart")).toBeInTheDocument();
+    expect(screen.getByTestId("school-techniques").textContent).not.toMatch(/École|Rang d'école| ND /);
+  });
+
+  it("fiche en français : noms et résumés du catalogue français", async () => {
+    await openKakita("fr", { schoolId: "kitsuki-enqueteur", insightRank: 2 });
+    const block = within(screen.getByTestId("school-techniques"));
+    expect(block.getByText("École d'enquêteurs Kitsuki")).toBeInTheDocument();
+    expect(block.getByText("R1 · La Méthode Kitsuki")).toBeInTheDocument();
+    expect(block.getByText("→ +10 au ND de qui te ment.")).toBeInTheDocument();
+  });
+
+  it("Assistant : compteur, case de ND d'armure, posture et rappels d'école en anglais", async () => {
+    await openKakita("en", { schoolId: "hiruma-bushi", insightRank: 3 });
+    act(() => fireEvent.click(screen.getByRole("button", { name: "L5R Assistant" })));
+    act(() => fireEvent.click(screen.getByRole("button", { name: "Combat" })));
+    expect(screen.getByText("Melee hits")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Add: Melee hits" })).toBeInTheDocument();
+    expect(screen.getByText("Hummingbird Wings (once per round)")).toBeInTheDocument();
+    expect(document.body.textContent).not.toMatch(/Touches au corps à corps|Ailes du colibri/);
+  });
+
+  it("table de bataille : événement en anglais", async () => {
+    await openKakita("en");
+    act(() => fireEvent.click(screen.getByRole("button", { name: "L5R Assistant" })));
+    act(() => fireEvent.click(screen.getByRole("button", { name: "Combat" })));
+    act(() => fireEvent.click(screen.getByRole("button", { name: "Battle" })));
+    // Ligne 7-9, colonne Engagé + armée en recul : Occasion héroïque.
+    const panel = within(screen.getByRole("group", { name: "Mass battle" }));
+    fireEvent.change(panel.getByRole("spinbutton", { name: "Battle roll total" }), { target: { value: "8" } });
+    act(() => fireEvent.click(panel.getByRole("button", { name: "Losing" })));
+    expect(within(panel.getByTestId("battle-outcome")).getByText("Heroic Opportunity")).toBeInTheDocument();
+  });
+
+  it("Bibliothèque : modèles anglais, fichiers example-*.json", async () => {
+    renderApp(<App storage={memoryStorage()} rng={() => 5} />, { locale: "en" });
+    await screen.findByRole("article", { name: "Courtier template" });
+    expect(screen.getByText("Kakita Haruto")).toBeInTheDocument();
+    const names: string[] = [];
+    URL.createObjectURL = vi.fn(() => "blob:example");
+    URL.revokeObjectURL = vi.fn();
+    vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(function (this: HTMLAnchorElement) { names.push(this.download); });
+    for (const t of ["Bushi", "Shugenja", "Courtier"]) fireEvent.click(screen.getByRole("button", { name: `JSON of the ${t} template` }));
+    expect(names).toEqual(["example-bushi-l5r.json", "example-shugenja-l5r.json", "example-courtier-l5r.json"]);
+  });
+});
+
+describe("Choix d'une école (annexe 54.2)", () => {
+  it("le nom affiché de l'école est écrit dans la langue de l'interface", () => {
+    const set = vi.fn();
+    chooseSchool(set, "doji-courtisan", "en");
+    expect(set).toHaveBeenLastCalledWith(["school"], "Doji Courtier School");
+    chooseSchool(set, "doji-courtisan", "fr");
+    expect(set).toHaveBeenLastCalledWith(["school"], "École de courtisans Doji");
   });
 });

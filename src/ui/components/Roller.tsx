@@ -1,14 +1,15 @@
 import { useEffect, useRef } from "react";
 import {
   applicableModifiers, armorRollTn, bowStrength, DAMAGE_MANEUVER_ID, describeEffect, focusOutcome, opposedMargin, opposedVerdict, stanceRestriction, woundEffectNote, describeModifier, effectOn, findSkill, fullDefenseBonus, maneuverCost, maneuverFreeRaises, modifierTN,
-  formatDR, isRanged, isSocialSkill, meditationVoidPoints, poolStats, reminderText, rollDice, schoolContext, schoolReminders, verdict, voidMultiplier,
-  castTime, castTimeLabel, concentrationTn, schoolRankOf, slotFor, spellCast, spellcastingOf, spellOptions, spellRaises, spellRestriction, SPELL_RINGS, spellSlotNeed, spellSlots,
+  formatDR, isRanged, isSocialSkill, meditationVoidPoints, poolStats, rollDice, schoolContext, schoolReminders, verdict, voidMultiplier,
+  castTime, castTimeLabel, concentrationTn, schoolOf, schoolRankOf, slotFor, spellCast, spellOptions, spellRaises, spellRestriction, SPELL_RINGS, spellSlotNeed, spellSlots,
   voidPointBonus, voidSpendBonus, voidSpendOption, woundState, type Spell, type SpellAction, type SpellRing, type SpellSlotKey,
   type ActionDef, type ActiveEffect, type Character, type CoreText, type Pool,
 } from "@carnet/core";
 import type { SpellOption } from "../../rules/ecoles";
 import { CALLED_ZONES, CENTER_BONUS, CONCENTRATE_ACTION_ID, MEDITATE_ACTION_ID, MELEE_TARGET_PENALTY, SPELL_CONCENTRATION, TN_PER_RAISE, TN_SCALE, type CalledZone } from "../../rules/l5r4e";
 import { useCoreText, useLocale, useT, type Locale, type Messages } from "../../i18n";
+import { useCatalog } from "../../i18n/catalog";
 import { actionSkillLabel, DICE_LETTER, formatPool, maneuverText, pct } from "../format";
 import {
   activeModifiers, calledRaises, contextOf, effectiveManeuvers, finalTN, isActive, isUnskilled, maneuverCosts, poolFor, rollWoundPenalty,
@@ -35,6 +36,7 @@ export function Roller() {
   const t = useT();
   const r = t.roller;
   const ct = useCoreText();
+  const cat = useCatalog();
   const { locale } = useLocale();
   const c = useCharacter();
   const { ui } = state;
@@ -134,7 +136,7 @@ export function Roller() {
       {chips.length > 0 && (
         <div className="tchips" data-testid="tech-chips">
           {chips.map((e) => (
-            <span key={e.key} className={`tchip${e.mastery ? " mastery" : ""}`} title={e.technique}>
+            <span key={e.key} className={`tchip${e.mastery ? " mastery" : ""}`} title={cat.effect(e).technique}>
               {e.mastery && <b className="tag">{r.mastery}</b>}{ct(describeEffect(e, c, ui.techInputs[e.key]))} · {e.source}
             </span>
           ))}
@@ -270,7 +272,7 @@ export function Roller() {
       {reminders.length > 0 && (
         <div data-testid="school-reminders">
           {reminders.map((e) => (
-            <div key={e.key} className="hint" style={{ color: "var(--accent-ink)" }}>{r.reminder(e.technique, e.source, reminderText(e, c))}</div>
+            <div key={e.key} className="hint" style={{ color: "var(--accent-ink)" }}>{r.reminder(cat.effect(e).technique, e.source, cat.reminder(e, c))}</div>
           ))}
         </div>
       )}
@@ -505,9 +507,10 @@ function SpellPanel({ action: a, spell }: { action: ActionDef; spell: Spell }) {
   const t = useT();
   const r = t.roller;
   const ct = useCoreText();
+  const cat = useCatalog();
   const c = useCharacter();
   const { opts } = state.ui;
-  const sc = spellcastingOf(c);
+  const school = schoolOf(c);
   const set = (patch: Partial<RollOptions>) => dispatch({ type: "option", patch });
   const damage = a.kind === "spellDamage";
   const options = spellOptions(c).filter(damage ? forSpellDamage : forSpellRoll);
@@ -516,7 +519,7 @@ function SpellPanel({ action: a, spell }: { action: ActionDef; spell: Spell }) {
       {options.map((o) => (
         <label key={o.id} className="chk">
           <input type="checkbox" checked={!!opts.spellOptions[o.id]} onChange={(e) => set({ spellOptions: { ...opts.spellOptions, [o.id]: e.target.checked } })} />
-          {" "}{o.label} <span className="muted">· {optionEffect(o, c, t, locale)}</span>
+          {" "}{school ? cat.spellOption(school, o) : o.label} <span className="muted">· {optionEffect(o, c, t, locale)}</span>
         </label>
       ))}
     </div>
@@ -544,7 +547,7 @@ function SpellPanel({ action: a, spell }: { action: ActionDef; spell: Spell }) {
           </RichSelect>
         </label>
       )}
-      {sc?.ringSwap && (
+      {school?.spellcasting?.ringSwap && (
         <div className="grid" style={{ gap: 6 }}>
           <label className="chk">
             <input
@@ -592,7 +595,7 @@ function SpellPanel({ action: a, spell }: { action: ActionDef; spell: Spell }) {
       <div className="hint">
         {r.interrupted(SPELL_CONCENTRATION.tn, SPELL_CONCENTRATION.base)}
       </div>
-      {sc?.reminders?.map((note) => <div key={note} className="hint" style={{ color: "var(--accent-ink)" }}>{note}</div>)}
+      {school && cat.spellReminders(school).map((note) => <div key={note} className="hint" style={{ color: "var(--accent-ink)" }}>{note}</div>)}
       {spell.effect && <div className="spelleffect prose" data-testid="spell-effect">{spell.effect}</div>}
     </div>
   );
@@ -654,6 +657,7 @@ function TechniqueOptions({ effects }: { effects: readonly ActiveEffect[] }) {
   const { techToggles, techInputs } = state.ui;
   const r = useT().roller;
   const ct = useCoreText();
+  const cat = useCatalog();
   return (
     <div className="grid bonuses" style={{ gap: 6, marginBottom: 12 }} role="group" aria-label={r.techniques}>
       <div className="label">{r.techniques}</div>
@@ -663,7 +667,7 @@ function TechniqueOptions({ effects }: { effects: readonly ActiveEffect[] }) {
           <div key={e.key}>
             <label className="chk">
               <input type="checkbox" checked={!!techToggles[e.key]} onChange={(ev) => dispatch({ type: "toggleTechnique", key: e.key, on: ev.target.checked })} />
-              {" "}{("label" in e && e.label) || e.technique}{" "}
+              {" "}{cat.effect(e).label || cat.effect(e).technique}{" "}
               <span className="muted">· {effect ? `${effect} · ` : ""}{"void" in e && e.void ? r.voidCost(e.void) : ""}{e.source}</span>
             </label>
             {"input" in e && e.input && (

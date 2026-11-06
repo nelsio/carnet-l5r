@@ -2,7 +2,7 @@
 
 « Terminé » = tests verts, `tsc --noEmit` sans erreur, lint propre, CI verte.
 
-État en v2.8.0 : **509 tests Vitest** (moteur, stockage, interface) et **70 tests Playwright** (chromium, iPhone 13, Pixel 7), lignes de `src/core` couvertes à 100 %. En v2.28.1 : 922 tests Vitest, 173 tests Playwright. En v2.28.4 : 937 tests Vitest, 173 tests Playwright. En v2.28.5 : 945 tests Vitest, 173 tests Playwright. En v2.30.0 : 980 tests Vitest, 180 tests Playwright.
+État en v2.8.0 : **509 tests Vitest** (moteur, stockage, interface) et **70 tests Playwright** (chromium, iPhone 13, Pixel 7), lignes de `src/core` couvertes à 100 %. En v2.28.1 : 922 tests Vitest, 173 tests Playwright. En v2.28.4 : 937 tests Vitest, 173 tests Playwright. En v2.28.5 : 945 tests Vitest, 173 tests Playwright. En v2.30.0 : 980 tests Vitest, 180 tests Playwright. En v2.31.0 : 995 tests Vitest, 181 tests Playwright.
 
 ### 10.0 Rangement des fichiers de test (annexe 47)
 - Un fichier par fonctionnalité, jamais par lot ni par version.
@@ -10,6 +10,7 @@
 - La traçabilité vers la spécification passe par le titre du `describe` (« (annexe E.2) », « (46.1) »), pas par le nom du fichier.
 - Un nouveau test va dans le fichier de sa fonctionnalité ; s'il n'existe pas, on le crée sous ce nom.
 - Langue (annexe 50.3) : sans fournisseur, un composant s'affiche en français ; `renderApp(ui, { locale })` (`tests/helpers/render.tsx`) enveloppe le fournisseur de langue. Playwright force `locale: "fr-FR"` ; les tests de l'anglais (E1 à E8 de l'annexe 52.5, V8 et V9 de l'annexe 53.4) le remplacent par `en-US` (`tests/e2e/i18n-en.spec.ts`, `tests/ui/i18n-en.spec.tsx`).
+- Catalogues (annexe 54.4) : couverture, repli, chiffres et clés de la surcouche anglaise dans `tests/i18n.catalog.spec.ts` ; modèles anglais dans `tests/core.example.spec.ts`.
 - Textes du moteur (annexe 53.2) : les tests du moteur comparent des codes `CoreText` ; un résumé composé se vérifie à travers le format français avec `say()` (`tests/helpers/text.ts`).
 
 ### 10.1 Moteur (`tests/core.rules.spec.ts`) — fourni, 80 tests

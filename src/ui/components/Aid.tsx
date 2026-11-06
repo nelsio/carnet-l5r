@@ -1,7 +1,7 @@
 import { Fragment, useEffect } from "react";
 import {
   armorEffects, armyStatus, battleOutcome, battleRollBonus, battleRollTotal, describeEffect, describeModifier, rollBattleDice, stanceEffects, fullAttackAllowed, guardRule, initiativeScore, isSimpleAttack, stanceRestriction, modifiersOf, movement, movementBonus, movementWater, resolveValue,
-  isShugenja, reminderText, rings, schoolOf, schoolReminders, spellRestriction, stackCount, stackEffects, stackMax, terrainWaiver, voidMultiplier,
+  isShugenja, rings, schoolOf, schoolReminders, spellRestriction, stackCount, stackEffects, stackMax, terrainWaiver, voidMultiplier,
   type ActionDef, type ActiveEffect,
 } from "@carnet/core";
 import {
@@ -11,6 +11,7 @@ import {
 import type { ReminderContext } from "../../rules/ecoles";
 import { SITUATION_LINKS } from "../../rules/portal";
 import { useCoreText, useLocale, useT } from "../../i18n";
+import { useCatalog } from "../../i18n/catalog";
 import { formatDistance, formatPool } from "../format";
 import { contextOf, currentArmorTN, DEFAULT_ROLL_OPTIONS, isActive, isRollable, poolFor, poolLabel, toPoolAction, uiRollStance } from "../rolls";
 import { currentActions, useCharacter, useStore, type AidSituation, type BattleState, type InfoPanel, type VoidChoice } from "../store";
@@ -155,6 +156,7 @@ function StancePanel() {
   const tx = useT().aid;
   const r = useT().rules;
   const ct = useCoreText();
+  const cat = useCatalog();
   const c = useCharacter();
   const { ui } = state;
   const tn = currentArmorTN(c, ui);
@@ -162,7 +164,7 @@ function StancePanel() {
   // Étiquettes de la posture, puis effets de technique réservés à cette posture (Hiruma R1, annexe I.3.4).
   const tagsOf = (s: (typeof STANCES)[number]): StanceTag[] => [
     ...s.tags.map((t, i) => ({ ...t, label: r.stances[s.id]?.tags[i] ?? t.label })),
-    ...stanceEffects(c, s.id).map((e) => ({ label: `${ct(describeEffect(e, c)) || e.technique} · ${e.source}`, up: true })),
+    ...stanceEffects(c, s.id).map((e) => ({ label: `${ct(describeEffect(e, c)) || cat.effect(e).technique} · ${e.source}`, up: true })),
   ];
   const current = STANCES.find((s) => s.id === ui.stance);
   return (
@@ -223,6 +225,7 @@ function StancePanel() {
 function SchoolCombat() {
   const { state, dispatch } = useStore();
   const tx = useT().aid;
+  const cat = useCatalog();
   const c = useCharacter();
   const { ui } = state;
   if (!schoolOf(c)) return null;
@@ -239,7 +242,7 @@ function SchoolCombat() {
       {boxes.map((e) => e.kind === "armor" && (
         <label key={e.key} className="chk">
           <input type="checkbox" checked={!!ui.schoolArmor[e.key]} onChange={(ev) => dispatch({ type: "toggleSchoolArmor", key: e.key, on: ev.target.checked })} />
-          {" "}<b>{e.label ?? e.technique}</b> <span className="muted">{tx.armorBox(resolveValue(e.value, c), e.source)}</span>
+          {" "}<b>{cat.effect(e).label ?? cat.effect(e).technique}</b> <span className="muted">{tx.armorBox(resolveValue(e.value, c), e.source)}</span>
         </label>
       ))}
       {stacked.some((e) => (ui.stacks[e.key] ?? 0) > 0) && (
@@ -276,19 +279,21 @@ function GuardBox() {
 function StackRow({ effect: e }: { effect: ActiveEffect }) {
   const { state, dispatch } = useStore();
   const tx = useT().aid;
+  const cat = useCatalog();
   const c = useCharacter();
   if (!("stack" in e) || !e.stack || (e.kind !== "armor" && e.kind !== "targetTn")) return null;
   const n = stackCount(c, e, state.ui.stacks);
   const max = stackMax(c, e);
   const value = resolveValue(e.value, c);
   const each = e.kind === "armor" ? tx.stackArmor(value) : tx.stackTarget(value);
+  const label = cat.effect(e).stackLabel ?? e.stack.label;
   return (
     <div className="stackrow">
-      <span><b>{e.stack.label}</b> <span className="muted">{tx.stackDetail(each, max, e.source)}</span></span>
+      <span><b>{label}</b> <span className="muted">{tx.stackDetail(each, max, e.source)}</span></span>
       <span className="stepper">
-        <button type="button" aria-label={tx.stackRemove(e.stack.label)} onClick={() => dispatch({ type: "stack", key: e.key, count: n - 1 })}>−</button>
+        <button type="button" aria-label={tx.stackRemove(label)} onClick={() => dispatch({ type: "stack", key: e.key, count: n - 1 })}>−</button>
         <b className="mono" data-testid={`stack-${e.key}`}>{n}</b>
-        <button type="button" aria-label={tx.stackAdd(e.stack.label)} disabled={n >= max} onClick={() => dispatch({ type: "stack", key: e.key, count: Math.min(max, n + 1) })}>+</button>
+        <button type="button" aria-label={tx.stackAdd(label)} disabled={n >= max} onClick={() => dispatch({ type: "stack", key: e.key, count: Math.min(max, n + 1) })}>+</button>
       </span>
     </div>
   );
@@ -298,6 +303,7 @@ function StackRow({ effect: e }: { effect: ActiveEffect }) {
 function RemindersPanel() {
   const { state } = useStore();
   const tx = useT().aid;
+  const cat = useCatalog();
   const c = useCharacter();
   const { situation, sub } = state.ui;
   const contexts: ReminderContext[] = situation === "court" ? ["social"] : sub === "duel" ? ["combat", "duel"] : ["combat"];
@@ -315,8 +321,8 @@ function RemindersPanel() {
       <div className="rems">
         {reminders.map((e) => (
           <div key={e.key}>
-            <b>{e.technique}</b> <span className="muted">· {e.source}</span>
-            {details && <div className="muted">{reminderText(e, c)}</div>}
+            <b>{cat.effect(e).technique}</b> <span className="muted">· {e.source}</span>
+            {details && <div className="muted">{cat.reminder(e, c)}</div>}
           </div>
         ))}
       </div>
@@ -334,6 +340,7 @@ const optionalInt = (v: string, min?: number) => (v === "" ? null : Math.max(min
 function BattlePanel() {
   const { state, dispatch, rng } = useStore();
   const tb = useT().aid.battle;
+  const cat = useCatalog();
   const r = useT().rules;
   const c = useCharacter();
   const { ui } = state;
@@ -422,7 +429,7 @@ function BattlePanel() {
       {outcome && total !== null && (
         <div className="battleres" data-testid="battle-outcome">
           <b>{tb.outcome(outcome.wounds, outcome.glory)}</b>
-          {outcome.event && <>, <b className="tag">{BATTLE_EVENT_LABELS[outcome.event]}</b></>}
+          {outcome.event && <>, <b className="tag">{cat.battleEvent(BATTLE_EVENT_LABELS[outcome.event], outcome.event)}</b></>}
           {details && (
             <div className="muted" style={{ fontSize: 13 }}>
               {tb.detail({

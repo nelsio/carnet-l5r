@@ -9,7 +9,7 @@ import { pathToFileURL } from "node:url";
 import sharp from "sharp";
 
 const lang = process.argv[2] === "en" ? "en" : "fr";
-// Textes cliqués, par langue (règles traduites au lot 53). Les noms de sort viennent du modèle : en français jusqu'au lot 54.
+// Textes cliqués, par langue (règles traduites au lot 53). Les noms de sort viennent du modèle de la langue (annexe 54.3).
 const L = {
   fr: {
     locale: "fr-FR", out: "docs/img", use: "Utiliser", view: "Vue", aid: "Assistant L5R", roll: /^Lancer/,
@@ -17,7 +17,7 @@ const L = {
   },
   en: {
     locale: "en-US", out: "docs/img/en", use: /^Use the /, view: "View", aid: "L5R Assistant", roll: /^Roll/,
-    skirmish: "Skirmish", attack: /Attack · Katana/, magic: "Magic", cast: /Cast · Frappe de jade/,
+    skirmish: "Skirmish", attack: /Attack · Katana/, magic: "Magic", cast: /Cast · Jade Strike/,
   },
 }[lang];
 const url = pathToFileURL(resolve("dist/carnet-l5r.html")).href;

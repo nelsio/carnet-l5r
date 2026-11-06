@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 2,
+  "name": "Kakita Haruto",
+  "clan": "Crane",
+  "family": "Kakita",
+  "school": "Kakita Bushi School",
+  "schoolId": "kakita-bushi",
+  "schoolRank": null,
+  "insightRank": 1,
+  "honor": 6.5,
+  "glory": 1.0,
+  "status": 1.0,
+  "xp": { "total": 40, "spent": 34 },
+  "traits": {
+    "stamina": 2, "willpower": 2,
+    "strength": 2, "perception": 2,
+    "agility": 3, "intelligence": 2,
+    "reflexes": 3, "awareness": 3
+  },
+  "voidRing": 2,
+  "voidPoints": 2,
+  "wounds": 0,
+  "armor": { "name": "Light Armor", "bonus": 5, "reduction": 3, "catalogId": "light" },
+  "skills": [
+    { "name": "Iaijutsu", "rank": 3, "trait": "reflexes", "emphases": ["Focus"] },
+    { "name": "Kenjutsu", "rank": 2, "trait": "agility", "emphases": ["Katana"] },
+    { "name": "Kyujutsu", "rank": 1, "trait": "reflexes", "emphases": [] },
+    { "name": "Defense", "rank": 1, "trait": "reflexes", "emphases": [] },
+    { "name": "Etiquette", "rank": 2, "trait": "awareness", "emphases": ["Courtesy"] },
+    { "name": "Sincerity", "rank": 1, "trait": "awareness", "emphases": ["Honesty"] },
+    { "name": "Tea Ceremony", "rank": 1, "trait": "void", "emphases": [] },
+    { "name": "Courtier", "rank": 1, "trait": "awareness", "emphases": [] },
+    { "name": "Investigation", "rank": 1, "trait": "perception", "emphases": ["Notice"] },
+    { "name": "Perform: Oratory", "rank": 1, "trait": "awareness", "emphases": [] },
+    { "name": "Horsemanship", "rank": 1, "trait": "agility", "emphases": [] }
+  ],
+  "weapons": [
+    { "name": "Katana", "skill": "Kenjutsu", "dr": "3k2", "keywords": ["samourai", "moyenne"] },
+    { "name": "Wakizashi", "skill": "Kenjutsu", "dr": "2k2", "keywords": ["samourai", "moyenne"] },
+    { "name": "Yumi", "skill": "Kyujutsu", "dr": "2k2", "bowStrength": 3, "keywords": ["arc", "distance", "grande"] }
+  ],
+  "techniques": [],
+  "maneuvers": [],
+  "modifiers": [
+    {
+      "id": "voix", "name": "Voice", "source": "advantage", "appliesTo": "skill", "skill": "Perform: Oratory",
+      "rolled": 1, "kept": 1, "flat": 0, "tn": 0, "freeRaises": 0, "mode": "always",
+      "note": "+1k1 to Perform rolls that use the voice (singing, oratory)."
+    }
+  ],
+  "advantages": "Voice",
+  "disadvantages": "Overconfident",
+  "notes": "Example character (Crane, Kakita bushi, rank 1). Replace everything with your own samurai."
+}

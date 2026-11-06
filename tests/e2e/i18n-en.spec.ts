@@ -80,4 +80,30 @@ test.describe("navigateur en anglais", () => {
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
   });
+
+  test("C6 : mobile 360 px, Techniques d'école en anglais : noms entiers, menu dans l'écran (annexe 54)", async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 780 });
+    await page.goto(pageUrl);
+    await page.getByRole("button", { name: "New blank sheet" }).click();
+    const school = page.getByRole("combobox", { name: "School techniques" });
+    expect(await school.evaluate((e) => parseFloat(getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(16);
+    await school.selectOption("kitsune-shugenja");
+    await expect(page.getByRole("textbox", { name: "School (displayed name)" })).toHaveValue("Kitsune Shugenja School (Fox)");
+    await expect(page.getByTestId("school-techniques")).toContainText("R1 · The Essence of Chikushudo");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
+    if (!(await page.evaluate(() => CSS.supports("appearance", "base-select")))) return;
+    await expect(school.locator("selectedcontent .n")).toHaveText("Kitsune Shugenja School (Fox)");
+    await school.click();
+    await expect(school.locator("legend", { hasText: "Minor Clans" })).toBeVisible();
+    const clipped = await school.locator("option .n").evaluateAll((els) => els.filter((e) => e.scrollWidth > e.clientWidth + 1).map((e) => e.textContent));
+    expect(clipped).toEqual([]);
+    for (const option of await school.locator("option").all()) {
+      const b = (await option.boundingBox())!;
+      expect(b.x).toBeGreaterThanOrEqual(0);
+      expect(b.x + b.width).toBeLessThanOrEqual(360.5);
+    }
+    await page.screenshot({ path: "test-results/i18n-en/ecoles-360.png" });
+    await page.keyboard.press("Escape");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
+  });
 });

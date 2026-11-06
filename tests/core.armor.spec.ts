@@ -60,10 +60,15 @@ describe("L28 : bloc Armure (E.18)", () => {
       schoolId: "hiruma-bushi", insightRank: 3,
       modifiers: [{ id: "m1", name: "Parade", source: "technique", appliesTo: "armor", rolled: 0, kept: 0, flat: 5, tn: 0, freeRaises: 0, note: "", mode: "optional" }],
     });
-    expect(armorSheet(c).optional).toEqual([
+    const optional = armorSheet(c).optional;
+    expect(optional.map((o) => ({ ...o, effect: undefined }))).toEqual([
       { label: "La Petite Leçon du loup", value: 5, stack: "Touches au corps à corps", source: "Hiruma R2" },
       { label: "Ailes du colibri (1 fois par round)", value: 6, source: "Hiruma R3" },
       { label: "Parade", value: 5 },
+    ]);
+    // Effet d'origine des cases de technique, pour leurs textes traduits (annexe 54.2).
+    expect(optional.map((o) => o.effect?.origin)).toEqual([
+      { school: "hiruma-bushi", rank: 2, index: 0 }, { school: "hiruma-bushi", rank: 3, index: 0 }, undefined,
     ]);
   });
 
