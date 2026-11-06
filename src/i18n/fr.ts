@@ -587,6 +587,7 @@ export const fr = {
     guide: "Guide",
     bug: "Signaler un bug",
     project: "Projet",
+    contact: "Contact",
     memo: [
       ["Système", "Roll & Keep, L5R 4e édition"],
       ["Explosion", "sur 10 ; dégâts sur 9 et 10 avec Kenjutsu ou Armes lourdes au rang 7"],
@@ -595,6 +596,36 @@ export const fr = {
     ],
     /** Dernière ligne du mémo, en couleur d'avertissement. */
     caution: ["Duel, bataille", "procédures résumées : vérifie le détail dans ton livre de base"],
+  },
+  /** Formulaire de contact (annexe 56). */
+  contact: {
+    title: "Contacter l'auteur",
+    name: "Nom ou pseudo",
+    optional: "facultatif",
+    email: "Email pour te répondre",
+    emailHint: "Sans email, je ne pourrai pas te répondre.",
+    subject: "Sujet",
+    subjects: { question: "Question", idea: "Idée/suggestion", feedback: "Retour d'expérience", other: "Autre" },
+    message: "Message",
+    count: (n: number, max: number) => `${n} / ${max}`,
+    send: "Envoyer",
+    sending: "Envoi…",
+    bugBefore: "Un bug ? → ",
+    bugLink: "Signaler sur GitHub",
+    privacy: "Ton message est transmis par mail via le service Web3Forms. Rien n'est stocké dans le Carnet.",
+    disabled: "Le formulaire de contact n'est pas encore disponible.",
+    offline: "Hors ligne : l'envoi sera possible une fois reconnecté.",
+    failed: "Échec de l'envoi, réessaie plus tard.",
+    tooSoon: "Un instant : réessaie dans quelques secondes.",
+    cooldown: "Message déjà envoyé : attends une minute avant le suivant.",
+    thanks: "Merci ! Message envoyé.",
+    errors: {
+      messageEmpty: "Écris ton message.",
+      messageShort: "Message trop court : 10 caractères au moins.",
+      messageLong: "Message trop long : 3000 caractères au plus.",
+      emailInvalid: "Adresse email invalide.",
+      nameLong: "80 caractères au plus.",
+    },
   },
   /** Export, import et fichier lié (HANDOFF §5.2, §8). */
   file: {
