@@ -5,10 +5,10 @@
 
 /**
  * Clé d'accès Web3Forms, publique par conception : elle ne permet que d'envoyer vers l'adresse associée.
- * Tant qu'elle vaut « A_REMPLACER », le formulaire est désactivé. Procédure : annexe 56.4.
+ * Vide ou « A_REMPLACER » : formulaire désactivé. Procédure : annexe 56.4 ; clé renseignée en v2.32.1 (annexe 56.7).
  */
 export const CONTACT_CONFIG = {
-  accessKey: "A_REMPLACER",
+  accessKey: "34812af9-dffc-4c23-88fa-2cbec965dcd8",
   endpoint: "https://api.web3forms.com/submit",
 } as const;
 
