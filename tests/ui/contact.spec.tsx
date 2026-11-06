@@ -15,6 +15,7 @@ import pkg from "../../package.json";
 import kakita from "../fixtures/kakita-v1.json";
 
 const config = CONTACT_CONFIG as { accessKey: string };
+const SHIPPED = CONTACT_CONFIG.accessKey;
 const KEY = "cle-de-test";
 const MESSAGE = "Bonjour, une question sur les écoles.";
 
@@ -33,7 +34,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  config.accessKey = "A_REMPLACER";
+  config.accessKey = SHIPPED;
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
   delete (navigator as { onLine?: boolean }).onLine;
@@ -93,6 +94,11 @@ describe("C1 : point d'entrée et clé non renseignée", () => {
     expect(isConfigured("A_REMPLACER")).toBe(false);
     expect(isConfigured("  ")).toBe(false);
     expect(isConfigured(KEY)).toBe(true);
+  });
+
+  it("v2.32.1 : clé livrée renseignée (annexe 56.7)", () => {
+    expect(SHIPPED).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+    expect(isConfigured(SHIPPED)).toBe(true);
   });
 });
 

@@ -2,7 +2,7 @@
 
 « Terminé » = tests verts, `tsc --noEmit` sans erreur, lint propre, CI verte.
 
-État en v2.8.0 : **509 tests Vitest** (moteur, stockage, interface) et **70 tests Playwright** (chromium, iPhone 13, Pixel 7), lignes de `src/core` couvertes à 100 %. En v2.28.1 : 922 tests Vitest, 173 tests Playwright. En v2.28.4 : 937 tests Vitest, 173 tests Playwright. En v2.28.5 : 945 tests Vitest, 173 tests Playwright. En v2.30.0 : 980 tests Vitest, 180 tests Playwright. En v2.31.0 : 995 tests Vitest, 181 tests Playwright. En v2.32.0 : 1024 tests Vitest, 184 tests Playwright.
+État en v2.8.0 : **509 tests Vitest** (moteur, stockage, interface) et **70 tests Playwright** (chromium, iPhone 13, Pixel 7), lignes de `src/core` couvertes à 100 %. En v2.28.1 : 922 tests Vitest, 173 tests Playwright. En v2.28.4 : 937 tests Vitest, 173 tests Playwright. En v2.28.5 : 945 tests Vitest, 173 tests Playwright. En v2.30.0 : 980 tests Vitest, 180 tests Playwright. En v2.31.0 : 995 tests Vitest, 181 tests Playwright. En v2.32.0 : 1024 tests Vitest, 184 tests Playwright. En v2.32.1 : 1025 tests Vitest, 185 tests Playwright.
 
 ### 10.0 Rangement des fichiers de test (annexe 47)
 - Un fichier par fonctionnalité, jamais par lot ni par version.

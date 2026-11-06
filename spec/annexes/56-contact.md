@@ -49,3 +49,9 @@ Procédure :
 - Le piège à robots porte aussi `aria-hidden="true"` : un lecteur d'écran ne doit pas le proposer.
 - Le focus piégé et le retour du focus s'appliquent aussi aux fenêtres d'import (cadre `Modal` commun) ; leurs tests passent sans changement.
 - Critère « un message de test arrive » : non vérifiable dans ce lot, la clé n'est pas encore créée ; procédure en 56.4.
+
+### 56.7 v2.32.1 : clé renseignée
+
+- `CONTACT_CONFIG.accessKey` reçoit la clé Web3Forms créée par l'auteur (étapes 1 et 2 de 56.4) : le formulaire est actif, dans le fichier de release comme sur Pages.
+- Tests : C1 garde le cas « A_REMPLACER » en le posant lui-même et vérifie que la clé livrée est renseignée ; chaque test remet la clé livrée. C12 (Playwright) ne teste plus la fenêtre désactivée : il envoie un message vers Web3Forms simulé par `page.route` (horloge avancée de 3 s), et vérifie la clé, le sujet et le remerciement. Aucun envoi réel.
+- Étape 3 de 56.4 (envoi de test réel, réception dans la boîte mail) : faite par l'auteur après le déploiement.

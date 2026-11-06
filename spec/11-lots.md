@@ -61,6 +61,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 49. **v2.31.0 — catalogues en anglais** (**livrée**, écarts en 54.5) : annexe 54, lot 54. Surcouches `src/rules/en/*.json` (écoles, techniques, maîtrises, table de bataille), lues par `src/i18n/catalog.ts` avec repli sur le français ; modèles de fiche anglais dans la Bibliothèque ; mots-clés de sort anglais reconnus.
 50. **v2.31.1 — README anglais** (**livrée**, écarts en 55.3) : annexe 55, lot 55. `README.md` en anglais avec les captures `docs/img/en/`, version française dans `README-fr.md`, liens des documents français vers `README-fr.md` ; toute modification de la vitrine se fait dans les deux README (§9.3). Localisation (lots 50 à 55) terminée.
 51. **v2.32.0 — formulaire de contact** (**livrée**, écarts en 56.6) : annexe 56, lot 56. Bouton Contact du pied de page, fenêtre « Contacter l'auteur » envoyée par Web3Forms, validation, piège à robots, délais de 3 s et 60 s, mode hors ligne ; bugs toujours vers les Issues.
+   - **v2.32.1** (patch, 56.7) : clé Web3Forms renseignée, formulaire actif.
 52. **À définir** : journal d'achats en XP (K.6), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
 
 ### Historique des états
