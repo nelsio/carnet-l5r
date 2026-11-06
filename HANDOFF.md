@@ -6,7 +6,7 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document et le dossier `spec/` qu'il indexe.
 
-**État actuel :** version **v2.31.0**, lot 54 : écoles, techniques, maîtrises, table de bataille et modèles de fiche en anglais, surcouche d'affichage des catalogues français (annexe 54) ; reste le README anglais (lot 55).
+**État actuel :** version **v2.31.1**, lot 55 : `README.md` en anglais, version française dans `README-fr.md` (annexe 55) ; la localisation (lots 50 à 55) est livrée : interface, règles, catalogues et vitrine en français et en anglais, guide joueur en français.
 
 ---
 
@@ -62,6 +62,7 @@ Fait foi :
 | 52 | Interface en anglais | 52 | v2.29.0 | [`52-i18n-anglais.md`](spec/annexes/52-i18n-anglais.md) |
 | 53 | Règles en anglais, noms de compétence anglais, textes du moteur ; 53.6 : `minimatch` 11 | 53 | v2.30.0, v2.30.1 | [`53-i18n-regles.md`](spec/annexes/53-i18n-regles.md) |
 | 54 | Catalogues en anglais : écoles, maîtrises, bataille, modèles | 54 | v2.31.0 | [`54-i18n-catalogues.md`](spec/annexes/54-i18n-catalogues.md) |
+| 55 | README anglais, `README-fr.md` | 55 | v2.31.1 | [`55-readme-anglais.md`](spec/annexes/55-readme-anglais.md) |
 
 ## Lire pour un lot
 

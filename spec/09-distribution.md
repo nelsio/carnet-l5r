@@ -12,10 +12,12 @@
 - Toute évolution du format de fiche incrémente `schemaVersion` et ajoute une migration testée.
 - Une ancienne fiche s'ouvre toujours dans une version plus récente de l'outil.
 
-### 9.3 README et guide joueur (en français)
-Depuis v2.20.2 (annexe M.1), le guide joueur est **`docs/GUIDE.md`**. Le **README** reste une vitrine : présentation, captures, démarrage, développement. Les licences et crédits sont dans `docs/CREDITS.md`.
+### 9.3 README et guide joueur
+Depuis v2.20.2 (annexe M.1), le guide joueur est **`docs/GUIDE.md`**, en français. Le **README** reste une vitrine : présentation, captures, démarrage, développement. Les licences et crédits sont dans `docs/CREDITS.md`.
 
-Règle pour chaque lot : **mettre à jour `docs/GUIDE.md`**. Ne toucher au README que si une fonction listée dans « Ce que fait le Carnet » change ; relancer `npm run build && npm run screenshots` (hors CI) et committer `docs/img/` si un écran capturé change visiblement.
+Depuis v2.31.1 (annexe 55.1), la vitrine existe en deux langues : **`README.md` en anglais** (page d'accueil du dépôt, captures `docs/img/en/`) et **`README-fr.md` en français** (captures `docs/img/`), reliés par une ligne `English · Français` sous les badges. Les documents en français (`CONTRIBUTING.md`, guide, crédits) pointent vers `README-fr.md`.
+
+Règle pour chaque lot : **mettre à jour `docs/GUIDE.md`**. Ne toucher aux README que si une fonction listée dans « Ce que fait le Carnet » change, et alors **toujours dans les deux README** ; relancer `npm run build && npm run screenshots && npm run screenshots -- en` (hors CI) et committer `docs/img/` si un écran capturé change visiblement.
 
 Contenu du guide :
 1. **Utiliser en ligne** : l'adresse GitHub Pages. Les fiches restent dans ton navigateur et ne sont jamais envoyées ; seule la visite est comptée (annexe O.5).
@@ -25,7 +27,7 @@ Contenu du guide :
    - sur Chrome ou Edge, la lier à un fichier du dossier Drive synchronisé.
 4. **Pour le MJ** : importer les JSON des joueurs en mode Consultation.
 5. **Changer d'appareil** : exporter, puis importer en « Nouvelle fiche ».
-6. Licences des polices et mention « L5R est une marque de son éditeur ; outil de fan non officiel » : dans `docs/CREDITS.md`, résumées en une ligne dans le README.
+6. Licences des polices et mention « L5R est une marque de son éditeur ; outil de fan non officiel » : dans `docs/CREDITS.md`, résumées en une ligne dans chaque README.
 
 ---
 

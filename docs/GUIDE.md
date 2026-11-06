@@ -1,6 +1,6 @@
 # Guide d'utilisation du Carnet de Rokugan
 
-[← Retour au README](../README.md)
+[← Retour au README](../README-fr.md)
 
 1. [Utiliser en ligne](#1-utiliser-en-ligne)
 2. [Utiliser hors ligne](#2-utiliser-hors-ligne)

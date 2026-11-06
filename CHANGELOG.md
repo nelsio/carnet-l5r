@@ -6,6 +6,13 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.31.1] - 2026-11-06
+
+### Documentation
+- Le README est désormais en anglais ; la version française est dans `README-fr.md`.
+- Les deux README signalent l'interface en français et en anglais.
+- Liens de comparaison des versions 2.31.0 et 2.31.1 en fin de journal.
+
 ## [2.31.0] - 2026-11-06
 
 ### Ajouté
@@ -427,7 +434,9 @@ Simples liens ouverts dans un nouvel onglet : le Carnet ne fait toujours aucune 
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.30.1...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.31.1...HEAD
+[2.31.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.31.1
+[2.31.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.31.0
 [2.30.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.30.1
 [2.30.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.30.0
 [2.29.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.29.0
