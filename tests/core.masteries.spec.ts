@@ -11,6 +11,7 @@ import {
 import { MASTERIES } from "../src/rules/ecoles";
 import { ARMOR_CATALOG } from "../src/rules/l5r4e";
 import perso from "../reference/perso-test-ecoles.json";
+import { say } from "./helpers/text";
 
 const char = (patch: Partial<Character> = {}): Character => ({ ...(structuredClone(perso) as Character), ...patch });
 const withSkill = (c: Character, name: string, rank: number, trait: Character["skills"][number]["trait"] = "agility"): Character => {
@@ -63,7 +64,7 @@ describe("Maîtrises de compétence (annexe E.4)", () => {
     const iai: PoolAction = { kind: "skill", skill: "Iaijutsu", trait: "reflexes" };
     expect(computePool(c, iai, {}).freeRaises).toBe(1);
     expect(computePool(c, attack(c, "Katana"), {}).freeRaises).toBeUndefined();
-    expect(computePool(c, iai, {}).applied?.map((e) => `${describeEffect(e, c)} · ${e.source}`)).toEqual(["1 augm. gratuite · Iaijutsu 10"]);
+    expect(computePool(c, iai, {}).applied?.map((e) => `${say(describeEffect(e, c))} · ${e.source}`)).toEqual(["1 augm. gratuite · Iaijutsu 10"]);
   });
 
   it("L1 (rappel) : Kenjutsu 3 donne +1g0 aux dégâts des épées, pas à l'attaque ni aux autres armes", () => {
@@ -77,7 +78,7 @@ describe("Maîtrises de compétence (annexe E.4)", () => {
   it("L2 (rappel) : Armes lourdes 7 explose sur 9, sans dé de plus ; un Désarmement garde 2g1 sans maîtrise", () => {
     const c = withSkill(char(), "Armes lourdes", 7);
     expect(computePool(c, damage(c, "Tetsubo"), {})).toMatchObject({ rolled: 5, kept: 3, explodeOn: 9 });
-    expect(computePool(c, damage(c, "Tetsubo"), {}).notes).toContain("Maîtrise Armes lourdes 7 : les dés explosent sur 9 et 10");
+    expect(computePool(c, damage(c, "Tetsubo"), {}).notes).toContainEqual({ key: "pool.explode", source: "Armes lourdes 7", on: 9 });
     const ken = withSkill(char(), "Kenjutsu", 7);
     expect(computePool(ken, damage(ken, "Katana"), { disarm: true })).toMatchObject({ rolled: 2, kept: 1, explodeOn: 10 });
   });
@@ -218,13 +219,14 @@ describe("Catalogue d'armures (annexe E.5)", () => {
     expect(computePool(c, { kind: "skill", skill: "Étiquette", trait: "awareness" }, {}).armorTn).toBeUndefined();
     expect(computePool(c, { kind: "initiative" }, {}).armorTn).toBeUndefined();
     expect(computePool(c, damage(c, "Katana"), {}).armorTn).toBeUndefined();
-    expect(armorRollTn(c, agility).notes).toEqual(["Armure lourde : +5 au ND (Agilité, Réflexes)"]);
+    expect(armorRollTn(c, agility).notes).toEqual([{ key: "armor.heavy", armor: "heavy", tn: 5, onFoot: false }]);
+    expect(say(armorRollTn(c, agility).notes[0]!)).toBe("Armure lourde : +5 au ND (Agilité, Réflexes)");
   });
 
   it("lourde et Hida R1 : malus ignoré, sauf en Discrétion", () => {
     const c = armored("heavy", { schoolId: "hida-bushi" });
     expect(computePool(c, attack(c, "Katana"), {}).armorTn).toBeUndefined();
-    expect(armorRollTn(c, attack(c, "Katana")).notes).toEqual(["Armure lourde : malus ignoré (Hida R1)"]);
+    expect(armorRollTn(c, attack(c, "Katana")).notes).toEqual([{ key: "armor.waived", armor: "heavy", source: "Hida R1" }]);
     expect(computePool(c, stealth, {}).armorTn).toBe(5);
   });
 

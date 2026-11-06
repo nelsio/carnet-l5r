@@ -17,8 +17,8 @@ export interface ArmorSheet {
   reduction: { armor: number; parts: ArmorPart[]; total: number };
   /** Technique qui lève le malus d'armure lourde (Hida R1), quand l'armure portée en a un. */
   waiver?: { source: string; except: string[] };
-  /** Bonus au ND d'armure à cocher en combat (panneau Posture). */
-  optional: string[];
+  /** Bonus au ND d'armure à cocher en combat (panneau Posture) ; `stack` : nom du compteur, formaté par l'interface. */
+  optional: { label: string; value: number; stack?: string; source?: string }[];
 }
 
 export function armorSheet(c: Character): ArmorSheet {
@@ -44,12 +44,11 @@ export function armorSheet(c: Character): ArmorSheet {
   const optional = [
     ...activeEffects(c).flatMap((e) => {
       if (e.kind !== "armor" || effectOn(e)) return [];
-      const value = `+${resolveValue(e.value, c)}${e.stack ? ` × ${e.stack.label ?? "compteur"}` : ""}`;
-      return [`${e.label ?? e.technique} (${value}, ${e.source})`];
+      return [{ label: e.label ?? e.technique, value: resolveValue(e.value, c), ...(e.stack ? { stack: e.stack.label } : {}), source: e.source }];
     }),
     ...modifiersOf(c)
       .filter((m) => m.appliesTo === "armor" && m.mode === "optional")
-      .map((m) => `${m.name} (${m.flat >= 0 ? "+" : ""}${m.flat})`),
+      .map((m) => ({ label: m.name, value: m.flat })),
   ];
 
   return {

@@ -1,11 +1,11 @@
 import { NEW_CHARACTER_NAME, STARTING_TRAIT, STARTING_XP } from "../rules/l5r4e";
 import { SCHEMA_VERSION, TRAIT_KEYS, type Character } from "./schema";
 
-/** Fiche vierge, valide pour le schéma. */
-export function createCharacter(): Character {
+/** Fiche vierge, valide pour le schéma ; `name` : nom dans la langue de l'interface (annexe 53.1). */
+export function createCharacter(name: string = NEW_CHARACTER_NAME): Character {
   return {
     schemaVersion: SCHEMA_VERSION,
-    name: NEW_CHARACTER_NAME,
+    name,
     clan: "", family: "", school: "", schoolId: "", schoolRank: null,
     insightRank: 1,
     honor: 0, glory: 0, status: 0,

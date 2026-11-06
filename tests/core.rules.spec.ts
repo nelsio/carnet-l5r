@@ -526,9 +526,9 @@ describe("Moteur : correctifs de règles (annexe E.2)", () => {
     expect(show(c, damage(c, "Yumi"))).toBe("4g2");
     const daikyu = computePool(c, damage(c, "Dai-kyu"), {});
     expect(`${daikyu.rolled}g${daikyu.kept}`).toBe("4g2");
-    expect(daikyu.warnings?.[0]).toMatch(/Force 3 minimum/);
+    expect(daikyu.warnings?.[0]).toEqual({ key: "pool.minStrength", weapon: "Dai-kyu", min: 3, strength: 2 });
     expect(computePool(c, damage(c, "Yumi"), {}).warnings).toBeUndefined();
-    expect(computePool(c, damage(c, "Yumi"), {}).notes).toContain("Force 2 : l'arc de force 3 tire à 2");
+    expect(computePool(c, damage(c, "Yumi"), {}).notes).toContainEqual({ key: "pool.bowCapped", strength: 2, bow: 3 });
   });
 
   it("L27 : tir yumi monté ND +10 ; dai-kyu à pied ND +10 ; dai-kyu monté ND +0 (C12)", () => {

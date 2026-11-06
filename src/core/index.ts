@@ -21,3 +21,4 @@ export * from "./spells";
 export * from "./insight";
 export * from "./grimoire";
 export * from "./photo";
+export * from "./text";

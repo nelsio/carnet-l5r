@@ -148,7 +148,7 @@ function TemplateCard({ example: x }: { example: Example }) {
         <div className="n">{c.name}</div>
         <div className="m">
           <span className="dot sm" aria-hidden="true" style={{ ["--dot-l" as string]: accent.light, ["--dot-d" as string]: accent.dark }} />
-          {accent.label ?? c.clan} · {tc.header.rank(schoolRankOf(c))}
+          {(accent.id && tc.rules.clans[accent.id]) || accent.label || c.clan} · {tc.header.rank(schoolRankOf(c))}
         </div>
       </div>
       <div className="file-actions">

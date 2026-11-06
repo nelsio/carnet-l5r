@@ -63,10 +63,9 @@ export function rolled(state: AppState, c: Character, action: Extract<AppAction,
   const feint = a.attack && success && typeof action.tn === "number" && (ui.maneuvers[FEINT_MANEUVER_ID] ?? 0) > 0
     ? feintBonus(c, total, action.tn) : 0;
   const maneuvers = a.attack
-    ? Object.entries(ui.maneuvers).filter(([, n]) => n > 0).map(([id, n]) => {
+    ? Object.entries(ui.maneuvers).filter(([, n]) => n > 0).flatMap(([id, n]) => {
         const m = effectiveManeuvers(c).find((x) => x.id === id);
-        const name = m?.name ?? id;
-        return m?.stackable ? `${name} ×${n}` : name;
+        return m ? [{ maneuver: m, count: n }] : [];
       })
     : [];
 

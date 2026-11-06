@@ -1,5 +1,4 @@
 import { attackTrait, catalogGap, catalogWeapon, formatDR, isRanged, parseDR, parseWeaponKeywords, weaponKeywords } from "@carnet/core";
-import { WEAPON_KEYWORD_LABELS } from "../../../rules/ecoles";
 import { useLocale, useT } from "../../../i18n";
 import { DICE_LETTER } from "../../format";
 import { poolLabel } from "../../rolls";
@@ -12,6 +11,7 @@ import { AddButton, Field, OptionalNumber, RemoveButton } from "./shared";
 function CatalogGap({ index }: { index: number }) {
   const { c, set } = useSheet();
   const s = useT().sheet.weapons;
+  const keywordLabels = useT().rules.weaponKeywords;
   const { locale } = useLocale();
   const w = c.weapons[index];
   const gap = w && catalogGap(w);
@@ -20,7 +20,7 @@ function CatalogGap({ index }: { index: number }) {
   const sameKeywords = [...(w.keywords ?? [])].sort().join() === [...gap.keywords].sort().join();
   const parts = [
     own.rolled !== book.rolled || own.kept !== book.kept ? formatDR(gap.dr, DICE_LETTER[locale]) : "",
-    sameKeywords ? "" : gap.keywords.map((k) => WEAPON_KEYWORD_LABELS[k]).join(", "),
+    sameKeywords ? "" : gap.keywords.map((k) => keywordLabels[k]).join(", "),
   ].filter(Boolean);
   return (
     <div className="suggest" role="group" aria-label={s.gapLabel(w.name)}>
@@ -36,6 +36,7 @@ function CatalogGap({ index }: { index: number }) {
 export function Weapons() {
   const { c, edit, set } = useSheet("weapons");
   const s = useT().sheet.weapons;
+  const keywordLabels = useT().rules.weaponKeywords;
   const { locale } = useLocale();
   const { state } = useStore();
   if (edit) {
@@ -87,7 +88,7 @@ export function Weapons() {
                 <td>
                   <b>{w.name}</b>
                   <div className="muted" style={{ fontSize: 12.5 }}>{s.summary(w.skill, formatDR(w.dr, DICE_LETTER[locale]), isRanged(w) ? w.bowStrength ?? 0 : undefined)}</div>
-                  {keywords.length > 0 && <div>{keywords.map((k) => <span key={k} className="tag">{WEAPON_KEYWORD_LABELS[k]}</span>)}</div>}
+                  {keywords.length > 0 && <div>{keywords.map((k) => <span key={k} className="tag">{keywordLabels[k]}</span>)}</div>}
                   {state.mode === "edit" && <CatalogGap index={i} />}
                 </td>
                 <td className="pool" data-testid={`attack-pool-${w.name}`}>{poolLabel(atk, locale)}</td>

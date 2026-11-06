@@ -2,6 +2,7 @@
 import { SOCIAL_SKILLS, type Stance } from "../rules/l5r4e";
 import { normalize, type PoolAction } from "./engine";
 import type { Character, Modifier } from "./schema";
+import type { ModifierEffect } from "./text";
 
 export function modifiersOf(c: Character): Modifier[] {
   return c.modifiers ?? [];
@@ -61,15 +62,10 @@ export function woundPenaltyReduction(c: Character): number {
   return modifiersOf(c).filter((m) => m.appliesTo === "wounds").reduce((s, m) => s + m.flat, 0);
 }
 
-/** Résumé lisible d'un effet : « +1g0 », « +1g1, +5 au total », « +5 au ND ». */
-export function describeModifier(m: Pick<Modifier, "appliesTo" | "rolled" | "kept" | "flat" | "freeRaises"> & { tn?: number }): string {
-  const sign = (n: number) => (n >= 0 ? `+${n}` : `${n}`);
-  if (m.appliesTo === "armor") return `${sign(m.flat)} au ND d'armure`;
-  if (m.appliesTo === "wounds") return `${sign(-m.flat)} à la pénalité de blessure`;
-  const parts: string[] = [];
-  if (m.rolled || m.kept) parts.push(`${m.rolled >= 0 && m.kept >= 0 ? "+" : ""}${m.rolled}g${m.kept}`);
-  if (m.flat) parts.push(`${sign(m.flat)} au total`);
-  if (m.freeRaises) parts.push(`${m.freeRaises} augm. gratuite${m.freeRaises > 1 ? "s" : ""}`);
-  if (m.tn) parts.push(`${sign(m.tn)} au ND`);
-  return parts.join(", ") || "sans effet";
+/**
+ * Effet d'un bonus, formaté par l'interface (annexe 53.2) : « +1g0 », « +1g1, +5 au total », « +5 au ND ».
+ * Seuls les champs utiles à l'affichage sont gardés.
+ */
+export function describeModifier(m: Pick<Modifier, "appliesTo" | "rolled" | "kept" | "flat" | "freeRaises"> & { tn?: number }): ModifierEffect {
+  return { key: "modifier", appliesTo: m.appliesTo, rolled: m.rolled, kept: m.kept, flat: m.flat, freeRaises: m.freeRaises, tn: m.tn ?? 0 };
 }

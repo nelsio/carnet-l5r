@@ -1,4 +1,4 @@
-import type { ActionDef, ArmyStatus, Character, CombatSub, Engagement, RollResult, Situation, SpellSlotKey, Stance } from "@carnet/core";
+import type { ActionDef, ArmyStatus, Character, CombatSub, CoreText, Engagement, Maneuver, RollResult, Situation, SpellSlotKey, Stance } from "@carnet/core";
 import type { Terrain } from "../../rules/l5r4e";
 import type { RollOptions } from "../rolls";
 
@@ -18,13 +18,14 @@ export type Path = readonly (string | number)[];
 
 export interface RollRecord {
   actionId: string;
-  label: string;
+  label: CoreText;
   kind: ActionDef["kind"];
   result: RollResult;
   tn: number | null | "opposed";
   raises: number;
   free: number;
-  maneuvers: string[];
+  /** Manœuvres annoncées, nommées à l'affichage (annexe 53.1). */
+  maneuvers: { maneuver: Maneuver; count: number }[];
   /** Désarmement réussi : les dégâts liés passent à 2g1 sans la Force. */
   disarm?: boolean;
   /** Dés de dégâts gagnés par « Augmentation des dégâts ». */
@@ -86,7 +87,7 @@ export interface UiState {
   lastRoll: RollRecord | null;
   /** Dernier sort lancé (v2.12.0) : emplacements pris, pour « Annuler (interrompu) » ; `success` null : jet sans ND. */
   spellCast: { actionId: string; slots: SpellSlotKey[]; success: boolean | null } | null;
-  history: { label: string; total: number; tn: number | null | "opposed" }[];
+  history: { label: CoreText; total: number; tn: number | null | "opposed" }[];
   sheetOpen: boolean;
   woundsExpanded: boolean;
   /** Bonus de jet cochés ou décochés pour le jet en cours (remis à zéro au choix d'une action). */

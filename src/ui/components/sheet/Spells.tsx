@@ -3,7 +3,7 @@ import {
   affinityOf, createSpell, deficiencyOf, fillFromGrimoire, formatDR, grimoireConflicts, normalize, sortSpells, spellcastingOf, spellRaises, spellTn, toCarnetSpell, SPELL_ELEMENTS,
   type GrimoireDiff, type GrimoireSpell, type Spell, type SpellElement,
 } from "@carnet/core";
-import { ELEMENT_LABELS, SPELL_KEYWORDS, UNIVERSAL_SPELLS } from "../../../rules/l5r4e";
+import { SPELL_KEYWORDS, UNIVERSAL_SPELLS } from "../../../rules/l5r4e";
 import { useLocale, useT } from "../../../i18n";
 import { DICE_LETTER } from "../../format";
 import { PORTAL, spellUrl } from "../../../rules/portal";
@@ -23,6 +23,7 @@ export function Spells() {
   const { c, edit, set, dispatch } = useSheet("magic");
   const { grimoire } = useStore();
   const sp = useT().sheet.spells;
+  const elements = useT().rules.elements;
   const { locale } = useLocale();
   const spells = c.spells ?? [];
   const starting = spellcastingOf(c)?.startingSpells;
@@ -126,7 +127,7 @@ export function Spells() {
                 />
                 <Field label={sp.element}>
                   <RichSelect variant="anneau" value={s.element} onChange={(v) => set(["spells", i, "element"], v)}>
-                    <RingOption value="all" label={ELEMENT_LABELS.all} />
+                    <RingOption value="all" label={elements.all} />
                     {SPELL_ELEMENTS.filter((x) => x !== "all").map((x) => <RingOption key={x} ring={x} />)}
                   </RichSelect>
                 </Field>
@@ -202,7 +203,7 @@ export function Spells() {
               <div className="spell-body">
               <div className="sp1">
                 <b>{s.name}</b>
-                <span className="tag el">{ELEMENT_LABELS[s.element]}</span>
+                <span className="tag el">{elements[s.element]}</span>
                 <span className="mono muted">{sp.masteryLine(s.mastery, spellTn(s.mastery))}</span>
                 <span className={`tag${s.memorized ? " memo" : ""}`}>{s.memorized ? sp.memorizedTag : sp.scrollTag}</span>
               </div>
@@ -248,12 +249,13 @@ function GrimoireNote() {
 export function SpellAffinity({ page }: { page: number }) {
   const c = useCharacter();
   const sp = useT().sheet.spells;
+  const elements = useT().rules.elements;
   const [affinity, deficiency] = [affinityOf(c), deficiencyOf(c)];
   const ring = (r: string | undefined) => (r ? { ["--rc" as string]: `var(--ring-${r})` } : undefined);
   return (
     <div className="affin" data-testid="affinity">
-      <span className="tag el" style={ring(affinity)}>{sp.affinity(affinity ? ELEMENT_LABELS[affinity] : undefined)}</span>
-      <span className="tag el" style={ring(deficiency)}>{sp.deficiency(deficiency ? ELEMENT_LABELS[deficiency] : undefined)}</span>
+      <span className="tag el" style={ring(affinity)}>{sp.affinity(affinity ? elements[affinity] : undefined)}</span>
+      <span className="tag el" style={ring(deficiency)}>{sp.deficiency(deficiency ? elements[deficiency] : undefined)}</span>
       <span className="muted"> {sp.page(page)}</span>
     </div>
   );

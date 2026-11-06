@@ -4,12 +4,12 @@ import {
   formatDR, isRanged, isSocialSkill, meditationVoidPoints, poolStats, reminderText, rollDice, schoolContext, schoolReminders, verdict, voidMultiplier,
   castTime, castTimeLabel, concentrationTn, schoolRankOf, slotFor, spellCast, spellcastingOf, spellOptions, spellRaises, spellRestriction, SPELL_RINGS, spellSlotNeed, spellSlots,
   voidPointBonus, voidSpendBonus, voidSpendOption, woundState, type Spell, type SpellAction, type SpellRing, type SpellSlotKey,
-  type ActionDef, type ActiveEffect, type Character, type Pool,
+  type ActionDef, type ActiveEffect, type Character, type CoreText, type Pool,
 } from "@carnet/core";
 import type { SpellOption } from "../../rules/ecoles";
-import { CALLED_ZONES, CENTER_BONUS, COMBAT_SUBS, CONCENTRATE_ACTION_ID, ELEMENT_LABELS, MEDITATE_ACTION_ID, MELEE_TARGET_PENALTY, SITUATIONS, SPELL_CONCENTRATION, TN_PER_RAISE, TN_SCALE, TRAIT_LABELS, type CalledZone } from "../../rules/l5r4e";
-import { useLocale, useT, type Locale, type Messages } from "../../i18n";
-import { DICE_LETTER, formatPool, pct } from "../format";
+import { CALLED_ZONES, CENTER_BONUS, CONCENTRATE_ACTION_ID, MEDITATE_ACTION_ID, MELEE_TARGET_PENALTY, SPELL_CONCENTRATION, TN_PER_RAISE, TN_SCALE, type CalledZone } from "../../rules/l5r4e";
+import { useCoreText, useLocale, useT, type Locale, type Messages } from "../../i18n";
+import { actionSkillLabel, DICE_LETTER, formatPool, maneuverText, pct } from "../format";
 import {
   activeModifiers, calledRaises, contextOf, effectiveManeuvers, finalTN, isActive, isUnskilled, maneuverCosts, poolFor, rollWoundPenalty,
   selectedKeys, targetBaseTN, toPoolAction, uiRollStance, type RollOptions,
@@ -18,6 +18,15 @@ import { selectedAction, useCharacter, useStore, type RollRecord } from "../stor
 import { RichSelect, RingOption } from "./RichSelect";
 import { NumberField } from "./fields";
 
+/** Notes d'arme affichées sous la réserve : force de l'arc, Désarmement. */
+const WEAPON_NOTES = new Set<CoreText["key"]>(["pool.bowCapped", "pool.bowMastery", "pool.disarm"]);
+
+/** « Augmentation des dégâts ×2 », « Feinte » : manœuvres annoncées d'un jet. */
+const maneuverLabel = (x: RollRecord["maneuvers"][number], rules: Messages["rules"]) => {
+  const { name } = maneuverText(x.maneuver, rules);
+  return x.maneuver.stackable ? `${name} ×${x.count}` : name;
+};
+
 /** Point de rupture mobile (HANDOFF §7), identique à styles.css. */
 const MOBILE_QUERY = "(max-width: 720px)";
 
@@ -25,6 +34,7 @@ export function Roller() {
   const { state, dispatch, rng } = useStore();
   const t = useT();
   const r = t.roller;
+  const ct = useCoreText();
   const { locale } = useLocale();
   const c = useCharacter();
   const { ui } = state;
@@ -84,11 +94,9 @@ export function Roller() {
   const emphasisOffered = a.kind === "skill" && pool.canRaise;
   const emphases = (findSkill(c, a.skill ?? "")?.emphases ?? []).filter((e) => e.trim() !== "");
   const unlimited = !!pool.unlimitedRaises;
-  const mastery = pool.explodeOn === 9 ? pool.notes.find((n) => n.startsWith("Maîtrise")) : undefined;
+  const mastery = pool.explodeOn === 9 ? pool.notes.find((n) => n.key === "pool.explode") : undefined;
   const stats = pool.rolled > 0 ? poolStats(pool, { emphasis: opts.emphasis && emphasisOffered, flatBonus: opts.flat }) : null;
-  const context = ui.situation === "combat"
-    ? COMBAT_SUBS.find((s) => s.id === ui.sub)?.label
-    : SITUATIONS.find((s) => s.id === ui.situation)?.label;
+  const context = ui.situation === "combat" ? t.rules.combatSubs[ui.sub] : t.rules.situations[ui.situation];
 
   const roll = () => {
     const result = rollDice(pool, { emphasis: opts.emphasis && emphasisOffered, flatBonus: opts.flat }, rng);
@@ -105,16 +113,16 @@ export function Roller() {
         <button type="button" className="close" aria-label={t.common.close} onClick={() => dispatch({ type: "closeSheet" })}>×</button>
       </div>
       <div className="label">{context}</div>
-      <h2 style={{ margin: "2px 0 8px" }}>{a.label}</h2>
+      <h2 style={{ margin: "2px 0 8px" }}>{ct(a.label)}</h2>
       {restriction && (
         <div className="hint" data-testid="stance-restriction" style={{ color: "var(--danger)", marginTop: 0 }}>
-          {restriction} {r.gmMayAllow}
+          {ct(restriction)} {r.gmMayAllow}
         </div>
       )}
-      {woundNote && <div className="hint" data-testid="wound-note" style={{ color: "var(--danger)", marginTop: 0 }}>{woundNote}</div>}
+      {woundNote && <div className="hint" data-testid="wound-note" style={{ color: "var(--danger)", marginTop: 0 }}>{ct(woundNote)}</div>}
       <div style={{ display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
         <span className="poolbig" data-testid="pool">{formatPool(pool.rolled, pool.kept, locale)}</span>
-        <span className="muted" style={{ fontSize: 13 }}>{poolOrigin(c, a, opts, r, locale)}{pool.bonus ? r.poolBonus(pool.bonus) : ""}</span>
+        <span className="muted" style={{ fontSize: 13 }}>{poolOrigin(c, a, opts, t, locale)}{pool.bonus ? r.poolBonus(pool.bonus) : ""}</span>
       </div>
       {/* Augmentations de dégâts de l'attaque, seule source de dés lancés en plus (annexe J.9). */}
       {opts.extraRolled > 0 && (
@@ -127,7 +135,7 @@ export function Roller() {
         <div className="tchips" data-testid="tech-chips">
           {chips.map((e) => (
             <span key={e.key} className={`tchip${e.mastery ? " mastery" : ""}`} title={e.technique}>
-              {e.mastery && <b className="tag">{r.mastery}</b>}{describeEffect(e, c, ui.techInputs[e.key])} · {e.source}
+              {e.mastery && <b className="tag">{r.mastery}</b>}{ct(describeEffect(e, c, ui.techInputs[e.key]))} · {e.source}
             </span>
           ))}
         </div>
@@ -141,12 +149,12 @@ export function Roller() {
           {typeof tn === "number" && <span className="ch">{r.success} <b data-testid="chance">{pct(stats.chance(tn), locale)}</b></span>}
         </div>
       )}
-      {mastery && <div className="hint" data-testid="mastery" style={{ color: "var(--accent-ink)" }}>{mastery}.</div>}
-      {pool.notes.filter((n) => n.startsWith("Force ") || n.includes("force de l'arc") || n.startsWith("Désarmement")).map((n) => (
-        <div key={n} className="hint" data-testid="weapon-note" style={{ color: "var(--accent-ink)" }}>{n}.</div>
+      {mastery && <div className="hint" data-testid="mastery" style={{ color: "var(--accent-ink)" }}>{ct(mastery)}.</div>}
+      {pool.notes.filter((n) => WEAPON_NOTES.has(n.key)).map((n) => (
+        <div key={n.key} className="hint" data-testid="weapon-note" style={{ color: "var(--accent-ink)" }}>{ct(n)}.</div>
       ))}
-      {armorRollTn(c, pa, ui.mounted).notes.map((n) => <div key={n} className="hint" data-testid="armor-note">{n}.</div>)}
-      {pool.warnings?.map((w) => <div key={w} className="hint" data-testid="weapon-warning" style={{ color: "var(--danger)" }}>{w}</div>)}
+      {armorRollTn(c, pa, ui.mounted).notes.map((n) => <div key={n.key} className="hint" data-testid="armor-note">{ct(n)}.</div>)}
+      {pool.warnings?.map((w) => <div key={w.key} className="hint" data-testid="weapon-warning" style={{ color: "var(--danger)" }}>{ct(w)}</div>)}
       {!pool.canRaise && a.kind === "skill" && <div className="hint" style={{ color: "var(--danger)" }}>{r.unskilled}</div>}
 
       <div className="opts">
@@ -249,7 +257,7 @@ export function Roller() {
                 type="checkbox" checked={isActive(m, ui.modifierToggles)}
                 onChange={(e) => dispatch({ type: "toggleModifier", id: m.id, on: e.target.checked })}
               />
-              {" "}{m.name} <span className="muted">· {describeModifier(m)}{m.mode === "optional" ? r.situational : ""}</span>
+              {" "}{m.name} <span className="muted">· {ct(describeModifier(m))}{m.mode === "optional" ? r.situational : ""}</span>
             </label>
           ))}
         </div>
@@ -317,7 +325,7 @@ export function Roller() {
           <span className="label">{r.history}</span>
           {ui.history.map((h, i) => (
             <div key={i}>
-              <span>{h.label}</span>
+              <span>{ct(h.label)}</span>
               <span className="mono">{h.total}{typeof h.tn === "number" ? (h.total >= h.tn ? " ✓" : " ✗") : ""}</span>
             </div>
           ))}
@@ -378,7 +386,7 @@ function ManualLine({ pool, emphasis, flat, free }: { pool: Pool; emphasis: bool
   const r = useT().roller;
   const nine = pool.explodeOn === 9;
   const add = pool.bonus + flat;
-  const tenDice = pool.notes.some((n) => n.startsWith("Règle des dix dés"));
+  const tenDice = pool.notes.some((n) => n.key === "pool.tenDice");
   return (
     <div className="manual" data-testid="manual">
       {pool.explodes
@@ -392,16 +400,17 @@ function ManualLine({ pool, emphasis, flat, free }: { pool: Pool; emphasis: bool
 }
 
 /** Origine de la réserve, en clair. */
-function poolOrigin(c: Character, a: ActionDef, opts: RollOptions, r: Messages["roller"], locale: Locale): string {
-  const o = r.origin;
+function poolOrigin(c: Character, a: ActionDef, opts: RollOptions, t: Messages, locale: Locale): string {
+  const o = t.roller.origin;
+  const traits = t.rules.traits;
   const extra = opts.extraRolled ? o.extraDice(opts.extraRolled) : "";
   switch (a.kind) {
     case "skill": {
       const trait = a.trait ?? "agility";
       const value = trait === "void" ? c.voidRing : c.traits[trait];
-      return `${a.skill} ${findSkill(c, a.skill ?? "")?.rank ?? 0} + ${TRAIT_LABELS[trait]} ${value}${extra}`;
+      return `${actionSkillLabel(c, a.skill ?? "", locale)} ${findSkill(c, a.skill ?? "")?.rank ?? 0} + ${traits[trait]} ${value}${extra}`;
     }
-    case "trait": return `${o.pureTrait(TRAIT_LABELS[a.trait ?? "stamina"])}${extra}`;
+    case "trait": return `${o.pureTrait(traits[a.trait ?? "stamina"])}${extra}`;
     case "damage": {
       // Force effective de l'arc : plafonnée par la Force, +1 avec Kyujutsu 7 (annexe E.2 C11).
       const bow = a.weapon && isRanged(a.weapon) ? o.bow(bowStrength(c, a.weapon)) : null;
@@ -410,7 +419,7 @@ function poolOrigin(c: Character, a: ActionDef, opts: RollOptions, r: Messages["
     case "spell": {
       // « Feu 3 + rang 1 + affinité 1 » (annexe F.5).
       const cast = spellCast(c, toPoolAction(a, opts) as SpellAction);
-      const parts = [`${ELEMENT_LABELS[cast.ring]} ${cast.ringValue}`, o.schoolRank(schoolRankOf(c))];
+      const parts = [`${t.rules.elements[cast.ring]} ${cast.ringValue}`, o.schoolRank(schoolRankOf(c))];
       if (cast.affinity) parts.push(o.affinity);
       const minus = cast.deficiency ? o.deficiency : "";
       return `${parts.join(" + ")}${minus}${cast.rolled ? o.schoolDice(cast.rolled) : ""}${extra}`;
@@ -420,12 +429,13 @@ function poolOrigin(c: Character, a: ActionDef, opts: RollOptions, r: Messages["
   }
 }
 
-const slotName = (k: SpellSlotKey, r: Messages["roller"]) => (k === "free" ? r.freeSlot : ELEMENT_LABELS[k]);
+const slotName = (k: SpellSlotKey, t: Messages) => (k === "free" ? t.roller.freeSlot : t.rules.elements[k]);
 
 /** Ligne « Emplacement : Feu 2/3 » (« libre 1/2 » si l'élément est épuisé, « aucun emplacement » en rouge), F.5. */
 function SlotLine({ action: a }: { action: ActionDef }) {
   const { state } = useStore();
-  const r = useT().roller;
+  const t = useT();
+  const r = t.roller;
   const c = useCharacter();
   const need = spellSlotNeed(c, toPoolAction(a, state.ui.opts) as SpellAction);
   const key = slotFor(c, need.ring);
@@ -435,7 +445,7 @@ function SlotLine({ action: a }: { action: ActionDef }) {
       <span>{r.slot}</span>
       <span>
         {slot && key
-          ? <><b>{slotName(key, r)}</b> <span className="mono">{slot.left}/{slot.max}</span>{need.count > 1 ? r.slotCount(need.count) : ""}</>
+          ? <><b>{slotName(key, t)}</b> <span className="mono">{slot.left}/{slot.max}</span>{need.count > 1 ? r.slotCount(need.count) : ""}</>
           : r.noSlot}
       </span>
     </div>
@@ -448,11 +458,12 @@ function SlotLine({ action: a }: { action: ActionDef }) {
  */
 function SpellCastLine({ action: a, manual = false }: { action: ActionDef; manual?: boolean }) {
   const { state, dispatch } = useStore();
-  const r = useT().roller;
+  const t = useT();
+  const r = t.roller;
   const cast = state.ui.spellCast?.actionId === a.id ? state.ui.spellCast : null;
   const readonly = state.mode === "readonly";
   const spent = cast && cast.slots.length > 0
-    ? r.slotsSpent(manual, cast.success, cast.slots.map((k) => slotName(k, r)).join(", "))
+    ? r.slotsSpent(manual, cast.success, cast.slots.map((k) => slotName(k, t)).join(", "))
     : cast ? r.noSlotSpent : null;
   if (manual && readonly && !spent) return null;
   return (
@@ -477,8 +488,9 @@ const forSpellRoll = (o: SpellOption) =>
   o.rolled !== undefined || o.freeRaises !== undefined || o.extraAffinity !== undefined || o.extraSlot !== undefined;
 const forSpellDamage = (o: SpellOption) => o.damageRolled !== undefined || o.damageKept !== undefined || o.damageFlat !== undefined;
 
-function optionEffect(o: SpellOption, c: Character, r: Messages["roller"], locale: Locale): string {
-  if (o.extraAffinity) return r.option.affinity(ELEMENT_LABELS[o.extraAffinity]);
+function optionEffect(o: SpellOption, c: Character, t: Messages, locale: Locale): string {
+  const r = t.roller;
+  if (o.extraAffinity) return r.option.affinity(t.rules.elements[o.extraAffinity]);
   if (o.extraSlot) return r.option.extraSlot(o.extraSlot);
   if (o.freeRaises) return r.option.freeRaises(o.freeRaises);
   if (o.rolled) return `+${formatPool(o.rolled, 0, locale)}`;
@@ -490,7 +502,9 @@ function optionEffect(o: SpellOption, c: Character, r: Messages["roller"], local
 function SpellPanel({ action: a, spell }: { action: ActionDef; spell: Spell }) {
   const { state, dispatch } = useStore();
   const { locale } = useLocale();
-  const r = useT().roller;
+  const t = useT();
+  const r = t.roller;
+  const ct = useCoreText();
   const c = useCharacter();
   const { opts } = state.ui;
   const sc = spellcastingOf(c);
@@ -502,7 +516,7 @@ function SpellPanel({ action: a, spell }: { action: ActionDef; spell: Spell }) {
       {options.map((o) => (
         <label key={o.id} className="chk">
           <input type="checkbox" checked={!!opts.spellOptions[o.id]} onChange={(e) => set({ spellOptions: { ...opts.spellOptions, [o.id]: e.target.checked } })} />
-          {" "}{o.label} <span className="muted">· {optionEffect(o, c, r, locale)}</span>
+          {" "}{o.label} <span className="muted">· {optionEffect(o, c, t, locale)}</span>
         </label>
       ))}
     </div>
@@ -519,7 +533,7 @@ function SpellPanel({ action: a, spell }: { action: ActionDef; spell: Spell }) {
     <div className="spellbox" data-testid="spell-panel">
       {restriction && (
         <div className="hint" data-testid="spell-restriction" style={{ color: "var(--danger)", marginTop: 0 }}>
-          {restriction} {r.gmMayAllow}
+          {ct(restriction)} {r.gmMayAllow}
         </div>
       )}
       {spell.element === "all" && (
@@ -552,7 +566,7 @@ function SpellPanel({ action: a, spell }: { action: ActionDef; spell: Spell }) {
       {checkboxes}
       {cast.freeRaises.length > 0 && (
         <div className="hint" data-testid="spell-free-raises" style={{ color: "var(--accent-ink)" }}>
-          {r.spellFreeRaises(cast.freeRaises.length, cast.freeRaises.join(", "))}
+          {r.spellFreeRaises(cast.freeRaises.length, cast.freeRaises.map(ct).join(", "))}
         </div>
       )}
       <div className="castrow">
@@ -562,7 +576,7 @@ function SpellPanel({ action: a, spell }: { action: ActionDef; spell: Spell }) {
         </label>
         <div className="tnline" style={{ margin: 0 }}>
           <span>{r.castTime}</span>
-          <b data-testid="cast-time">{castTimeLabel(time)}</b>
+          <b data-testid="cast-time">{ct(castTimeLabel(time))}</b>
         </div>
       </div>
       {raises.length > 0 && (
@@ -586,6 +600,7 @@ function SpellPanel({ action: a, spell }: { action: ActionDef; spell: Spell }) {
 
 function TnField({ action: a, opts, set }: { action: ActionDef; opts: RollOptions; set: (p: Partial<RollOptions>) => void }) {
   const r = useT().roller;
+  const tnLabels = useT().rules.tnScale;
   switch (a.tn) {
     case null: return null;
     case "target":
@@ -625,7 +640,7 @@ function TnField({ action: a, opts, set }: { action: ActionDef; opts: RollOption
       return (
         <label className="field"><span className="label">{r.baseTn}</span>
           <RichSelect variant="ligne" className="mono" value={opts.tn} onChange={(v) => set({ tn: Number(v) })}>
-            {TN_SCALE.map((t) => <option key={t.tn} value={t.tn}>{t.tn} · {t.label}</option>)}
+            {TN_SCALE.map((s, i) => <option key={s.tn} value={s.tn}>{s.tn} · {tnLabels[i] ?? s.label}</option>)}
           </RichSelect>
         </label>
       );
@@ -638,11 +653,12 @@ function TechniqueOptions({ effects }: { effects: readonly ActiveEffect[] }) {
   const c = useCharacter();
   const { techToggles, techInputs } = state.ui;
   const r = useT().roller;
+  const ct = useCoreText();
   return (
     <div className="grid bonuses" style={{ gap: 6, marginBottom: 12 }} role="group" aria-label={r.techniques}>
       <div className="label">{r.techniques}</div>
       {effects.map((e) => {
-        const effect = describeEffect(e, c, techInputs[e.key]);
+        const effect = ct(describeEffect(e, c, techInputs[e.key]));
         return (
           <div key={e.key}>
             <label className="chk">
@@ -674,22 +690,25 @@ function ManeuverPicker({ effects }: { effects: readonly ActiveEffect[] }) {
   const costs = maneuverCosts(state.ui.opts);
   const setCount = (id: string, count: number) => dispatch({ type: "maneuver", id, count });
   const setOpt = (patch: { calledZone?: CalledZone; quadruped?: boolean }) => dispatch({ type: "option", patch });
-  const r = useT().roller;
+  const t = useT();
+  const r = t.roller;
+  const ct = useCoreText();
   return (
     <>
       <div className="label">{r.maneuvers} <span style={{ textTransform: "none", letterSpacing: 0, fontWeight: 500 }}>{r.maneuversDetail}</span></div>
       <div className="mans">
         {list.map((m) => {
           const n = sel[m.id] ?? 0;
+          const { name, effect } = maneuverText(m, t.rules);
           return m.stackable ? (
             <div key={m.id} className={`man${n ? " on" : ""}`}>
-              <button type="button" aria-label={r.removeOne(m.name)} onClick={() => setCount(m.id, n - 1)}>−</button>
-              <span title={m.effect}>{m.name} <b className="mono">{n}</b></span>
-              <button type="button" aria-label={r.addOne(m.name)} onClick={() => setCount(m.id, n + 1)}>+</button>
+              <button type="button" aria-label={r.removeOne(name)} onClick={() => setCount(m.id, n - 1)}>−</button>
+              <span title={effect}>{name} <b className="mono">{n}</b></span>
+              <button type="button" aria-label={r.addOne(name)} onClick={() => setCount(m.id, n + 1)}>+</button>
             </div>
           ) : (
-            <button key={m.id} type="button" className={`man${n ? " on" : ""}`} aria-pressed={n > 0} title={m.effect} onClick={() => setCount(m.id, n ? 0 : 1)}>
-              {m.name} <b className="mono">{Math.max(0, (costs[m.id] ?? maneuverCost(c, m)) - (free[m.id] ?? 0))}</b>
+            <button key={m.id} type="button" className={`man${n ? " on" : ""}`} aria-pressed={n > 0} title={effect} onClick={() => setCount(m.id, n ? 0 : 1)}>
+              {name} <b className="mono">{Math.max(0, (costs[m.id] ?? maneuverCost(c, m)) - (free[m.id] ?? 0))}</b>
             </button>
           );
         })}
@@ -698,7 +717,7 @@ function ManeuverPicker({ effects }: { effects: readonly ActiveEffect[] }) {
         <label className="field" style={{ marginTop: 6, maxWidth: 260 }}>
           <span className="label">{r.calledZone}</span>
           <RichSelect variant="ligne" value={state.ui.opts.calledZone} onChange={(v) => setOpt({ calledZone: v as CalledZone })}>
-            {CALLED_ZONES.map((z) => <option key={z.id} value={z.id}>{r.zoneCost(z.label, z.cost)}</option>)}
+            {CALLED_ZONES.map((z) => <option key={z.id} value={z.id}>{r.zoneCost(t.rules.calledZones[z.id] ?? z.label, z.cost)}</option>)}
           </RichSelect>
         </label>
       )}
@@ -710,7 +729,7 @@ function ManeuverPicker({ effects }: { effects: readonly ActiveEffect[] }) {
       )}
       {reserved.map((e) => (
         <div key={e.key} className="hint" style={{ marginTop: 4, color: "var(--accent-ink)" }}>
-          {r.reserved(describeEffect(e, c), e.source)}
+          {r.reserved(ct(describeEffect(e, c)), e.source)}
         </div>
       ))}
       {(sel[DAMAGE_MANEUVER_ID] ?? 0) > 0 && (
@@ -728,6 +747,7 @@ function ManeuverPicker({ effects }: { effects: readonly ActiveEffect[] }) {
 function RollOutcome({ roll: r }: { roll: RollRecord }) {
   const { locale } = useLocale();
   const t = useT().roller;
+  const rules = useT().rules;
   const { total } = r.result;
   const hasTN = typeof r.tn === "number";
   const ok = hasTN && total >= (r.tn as number);
@@ -756,7 +776,7 @@ function RollOutcome({ roll: r }: { roll: RollRecord }) {
           {ok && (r.raises > 0 || r.free > 0) && (
             <div className="hint">{t.raisesToApply(r.raises + r.free, r.free)}</div>
           )}
-          {r.maneuvers.length > 0 && <div className="hint">{t.maneuversResult(ok, r.maneuvers.join(", "))}</div>}
+          {r.maneuvers.length > 0 && <div className="hint">{t.maneuversResult(ok, r.maneuvers.map((x) => maneuverLabel(x, rules)).join(", "))}</div>}
           {r.damageDice > 0 && !r.disarm && <div className="hint">{t.prefilled(`+${formatPool(r.damageDice, 0, locale)}`)}</div>}
           {r.feint ? <div className="hint" data-testid="feint-note">{t.feint(r.feint)}</div> : null}
           {r.disarm && <div className="hint" data-testid="disarm-note">{t.disarm}</div>}

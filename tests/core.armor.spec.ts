@@ -61,9 +61,9 @@ describe("L28 : bloc Armure (E.18)", () => {
       modifiers: [{ id: "m1", name: "Parade", source: "technique", appliesTo: "armor", rolled: 0, kept: 0, flat: 5, tn: 0, freeRaises: 0, note: "", mode: "optional" }],
     });
     expect(armorSheet(c).optional).toEqual([
-      "La Petite Leçon du loup (+5 × Touches au corps à corps, Hiruma R2)",
-      "Ailes du colibri (1 fois par round) (+6, Hiruma R3)",
-      "Parade (+5)",
+      { label: "La Petite Leçon du loup", value: 5, stack: "Touches au corps à corps", source: "Hiruma R2" },
+      { label: "Ailes du colibri (1 fois par round)", value: 6, source: "Hiruma R3" },
+      { label: "Parade", value: 5 },
     ]);
   });
 

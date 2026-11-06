@@ -17,6 +17,7 @@
 | P11 | **Tranché le 01/11/2026** (remplace la décision du 31/10) : le site s'appelle désormais « Les chroniques de Rokugan », il sert de ressource commune et non de site du MJ de chaque groupe. Lot 33 repris en lot 37 (v2.25.1, annexe O.2), crédit tel qu'en O.2 §4. | Décision retenue |
 | P12 | **Tranché le 31/10/2026, accepté** : service worker sur GitHub Pages (lot 34, annexe O.3). Exception au principe « aucune requête automatique » : le navigateur charge `sw.js` et le manifeste, même origine, rien n'est envoyé. | Décision retenue |
 | P13 | **Tranché le 31/10/2026 : accepté.** Mesure de fréquentation (GoatCounter) sur l'adresse GitHub Pages (`handoff-tracking.md`), exception au §1 : requête automatique vers un autre site, script injecté par `pages.yml` seulement (lot 35, annexe O.5). Le fichier de release et le smoke « aucune requête réseau » ne changent pas. | Décision retenue |
+| P14 | **Tranché le 06/11/2026 : accepté.** Noms français des compétences absentes des données jusqu'au lot 53 (Artisanat, Jeux, Dressage, Métier, Ingénierie, Navigation, Contrefaçon, Escamotage, Éventail de guerre, Armes paysannes) et sous-types : ceux de `SKILL_NAMES` ; Artisanat / Artisan (noble) et Métier / Craft (marchande) restent deux compétences (annexe 53.5). | Décision retenue |
 
 ---
 

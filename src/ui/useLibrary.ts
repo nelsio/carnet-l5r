@@ -211,7 +211,7 @@ export function useLibrary(
     },
     async create() {
       await save();
-      const entry: LibraryEntry = { id: newId(), character: createCharacter(), mode: "edit", updatedAt: now().toISOString() };
+      const entry: LibraryEntry = { id: newId(), character: createCharacter(t.rules.newCharacter), mode: "edit", updatedAt: now().toISOString() };
       await storage.library.put(entry);
       await openEntry(entry, true);
       await refresh();

@@ -1,7 +1,7 @@
 /** Interface en anglais dans le build (annexe 52.5) : E1, E3, E7 ; E2 et E4 en Vitest (`tests/ui/i18n-en.spec.tsx`). */
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
-import { expect, test, type Locator } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 const pageUrl = pathToFileURL(resolve("dist/carnet-l5r.html")).href;
 
@@ -33,6 +33,34 @@ test.describe("navigateur en anglais", () => {
     await expect(page.getByTestId("skill-pool-Kenjutsu")).toHaveText(/^\d+k\d+/);
     await page.getByRole("group", { name: "View" }).getByRole("button", { name: "Statistics" }).click();
     await expect(page.getByRole("columnheader", { name: /^TN \d+$/ }).first()).toBeVisible();
+  });
+
+  /** Fiche vierge en anglais, bloc Identité refermé (même départ que `status-bar.spec.ts`, annexe 45). */
+  async function blank(page: Page, width: number) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto(pageUrl);
+    await page.getByRole("button", { name: "New blank sheet" }).click();
+    await page.getByRole("button", { name: "Done: Identity & reputation" }).click();
+  }
+  const overflowing = (l: Locator) => l.evaluateAll((spans) => spans.filter((s) => s.scrollWidth > s.clientWidth).map((s) => s.textContent));
+
+  for (const width of [800, 1280]) {
+    test(`V8 : ${width} px, piste de blessures en anglais sans troncature (annexe 53.4)`, async ({ page }) => {
+      await blank(page, width);
+      const labels = page.locator(".wtrack .wl span[aria-hidden='true']");
+      await expect(labels).toHaveText(["Healthy", "Nicked", "Grazed", "Hurt", "Injured", "Crippled", "Down", "Out"]);
+      expect(await overflowing(labels)).toEqual([]);
+    });
+  }
+
+  test("V8 : mobile 360 px, détail des blessures en anglais sans débordement (annexe 53.4)", async ({ page }) => {
+    await blank(page, 360);
+    await expect(page.getByRole("heading", { level: 1, name: "New samurai" })).toBeVisible();
+    await page.getByRole("button", { name: /^Healthy/ }).click();
+    const names = page.getByTestId("wound-detail").locator(".wn");
+    await expect(names).toHaveText(["Healthy", "Nicked", "Grazed", "Hurt", "Injured", "Crippled", "Down", "Out"]);
+    expect(await overflowing(names)).toEqual([]);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
   });
 
   test("E7 : mobile 360 px, onglets sur une ligne, bouton de langue sans chevauchement", async ({ page }) => {

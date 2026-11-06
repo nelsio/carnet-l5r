@@ -8,6 +8,7 @@ import {
 import * as rules from "../src/rules/l5r4e";
 import { MODIFIER_TEMPLATES } from "../src/rules/l5r4e";
 import kakita from "./fixtures/kakita-v1.json";
+import { say } from "./helpers/text";
 
 const base = () => structuredClone(kakita) as Character;
 const mod = (patch: Partial<Modifier>): Modifier => ({
@@ -55,7 +56,7 @@ describe("Effet sur la réserve", () => {
   it("bonus fixe ajouté au total, augmentations gratuites remontées, notes lisibles", () => {
     const pool = computePool(base(), notice, { modifiers: [mod({ name: "Avantage", rolled: 1, kept: 1, flat: 3, freeRaises: 1 })] });
     expect(pool).toMatchObject({ rolled: 4, kept: 3, bonus: 3, freeRaises: 1 });
-    expect(pool.notes).toContain("Avantage : +1g1, +3 au total, 1 augm. gratuite");
+    expect(pool.notes.map((n) => say(n))).toContain("Avantage : +1g1, +3 au total, 1 augm. gratuite");
     expect(computePool(base(), notice, {}).freeRaises).toBeUndefined();
   });
   it("un malus ne descend jamais sous zéro dé", () => {
@@ -103,12 +104,14 @@ describe("Modèles", () => {
     }
   });
   it("résume un effet en clair", () => {
-    expect(describeModifier(mod({ rolled: 1 }))).toBe("+1g0");
-    expect(describeModifier(mod({ rolled: -1 }))).toBe("-1g0");
-    expect(describeModifier(mod({ flat: -5 }))).toBe("-5 au total");
-    expect(describeModifier(mod({ freeRaises: 2 }))).toBe("2 augm. gratuites");
-    expect(describeModifier(mod({ appliesTo: "armor", flat: 5 }))).toBe("+5 au ND d'armure");
-    expect(describeModifier(mod({}))).toBe("sans effet");
+    expect(describeModifier(mod({ rolled: 1 }))).toEqual({ key: "modifier", appliesTo: "all", rolled: 1, kept: 0, flat: 0, freeRaises: 0, tn: 0 });
+    const text = (m: Parameters<typeof mod>[0]) => say(describeModifier(mod(m)));
+    expect(text({ rolled: 1 })).toBe("+1g0");
+    expect(text({ rolled: -1 })).toBe("-1g0");
+    expect(text({ flat: -5 })).toBe("-5 au total");
+    expect(text({ freeRaises: 2 })).toBe("2 augm. gratuites");
+    expect(text({ appliesTo: "armor", flat: 5 })).toBe("+5 au ND d'armure");
+    expect(text({})).toBe("sans effet");
   });
 });
 
@@ -153,9 +156,9 @@ describe("Compétences sociales, pénalité de blessure, ND, posture", () => {
   });
 
   it("résumés", () => {
-    expect(describeModifier(mod({ appliesTo: "wounds", flat: 3 }))).toBe("-3 à la pénalité de blessure");
-    expect(describeModifier(mod({ appliesTo: "social", tn: 5 }))).toBe("+5 au ND");
-    expect(describeModifier(mod({ rolled: 1, tn: -5 }))).toBe("+1g0, -5 au ND");
+    expect(say(describeModifier(mod({ appliesTo: "wounds", flat: 3 })))).toBe("-3 à la pénalité de blessure");
+    expect(say(describeModifier(mod({ appliesTo: "social", tn: 5 })))).toBe("+5 au ND");
+    expect(say(describeModifier(mod({ rolled: 1, tn: -5 })))).toBe("+1g0, -5 au ND");
   });
 });
 

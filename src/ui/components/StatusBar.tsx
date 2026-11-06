@@ -4,7 +4,7 @@ import {
   setSpellSlotsUsed, SPELL_SLOT_KEYS, spellSlots, woundPenaltyAt, woundState, type SpellSlotKey,
   type Character,
 } from "@carnet/core";
-import { ARMOR_TN, ELEMENT_LABELS, VOID_COMBAT, WOUND_LEVELS } from "../../rules/l5r4e";
+import { ARMOR_TN, VOID_COMBAT, WOUND_LEVELS } from "../../rules/l5r4e";
 import { useT, type Messages } from "../../i18n";
 import { contextOf, currentArmorTN, selectedKeys } from "../rolls";
 import { useCharacter, useStore } from "../store";
@@ -29,11 +29,11 @@ export function StatusBar() {
   const maxWounds = ws.thresholds[ws.thresholds.length - 1];
   const [damageOpen, setDamageOpen] = useState(false);
   // Pénalités effectives de chaque niveau, même calcul que la tuile Pénalité (annexe E.9 S5).
-  const levels = WOUND_LEVELS.map((w, i) => {
+  const levels = WOUND_LEVELS.map((_, i) => {
     const penalty = woundPenaltyAt(c, i, contextOf(ui));
     const current = i === ws.level && hurt;
     return {
-      label: w.label, short: w.short ?? w.label, current,
+      label: t.rules.wounds[i] ?? "", short: t.rules.woundsShort[i] ?? "", current,
       min: i === 0 ? 0 : ws.thresholds[i - 1] + 1, max: ws.thresholds[i],
       penaltyText: penalty === null ? "✕" : `+${penalty}`,
       cls: (base: string) => [base, i < ws.level ? "past" : "", current ? "cur" : ""].filter(Boolean).join(" "),
@@ -47,7 +47,7 @@ export function StatusBar() {
       <div className="status-in">
         <button type="button" className={`wsum${hurt ? " hurt" : ""}`} aria-expanded={ui.woundsExpanded} onClick={() => dispatch({ type: "toggleWounds" })}>
           <span>
-            <b>{ws.label}</b> <span className="muted">{ws.penalty === null ? "" : s.penaltySummary(ws.penalty)}</span>
+            <b>{ws.status === "dead" ? t.rules.dead : t.rules.wounds[ws.level]}</b> <span className="muted">{ws.penalty === null ? "" : s.penaltySummary(ws.penalty)}</span>
           </span>
           <span className="muted mono">{c.wounds} / {maxWounds} {ui.woundsExpanded ? "▴" : "▾"}</span>
         </button>
@@ -111,7 +111,7 @@ export function StatusBar() {
   );
 }
 
-const slotLabel = (k: SpellSlotKey, s: Messages["statusBar"]) => (k === "free" ? s.freeSlots : ELEMENT_LABELS[k]);
+const slotLabel = (k: SpellSlotKey, t: Messages) => (k === "free" ? t.statusBar.freeSlots : t.rules.elements[k]);
 
 /**
  * Ligne « Sorts » (annexe F.5) : six mini-tuiles restants/max, à la couleur de l'Anneau ;
@@ -119,7 +119,8 @@ const slotLabel = (k: SpellSlotKey, s: Messages["statusBar"]) => (k === "free" ?
  */
 function SpellSlots({ readonly }: { readonly: boolean }) {
   const { dispatch } = useStore();
-  const s = useT().statusBar;
+  const t = useT();
+  const s = t.statusBar;
   const c = useCharacter();
   const [open, setOpen] = useState(false);
   const slots = spellSlots(c);
@@ -133,7 +134,7 @@ function SpellSlots({ readonly }: { readonly: boolean }) {
         <span className="label slotlabel">{s.spells}</span>
         {SPELL_SLOT_KEYS.map((k) => (
           <span key={k} className={`slot s-${k}${slots[k].left === 0 ? " empty" : ""}`} data-testid={`slot-${k}`}>
-            <span className="label">{slotLabel(k, s)}</span>
+            <span className="label">{slotLabel(k, t)}</span>
             <b className="mono">{slots[k].left}/{slots[k].max}</b>
           </span>
         ))}
@@ -142,10 +143,10 @@ function SpellSlots({ readonly }: { readonly: boolean }) {
         <div className="slotedit" role="group" aria-label={s.slots}>
           {SPELL_SLOT_KEYS.map((k) => (
             <div key={k} className="slotrow">
-              <span>{slotLabel(k, s)} <span className="muted">{s.slotsRemaining(slots[k].left, slots[k].max)}</span></span>
+              <span>{slotLabel(k, t)} <span className="muted">{s.slotsRemaining(slots[k].left, slots[k].max)}</span></span>
               <span className="stepper">
-                <button type="button" aria-label={s.spendSlot(slotLabel(k, s))} onClick={() => setUsed(k, slots[k].used + 1)}>−</button>
-                <button type="button" aria-label={s.refundSlot(slotLabel(k, s))} onClick={() => setUsed(k, slots[k].used - 1)}>+</button>
+                <button type="button" aria-label={s.spendSlot(slotLabel(k, t))} onClick={() => setUsed(k, slots[k].used + 1)}>−</button>
+                <button type="button" aria-label={s.refundSlot(slotLabel(k, t))} onClick={() => setUsed(k, slots[k].used - 1)}>+</button>
               </span>
             </div>
           ))}

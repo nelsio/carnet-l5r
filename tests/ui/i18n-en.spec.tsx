@@ -153,6 +153,40 @@ describe("Contenu en français (52.4)", () => {
     expect(menu.getByRole("menuitem", { name: /^What's new: / })).toBeInTheDocument();
   });
 
+  it("V9 : Assistant en anglais (escarmouche) : situations, postures, actions et explications du moteur", async () => {
+    await openKakita("en");
+    act(() => fireEvent.click(screen.getByRole("button", { name: "L5R Assistant" })));
+    act(() => fireEvent.click(screen.getByRole("button", { name: "Combat" })));
+    expect(screen.getByRole("button", { name: "Skirmish" })).toBeInTheDocument();
+    expect(screen.getByText("Attack · Katana")).toBeInTheDocument();
+    expect(screen.getAllByText(/Kenjutsu \(Agility\) against the target's Armor TN/).length).toBeGreaterThan(0);
+    expect(screen.getByText("Damage · Katana")).toBeInTheDocument();
+    expect(screen.getByTestId("posture-desc")).toHaveTextContent("Normal stance.");
+    expect(document.body.textContent).not.toMatch(/Attaque · |contre le ND d'armure/);
+    act(() => fireEvent.click(screen.getByText("Attack · Katana")));
+    expect(screen.getByRole("heading", { level: 2, name: "Attack · Katana" })).toBeInTheDocument();
+    expect(screen.getByText(/Kenjutsu 2 \+ Agility 3/)).toBeInTheDocument();
+  });
+
+  it("V9 : en français, les mêmes phrases qu'avant le lot 53", async () => {
+    await openKakita("fr");
+    act(() => fireEvent.click(screen.getByRole("button", { name: "Assistant L5R" })));
+    act(() => fireEvent.click(screen.getByRole("button", { name: "Combat" })));
+    expect(screen.getByText("Attaque · Katana")).toBeInTheDocument();
+    expect(screen.getAllByText(/Kenjutsu \(Agilité\) contre le ND d'armure de la cible\. Choisis tes manœuvres dans le lanceur\./).length).toBeGreaterThan(0);
+    expect(screen.getByTestId("posture-desc")).toHaveTextContent("Posture normale.");
+  });
+
+  it("fiche saisie en anglais : compétence du catalogue affichée sous le nom de la fiche, en anglais sinon", async () => {
+    await openKakita("en", { skills: [{ name: "Courtier", rank: 2, trait: "awareness", emphases: [] }] } as Partial<Character>);
+    act(() => fireEvent.click(screen.getByRole("button", { name: "L5R Assistant" })));
+    act(() => fireEvent.click(screen.getByRole("button", { name: "Court" })));
+    act(() => fireEvent.click(screen.getAllByText("Convince, manipulate")[0]!));
+    expect(screen.getByText(/^Courtier 2 \+ Awareness 3/)).toBeInTheDocument();
+    act(() => fireEvent.click(screen.getAllByText("Be believed")[0]!));
+    expect(screen.getByText(/^Sincerity 0 \+ Awareness 3/)).toBeInTheDocument();
+  });
+
   it("menu Ressources en français : aucun suffixe", async () => {
     await openKakita("fr");
     fireEvent.click(screen.getByRole("button", { name: "Ressources" }));

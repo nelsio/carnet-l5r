@@ -9,6 +9,7 @@ import {
   woundState, type Character,
 } from "@carnet/core";
 import kakita from "./fixtures/kakita-v1.json";
+import { say } from "./helpers/text";
 
 const base = () => structuredClone(kakita) as Character;
 const sword = { name: "Katana", skill: "Kenjutsu", dr: "3k2" };
@@ -31,11 +32,15 @@ describe("Moteur : cas limites", () => {
   });
   it("explique la réserve dans les notes", () => {
     const grapple = { kind: "skill", skill: "Jiujutsu", trait: "agility", attack: true } as const;
-    expect(computePool(base(), grapple, {}).notes).toContain("Sans compétence : pas d'explosion ni d'augmentation");
+    expect(computePool(base(), grapple, {}).notes).toContainEqual({ key: "pool.unskilled" });
     const c = base();
     c.traits.agility = 9;
     const notes = computePool(c, { kind: "skill", skill: "Kenjutsu", trait: "agility", attack: true }, { stance: "fullAttack", voidPoint: true, extraRolled: 1 }).notes;
-    expect(notes).toEqual(["Assaut : +2g1", "+1 dé(s) lancé(s)", "Point de Vide : +1g1", "Règle des dix dés : +12"]);
+    expect(notes).toEqual([
+      { key: "pool.fullAttack", rolled: 2, kept: 1 }, { key: "pool.extraRolled", n: 1 },
+      { key: "pool.voidPoint", katana: false, rolled: 1, kept: 1 }, { key: "pool.tenDice", bonus: 12 },
+    ]);
+    expect(notes.map((n) => say(n))).toEqual(["Assaut : +2g1", "+1 dé(s) lancé(s)", "Point de Vide : +1g1", "Règle des dix dés : +12"]);
   });
   it("la spécialisation ne s'applique pas à une réserve non qualifiée", () => {
     const pool = { rolled: 1, kept: 1, bonus: 0, explodes: false, canRaise: false, notes: [] };
@@ -162,10 +167,10 @@ describe("Catalogue d'actions", () => {
   it("Escarmouche : Initiative en tête, attaque puis dégâts rattachés, Défense totale en dernier", () => {
     const acts = buildActions(c(), "combat", "skirmish");
     expect(acts[0]?.kind).toBe("initiative");
-    expect(acts[1]).toMatchObject({ label: "Attaque · Katana", attack: true, trait: "agility" });
-    expect(acts[2]).toMatchObject({ label: "Dégâts · Katana", parent: acts[1]?.id, kind: "damage", dr: "3k2" });
-    expect(acts.find((a) => a.label === "Tir · Yumi")?.trait).toBe("reflexes");
-    expect(acts.find((a) => a.label === "Dégâts · Yumi")?.description).toContain("Force de l'arc 3");
+    expect(acts[1]).toMatchObject({ label: { key: "action.attack", weapon: "Katana", ranged: false }, attack: true, trait: "agility" });
+    expect(acts[2]).toMatchObject({ label: { key: "action.damage", name: "Katana" }, parent: acts[1]?.id, kind: "damage", dr: "3k2" });
+    expect(acts.find((a) => a.id === "atk-skirmish-Yumi")).toMatchObject({ label: { key: "action.attack", ranged: true }, trait: "reflexes" });
+    expect(acts.find((a) => a.id === "dmg-skirmish-Yumi")?.description).toEqual({ key: "action.bowDamageAbout", bow: 3, dr: "2k2" });
     expect(acts.find((a) => a.id === "unarmed-dmg")?.parent).toBe("unarmed");
     expect(acts.at(-1)?.fullDefense).toBe(true);
     expect(buildActions(c(), "combat")).toEqual(acts);
@@ -173,7 +178,9 @@ describe("Catalogue d'actions", () => {
   it("Duel : Frappe puis dégâts des sabres seulement", () => {
     const acts = buildActions(c(), "combat", "duel");
     expect(acts.slice(0, 3).map((a) => a.id)).toEqual(["assess", "focus", "strike"]);
-    expect(acts.filter((a) => a.parent === "strike").map((a) => a.label)).toEqual(["Dégâts · Katana", "Dégâts · Wakizashi"]);
+    expect(acts.filter((a) => a.parent === "strike").map((a) => a.label)).toEqual([
+      { key: "action.damage", name: "Katana" }, { key: "action.damage", name: "Wakizashi" },
+    ]);
   });
   it("Bataille : actions de bataille puis armes", () => {
     const acts = buildActions(c(), "combat", "battle");

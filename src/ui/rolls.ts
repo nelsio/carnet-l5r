@@ -96,15 +96,15 @@ export function toPoolAction(a: ActionDef, spell: Partial<SpellRollOptions> = {}
   switch (a.kind) {
     case "spell":
       return {
-        kind: "spell", spell: a.spell ?? createSpell(a.label),
+        kind: "spell", spell: a.spell ?? createSpell(a.id),
         ...(spell.spellElement ? { element: spell.spellElement } : {}),
         ...(spell.spellRing ? { ring: spell.spellRing } : {}),
         options,
       };
     case "spellDamage":
-      return { kind: "spellDamage", spell: a.spell ?? createSpell(a.label), options };
+      return { kind: "spellDamage", spell: a.spell ?? createSpell(a.id), options };
     case "damage":
-      return { kind: "damage", weapon: a.weapon ?? { name: a.label, skill: "", dr: a.dr ?? "0g0" }, unarmed: a.unarmed };
+      return { kind: "damage", weapon: a.weapon ?? { name: a.id, skill: "", dr: a.dr ?? "0g0" }, unarmed: a.unarmed };
     case "initiative":
       return { kind: "initiative" };
     case "trait":

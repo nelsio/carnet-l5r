@@ -12,13 +12,14 @@ import { RichSelect, type SelectVariant } from "./RichSelect";
 export function ArmorCatalogSelect({ variant = "champ" }: { variant?: SelectVariant }) {
   const { dispatch } = useStore();
   const t = useT().sheet.armor;
+  const armors = useT().rules.armors;
   const c = useCharacter();
   const choose = (id: string) => {
     const a = ARMOR_CATALOG.find((x) => x.id === id);
     const { name, bonus, reduction } = c.armor;
     dispatch({
       type: "set", path: ["armor"],
-      value: a ? { name: a.name, bonus: a.bonus, reduction: a.reduction, catalogId: a.id } : { name, bonus, reduction },
+      value: a ? { name: armors[a.id]?.name ?? a.name, bonus: a.bonus, reduction: a.reduction, catalogId: a.id } : { name, bonus, reduction },
     });
   };
   return (
@@ -26,7 +27,7 @@ export function ArmorCatalogSelect({ variant = "champ" }: { variant?: SelectVari
       <RichSelect variant={variant} value={c.armor.catalogId ?? ""} onChange={choose}>
         <option value="">{t.customOption}</option>
         {ARMOR_CATALOG.map((a) => (
-          <option key={a.id} value={a.id}>{t.catalogOption(a.name, a.bonus, a.bonusMounted, a.reduction)}</option>
+          <option key={a.id} value={a.id}>{t.catalogOption(armors[a.id]?.name ?? a.name, a.bonus, a.bonusMounted, a.reduction)}</option>
         ))}
       </RichSelect>
     </label>
@@ -66,5 +67,6 @@ export function ArmorFields({ variant }: { variant?: SelectVariant }) {
 export function ArmorEffect() {
   const armor = catalogArmor(useCharacter());
   const t = useT().sheet.armor;
-  return armor?.summary ? <span data-testid="armor-effect">{t.effect(armor.name, armor.summary)}</span> : null;
+  const text = useT().rules.armors[armor?.id ?? ""];
+  return armor?.summary ? <span data-testid="armor-effect">{t.effect(text?.name ?? armor.name, text?.summary || armor.summary)}</span> : null;
 }

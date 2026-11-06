@@ -1,9 +1,8 @@
-import { characterShape, CharacterSchema, SCHEMA_VERSION, zodErrors, type Character, type FieldError } from "./schema";
+import { characterShape, CharacterSchema, SCHEMA_VERSION, validationMessages, zodErrors, type Character, type FieldError } from "./schema";
 import { catalogWeapon } from "./schools";
 
 type Json = Record<string, unknown>;
 
-export const NEWER_VERSION_MESSAGE = "Fichier créé par une version plus récente de l'outil";
 
 export class CharacterFormatError extends Error {
   constructor(readonly errors: FieldError[]) {
@@ -111,7 +110,7 @@ const MIGRATIONS: Record<number, (o: Json) => Json> = {
 /** Ramène un JSON (complet ou partiel) au format courant, sans le valider. */
 export function upgrade(json: Json): Json {
   const version = schemaVersionOf(json);
-  if (version > SCHEMA_VERSION) throw new CharacterFormatError([{ path: "schemaVersion", message: NEWER_VERSION_MESSAGE }]);
+  if (version > SCHEMA_VERSION) throw new CharacterFormatError([{ path: "schemaVersion", message: validationMessages().newerVersion }]);
   let o = json;
   for (let v = version; v < SCHEMA_VERSION; v++) o = MIGRATIONS[v](o);
   return { ...o, schemaVersion: SCHEMA_VERSION };
@@ -119,7 +118,7 @@ export function upgrade(json: Json): Json {
 
 /** Ramène toute version connue au format courant et valide la fiche complète. */
 export function migrate(json: unknown): Character {
-  if (!isObject(json)) throw new CharacterFormatError([{ path: "", message: "doit être un objet JSON" }]);
+  if (!isObject(json)) throw new CharacterFormatError([{ path: "", message: validationMessages().jsonObject }]);
   const result = CharacterSchema.safeParse(upgrade(json));
   if (!result.success) throw new CharacterFormatError(zodErrors(result.error));
   return withV2Defaults(result.data);

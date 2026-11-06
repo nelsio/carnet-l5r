@@ -1,15 +1,18 @@
 import { z } from "zod";
-import type { Messages } from "../i18n";
-import { fr } from "../i18n/fr";
+import type { Widen } from "../i18n/types";
+import { validationFr } from "../i18n/validation-fr";
 
-type ValidationMessages = Messages["validation"];
+type ValidationMessages = Widen<typeof validationFr>;
 /** Messages d'erreur dans la langue de l'interface, lus au moment de la validation (annexe 50.2). */
-let messages: ValidationMessages = fr.validation;
+let messages: ValidationMessages = validationFr;
 
 /** Change la langue des messages d'erreur ; appelé par le fournisseur de langue de l'interface. */
 export function setValidationMessages(next: ValidationMessages): void {
   messages = next;
 }
+
+/** Messages courants : import et fusion les lisent comme le schéma (annexe 53.2). */
+export const validationMessages = (): ValidationMessages => messages;
 
 /** Message d'erreur zod : clé dans les messages courants, paramètres d'un message interpolé. */
 const m = (key: keyof ValidationMessages, ...args: number[]) => ({

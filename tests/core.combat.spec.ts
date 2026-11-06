@@ -10,6 +10,7 @@ import {
 } from "@carnet/core";
 import { SCHOOLS } from "../src/rules/ecoles";
 import perso from "../reference/perso-test-ecoles.json";
+import { say } from "./helpers/text";
 
 const char = (patch: Partial<Character> = {}): Character => ({ ...(structuredClone(perso) as Character), ...patch });
 const skills = (perso as Character).skills;
@@ -41,8 +42,8 @@ describe("Lot 12, v2.3.0 : combat complet (annexe E.3)", () => {
 
   it("F1, F2 : en Centre, aucune action sauf l'Initiative ; le duel est en Centre implicite sans restriction", () => {
     const c = char();
-    expect(stanceRestriction(attack(c, "Katana"), { stance: "center" })).toMatch(/aucune action/);
-    expect(stanceRestriction({ kind: "skill", skill: "Investigation", trait: "perception" }, { stance: "center" })).toMatch(/aucune action/);
+    expect(stanceRestriction(attack(c, "Katana"), { stance: "center" })).toEqual({ key: "restrict.center" });
+    expect(stanceRestriction({ kind: "skill", skill: "Investigation", trait: "perception" }, { stance: "center" })).toEqual({ key: "restrict.center" });
     expect(stanceRestriction({ kind: "initiative" }, { stance: "center" })).toBeNull();
     expect(stanceRestriction(attack(c, "Katana"), { stance: "attack", sub: "duel" })).toBeNull();
     expect(rollStance({ stance: "attack", sub: "duel" })).toBe("center");
@@ -51,10 +52,10 @@ describe("Lot 12, v2.3.0 : combat complet (annexe E.3)", () => {
 
   it("L10 : Assaut → tir yumi empêché ; Assaut monté refusé avec Équitation 1, permis avec Équitation 3 (F2)", () => {
     const c = char();
-    expect(stanceRestriction(attack(c, "Yumi"), { stance: "fullAttack" })).toMatch(/pas d'attaque à distance/);
+    expect(stanceRestriction(attack(c, "Yumi"), { stance: "fullAttack" })).toEqual({ key: "restrict.fullAttackRanged" });
     expect(stanceRestriction(attack(c, "Katana"), { stance: "fullAttack" })).toBeNull();
-    expect(stanceRestriction(attack(c, "Katana"), { stance: "defense" })).toMatch(/Défense/);
-    expect(stanceRestriction(attack(c, "Katana"), { stance: "fullDefense" })).toMatch(/Défense/);
+    expect(stanceRestriction(attack(c, "Katana"), { stance: "defense" })).toEqual({ key: "restrict.defense" });
+    expect(stanceRestriction(attack(c, "Katana"), { stance: "fullDefense" })).toEqual({ key: "restrict.defense" });
     expect(stanceRestriction({ kind: "skill", skill: "Défense", trait: "reflexes" }, { stance: "fullDefense" })).toBeNull();
     expect(fullAttackAllowed(withRiding(1), true)).toBe(false);
     expect(fullAttackAllowed(withRiding(1), false)).toBe(true);
@@ -126,8 +127,10 @@ describe("Lot 12, v2.3.0 : combat complet (annexe E.3)", () => {
   });
 
   it("F11 : rappels d'Estropié et d'À terre", () => {
-    expect(woundEffectNote("Estropié")).toMatch(/cran de plus/);
-    expect(woundEffectNote("À terre")).toMatch(/1 point de Vide/);
+    expect(woundEffectNote("Estropié")).toEqual({ key: "wound.crippled" });
+    expect(woundEffectNote("À terre")).toEqual({ key: "wound.down" });
+    expect(say(woundEffectNote("Estropié")!)).toMatch(/cran de plus/);
+    expect(say(woundEffectNote("À terre")!)).toMatch(/1 point de Vide/);
     expect(woundEffectNote("Blessé")).toBeUndefined();
   });
 });

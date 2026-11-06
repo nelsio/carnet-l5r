@@ -10,7 +10,7 @@ import {
 } from "../../rules/l5r4e";
 import type { ReminderContext } from "../../rules/ecoles";
 import { SITUATION_LINKS } from "../../rules/portal";
-import { useLocale, useT } from "../../i18n";
+import { useCoreText, useLocale, useT } from "../../i18n";
 import { formatDistance, formatPool } from "../format";
 import { contextOf, currentArmorTN, DEFAULT_ROLL_OPTIONS, isActive, isRollable, poolFor, poolLabel, toPoolAction, uiRollStance } from "../rolls";
 import { currentActions, useCharacter, useStore, type AidSituation, type BattleState, type InfoPanel, type VoidChoice } from "../store";
@@ -20,12 +20,20 @@ import { Roller } from "./Roller";
 import { TakeDamage } from "./StatusBar";
 
 /** Situations de l'Assistant L5R : « Magie » pour un shugenja seulement (annexe F.5). */
-const aidSituations = (shugenja: boolean): readonly { id: AidSituation; label: string }[] =>
+const aidSituations = (shugenja: boolean): readonly { id: AidSituation }[] =>
   SITUATIONS.filter((s) => s.id !== "magic" || shugenja);
+
+/** Titre d'un groupe d'actions : groupe nommé (« Repos »), sinon l'élément d'un sort (annexe 53.1). */
+function useGroupLabel(): (group: string) => string {
+  const r = useT().rules;
+  return (group) => r.groups[group] ?? (r.elements as Record<string, string>)[group] ?? group;
+}
 
 export function Aid() {
   const { state, dispatch } = useStore();
   const tx = useT().aid;
+  const r = useT().rules;
+  const groupLabel = useGroupLabel();
   const c = useCharacter();
   const { ui } = state;
 
@@ -48,7 +56,7 @@ export function Aid() {
     // Cinq onglets (Magie) : plus serrés sur mobile, pour tenir sur une ligne à 360 px.
     <div className={`sit${tabs.length > 4 ? " many" : ""}`} role="group" aria-label={tx.situation}>
       {tabs.map((s) => (
-        <button key={s.id} type="button" aria-pressed={ui.situation === s.id} onClick={() => dispatch({ type: "situation", situation: s.id })}>{s.label}</button>
+        <button key={s.id} type="button" aria-pressed={ui.situation === s.id} onClick={() => dispatch({ type: "situation", situation: s.id })}>{r.situations[s.id]}</button>
       ))}
     </div>
   );
@@ -64,7 +72,7 @@ export function Aid() {
       {combat && (
         <div className="sit sub" role="group" aria-label={tx.combatType}>
           {COMBAT_SUBS.map((s) => (
-            <button key={s.id} type="button" aria-pressed={ui.sub === s.id} onClick={() => dispatch({ type: "sub", sub: s.id })}>{s.label}</button>
+            <button key={s.id} type="button" aria-pressed={ui.sub === s.id} onClick={() => dispatch({ type: "sub", sub: s.id })}>{r.combatSubs[s.id]}</button>
           ))}
         </div>
       )}
@@ -86,7 +94,7 @@ export function Aid() {
             {actions.filter((a) => a.kind !== "initiative").map((a, i, list) => (
               // Titre de groupe avant la première action du groupe (« Repos », annexe E.6).
               a.group && a.group !== list[i - 1]?.group
-                ? <Fragment key={a.id}><h3 className="label actgroup">{a.group}</h3><ActionCard action={a} /></Fragment>
+                ? <Fragment key={a.id}><h3 className="label actgroup">{groupLabel(a.group)}</h3><ActionCard action={a} /></Fragment>
                 : <ActionCard key={a.id} action={a} />
             ))}
             {combat && !c.weapons.length && <p className="muted">{tx.noWeapons}</p>}
@@ -145,13 +153,16 @@ function InitiativeCard({ action }: { action: ActionDef }) {
 function StancePanel() {
   const { state, dispatch } = useStore();
   const tx = useT().aid;
+  const r = useT().rules;
+  const ct = useCoreText();
   const c = useCharacter();
   const { ui } = state;
   const tn = currentArmorTN(c, ui);
   const armorMods = modifiersOf(c).filter((m) => m.appliesTo === "armor");
   // Étiquettes de la posture, puis effets de technique réservés à cette posture (Hiruma R1, annexe I.3.4).
   const tagsOf = (s: (typeof STANCES)[number]): StanceTag[] => [
-    ...s.tags, ...stanceEffects(c, s.id).map((e) => ({ label: `${describeEffect(e, c) || e.technique} · ${e.source}`, up: true })),
+    ...s.tags.map((t, i) => ({ ...t, label: r.stances[s.id]?.tags[i] ?? t.label })),
+    ...stanceEffects(c, s.id).map((e) => ({ label: `${ct(describeEffect(e, c)) || e.technique} · ${e.source}`, up: true })),
   ];
   const current = STANCES.find((s) => s.id === ui.stance);
   return (
@@ -173,9 +184,9 @@ function StancePanel() {
           const locked = s.id === "fullAttack" && !fullAttackAllowed(c, ui.mounted);
           return (
             <option key={s.id} value={s.id} disabled={locked} title={locked ? tx.mountedAssaultLocked : undefined}>
-              <span className="n">{s.label}</span>
+              <span className="n">{r.stances[s.id]?.label}</span>
               <EffectTags tags={tagsOf(s)} />
-              <span className="d">{s.description}</span>
+              <span className="d">{r.stances[s.id]?.description}</span>
             </option>
           );
         })}
@@ -183,7 +194,7 @@ function StancePanel() {
       {current && (
         <div className="posture-desc" id="posture-desc" data-testid="posture-desc">
           <EffectTags tags={tagsOf(current)} />
-          {current.description}
+          {r.stances[current.id]?.description}
         </div>
       )}
       <div className="grid" style={{ gap: 4, marginTop: 8 }}>
@@ -198,7 +209,7 @@ function StancePanel() {
           {armorMods.map((m) => (
             <label key={m.id} className="chk">
               <input type="checkbox" checked={isActive(m, ui.armorToggles)} onChange={(e) => dispatch({ type: "toggleArmorModifier", id: m.id, on: e.target.checked })} />
-              {" "}{m.name} <span className="muted">· {describeModifier(m)}{m.stance ? ` · ${STANCES.find((s) => s.id === m.stance)?.label}` : ""}</span>
+              {" "}{m.name} <span className="muted">· {ct(describeModifier(m))}{m.stance ? ` · ${r.stances[m.stance]?.label}` : ""}</span>
             </label>
           ))}
         </div>
@@ -323,6 +334,7 @@ const optionalInt = (v: string, min?: number) => (v === "" ? null : Math.max(min
 function BattlePanel() {
   const { state, dispatch, rng } = useStore();
   const tb = useT().aid.battle;
+  const r = useT().rules;
   const c = useCharacter();
   const { ui } = state;
   const b = ui.battle;
@@ -358,14 +370,14 @@ function BattlePanel() {
           </label>
           <div className="hint" data-testid="army-status">
             {status
-              ? <b>{ARMY_STATUSES.find((s) => s.id === status)?.verdict}</b>
+              ? <b>{r.armyStatuses[status]?.verdict}</b>
               : tb.commandHint(BATTLE_COMMAND.margin)}
           </div>
         </div>
       ) : (
         <div className="terrain" role="group" aria-label={tb.armyStatus} style={{ marginTop: 6 }}>
           {ARMY_STATUSES.map((s) => (
-            <button key={s.id} type="button" aria-pressed={b.status === s.id} onClick={() => set({ status: s.id })}>{s.label}</button>
+            <button key={s.id} type="button" aria-pressed={b.status === s.id} onClick={() => set({ status: s.id })}>{r.armyStatuses[s.id]?.label}</button>
           ))}
         </div>
       )}
@@ -373,7 +385,7 @@ function BattlePanel() {
       <div className="label" style={{ marginTop: 8 }}>{tb.engagement}</div>
       <div className="terrain seg4" role="group" aria-label={tb.engagement}>
         {ENGAGEMENTS.map((e) => (
-          <button key={e.id} type="button" aria-pressed={b.engagement === e.id} onClick={() => set({ engagement: e.id })}>{e.label}</button>
+          <button key={e.id} type="button" aria-pressed={b.engagement === e.id} onClick={() => set({ engagement: e.id })}>{r.engagements[e.id]}</button>
         ))}
       </div>
       {details && (
@@ -415,7 +427,7 @@ function BattlePanel() {
             <div className="muted" style={{ fontSize: 13 }}>
               {tb.detail({
                 total, tactician: b.tactician, min: outcome.row.min, max: outcome.row.max,
-                column: ENGAGEMENTS.find((e) => e.id === b.engagement)?.label ?? "", shift: outcome.shift,
+                column: r.engagements[b.engagement] ?? "", shift: outcome.shift,
               })}
             </div>
           )}
@@ -555,6 +567,7 @@ function VoidPanel() {
 function MovePanel() {
   const { state, dispatch } = useStore();
   const tm = useT().aid.move;
+  const r = useT().rules;
   const { locale } = useLocale();
   const details = !!state.ui.info.move;
   const c = useCharacter();
@@ -584,7 +597,7 @@ function MovePanel() {
           <button
             key={t.id} type="button" aria-pressed={terrain === t.id}
             onClick={() => dispatch({ type: "terrain", terrain: t.id })}
-          >{t.label}</button>
+          >{r.terrains[t.id]}</button>
         ))}
       </div>
       <div className="moves">
@@ -598,7 +611,7 @@ function MovePanel() {
         ))}
       </div>
       {bonus > 0 && <p className="hint" style={{ margin: "6px 0 0", color: "var(--accent-ink)" }}>{tm.bonus(bonus)}</p>}
-      {waiver && <p className="hint" data-testid="terrain-waiver" style={{ margin: "6px 0 0", color: "var(--accent-ink)" }}>{tm.waiver(waiver.source, TERRAINS.find((t) => t.id === terrain)?.label.toLowerCase() ?? "")}</p>}
+      {waiver && <p className="hint" data-testid="terrain-waiver" style={{ margin: "6px 0 0", color: "var(--accent-ink)" }}>{tm.waiver(waiver.source, r.terrains[terrain]?.toLowerCase() ?? "")}</p>}
       {details && (
         <p className="hint" style={{ marginBottom: 0 }}>
           {tm.terrainHint}
@@ -639,13 +652,14 @@ function ActionsInfoButton() {
 function ActionCard({ action: a }: { action: ActionDef }) {
   const { state, dispatch } = useStore();
   const tx = useT().aid;
+  const ct = useCoreText();
   const c = useCharacter();
   const { locale } = useLocale();
   const { ui } = state;
   if (a.kind === "move") return <MovePanel />;
   if (a.kind === "info") {
     return (
-      <div className="act info"><span className="t">{a.label}</span><span /><span className="d">{a.description}</span></div>
+      <div className="act info"><span className="t">{ct(a.label)}</span><span /><span className="d">{ct(a.description)}</span></div>
     );
   }
   const stance = uiRollStance(ui);
@@ -662,11 +676,11 @@ function ActionCard({ action: a }: { action: ActionDef }) {
   if (blocked) {
     return (
       <div className={["act", "blocked", child ? "child" : ""].filter(Boolean).join(" ")} data-testid={`blocked-${a.id}`}>
-        <span className="t">{a.label}</span>
+        <span className="t">{ct(a.label)}</span>
         <span className="p">{p ? poolLabel(p, locale) : ""}</span>
         <span className="d">
-          <span className="reason">{blocked}</span>{" "}
-          <button type="button" className="linkbtn" aria-label={tx.rollAnywayLabel(a.label)} onClick={() => dispatch({ type: "select", id: a.id })}>{tx.rollAnyway}</button>
+          <span className="reason">{ct(blocked)}</span>{" "}
+          <button type="button" className="linkbtn" aria-label={tx.rollAnywayLabel(ct(a.label))} onClick={() => dispatch({ type: "select", id: a.id })}>{tx.rollAnyway}</button>
         </span>
       </div>
     );
@@ -682,9 +696,9 @@ function ActionCard({ action: a }: { action: ActionDef }) {
       aria-pressed={selected}
       onClick={() => dispatch({ type: "select", id: a.id })}
     >
-      <span className="t">{a.label}{pending > 0 && <> <span className="pend">{tx.pending(`+${formatPool(pending, 0, locale)}`)}</span></>}{!showDesc && tag}</span>
+      <span className="t">{ct(a.label)}{pending > 0 && <> <span className="pend">{tx.pending(`+${formatPool(pending, 0, locale)}`)}</span></>}{!showDesc && tag}</span>
       <span className="p">{p ? poolLabel(p, locale) : ""}</span>
-      {showDesc && <span className="d">{tag && <>{tag}{" "}</>}{a.description}</span>}
+      {showDesc && <span className="d">{tag && <>{tag}{" "}</>}{ct(a.description)}</span>}
     </button>
   );
 }

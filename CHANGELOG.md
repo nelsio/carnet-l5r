@@ -6,6 +6,18 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.30.0] - 2026-11-06
+
+### Ajouté
+- Règles en anglais : anneaux, blessures, ND, postures, manœuvres et explications de l'Assistant suivent la langue choisie.
+- **Une fiche saisie en anglais fonctionne comme une fiche française** : techniques d'école et maîtrises reconnaissent les noms anglais des compétences (Stealth, Courtier, Perform…), des spécialisations et des mots-clés d'arme.
+
+### Modifié
+- En anglais, une nouvelle fiche s'appelle « New samurai » et l'armure choisie dans la liste du livre prend son nom anglais.
+
+### Technique
+- Le moteur renvoie des codes plutôt que des phrases ; l'interface les met en forme dans la langue choisie. Table complète des compétences de la 4e, en français et en anglais.
+
 ## [2.29.0] - 2026-11-06
 
 ### Ajouté

@@ -29,6 +29,6 @@ describe("Fiche d'exemple (annexe E.9 S4)", () => {
     const persuade = buildActions(c, "court").find((a) => a.id === "persuade")!;
     expect(show(c, { kind: "skill", skill: persuade.skill ?? "", trait: "awareness" })).toBe("4g3");
     // L'action « Se produire » reprend le nom de la fiche.
-    expect(buildActions(c, "court").some((a) => a.label === "Se produire · Art oratoire")).toBe(true);
+    expect(buildActions(c, "court").map((a) => a.label)).toContainEqual({ key: "action.perform", detail: "Art oratoire" });
   });
 });

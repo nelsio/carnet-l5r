@@ -5,6 +5,9 @@ import { chooseSchool, useSheet } from "./hooks";
 import { AddButton, RemoveButton } from "./shared";
 import { SpellAffinity } from "./Spells";
 
+/** Couleur du badge : classes d'avant le lot 53 (`b-cocher`, `b-rappel`). */
+const BADGE_CLASS = { auto: "b-auto", optional: "b-cocher", reminder: "b-rappel", text: "b-texte" } as const;
+
 export function Techniques() {
   const { c, edit, set } = useSheet("techniques");
   const s = useT().sheet.techniques;
@@ -45,6 +48,7 @@ export function Techniques() {
 function SchoolTechniques() {
   const { c, edit, set } = useSheet("techniques");
   const s = useT().sheet.techniques;
+  const categories = useT().rules.techniqueCategories;
   const { state } = useStore();
   const school = schoolOf(c);
   const suggestion = state.mode === "edit" ? suggestSchool(c) : undefined;
@@ -76,7 +80,7 @@ function SchoolTechniques() {
               <b>{s.rankTitle(r.rank, r.name)}</b>
               <span>
                 {on
-                  ? techniqueCategories(r).map((cat) => <span key={cat} className={`badge b-${cat.replace(/\W/g, "")}`}>{cat}</span>)
+                  ? techniqueCategories(r).map((cat) => <span key={cat} className={`badge ${BADGE_CLASS[cat]}`}>{categories[cat]}</span>)
                   : <span className="badge">{s.lockedRank(r.rank)}</span>}
               </span>
             </div>

@@ -15,6 +15,7 @@ export function Header() {
   const { character: c, ui } = state;
   const readonly = state.mode === "readonly";
   const clan = c?.clan.trim() ? clanAccent(c.clan) : null;
+  const clanName = clan?.id ? (t.rules.clans[clan.id] ?? clan.label) : clan?.label;
   const clanHref = clanUrl(clan?.id ?? null);
   // Sous le nom : école affichée et rang d'école, plus de famille (annexe E.19 S8).
   const sub = c ? [c.school.trim(), t.header.rank(schoolRankOf(c))].filter(Boolean).join(" · ") : "";
@@ -40,10 +41,10 @@ export function Header() {
             <>
               <div className="eyebrow">
                 <span className="brand">{APP_NAME}</span>
-                {clan && <><span className="sep" aria-hidden="true" />{clan.label && clanHref ? (
+                {clan && <><span className="sep" aria-hidden="true" />{clanName && clanHref ? (
                   // Page du clan sur le portail (annexe L.7).
-                  <ExternalLink href={clanHref} className="mon" label={t.header.clanPage(clan.label)}>{clan.label}</ExternalLink>
-                ) : <div className="mon">{clan.label ?? t.header.clan(c.clan)}</div>}</>}
+                  <ExternalLink href={clanHref} className="mon" label={t.header.clanPage(clanName)}>{clanName}</ExternalLink>
+                ) : <div className="mon">{clanName ?? t.header.clan(c.clan)}</div>}</>}
               </div>
               <FitName name={c.name}>{readonly && <> <span className="badge">{t.header.readonly}</span></>}</FitName>
               <div className="sub">{sub}</div>

@@ -9,10 +9,16 @@ import { pathToFileURL } from "node:url";
 import sharp from "sharp";
 
 const lang = process.argv[2] === "en" ? "en" : "fr";
-// Textes cliqués, par langue. Situations, actions et sorts viennent des règles et du modèle : en français jusqu'au lot 53.
+// Textes cliqués, par langue (règles traduites au lot 53). Les noms de sort viennent du modèle : en français jusqu'au lot 54.
 const L = {
-  fr: { locale: "fr-FR", out: "docs/img", use: "Utiliser", view: "Vue", aid: "Assistant L5R", roll: /^Lancer/ },
-  en: { locale: "en-US", out: "docs/img/en", use: /^Use the /, view: "View", aid: "L5R Assistant", roll: /^Roll/ },
+  fr: {
+    locale: "fr-FR", out: "docs/img", use: "Utiliser", view: "Vue", aid: "Assistant L5R", roll: /^Lancer/,
+    skirmish: "Escarmouche", attack: /Attaque · Katana/, magic: "Magie", cast: /Lancer · Frappe de jade/,
+  },
+  en: {
+    locale: "en-US", out: "docs/img/en", use: /^Use the /, view: "View", aid: "L5R Assistant", roll: /^Roll/,
+    skirmish: "Skirmish", attack: /Attack · Katana/, magic: "Magic", cast: /Cast · Frappe de jade/,
+  },
 }[lang];
 const url = pathToFileURL(resolve("dist/carnet-l5r.html")).href;
 const out = resolve(L.out);
@@ -40,10 +46,10 @@ await d.evaluate(() => window.scrollTo(0, 0)); await settle(d);
 shots.fiche = await d.screenshot();
 await tab(d, L.aid).click();
 await situation(d, "Combat").click();
-await d.getByRole("button", { name: "Escarmouche", exact: true }).click();
-await d.getByRole("button", { name: /Attaque · Katana/ }).first().click(); await settle(d);
+await d.getByRole("button", { name: L.skirmish, exact: true }).click();
+await d.getByRole("button", { name: L.attack }).first().click(); await settle(d);
 await d.getByRole("button", { name: L.roll }).last().click(); await settle(d);
-await d.getByRole("button", { name: /Attaque · Katana/ }).first().evaluate((e) => e.scrollIntoView({ block: "center" })); await settle(d);
+await d.getByRole("button", { name: L.attack }).first().evaluate((e) => e.scrollIntoView({ block: "center" })); await settle(d);
 shots.combat = await d.screenshot();
 
 // Mobile : fiche, Assistant L5R en Magie, lanceur d'un sort.
@@ -52,9 +58,9 @@ await m.getByRole("button", { name: L.use }).nth(1).click(); await settle(m);
 await m.evaluate(() => window.scrollTo(0, 0)); await settle(m);
 const phones = [await m.screenshot()];
 await tab(m, L.aid).click();
-await situation(m, "Magie").click(); await settle(m);
+await situation(m, L.magic).click(); await settle(m);
 phones.push(await m.screenshot());
-await m.getByRole("button", { name: /Lancer · Frappe de jade/ }).click(); await settle(m);
+await m.getByRole("button", { name: L.cast }).click(); await settle(m);
 phones.push(await m.screenshot());
 
 await browser.close();

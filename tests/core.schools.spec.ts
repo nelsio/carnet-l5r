@@ -11,6 +11,7 @@ import {
 } from "@carnet/core";
 import perso from "../reference/perso-test-ecoles.json";
 import kakitaV1 from "./fixtures/kakita-v1.json";
+import { say } from "./helpers/text";
 
 const char = (schoolId: string, rank: number, patch: Partial<Character> = {}): Character =>
   ({ ...(structuredClone(perso) as Character), schoolId, insightRank: rank, ...patch });
@@ -221,17 +222,17 @@ describe("Moteur d'effets : détails", () => {
   it("étiquettes des effets appliqués : « +1g1 +1 · Kakita R1 » (le bonus fixe suit le rang d'école)", () => {
     const c = char("kakita-bushi", 1);
     const p = computePool(c, attack(c, "Katana"), { stance: "center" });
-    expect(p.applied!.map((e) => `${describeEffect(e, c)} · ${e.source}`)).toEqual(["+1g1 +1 · Kakita R1"]);
+    expect(p.applied!.map((e) => `${say(describeEffect(e, c))} · ${e.source}`)).toEqual(["+1g1 +1 · Kakita R1"]);
     expect(p.techFlat).toBe(1);
     const r2 = char("kakita-bushi", 2);
     const p2 = computePool(r2, attack(r2, "Katana"), { stance: "center" });
-    expect(p2.applied!.map((e) => `${describeEffect(e, r2)} · ${e.source}`)).toEqual(["+1g1 +2 · Kakita R1"]);
+    expect(p2.applied!.map((e) => `${say(describeEffect(e, r2))} · ${e.source}`)).toEqual(["+1g1 +2 · Kakita R1"]);
     expect(p2.optional!.map((e) => e.source)).toEqual(["Kakita R2"]);
   });
 
   it("effets réservés à une posture : Hiruma R1 et R2 en Attaque, rien en Assaut (annexe I.3.4)", () => {
     const c = char("hiruma-bushi", 3);
-    expect(stanceEffects(c, "attack").map((e) => `${describeEffect(e, c)} · ${e.source}`))
+    expect(stanceEffects(c, "attack").map((e) => `${say(describeEffect(e, c))} · ${e.source}`))
       .toEqual(["+1g0 · Hiruma R1", "+5 au ND d'armure par cran · Hiruma R2"]);
     expect(stanceEffects(c, "fullAttack")).toEqual([]);
   });
@@ -282,7 +283,7 @@ describe("Moteur d'effets : détails", () => {
   it("résumés des effets : ND d'armure, ND de la cible, blessures, manœuvres, autres", () => {
     const text = (id: string, rank: number, kind: string) => {
       const c = char(id, rank);
-      return activeEffects(c).filter((e) => e.kind === kind).map((e) => describeEffect(e, c));
+      return activeEffects(c).filter((e) => e.kind === kind).map((e) => say(describeEffect(e, c)));
     };
     expect(text("hiruma-bushi", 3, "armor")).toEqual(["+5 au ND d'armure par cran", "+6 au ND d'armure"]);
     expect(text("yoritomo-bushi", 2, "targetTn")).toEqual(["-5 au ND de la cible par cran"]);
