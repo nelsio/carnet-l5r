@@ -6,6 +6,12 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.32.2] - 2026-11-06
+
+### Documentation
+- Le README est de nouveau en français par défaut ; la version anglaise est dans `README-en.md`.
+- Guide d'utilisation réorganisé : « Le Carnet en 5 minutes » en tête, une section par tâche, le détail des règles replié sous « En détail », toute la magie dans une section Shugenja.
+
 ## [2.32.1] - 2026-11-06
 
 ### Corrigé
@@ -454,7 +460,8 @@ Simples liens ouverts dans un nouvel onglet : le Carnet ne fait toujours aucune 
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.32.1...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.32.2...HEAD
+[2.32.2]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.32.2
 [2.32.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.32.1
 [2.32.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.32.0
 [2.31.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.31.1

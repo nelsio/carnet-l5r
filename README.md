@@ -1,80 +1,80 @@
 # Carnet de Rokugan
 
 [![CI](https://github.com/nelsio/carnet-l5r/actions/workflows/ci.yml/badge.svg)](https://github.com/nelsio/carnet-l5r/actions/workflows/ci.yml)
-[![Latest release](https://img.shields.io/github/v/release/nelsio/carnet-l5r)](https://github.com/nelsio/carnet-l5r/releases/latest)
-[![MIT License](https://img.shields.io/github/license/nelsio/carnet-l5r)](LICENSE)
+[![Dernière release](https://img.shields.io/github/v/release/nelsio/carnet-l5r)](https://github.com/nelsio/carnet-l5r/releases/latest)
+[![Licence MIT](https://img.shields.io/github/license/nelsio/carnet-l5r)](LICENSE)
 
-**English** · [Français](README-fr.md)
+[English](README-en.md) · **Français**
 
-Campaign companion for **Legend of the Five Rings, 4th edition** players: free, no account needed. Your character sheet, plus a Roll & Keep assistant with rolls ready to throw for each situation, on desktop and mobile.
+Compagnon de campagne gratuit et sans compte pour les joueurs de **La Légende des Cinq Anneaux (L5R), 4e édition** : ta fiche de personnage, et un assistant de jets Roll & Keep prêts à lancer selon la situation, sur ordinateur comme sur mobile.
 
-**▶ [Open the Carnet](https://nelsio.github.io/carnet-l5r/)** · [User guide](docs/GUIDE.md) (in French) · [What's new](https://github.com/nelsio/carnet-l5r/releases)
+**▶ [Ouvrir le Carnet](https://nelsio.github.io/carnet-l5r/)** · [Guide d'utilisation](docs/GUIDE.md) · [Nouveautés](https://github.com/nelsio/carnet-l5r/releases)
 
-![Kakita Haruto's sheet: rings, traits, wounds and Void status bar](docs/img/en/fiche.png)
+![Fiche de Kakita Haruto : anneaux, traits, barre d'état des blessures et du Vide](docs/img/fiche.png)
 
-A single HTML file, **no server, no account**: your sheets stay in your browser and are never sent anywhere ([privacy](#privacy)).
+Un seul fichier HTML, **sans serveur ni compte** : tes fiches restent dans ton navigateur et ne sont jamais envoyées ([confidentialité](#confidentialité)).
 
-## What the Carnet does
+## Ce que fait le Carnet
 
-- **Full sheet**: rings, skills, weapons, armor, school techniques, spells. Dice pools (`5k3`…) are recalculated on every change.
-- **Assistant L5R** by situation: Investigation, Court, Movement, Combat (skirmish, iaijutsu duel, mass battle) and Magic.
-- **Dice roller**: it rolls for you, or tells you how to roll your real dice. Odds of success against the TN, Raises, maneuvers, Void.
-- **40 schools** (bushi, courtiers, shugenja) and skill masteries applied automatically.
-- **Import from a photo of a paper sheet**, with the AI of your choice: the Carnet gives you the prompt, you paste the answer and check it.
-- **Tracking during play**: wounds, Void Points, spell slots, new day.
-- **On phone** as on desktop, in light or dark theme.
-- **In English or French**: interface, rules and schools follow your browser's language, with an **FR/EN** button in the header. Spells from the campaign portal's grimoire stay in French.
+- **Fiche complète** : anneaux, compétences, armes, armure, techniques d'école, sorts. Les réserves (`5g3`…) se recalculent à chaque changement.
+- **Assistant L5R** par situation : Enquête, Cour, Déplacement, Combat (escarmouche, duel iaijutsu, bataille de masse) et Magie.
+- **Lanceur** : il lance les dés pour toi, ou t'indique comment lancer tes vrais dés. Chance de réussite contre le ND, augmentations, manœuvres, Vide.
+- **40 écoles** (bushi, courtisans, shugenja) et les maîtrises de compétence appliquées d'office.
+- **Import depuis une photo de fiche papier**, via l'IA de ton choix : le Carnet fournit le prompt, tu colles la réponse et tu vérifies.
+- **Suivi en partie** : blessures, points de Vide, emplacements de sorts, nouvelle journée.
+- **Sur téléphone** comme sur ordinateur, en thème clair ou sombre.
+- **En français ou en anglais** : interface, règles et écoles suivent la langue du navigateur, avec un bouton **FR/EN** dans l'en-tête. Les sorts du grimoire du portail restent en français.
 
-![Skirmish: attacks and damage on the left, roller with maneuvers and result on the right](docs/img/en/combat.png)
+![Escarmouche : attaques et dégâts à gauche, lanceur avec manœuvres et résultat à droite](docs/img/combat.png)
 
-![On mobile: sheet, Assistant L5R in Magic, and the roller for a spell](docs/img/en/mobile.png)
+![Sur mobile : fiche, Assistant L5R en Magie et lanceur d'un sort](docs/img/mobile.png)
 
-## Getting started
+## Démarrer
 
-1. Open **https://nelsio.github.io/carnet-l5r/**.
-2. Create your sheet: **New blank sheet**, a **template** (Bushi, Shugenja, Courtier), or a JSON exported from the [portal's Forge](https://vincenzorpg.github.io/L5R/createcharacter.html) (in French).
-3. Play: **Assistant L5R** tab, pick the situation, tap an action.
+1. Ouvre **https://nelsio.github.io/carnet-l5r/**.
+2. Crée ta fiche : **Nouvelle fiche vierge**, un **modèle** (Bushi, Shugenja, Courtisan), ou un JSON exporté de la [Forge du portail](https://vincenzorpg.github.io/L5R/createcharacter.html).
+3. Joue : onglet **Assistant L5R**, choisis la situation, touche une action.
 
-To play **offline**, **install the Carnet** from your browser (see the [guide](docs/GUIDE.md#installer-sur-ton-téléphone-ou-ton-ordinateur), in French) or download `carnet-l5r.html` from the [latest release](https://github.com/nelsio/carnet-l5r/releases/latest) and open it in your browser.
+Pour jouer **hors ligne**, **installe le Carnet** depuis ton navigateur (voir le [guide](docs/GUIDE.md#installer-sur-ton-téléphone-ou-ton-ordinateur)) ou télécharge `carnet-l5r.html` depuis la [dernière release](https://github.com/nelsio/carnet-l5r/releases/latest) et ouvre-le dans ton navigateur.
 
-> **Remember to export your sheet** (**File** block → **Export the sheet**): it is your backup, and the way to change devices or share it with the GM. On Chrome and Edge, **Link to a file…** saves it continuously, for example in your group's shared folder.
+> **Pense à exporter ta fiche** (bloc **Fichier** → **Exporter la fiche**) : c'est ta sauvegarde, et le moyen de changer d'appareil ou de la partager avec le MJ. Sur Chrome et Edge, **Lier à un fichier** l'enregistre en continu, par exemple dans le dossier partagé de ton groupe.
 
-**GM**: import the players' sheets as **Read-only (GM)**. Details in the [guide](docs/GUIDE.md#11-pour-le-mj) (in French).
+**MJ** : importe les fiches des joueurs en **Consultation**, en lecture seule. Détails dans le [guide](docs/GUIDE.md#11-pour-le-mj).
 
-## Privacy
+## Confidentialité
 
-The web address counts visits with [GoatCounter](https://www.goatcounter.com), without cookies: each time the page opens, it receives the page address, the site you came from, your browser, your language and your screen size. Your IP address is used to infer your country and is not stored. **Your sheets and your characters' names are never sent.** The `carnet-l5r.html` file counts nothing.
+L'adresse web compte les visites avec [GoatCounter](https://www.goatcounter.com), sans cookie : à chaque ouverture, il reçoit l'adresse de la page, le site d'où tu viens, ton navigateur, ta langue et la taille de ton écran. Ton adresse IP sert à déduire ton pays et n'est pas conservée. **Tes fiches et le nom de tes personnages ne sont jamais envoyés.** Le fichier `carnet-l5r.html` ne compte rien.
 
-## Learn more
+## En savoir plus
 
-- [User guide](docs/GUIDE.md) (in French): every screen and every rule applied, in detail.
-- [What's new](https://github.com/nelsio/carnet-l5r/releases) and [CHANGELOG](CHANGELOG.md) (in French).
-- [Report an issue](https://github.com/nelsio/carnet-l5r/issues/new): bug, rule to check, idea.
+- [Guide d'utilisation](docs/GUIDE.md) : le Carnet en 5 minutes, puis chaque écran ; le détail des règles se déplie au besoin.
+- [Nouveautés](https://github.com/nelsio/carnet-l5r/releases) et [CHANGELOG](CHANGELOG.md).
+- [Signaler un problème](https://github.com/nelsio/carnet-l5r/issues/new) : bug, règle à vérifier, idée.
 
-## Contact / Feedback
+## Contact / Retours
 
-- **A bug?** Open a [GitHub issue](https://github.com/nelsio/carnet-l5r/issues/new): it is public, and others can follow it.
-- **A question, an idea, some feedback?** Use **Contact** at the bottom of the Carnet: a private message to the author, sent by email through the [Web3Forms](https://web3forms.com) service. Leave an email address if you want a reply. Nothing is stored in the Carnet, and your sheets are never sent.
+- **Un bug ?** Ouvre une [issue GitHub](https://github.com/nelsio/carnet-l5r/issues/new) : elle est publique, d'autres peuvent la suivre.
+- **Une question, une idée, un retour d'expérience ?** Utilise **Contact** en bas du Carnet : un message privé à l'auteur, transmis par mail via le service [Web3Forms](https://web3forms.com). Laisse ton email si tu veux une réponse. Rien n'est stocké dans le Carnet, et tes fiches ne sont jamais envoyées.
 
-L5R is a trademark of its publisher; **unofficial**, free fan tool, not affiliated with the rights holders of *Legend of the Five Rings*. It reproduces no text from the books: **your core book is the authority**. Code under the [MIT](LICENSE) license; fonts, trademarks and credits: [CREDITS.md](docs/CREDITS.md).
+Outil de fan **non officiel** et gratuit, sans lien avec les ayants droit de *Legend of the Five Rings*. Il ne reproduit aucun texte des livres : **ton livre de base fait foi**. Code sous licence [MIT](LICENSE) ; polices, marques et crédits : [CREDITS.md](docs/CREDITS.md).
 
 ---
 
-## Development
+## Développement
 
-Specification (in French): [`HANDOFF.md`](HANDOFF.md) (index), details in [`spec/`](spec/). **Node 24** (see `.nvmrc`).
+Spécification : [`HANDOFF.md`](HANDOFF.md) (index), détail dans [`spec/`](spec/). **Node 24** (voir `.nvmrc`).
 
 ```sh
 npm install
-npm run dev            # development server
-npm run lint           # ESLint and specification reference check
+npm run dev            # serveur de développement
+npm run lint           # ESLint et contrôle des références à la spécification
 npm run typecheck      # tsc --noEmit
 npm test               # Vitest
-npm run test:coverage  # Vitest + coverage (100% of lines in src/core)
-npm run build          # dist/carnet-l5r.html, single self-contained file
-npm run test:e2e       # Playwright, on the build
+npm run test:coverage  # Vitest + couverture (100 % des lignes de src/core)
+npm run build          # dist/carnet-l5r.html, fichier unique autonome
+npm run test:e2e       # Playwright, sur le build
 ```
 
-**Publishing a version**: update `version` in `package.json` (SemVer) and `CHANGELOG.md`, merge into `main`, then push the tag (`git tag v1.2.3 && git push origin v1.2.3`). The `release.yml` workflow checks that the tag matches `package.json`, reruns the checks and publishes the release with `carnet-l5r.html`. Every merge into `main` also updates the online version (`pages.yml`).
+**Publier une version** : mettre à jour `version` dans `package.json` (SemVer) et `CHANGELOG.md`, merger sur `main`, puis poser le tag (`git tag v1.2.3 && git push origin v1.2.3`). Le workflow `release.yml` vérifie que le tag correspond à `package.json`, relance les contrôles et publie la release avec `carnet-l5r.html`. Chaque merge sur `main` met aussi à jour la version en ligne (`pages.yml`).
 
-**Contributing**: see [`CONTRIBUTING.md`](CONTRIBUTING.md) and the [code of conduct](CODE_OF_CONDUCT.md) (in French). Report security vulnerabilities privately: [`SECURITY.md`](SECURITY.md) (in French).
+**Contribuer** : voir [`CONTRIBUTING.md`](CONTRIBUTING.md) et le [code de conduite](CODE_OF_CONDUCT.md). Une faille de sécurité se signale en privé : [`SECURITY.md`](SECURITY.md).

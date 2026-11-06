@@ -4,7 +4,7 @@ Merci de ton intérêt ! Ce guide résume comment signaler un problème, propose
 
 ## 1. Esprit du projet
 
-Le Carnet de Rokugan est un **outil de fan**, non officiel. Il tient dans **un seul fichier HTML**, ne fait **aucune requête automatique** et **n'envoie aucune donnée de fiche** : les fiches restent chez chaque joueur. Toute contribution doit respecter ces trois contraintes. Seule exception, hors du fichier : l'adresse GitHub Pages compte les visites (voir [Confidentialité](README-fr.md#confidentialité)).
+Le Carnet de Rokugan est un **outil de fan**, non officiel. Il tient dans **un seul fichier HTML**, ne fait **aucune requête automatique** et **n'envoie aucune donnée de fiche** : les fiches restent chez chaque joueur. Toute contribution doit respecter ces trois contraintes. Seule exception, hors du fichier : l'adresse GitHub Pages compte les visites (voir [Confidentialité](README.md#confidentialité)).
 
 ## 2. Signaler un bug ou une règle
 
@@ -21,7 +21,7 @@ Ouvre une issue **Idée d'évolution** avant de coder. Les évolutions important
 
 ## 4. Développer
 
-Prérequis et commandes : section [Développement du README](README-fr.md#développement).
+Prérequis et commandes : section [Développement du README](README.md#développement).
 
 ## 5. Règles du code
 
@@ -45,7 +45,7 @@ Prérequis et commandes : section [Développement du README](README-fr.md#dével
 
 ## 8. Versions
 
-- [SemVer](https://semver.org/lang/fr/), procédure « Publier une version » du [README](README-fr.md#développement).
+- [SemVer](https://semver.org/lang/fr/), procédure « Publier une version » du [README](README.md#développement).
 - Chaque version a son entrée dans [`CHANGELOG.md`](CHANGELOG.md).
 - Un changement du format de fiche incrémente `schemaVersion` et ajoute une migration testée.
 
