@@ -1,5 +1,6 @@
 import { armorSheet, type ArmorPart } from "@carnet/core";
-import { useT } from "../../../i18n";
+import { useLocale, useT } from "../../../i18n";
+import { skillLabel } from "../../format";
 import { ArmorFields } from "../ArmorCatalog";
 import { useSheet } from "./hooks";
 
@@ -7,6 +8,8 @@ import { useSheet } from "./hooks";
 export function Armor() {
   const { c, edit } = useSheet("armor");
   const s = useT().sheet.armor;
+  const armors = useT().rules.armors;
+  const { locale } = useLocale();
   if (edit) {
     return (
       <div className="armform">
@@ -19,7 +22,7 @@ export function Armor() {
   }
   const a = armorSheet(c);
   const plus = (parts: ArmorPart[]) => parts.map((p) => ` + ${p.value} ${p.source}`).join("");
-  const rule = a.catalog?.summary;
+  const rule = a.catalog?.summary && (armors[a.catalog.id]?.summary || a.catalog.summary);
   return (
     <div className="armblock" data-testid="armor-block">
       <div className="armname">
@@ -46,10 +49,12 @@ export function Armor() {
       {rule && (
         <p className="armrule" data-testid="armor-rule">
           <b>{s.specialRule}</b> {rule}
-          {a.waiver && <> {s.waiver(a.waiver.source, a.waiver.except.join(", "))}</>}
+          {a.waiver && <> {s.waiver(a.waiver.source, a.waiver.except.map((x) => skillLabel(x, locale)).join(", "))}</>}
         </p>
       )}
-      {a.optional.length > 0 && <p className="hint">{s.optional(a.optional.join(" ; "))}</p>}
+      {a.optional.length > 0 && <p className="hint">{s.optional(a.optional.map((o) => (o.source
+        ? `${o.label} (+${o.value}${o.stack ? ` × ${o.stack}` : ""}, ${o.source})`
+        : `${o.label} (${o.value >= 0 ? "+" : ""}${o.value})`)).join(" ; "))}</p>}
       <p className="hint" style={{ margin: 0 }}>{s.referenceStance}</p>
     </div>
   );

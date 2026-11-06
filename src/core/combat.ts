@@ -5,6 +5,7 @@ import {
 } from "../rules/l5r4e";
 import { findSkill, isRanged, type PoolAction } from "./engine";
 import type { Character } from "./schema";
+import { text, type CoreText } from "./text";
 import { duelFocusRule, schoolReduction, voidMultiplier } from "./schools";
 
 /** Situation de combat qui limite les actions : posture, monture, type de combat. */
@@ -23,20 +24,20 @@ export function rollStance(s: StanceSituation): Stance {
  * Raison pour laquelle la posture empêche cette action (F2), ou `null`. Ce n'est jamais un blocage dur :
  * l'interface garde « Lancer quand même ».
  */
-export function stanceRestriction(a: PoolAction, s: StanceSituation): string | null {
+export function stanceRestriction(a: PoolAction, s: StanceSituation): CoreText | null {
   if (s.sub === "duel") return null;
   const attack = a.kind === "skill" && !!a.attack;
   // Sorts en escarmouche (annexe F.5, v2.12.0) : ni en Assaut ni en Défense totale ; Centre comme toute action.
-  if (a.kind === "spell" && s.stance === "fullAttack") return "Assaut : attaques seulement, pas de sort.";
-  if (a.kind === "spell" && s.stance === "fullDefense") return "Défense totale : actions gratuites seulement, pas de sort.";
+  if (a.kind === "spell" && s.stance === "fullAttack") return text("restrict.fullAttackSpell");
+  if (a.kind === "spell" && s.stance === "fullDefense") return text("restrict.fullDefenseSpell");
   switch (s.stance) {
     case "center":
-      return a.kind === "initiative" ? null : "Posture Centre : aucune action ce round.";
+      return a.kind === "initiative" ? null : text("restrict.center");
     case "defense":
     case "fullDefense":
-      return attack ? "Posture Défense : pas d'attaque ce round." : null;
+      return attack ? text("restrict.defense") : null;
     case "fullAttack":
-      return attack && a.kind === "skill" && a.weapon && isRanged(a.weapon) ? "Assaut : pas d'attaque à distance." : null;
+      return attack && a.kind === "skill" && a.weapon && isRanged(a.weapon) ? text("restrict.fullAttackRanged") : null;
     default:
       return null;
   }
@@ -101,7 +102,8 @@ export function opposedVerdict(total: number, opponent: number, raises: number):
   return margin === 0 ? "tie" : "lose";
 }
 
-/** Rappel des effets d'un niveau de blessure (F11), s'il y en a un. */
-export function woundEffectNote(label: string): string | undefined {
-  return WOUND_EFFECT_NOTES[label];
+/** Rappel des effets d'un niveau de blessure (F11), s'il y en a un ; `label` : libellé canonique de `WOUND_LEVELS`. */
+export function woundEffectNote(label: string): CoreText | undefined {
+  const key = WOUND_EFFECT_NOTES[label];
+  return key && text(key);
 }

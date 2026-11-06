@@ -1,17 +1,16 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { normalize, sameSpell, searchGrimoire, spellTn, type GrimoireDiff, type GrimoireFillField, type GrimoireSpell, type Spell, type SpellElement } from "@carnet/core";
 import { useLocale, useT, type Messages } from "../../i18n";
-import { ELEMENT_LABELS } from "../../rules/l5r4e";
 import { GRIMOIRE_FILES, PORTAL_NAME_OF } from "../../rules/portal";
 import { useStore } from "../store";
 
 /** Filtres d'élément du panneau : tous, universels, puis les cinq Anneaux. */
-const elementChips = (t: Messages["grimoire"]): readonly [SpellElement | "all-elements", string][] => [
+const elementChips = (t: Messages["grimoire"], elements: Messages["rules"]["elements"]): readonly [SpellElement | "all-elements", string][] => [
   ["all-elements", t.allElements], ["all", t.universals],
-  ...(["air", "earth", "fire", "water", "void"] as const).map((e): [SpellElement, string] => [e, ELEMENT_LABELS[e]]),
+  ...(["air", "earth", "fire", "water", "void"] as const).map((e): [SpellElement, string] => [e, elements[e]]),
 ];
 
-const elementLabel = (e: SpellElement, t: Messages["grimoire"]) => (e === "all" ? t.universal : ELEMENT_LABELS[e]);
+const elementLabel = (e: SpellElement, t: Messages["grimoire"], elements: Messages["rules"]["elements"]) => (e === "all" ? t.universal : elements[e]);
 const ringColor = (e: SpellElement) => ({ ["--rc" as string]: `var(--ring-${e})` });
 
 /** Icône de rouleau du bouton « Ajouter depuis le grimoire ». */
@@ -26,7 +25,8 @@ export function ScrollIcon() {
 /** Ligne d'un sort du grimoire : barre de couleur, nom français et anglais, élément · maîtrise · ND · mots-clés. */
 export function GrimoireRow({ g }: { g: GrimoireSpell }) {
   const t = useT().grimoire;
-  const meta = [elementLabel(g.element, t), t.mastery(g.mastery), t.tn(spellTn(g.mastery)), ...(g.keywords.length ? [g.keywords.join(", ")] : [])];
+  const elements = useT().rules.elements;
+  const meta = [elementLabel(g.element, t, elements), t.mastery(g.mastery), t.tn(spellTn(g.mastery)), ...(g.keywords.length ? [g.keywords.join(", ")] : [])];
   return (
     <>
       <span className="bar" aria-hidden="true" />
@@ -300,7 +300,7 @@ export function GrimoirePanel({ spells, onAdd, onClose }: PanelProps) {
           value={query} onChange={(e) => { setQuery(e.target.value); setActive(0); }}
         />
         <div className="gchips" role="group" aria-label={t.element}>
-          {elementChips(t).map(([key, label]) => (
+          {elementChips(t, tc.rules.elements).map(([key, label]) => (
             <button
               key={key} type="button" className="gchip" aria-pressed={element === key}
               style={key === "all-elements" ? undefined : ringColor(key)}

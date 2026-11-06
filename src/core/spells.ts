@@ -3,12 +3,13 @@
  * jet de sort et situation « Magie » (v2.11.0), emplacements et sorts en escarmouche (v2.12.0).
  */
 import type { SpellOption, Spellcasting } from "../rules/ecoles";
-import { CONCENTRATE_ACTION_ID, ELEMENT_LABELS, SPELL_CAST_TIME_MIN, SPELL_CONCENTRATION, SPELL_TN, type ActionDef } from "../rules/l5r4e";
-import { formatDR, normalize, parseDR, rings, type PoolAction } from "./engine";
+import { CONCENTRATE_ACTION_ID, SPELL_CAST_TIME_MIN, SPELL_CONCENTRATION, SPELL_TN, type ActionDef } from "../rules/l5r4e";
+import { normalize, parseDR, rings, type PoolAction } from "./engine";
 import {
   SPELL_ELEMENTS, SPELL_RINGS, SPELL_SLOT_KEYS, type Character, type Spell, type SpellElement, type SpellRing, type SpellSlotKey,
 } from "./schema";
 import { schoolOf, schoolRankOf } from "./schools";
+import { text, type CoreText } from "./text";
 
 /** ND d'un sort : 5 + 5 × maîtrise (« Maîtrise 2 · ND 15 »). */
 export function spellTn(mastery: number): number {
@@ -94,7 +95,7 @@ export interface SpellCast {
   /** Dés lancés en plus des cases de l'école (Kuni : cible non humaine). */
   rolled: number;
   /** Raisons des augmentations gratuites de l'école (« mot-clé Jade »), une par augmentation. */
-  freeRaises: string[];
+  freeRaises: CoreText[];
 }
 
 /** Jet de sort (F.2) : (Anneau + rang de lancement) g Anneau, cases et augmentations gratuites de l'école. */
@@ -106,9 +107,9 @@ export function spellCast(c: Character, a: Omit<SpellAction, "kind">): SpellCast
   const options = chosenOptions(c, a.options);
   const keywords = a.spell.keywords.map(normalize);
   const freeRaises = [
-    ...(sc?.freeRaiseKeywords ?? []).filter((k) => keywords.includes(normalize(k))).map((k) => `mot-clé ${k}`),
-    ...(sc?.freeRaiseAffinity && affinityOf(c) === element ? ["élément d'affinité"] : []),
-    ...options.flatMap((o) => Array.from({ length: o.freeRaises ?? 0 }, () => o.label)),
+    ...(sc?.freeRaiseKeywords ?? []).filter((k) => keywords.includes(normalize(k))).map((k) => text("spell.keyword", { keyword: k })),
+    ...(sc?.freeRaiseAffinity && affinityOf(c) === element ? [text("spell.affinity")] : []),
+    ...options.flatMap((o) => Array.from({ length: o.freeRaises ?? 0 }, () => text("spell.option", { label: o.label }))),
   ];
   return {
     element, ring, ringValue: rings(c)[ring], rank, affinity, deficiency,
@@ -128,10 +129,10 @@ export function spellDamage(c: Character, a: Omit<SpellDamageAction, "kind">): {
 }
 
 /** Sort que le rang ne permet pas (carte grisée, « Lancer quand même ») : rang de lancement 0, maîtrise > rang d'école. */
-export function spellRestriction(c: Character, spell: Spell, element = defaultSpellElement(c, spell), options?: readonly string[]): string | null {
+export function spellRestriction(c: Character, spell: Spell, element = defaultSpellElement(c, spell), options?: readonly string[]): CoreText | null {
   const school = schoolRankOf(c);
-  if (castingRank(c, element, options).rank <= 0) return `Déficience : impossible au rang ${school}.`;
-  if (spell.mastery > school) return `Maîtrise ${spell.mastery} > rang ${school}.`;
+  if (castingRank(c, element, options).rank <= 0) return text("spell.deficiency", { rank: school });
+  if (spell.mastery > school) return text("spell.mastery", { mastery: spell.mastery, rank: school });
   return null;
 }
 
@@ -141,32 +142,34 @@ export function castTime(mastery: number, raises = 0): number {
 }
 
 /** « 2 actions complexes ». */
-export const castTimeLabel = (n: number) => `${n} action${n > 1 ? "s" : ""} complexe${n > 1 ? "s" : ""}`;
+export const castTimeLabel = (n: number): CoreText => text("spell.castTime", { n });
 
 /** Actions de la situation « Magie » : un lancer par sort, groupés par élément, et ses dégâts s'il a une VD. */
 export function spellActions(c: Character): ActionDef[] {
   return sortSpells(c.spells ?? []).flatMap((spell): ActionDef[] => {
     const id = `spell-${spell.id}`;
     const tn = spellTn(spell.mastery);
-    const group = ELEMENT_LABELS[spell.element];
+    // Groupe : l'élément du sort, titré par l'interface.
+    const group = spell.element;
     const cast: ActionDef = {
-      id, situation: "magic", kind: "spell", spell, tn, group, label: `Lancer · ${spell.name}`,
-      description: [`ND ${tn}`, castTimeLabel(castTime(spell.mastery)), spell.keywords.join(", "), spell.memorized ? "mémorisé" : "parchemin"]
-        .filter(Boolean).join(" · "),
+      id, situation: "magic", kind: "spell", spell, tn, group, label: text("action.cast", { spell: spell.name }),
+      description: text("action.castAbout", {
+        tn, castTime: castTime(spell.mastery), keywords: spell.keywords.join(", "), memorized: !!spell.memorized,
+      }),
     };
     if (!spell.damage?.trim()) return [cast];
     return [cast, {
       id: `spelldmg-${spell.id}`, situation: "magic", parent: id, kind: "spellDamage", spell, tn: null, group,
-      label: `Dégâts · ${spell.name}`, description: `VD ${formatDR(spell.damage)}, sans la Force ni point de Vide.`,
+      label: text("action.damage", { name: spell.name }), description: text("action.spellDamageAbout", { dr: spell.damage }),
     }];
   });
 }
 
 /** « Rester concentré » après une interruption (F.2) : Volonté, ND 10, ou 5 + dégâts subis. */
 export const CONCENTRATE_ACTION: ActionDef = {
-  id: CONCENTRATE_ACTION_ID, situation: "magic", kind: "trait", trait: "willpower", tn: SPELL_CONCENTRATION.tn, group: "Interruption",
-  label: "Rester concentré (Volonté)",
-  description: `Interrompu pendant l'incantation : Volonté, ND ${SPELL_CONCENTRATION.tn}, ou ${SPELL_CONCENTRATION.base} + dégâts subis. Raté : le sort est perdu, sans dépenser l'emplacement.`,
+  id: CONCENTRATE_ACTION_ID, situation: "magic", kind: "trait", trait: "willpower", tn: SPELL_CONCENTRATION.tn, group: "interrupt",
+  label: text("action.label", { id: CONCENTRATE_ACTION_ID }),
+  description: text("action.concentrateAbout", { tn: SPELL_CONCENTRATION.tn, base: SPELL_CONCENTRATION.base }),
 };
 
 /** ND de « Rester concentré » : 5 + dégâts subis, ou 10 sans dégâts. */
@@ -174,10 +177,10 @@ export function concentrationTn(damage: number | null): number {
   return damage && damage > 0 ? SPELL_CONCENTRATION.base + damage : SPELL_CONCENTRATION.tn;
 }
 
-/** Sorts en escarmouche (v2.12.0) : mêmes cartes que la situation Magie, ids préfixés `sk-`, groupe « Sorts ». */
+/** Sorts en escarmouche (v2.12.0) : mêmes cartes que la situation Magie, ids préfixés `sk-`, groupe `spells` (« Sorts »). */
 export function skirmishSpellActions(c: Character): ActionDef[] {
   return spellActions(c).map((a) => ({
-    ...a, id: `sk-${a.id}`, ...(a.parent ? { parent: `sk-${a.parent}` } : {}), situation: "combat", sub: "skirmish", group: "Sorts",
+    ...a, id: `sk-${a.id}`, ...(a.parent ? { parent: `sk-${a.parent}` } : {}), situation: "combat", sub: "skirmish", group: "spells",
   }));
 }
 

@@ -170,9 +170,21 @@ export const EMPHASIS_ALIASES: readonly (readonly string[])[] = [
   ["Ragots", "Gossip"],
   ["Courtoisie", "Politesse", "Courtesy"],
   ["Rhétorique", "Rhetoric"],
+  // Indices des actions de l'Assistant (annexe 53.3) : une spécialisation saisie en anglais est choisie d'office.
+  ["Remarquer", "Notice"],
+  ["Fouille", "Search"],
+  ["Interrogatoire", "Interrogation"],
+  ["Estimation", "Appraisal"],
+  ["Récupération du Vide", "Void Recovery"],
 ];
 
 export const WEAPON_KEYWORD_LABELS: Readonly<Record<WeaponKeyword, string>> = {
   samourai: "Samouraï", lourde: "Lourde", paysan: "Paysan", ninja: "Ninja", arc: "Arc", hast: "Hast", lance: "Lance",
   "deux-mains": "Deux mains", petite: "Petite", moyenne: "Moyenne", grande: "Grande", distance: "Distance", cimeterre: "Cimeterre",
+};
+
+/** Mots-clés d'arme saisis en anglais (annexe 53.3) → identifiant ; libellés anglais dans le dictionnaire. */
+export const WEAPON_KEYWORD_ALIASES: Readonly<Record<string, WeaponKeyword>> = {
+  samurai: "samourai", heavy: "lourde", peasant: "paysan", bow: "arc", polearm: "hast", spear: "lance",
+  "two-handed": "deux-mains", small: "petite", medium: "moyenne", large: "grande", ranged: "distance", scimitar: "cimeterre",
 };

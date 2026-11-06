@@ -1,6 +1,6 @@
 import { normalize } from "./engine";
 import { CharacterFormatError, migrate } from "./migrate";
-import { MAX_CHARACTER_BYTES, type Character, type FieldError } from "./schema";
+import { MAX_CHARACTER_BYTES, validationMessages, type Character, type FieldError } from "./schema";
 
 /** `<nom-normalisé>-l5r.json` (HANDOFF §8). */
 export function exportFileName(c: Pick<Character, "name">): string {
@@ -18,12 +18,12 @@ export type ParsedFile = { ok: true; json: unknown } | { ok: false; errors: Fiel
 /** Lecture d'un fichier importé : taille maximale, puis analyse JSON. */
 export function parseCharacterFile(text: string, bytes = new TextEncoder().encode(text).length): ParsedFile {
   if (bytes > MAX_CHARACTER_BYTES) {
-    return { ok: false, errors: [{ path: "", message: `Fichier trop volumineux (${Math.ceil(bytes / 1024)} Ko, maximum ${MAX_CHARACTER_BYTES / 1024} Ko)` }] };
+    return { ok: false, errors: [{ path: "", message: validationMessages().tooLarge(Math.ceil(bytes / 1024), MAX_CHARACTER_BYTES / 1024) }] };
   }
   try {
     return { ok: true, json: JSON.parse(text) as unknown };
   } catch {
-    return { ok: false, errors: [{ path: "", message: "Fichier illisible : ce n'est pas un JSON valide" }] };
+    return { ok: false, errors: [{ path: "", message: validationMessages().notJson }] };
   }
 }
 

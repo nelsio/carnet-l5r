@@ -3,7 +3,7 @@ import {
   type Character, type Pool, type PoolAction,
 } from "@carnet/core";
 import { useLocale, useT, type Messages } from "../../i18n";
-import { ELEMENT_LABELS, shownWoundMultiplier, TRAIT_LABELS } from "../../rules/l5r4e";
+import { shownWoundMultiplier } from "../../rules/l5r4e";
 import { pct } from "../format";
 import { poolLabel } from "../rolls";
 import { useCharacter, useStore } from "../store";
@@ -19,7 +19,7 @@ interface Row {
   hasTN: boolean;
 }
 
-function buildRows(c: Character, voidPoint: boolean, emphasis: boolean, t: Messages["stats"], intl: string): Row[] {
+function buildRows(c: Character, voidPoint: boolean, emphasis: boolean, t: Messages["stats"], rules: Messages["rules"], intl: string): Row[] {
   const row = (label: string, action: PoolAction, child = false, emph = false): Row => ({
     label, child, pool: computePool(c, action, { voidPoint, modifiers: defaultModifiers(c, action) }),
     emphasis: emphasis && emph, hasTN: action.kind === "skill" || action.kind === "trait" || action.kind === "spell",
@@ -31,10 +31,10 @@ function buildRows(c: Character, voidPoint: boolean, emphasis: boolean, t: Messa
       row(t.damage(w.name), { kind: "damage", weapon: w }, true),
     ]),
     ...[...c.skills].sort((a, b) => a.name.localeCompare(b.name, intl)).map((s) =>
-      row(t.skill(s.name, TRAIT_LABELS[s.trait]), { kind: "skill", skill: s.name, trait: s.trait }, false, s.emphases.length > 0)),
+      row(t.skill(s.name, rules.traits[s.trait]), { kind: "skill", skill: s.name, trait: s.trait }, false, s.emphases.length > 0)),
     // Une ligne par sort du Rouleaux & invocations (annexe F.5), élément de lancement par défaut.
     ...sortSpells(c.spells ?? []).flatMap((spell) => [
-      row(t.spell(spell.name, ELEMENT_LABELS[defaultSpellElement(c, spell)]), { kind: "spell", spell }),
+      row(t.spell(spell.name, rules.elements[defaultSpellElement(c, spell)]), { kind: "spell", spell }),
       ...(spell.damage?.trim() ? [row(t.damage(spell.name), { kind: "spellDamage", spell }, true)] : []),
     ]),
   ];
@@ -44,12 +44,12 @@ function buildRows(c: Character, voidPoint: boolean, emphasis: boolean, t: Messa
 export function Stats() {
   const { state, dispatch } = useStore();
   const c = useCharacter();
-  const { stats: ts, roller: r } = useT();
+  const { stats: ts, roller: r, rules } = useT();
   const { intl, locale } = useLocale();
   const opts = state.ui.stats;
   const currentPenalty = woundState(c, { woundMultiplier: shownWoundMultiplier(state.ui.woundMultiplier) }).penalty ?? 0;
   const penalty = opts.penalty ? currentPenalty : 0;
-  const rows = buildRows(c, opts.voidPoint, opts.emphasis, ts, intl);
+  const rows = buildRows(c, opts.voidPoint, opts.emphasis, ts, rules, intl);
   const set = (patch: Partial<typeof opts>) => dispatch({ type: "statsOption", patch });
 
   return (

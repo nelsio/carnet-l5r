@@ -1,9 +1,11 @@
 import {
-  ARMOR_CATALOG, ARMOR_ROLL_TN, ARMOR_TN, CENTER_BONUS, DEAD_LABEL, DISARM_DAMAGE, DUEL_ASSESSMENT_WIN, FULL_DEFENSE_DIVISOR, HEAVY_ARMOR_TRAITS, MELEE_TARGET_PENALTY, MOVEMENT, POOL_BONUS, RANGED_PATTERN, RINGS, SKILL_ALIASES,
+  ARMOR_CATALOG, ARMOR_ROLL_TN, ARMOR_TN, CENTER_BONUS, DEAD_LABEL, DISARM_DAMAGE, DUEL_ASSESSMENT_WIN, FULL_DEFENSE_DIVISOR, HEAVY_ARMOR_TRAITS, MELEE_TARGET_PENALTY, MOVEMENT, POOL_BONUS, RANGED_PATTERN, RINGS, SKILL_ALIASES, SKILL_SUBTYPE_ALIASES,
   TERRAINS, TN_PER_RAISE, WOUND_FIRST_MULTIPLIER, WOUND_LEVELS, WOUND_NEXT_MULTIPLIER,
   type CatalogArmor, type RingKey, type Stance, type Terrain,
 } from "../rules/l5r4e";
+import { parseDR, type DiceCode } from "./dice";
 import { describeModifier, woundPenaltyReduction } from "./modifiers";
+import { text, type CoreText } from "./text";
 import type { Character, Maneuver, Modifier, RollTrait, Skill, Spell, SpellRing, TraitKey, WeaponKeyword } from "./schema";
 import { spellCast, spellDamage } from "./spells";
 import {
@@ -11,9 +13,10 @@ import {
   terrainWaiver, voidMultiplier, voidPointBonus, voidSpendBonus, voidSpendOption, woundEffects, type ActiveEffect, type SchoolContext,
 } from "./schools";
 
+export { formatDR, parseDR, type DiceCode } from "./dice";
+
 export type Rng = () => number;
 
-export interface DiceCode { rolled: number; kept: number }
 export interface TenDice extends DiceCode { bonus: number }
 
 export interface Pool extends TenDice {
@@ -21,7 +24,8 @@ export interface Pool extends TenDice {
   /** Plus petite face qui explose (10 si absent ; 9 avec la maîtrise d'une compétence martiale). */
   explodeOn?: number;
   canRaise: boolean;
-  notes: string[];
+  /** Notes de la réserve : codes formatés par l'interface (annexe 53.2). */
+  notes: CoreText[];
   /** Augmentations gratuites apportées par les bonus de jet et les techniques. */
   freeRaises?: number;
   /** Techniques d'école appliquées d'office, et proposées à cocher (annexe C). */
@@ -42,7 +46,7 @@ export interface Pool extends TenDice {
   /** Modification du ND par l'armure portée : armure légère, armure lourde (annexe E.5). */
   armorTn?: number;
   /** Avertissements de l'arme (Force insuffisante pour le dai-kyu). */
-  warnings?: string[];
+  warnings?: CoreText[];
 }
 
 /** Arme telle que lue par le moteur (`bowStrength` et `keywords` facultatifs). */
@@ -128,13 +132,30 @@ export function rings(c: Character): Record<RingKey, number> {
   };
 }
 
+/** Index des alias : nom normalisé → nom français normalisé (le premier du groupe). */
+const aliasIndex = (groups: readonly (readonly string[])[]): Map<string, string> =>
+  new Map(groups.flatMap((g) => g.map((x) => [normalize(x), normalize(g[0] ?? x)] as const)));
+let skillIndex: Map<string, string> | undefined;
+let subtypeIndex: Map<string, string> | undefined;
+
+/**
+ * Clé d'une compétence : nom français normalisé. Une compétence à sous-type (« Perform: Storytelling »)
+ * normalise le préfixe et le sous-type séparément (annexe 53.3) ; un sous-type inconnu reste tel quel.
+ */
 const skillKey = (name: string): string => {
+  skillIndex ??= aliasIndex(SKILL_ALIASES);
   const n = normalize(name);
-  const group = SKILL_ALIASES.find((g) => g.some((x) => normalize(x) === n));
-  return group ? normalize(group[0]) : n;
+  const whole = skillIndex.get(n);
+  if (whole !== undefined) return whole;
+  const colon = n.indexOf(":");
+  if (colon < 0) return n;
+  subtypeIndex ??= aliasIndex(SKILL_SUBTYPE_ALIASES);
+  const prefix = n.slice(0, colon).trim();
+  const sub = n.slice(colon + 1).trim();
+  return `${skillIndex.get(prefix) ?? prefix} : ${subtypeIndex.get(sub) ?? sub}`;
 };
 
-/** Deux noms de compétence équivalents (« Courtoisie » et « Courtisan », « Furtivité » et « Discrétion »). */
+/** Deux noms de compétence équivalents (« Courtoisie » et « Courtisan », « Stealth » et « Discrétion »). */
 export function sameSkill(a: string, b: string): boolean {
   return skillKey(a) === skillKey(b);
 }
@@ -143,17 +164,6 @@ export function sameSkill(a: string, b: string): boolean {
 export function findSkill(c: Character, name: string): Skill | undefined {
   const key = normalize(name);
   return c.skills.find((s) => normalize(s.name) === key) ?? c.skills.find((s) => sameSkill(s.name, name));
-}
-
-export function parseDR(s: string): DiceCode {
-  const m = /^\s*(\d+)\s*[kg]\s*(\d+)\s*$/i.exec(s);
-  return m ? { rolled: Number(m[1]), kept: Number(m[2]) } : { rolled: 0, kept: 0 };
-}
-
-/** VD pour l'affichage : « 3k3 », « 3 K 3 », « 3g3 » → « 3g3 » ; texte invalide rendu tel quel, rogné (annexe H.5). */
-export function formatDR(s: string, letter = "g"): string {
-  const m = /^\s*(\d+)\s*[kg]\s*(\d+)\s*$/i.exec(s);
-  return m ? `${Number(m[1])}${letter}${Number(m[2])}` : s.trim();
 }
 
 export function formatDice(rolled: number, kept: number): string {
@@ -190,7 +200,7 @@ export function applyTenDiceRule(rolled: number, kept: number): TenDice {
 }
 
 export function computePool(c: Character, action: PoolAction, mods: PoolMods): Pool {
-  const notes: string[] = [];
+  const notes: CoreText[] = [];
   let rolled: number;
   let kept: number;
   let explodes = true;
@@ -205,18 +215,18 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
         rolled = trait + rank;
       } else if (mods.voidSkill) {
         rolled = trait + 1;
-        notes.push("Vide : compétence jouée au rang 1");
+        notes.push(text("pool.voidSkill"));
       } else {
         rolled = trait;
         explodes = false;
         canRaise = false;
-        notes.push("Sans compétence : pas d'explosion ni d'augmentation");
+        notes.push(text("pool.unskilled"));
       }
       kept = trait;
       if (action.attack && mods.stance === "fullAttack") {
         rolled += POOL_BONUS.fullAttack.rolled;
         kept += POOL_BONUS.fullAttack.kept;
-        notes.push("Assaut : +2g1");
+        notes.push(text("pool.fullAttack", POOL_BONUS.fullAttack));
       }
       break;
     }
@@ -228,7 +238,7 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
       if (mods.disarm) {
         // Désarmement réussi : 2g1, quelle que soit l'arme (C6).
         ({ rolled, kept } = parseDR(DISARM_DAMAGE));
-        notes.push("Désarmement : 2g1 sans la Force ni augmentation de dégâts");
+        notes.push(text("pool.disarm", { rolled, kept }));
         break;
       }
       const dr = parseDR(action.weapon.dr);
@@ -262,7 +272,7 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
   const damage = action.kind === "damage" || action.kind === "spellDamage";
   if (mods.extraRolled && !disarmed) {
     rolled = Math.max(0, rolled + mods.extraRolled);
-    notes.push(`${mods.extraRolled > 0 ? "+" : ""}${mods.extraRolled} dé(s) lancé(s)`);
+    notes.push(text("pool.extraRolled", { n: mods.extraRolled }));
   }
   let flat = action.kind === "spellDamage" ? spellDamage(c, action).flat : 0;
   let freeRaises = action.kind === "spell" ? spellCast(c, action).freeRaises.length : 0;
@@ -270,7 +280,7 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
     rolled += CENTER_BONUS.rolled;
     kept += CENTER_BONUS.kept;
     flat += c.voidRing;
-    notes.push(`Bonus de Centre : +${CENTER_BONUS.rolled}g${CENTER_BONUS.kept} +${c.voidRing}`);
+    notes.push(text("pool.center", { rolled: CENTER_BONUS.rolled, kept: CENTER_BONUS.kept, flat: c.voidRing }));
   }
   if (mods.assessmentWon && action.kind === "skill" && action.focus) {
     const w = DUEL_ASSESSMENT_WIN;
@@ -278,18 +288,18 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
     const [r, k] = master ? [w.masteryRolled, w.masteryKept] : [w.rolled, w.kept];
     rolled += r;
     kept += k;
-    notes.push(`Évaluation gagnée de ${w.margin} ou plus : +${r}g${k}`);
+    notes.push(text("pool.assessment", { margin: w.margin, rolled: r, kept: k }));
   }
   if (mods.meleeTarget && action.kind === "skill" && action.attack && action.weapon && isRanged(action.weapon)) {
     flat -= MELEE_TARGET_PENALTY;
-    notes.push(`Cible au corps à corps : −${MELEE_TARGET_PENALTY}`);
+    notes.push(text("pool.meleeTarget", { penalty: MELEE_TARGET_PENALTY }));
   }
   for (const m of mods.modifiers ?? []) {
     rolled = Math.max(0, rolled + m.rolled);
     kept = Math.max(0, kept + m.kept);
     flat += m.flat;
     freeRaises += m.freeRaises;
-    notes.push(`${m.name} : ${describeModifier(m)}`);
+    notes.push(text("pool.modifier", { name: m.name, effect: describeModifier(m) }));
   }
   // Techniques d'école et maîtrises : effets d'office et effets cochés. Les dégâts d'un Désarmement n'en reçoivent aucun.
   const ctx = schoolContext({
@@ -313,9 +323,9 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
     if (e.explodeOn && explodes) {
       // Maîtrise Kenjutsu ou Armes lourdes 7 (C1, E.4).
       explodeOn = Math.min(explodeOn, e.explodeOn);
-      notes.push(`Maîtrise ${e.source} : les dés explosent sur ${e.explodeOn} et 10`);
+      notes.push(text("pool.explode", { source: e.source, on: e.explodeOn }));
     } else {
-      notes.push(`${e.source} : ${describeEffect(e, c, input)}`);
+      notes.push(text("pool.effect", { source: e.source, parts: describeEffect(e, c, input).parts }));
     }
   }
   const vm = voidMultiplier(c);
@@ -327,17 +337,17 @@ export function computePool(c: Character, action: PoolAction, mods: PoolMods): P
     const per = voidPointBonus(c, action, ctx);
     rolled += per.rolled * POOL_BONUS.voidPoint.rolled * vm;
     kept += per.kept * POOL_BONUS.voidPoint.kept * vm;
-    notes.push(`${katana ? "Vide (katana)" : "Point de Vide"} : +${per.rolled * vm}g${per.kept * vm}`);
+    notes.push(text("pool.voidPoint", { katana, rolled: per.rolled * vm, kept: per.kept * vm }));
   }
   const spend = mods.voidSpend && !damage ? voidSpendOption(c, action) : undefined;
   if (spend) {
     const b = voidSpendBonus(c, spend, action, ctx);
     rolled += b.rolled * vm;
     kept += b.kept * vm;
-    notes.push(`${spend.points} points de Vide (${spend.source}) : +${b.rolled * vm}g${b.kept * vm}`);
+    notes.push(text("pool.voidSpend", { points: spend.points, source: spend.source, rolled: b.rolled * vm, kept: b.kept * vm }));
   }
   const ten = applyTenDiceRule(rolled, kept);
-  if (ten.bonus) notes.push(`Règle des dix dés : +${ten.bonus}`);
+  if (ten.bonus) notes.push(text("pool.tenDice", { bonus: ten.bonus }));
   const pool: Pool = {
     ...ten, bonus: ten.bonus + flat + techFlat, explodes, explodeOn, canRaise, notes, applied, optional, techFlat,
   };
@@ -366,23 +376,23 @@ export function catalogArmor(c: Character): CatalogArmor | undefined {
  * Malus de l'armure au ND de ce jet (annexe E.5) : armure légère, +5 en Athlétisme et Discrétion ;
  * armure lourde (cavalerie à pied), +5 aux jets d'Agilité et de Réflexes, sauf technique qui le lève (Hida R1).
  */
-export function armorRollTn(c: Character, action: PoolAction, mounted = false): { tn: number; notes: string[] } {
+export function armorRollTn(c: Character, action: PoolAction, mounted = false): { tn: number; notes: CoreText[] } {
   const armor = catalogArmor(c);
-  const out = { tn: 0, notes: [] as string[] };
+  const out = { tn: 0, notes: [] as CoreText[] };
   if (!armor || (action.kind !== "skill" && action.kind !== "trait")) return out;
   const skill = action.kind === "skill" ? action.skill : undefined;
   if (skill && armor.tnSkills?.some((s) => skillIs(skill, s))) {
     out.tn += ARMOR_ROLL_TN;
-    out.notes.push(`${armor.name} : +${ARMOR_ROLL_TN} au ND`);
+    out.notes.push(text("armor.skillTn", { armor: armor.id, tn: ARMOR_ROLL_TN }));
   }
   const heavy = armor.heavy === "always" || (armor.heavy === "onFoot" && !mounted);
   if (heavy && HEAVY_ARMOR_TRAITS.includes(action.trait)) {
     const waiver = heavyArmorWaiver(c, skill);
     if (waiver) {
-      out.notes.push(`${armor.name} : malus ignoré (${waiver.source})`);
+      out.notes.push(text("armor.waived", { armor: armor.id, source: waiver.source }));
     } else {
       out.tn += ARMOR_ROLL_TN;
-      out.notes.push(`${armor.name} : +${ARMOR_ROLL_TN} au ND (Agilité, Réflexes${armor.heavy === "onFoot" ? ", à pied" : ""})`);
+      out.notes.push(text("armor.heavy", { armor: armor.id, tn: ARMOR_ROLL_TN, onFoot: armor.heavy === "onFoot" }));
     }
   }
   return out;
@@ -400,15 +410,15 @@ export function isKatanaVoid(w: WeaponLike): boolean {
  * Force effective d'un arc (C11) : force de l'arc, +1 avec la maîtrise Kyujutsu 7, plafonnée par la Force du personnage
  * (le +1 s'ajoute avant le plafond, HANDOFF P16).
  */
-export function bowStrength(c: Character, w: WeaponLike, notes: string[] = []): number {
+export function bowStrength(c: Character, w: WeaponLike, notes: CoreText[] = []): number {
   let s = w.bowStrength ?? 0;
   const bonus = bowStrengthBonus(c, w);
   if (bonus.value) {
     s += bonus.value;
-    notes.push(`Maîtrise ${bonus.source} : force de l'arc +${bonus.value}`);
+    notes.push(text("pool.bowMastery", { source: bonus.source ?? "", value: bonus.value }));
   }
   if (s > c.traits.strength) {
-    notes.push(`Force ${c.traits.strength} : l'arc de force ${s} tire à ${c.traits.strength}`);
+    notes.push(text("pool.bowCapped", { strength: c.traits.strength, bow: s }));
     s = c.traits.strength;
   }
   return s;
@@ -422,11 +432,11 @@ function applyWeaponRules(c: Character, w: WeaponLike, attack: boolean, mounted:
     const tn = mounted ? (book.tnMounted ?? 0) : (book.tnOnFoot ?? 0);
     if (tn) {
       pool.weaponTn = tn;
-      pool.notes.push(`${book.name} : +${tn} au ND des tirs ${mounted ? "montés" : "à pied"}`);
+      pool.notes.push(text("pool.weaponTn", { weapon: book.name, tn, mounted }));
     }
   }
   if (book.minStrength && c.traits.strength < book.minStrength) {
-    (pool.warnings ??= []).push(`${book.name} : Force ${book.minStrength} minimum (tu as ${c.traits.strength}).`);
+    (pool.warnings ??= []).push(text("pool.minStrength", { weapon: book.name, min: book.minStrength, strength: c.traits.strength }));
   }
 }
 

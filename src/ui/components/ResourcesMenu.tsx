@@ -37,6 +37,7 @@ const carnet = (t: Messages["resources"]): Entry[] => [
 export function ResourcesMenu() {
   const { state } = useStore();
   const t = useT().resources;
+  const clanNames = useT().rules.clans;
   const [open, setOpen] = useState(false);
   const wrap = useRef<HTMLDivElement>(null);
   const button = useRef<HTMLButtonElement>(null);
@@ -47,7 +48,7 @@ export function ResourcesMenu() {
   const clanHref = clanUrl(clan?.id ?? null);
   const portal: Entry[] = [{ href: PORTAL.home, kanji: "帝", title: PORTAL_NAME, desc: t.portal, french: true }];
   if (clan?.id && clan.label && clanHref) {
-    portal.push({ href: clanHref, kanji: PORTAL_CLAN_KANJI[clan.id], title: clan.label, desc: t.clan, french: true });
+    portal.push({ href: clanHref, kanji: PORTAL_CLAN_KANJI[clan.id], title: clanNames[clan.id] ?? clan.label, desc: t.clan, french: true });
   }
 
   const close = (focusButton = false) => {

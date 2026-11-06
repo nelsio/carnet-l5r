@@ -12,6 +12,7 @@ import {
 import { SCHOOLS } from "../src/rules/ecoles";
 import perso from "../reference/perso-test-courtisans.json";
 import bushiPerso from "../reference/perso-test-ecoles.json";
+import { say } from "./helpers/text";
 
 const char = (schoolId: string, rank: number, patch: Partial<Character> = {}): Character =>
   ({ ...(structuredClone(perso) as Character), schoolId, insightRank: rank, ...patch });
@@ -231,7 +232,7 @@ describe("Moteur d'effets : spécialisations, groupes de compétences, catalogue
   it("résumés : ND, augmentations non limitées, Vide, saisie", () => {
     const text = (id: string, rank: number, kind: string) => {
       const c = char(id, rank);
-      return activeEffects(c).filter((e) => e.kind === kind).map((e) => describeEffect(e, c));
+      return activeEffects(c).filter((e) => e.kind === kind).map((e) => say(describeEffect(e, c)));
     };
     expect(text("ide-emissaire", 1, "roll")).toEqual(["1 augm. gratuite", "ND +5"]);
     expect(text("shosuro-acteur", 5, "roll").at(-1)).toBe("augmentations non limitées");
@@ -254,9 +255,9 @@ describe("Moteur d'effets : spécialisations, groupes de compétences, catalogue
     const c = char("", 1);
     const court = buildActions(c, "court");
     expect(court.map((a) => a.skill)).toEqual(expect.arrayContaining(["Sincérité", "Intimidation", "Comédie", "Commerce", "Représentation : Conteur"]));
-    expect(court.find((a) => a.id === "perform-Représentation : Conteur")?.label).toBe("Se produire · Conteur");
+    expect(court.find((a) => a.id === "perform-Représentation : Conteur")?.label).toEqual({ key: "action.perform", detail: "Conteur" });
     const lore = buildActions(c, "investigation").filter((a) => a.skill?.startsWith("Connaissance"));
-    expect(lore.map((a) => a.label)).toEqual(["Se souvenir · Histoire"]);
+    expect(lore.map((a) => say(a.label))).toEqual(["Se souvenir · Histoire"]);
     const none = buildActions(char("", 1, { skills: [] }), "investigation").filter((a) => a.id === "lore");
     expect(none).toHaveLength(1);
   });

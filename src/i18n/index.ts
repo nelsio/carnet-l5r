@@ -4,12 +4,11 @@
  */
 import { createContext, createElement, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { setValidationMessages } from "../core/schema";
+import type { CoreText } from "../core/text";
 import { en } from "./en";
 import { fr } from "./fr";
+import type { Widen } from "./types";
 
-/** Forme du dictionnaire : textes élargis en `string`, fonctions d'interpolation gardées telles quelles. */
-type Widen<T> = T extends (...a: infer A) => infer R ? (...a: A) => R
-  : T extends string ? string : { readonly [K in keyof T]: Widen<T[K]> };
 export type Messages = Widen<typeof fr>;
 export type Locale = "fr" | "en";
 
@@ -79,6 +78,18 @@ export function I18nProvider({ locale: initial = "fr", children }: { locale?: Lo
 
 /** Dictionnaire de la langue courante. */
 export const useT = (): Messages => useContext(I18nContext).t;
+
+/** Texte produit par le moteur (code et paramètres) dans la langue du dictionnaire `m` (annexe 53.2). */
+export function formatCore(m: Messages, text: CoreText): string {
+  const f = (x: CoreText): string => (m.core[x.key] as (p: CoreText, f: (t: CoreText) => string) => string)(x, f);
+  return f(text);
+}
+
+/** Formateur des textes du moteur dans la langue courante. */
+export function useCoreText(): (text: CoreText) => string {
+  const t = useT();
+  return useMemo(() => (text: CoreText) => formatCore(t, text), [t]);
+}
 
 /** Langue courante, changement de langue et locale `Intl`. */
 export function useLocale(): Pick<I18n, "locale" | "setLocale" | "intl"> {

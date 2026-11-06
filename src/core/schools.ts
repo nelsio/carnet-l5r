@@ -1,12 +1,13 @@
 /** Techniques d'école : moteur d'effets du catalogue bushi (HANDOFF annexe C.4). */
-import { DEFAULT_MANEUVERS, DUEL_FOCUS, GUARD, MEDITATION_VOID_POINTS, type RingKey, type Stance, type Terrain } from "../rules/l5r4e";
+import { DUEL_FOCUS, GUARD, MEDITATION_VOID_POINTS, type RingKey, type Stance, type Terrain } from "../rules/l5r4e";
 import { isSocialSkill } from "./modifiers";
 import {
-  BUGEI_SKILLS, EMPHASIS_ALIASES, MASTERIES, SCHOOLS, WEAPON_CATALOG,
+  BUGEI_SKILLS, EMPHASIS_ALIASES, MASTERIES, SCHOOLS, WEAPON_CATALOG, WEAPON_KEYWORD_ALIASES,
   type CatalogWeapon, type Effect, type Mastery, type On, type ReminderContext, type School, type SchoolRank, type Value, type When,
 } from "../rules/ecoles";
 import { findSkill, isRanged, normalize, rings, sameSkill, traitValue, type PoolAction, type WeaponLike } from "./engine";
 import { WEAPON_KEYWORDS, type Character, type Maneuver, type Skill, type TraitKey, type WeaponKeyword } from "./schema";
+import type { EffectPart } from "./text";
 
 /** Situation du personnage au moment du jet. */
 export interface SchoolContext {
@@ -184,7 +185,8 @@ export function parseWeaponKeywords(text: string): WeaponKeyword[] {
   const valid = new Set<string>(WEAPON_KEYWORDS);
   const out: WeaponKeyword[] = [];
   for (const raw of text.split(/[,;]/)) {
-    const k = normalize(raw).replace(/\s+/g, "-");
+    const typed = normalize(raw).replace(/\s+/g, "-");
+    const k = WEAPON_KEYWORD_ALIASES[typed] ?? typed;
     if (valid.has(k) && !out.includes(k as WeaponKeyword)) out.push(k as WeaponKeyword);
   }
   return out;
@@ -200,10 +202,9 @@ export function weaponKeywords(c: Character, w: WeaponLike): Set<WeaponKeyword> 
   return set;
 }
 
-let bugei: Set<string> | undefined;
+/** Compétence Bugei, sous son nom français, ancien ou anglais (annexe 53.3). */
 export function isBugeiSkill(name: string): boolean {
-  bugei ??= new Set(BUGEI_SKILLS.map(normalize));
-  return bugei.has(normalize(name));
+  return BUGEI_SKILLS.some((b) => sameSkill(name, b));
 }
 
 const actionWeapon = (a: PoolAction | undefined): WeaponLike | undefined =>
@@ -490,25 +491,27 @@ export function reminderText(e: ActiveEffect, c: Character): string {
   return e.text.replace("{n}", String(resolveValue(e.value, c)));
 }
 
-export type TechniqueCategory = "auto" | "à cocher" | "rappel" | "texte";
+/** Badge d'un rang ; libellé dans le dictionnaire (annexe 53.2). */
+export type TechniqueCategory = "auto" | "optional" | "reminder" | "text";
 
 /** Badges d'un rang : effets d'office, à cocher, rappels, ou purement descriptif. */
 export function techniqueCategories(r: SchoolRank): TechniqueCategory[] {
   const cats = new Set<TechniqueCategory>();
   for (const e of r.effects) {
-    if (e.kind === "reminder") cats.add("rappel");
-    else if (("mode" in e && e.mode === "optional") || ("stack" in e && e.stack)) cats.add("à cocher");
+    if (e.kind === "reminder") cats.add("reminder");
+    else if (("mode" in e && e.mode === "optional") || ("stack" in e && e.stack)) cats.add("optional");
     else cats.add("auto");
   }
-  if (!cats.size) cats.add("texte");
+  if (!cats.size) cats.add("text");
   return [...cats];
 }
 
-const signed = (n: number) => (n >= 0 ? `+${n}` : `${n}`);
-
-/** Effet chiffré d'une technique : « +1g1 +1 », « +5 au ND d'armure », « 1 augm. gratuite pour Coup ciblé ». */
-export function describeEffect(e: ActiveEffect, c: Character, input?: number): string {
-  const parts: string[] = [];
+/**
+ * Effet chiffré d'une technique, formaté par l'interface (annexe 53.2) : « +1g1 +1 », « +5 au ND d'armure »,
+ * « 1 augm. gratuite pour Coup ciblé ». La manœuvre est donnée par son id.
+ */
+export function describeEffect(e: ActiveEffect, c: Character, input?: number): { key: "effect"; parts: EffectPart[] } {
+  const parts: EffectPart[] = [];
   switch (e.kind) {
     case "roll": {
       const r = resolveValue(e.rolled, c, input);
@@ -516,35 +519,31 @@ export function describeEffect(e: ActiveEffect, c: Character, input?: number): s
       const f = resolveValue(e.flat, c, input);
       const fr = resolveValue(e.freeRaises, c, input);
       const tn = resolveValue(e.tn, c, input);
-      if (r || k) parts.push(`${r >= 0 && k >= 0 ? "+" : ""}${r}g${k}`);
-      if (f || (e.flat !== undefined && e.input)) parts.push(signed(f));
-      if (fr || (e.freeRaises !== undefined && e.input)) parts.push(`${fr} augm. gratuite${fr > 1 ? "s" : ""}`);
-      if (tn) parts.push(`ND ${signed(tn)}`);
-      if (e.unlimitedRaises) parts.push("augmentations non limitées");
-      if (e.explodeOn) parts.push(`explose sur ${e.explodeOn}`);
+      if (r || k) parts.push({ kind: "dice", rolled: r, kept: k });
+      if (f || (e.flat !== undefined && e.input)) parts.push({ kind: "flat", n: f });
+      if (fr || (e.freeRaises !== undefined && e.input)) parts.push({ kind: "freeRaises", n: fr });
+      if (tn) parts.push({ kind: "tn", n: tn });
+      if (e.unlimitedRaises) parts.push({ kind: "unlimitedRaises" });
+      if (e.explodeOn) parts.push({ kind: "explode", on: e.explodeOn });
       break;
     }
     case "voidBoost":
-      parts.push(`Vide : +${e.rolled}g${e.kept} par point`);
+      parts.push({ kind: "voidBoost", rolled: e.rolled, kept: e.kept });
       break;
     case "armor":
-      parts.push(`${signed(resolveValue(e.value, c))} au ND d'armure${e.stack ? " par cran" : ""}`);
+      parts.push({ kind: "armor", n: resolveValue(e.value, c), perStack: !!e.stack });
       break;
     case "targetTn":
-      parts.push(`${signed(resolveValue(e.value, c))} au ND de la cible par cran`);
+      parts.push({ kind: "targetTn", n: resolveValue(e.value, c) });
       break;
     case "wounds":
-      if (e.ignorePenalty === "all") parts.push("pénalité de blessure ignorée");
+      if (e.ignorePenalty === "all") parts.push({ kind: "ignoreWounds" });
       break;
     case "maneuver":
-      if (e.freeRaisesFor) {
-        const m = DEFAULT_MANEUVERS.find((x) => x.id === e.freeRaisesFor?.maneuver);
-        const n = e.freeRaisesFor.count;
-        parts.push(`${n} augm. gratuite${n > 1 ? "s" : ""} pour ${m?.name ?? e.freeRaisesFor.maneuver}`);
-      }
+      if (e.freeRaisesFor) parts.push({ kind: "maneuverRaises", n: e.freeRaisesFor.count, maneuver: e.freeRaisesFor.maneuver });
       break;
     default:
       break;
   }
-  return parts.join(" ");
+  return { key: "effect", parts };
 }

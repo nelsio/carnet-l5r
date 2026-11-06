@@ -2,6 +2,7 @@
 import { describe, expect, it } from "vitest";
 import { buildActions, CharacterSchema, formatDR, spellActions } from "@carnet/core";
 import perso from "../reference/perso-test-shugenja.json";
+import { say } from "./helpers/text";
 
 const DICE_K = /\b\d+k\d+\b/;
 
@@ -23,8 +24,11 @@ describe("Descriptions d'actions (H.5)", () => {
       { name: "Katana", skill: "Kenjutsu", dr: "3k3" },
       { name: "Yumi", skill: "Kyujutsu", dr: "2K2", bowStrength: 3, keywords: ["arc", "distance", "grande"] },
     ];
-    const text = [...buildActions(c, "combat", "skirmish"), ...spellActions(c)].map((a) => a.description).join("\n");
+    const all = [...buildActions(c, "combat", "skirmish"), ...spellActions(c)];
+    const text = all.map((a) => say(a.description)).join("\n");
     expect(text).not.toMatch(DICE_K);
+    // En anglais : notation XkY (annexe 52.3).
+    expect(all.map((a) => say(a.description, "en")).join("\n")).toContain("Strength + DR 3k3.");
     expect(text).toContain("Force + VD 3g3.");
     expect(text).toContain("VD de la flèche 2g2.");
     expect(text).toContain("VD 2g2, sans la Force ni point de Vide.");

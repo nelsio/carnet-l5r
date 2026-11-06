@@ -4,7 +4,7 @@ import { normalize } from "./engine";
 import { CharacterFormatError, isObject, upgrade, withV2Defaults } from "./migrate";
 import {
   ArmorSchema, CharacterSchema, ManeuverSchema, ModifierSchema, SkillSchema, SpellSchema, TechniqueSchema, TraitsSchema,
-  WeaponSchema, XpSchema, characterShape, zodErrors,
+  WeaponSchema, XpSchema, characterShape, validationMessages, zodErrors,
   type Character, type FieldError,
 } from "./schema";
 
@@ -56,7 +56,7 @@ function findMatch(list: Json[], item: Json, field: ListField): Json | undefined
  * Ne modifie jamais `base`. Un seul champ invalide bloque toute la fusion.
  */
 export function mergeCharacter(base: Character, patch: unknown): MergeResult {
-  if (!isObject(patch)) return { ok: false, errors: [{ path: "", message: "doit être un objet JSON" }] };
+  if (!isObject(patch)) return { ok: false, errors: [{ path: "", message: validationMessages().jsonObject }] };
 
   let src: Json;
   try {
@@ -88,7 +88,7 @@ export function mergeCharacter(base: Character, patch: unknown): MergeResult {
 
   const mergeObject = (key: string, value: unknown, schema: ObjectSchema) => {
     if (!isObject(value)) {
-      errors.push({ path: key, message: "doit être un objet" });
+      errors.push({ path: key, message: validationMessages().object });
       return;
     }
     const target = out[key] as Json;
@@ -105,7 +105,7 @@ export function mergeCharacter(base: Character, patch: unknown): MergeResult {
 
   const mergeList = (key: string, value: unknown, field: ListField) => {
     if (!Array.isArray(value)) {
-      errors.push({ path: key, message: "doit être une liste" });
+      errors.push({ path: key, message: validationMessages().list });
       return;
     }
     if (value.length === 0) return;
@@ -118,7 +118,7 @@ export function mergeCharacter(base: Character, patch: unknown): MergeResult {
     value.forEach((item, i) => {
       const itemPath = `${key}[${i}]`;
       if (!isObject(item)) {
-        errors.push({ path: itemPath, message: "doit être un objet" });
+        errors.push({ path: itemPath, message: validationMessages().object });
         return;
       }
       const known: Json = {};

@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 2,
+  "name": "Hiruma Daisuke",
+  "clan": "Crab",
+  "family": "Hiruma",
+  "school": "Hiruma Bushi School",
+  "schoolId": "hiruma-bushi",
+  "schoolRank": 3,
+  "insightRank": 3,
+  "honor": 4.5,
+  "glory": 2.0,
+  "status": 1.0,
+  "xp": { "total": 120, "spent": 112 },
+  "traits": {
+    "stamina": 3, "willpower": 3,
+    "strength": 3, "perception": 3,
+    "agility": 4, "intelligence": 2,
+    "reflexes": 3, "awareness": 2
+  },
+  "voidRing": 2,
+  "voidPoints": 2,
+  "wounds": 0,
+  "armor": { "name": "Light Armor", "bonus": 5, "reduction": 3, "catalogId": "light" },
+  "skills": [
+    { "name": "Stealth", "rank": 4, "trait": "agility", "emphases": [] },
+    { "name": "Kenjutsu", "rank": 3, "trait": "agility", "emphases": ["Katana"] },
+    { "name": "Athletics", "rank": 3, "trait": "strength", "emphases": [] },
+    { "name": "Defense", "rank": 2, "trait": "reflexes", "emphases": [] },
+    { "name": "Hunting", "rank": 3, "trait": "perception", "emphases": ["Tracking"] },
+    { "name": "Kyujutsu", "rank": 2, "trait": "reflexes", "emphases": [] },
+    { "name": "Investigation", "rank": 2, "trait": "perception", "emphases": ["Notice"] },
+    { "name": "Horsemanship", "rank": 1, "trait": "agility", "emphases": [] },
+    { "name": "Battle", "rank": 1, "trait": "perception", "emphases": [] },
+    { "name": "Iaijutsu", "rank": 1, "trait": "reflexes", "emphases": [] },
+    { "name": "Jiujutsu", "rank": 1, "trait": "agility", "emphases": [] },
+    { "name": "Meditation", "rank": 1, "trait": "void", "emphases": ["Void Recovery"] },
+    { "name": "Courtier", "rank": 1, "trait": "awareness", "emphases": [] },
+    { "name": "Etiquette", "rank": 1, "trait": "awareness", "emphases": [] },
+    { "name": "Lore: Shadowlands", "rank": 2, "trait": "intelligence", "emphases": [] },
+    { "name": "Perform: Storytelling", "rank": 1, "trait": "awareness", "emphases": [] }
+  ],
+  "weapons": [
+    { "name": "Katana", "skill": "Kenjutsu", "dr": "3k2" },
+    { "name": "Wakizashi", "skill": "Kenjutsu", "dr": "2k2" },
+    { "name": "Yumi", "skill": "Kyujutsu", "dr": "2k2", "bowStrength": 3 }
+  ],
+  "techniques": [],
+  "maneuvers": [],
+  "advantages": "Strength of the Earth",
+  "disadvantages": "Brash",
+  "notes": "Scout of the Kaiu Wall, entered entirely in English (annex 53, V1)."
+}

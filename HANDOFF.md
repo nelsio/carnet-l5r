@@ -6,7 +6,7 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document et le dossier `spec/` qu'il indexe.
 
-**État actuel :** version **v2.29.0**, lot 52 : interface en anglais, bouton FR/EN dans l'en-tête, langue du navigateur au premier lancement ; règles et catalogues encore en français (annexe 52).
+**État actuel :** version **v2.30.0**, lot 53 : règles et explications de l'Assistant en anglais, textes du moteur en codes formatés par l'interface, fiche saisie en anglais reconnue ; catalogues (écoles, maîtrises, modèles) encore en français (annexe 53).
 
 ---
 
@@ -60,6 +60,7 @@ Fait foi :
 | 50 | Localisation : infrastructure, première moitié des textes | 50 | v2.28.4 | [`50-i18n-infra.md`](spec/annexes/50-i18n-infra.md) |
 | 51 | Localisation : seconde moitié des textes, contrôle bloquant | 51 | v2.28.5 | [`51-i18n-extraction.md`](spec/annexes/51-i18n-extraction.md) |
 | 52 | Interface en anglais | 52 | v2.29.0 | [`52-i18n-anglais.md`](spec/annexes/52-i18n-anglais.md) |
+| 53 | Règles en anglais, noms de compétence anglais, textes du moteur | 53 | v2.30.0 | [`53-i18n-regles.md`](spec/annexes/53-i18n-regles.md) |
 
 ## Lire pour un lot
 

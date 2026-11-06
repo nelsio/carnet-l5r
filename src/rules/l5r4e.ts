@@ -5,6 +5,7 @@
  */
 import type { Maneuver, RollTrait, Spell, SpellElement, TraitKey } from "../core/schema";
 import type { WeaponLike } from "../core/engine";
+import type { CoreText } from "../core/text";
 import battleTable from "./table-bataille.json";
 
 export type RingKey = "earth" | "water" | "fire" | "air" | "void";
@@ -206,10 +207,10 @@ export const MEDITATION_VOID_POINTS = 1;
 export const MEDITATE_ACTION_ID = "meditate";
 /** Tir sur une cible engagée au corps à corps (p. 84) : −10 au total. */
 export const MELEE_TARGET_PENALTY = 10;
-/** Niveaux de blessure à rappel (p. 84) : Estropié, À terre. */
-export const WOUND_EFFECT_NOTES: Readonly<Record<string, string>> = {
-  "Estropié": "Estropié : chaque déplacement coûte un cran de plus (action libre → simple, simple → complexe).",
-  "À terre": "À terre : actions gratuites seulement, en dépensant 1 point de Vide pour chacune.",
+/** Niveaux de blessure à rappel (p. 84) : Estropié, À terre ; texte du rappel dans le dictionnaire (annexe 53.2). */
+export const WOUND_EFFECT_NOTES: Readonly<Record<string, "wound.crippled" | "wound.down">> = {
+  "Estropié": "wound.crippled",
+  "À terre": "wound.down",
 };
 
 /* ---------- Bataille de masse (annexe E.8, v2.7.0) ---------- */
@@ -308,13 +309,16 @@ export type CombatSub = "skirmish" | "duel" | "battle";
 export type ActionTN = number | "target" | "opposed" | "assessment" | null;
 export type ActionKind = "skill" | "trait" | "damage" | "initiative" | "move" | "info" | "spell" | "spellDamage";
 
-/** Forme d'une action de l'Assistant L5R (HANDOFF §4.7). */
+/**
+ * Forme d'une action de l'Assistant L5R (HANDOFF §4.7). Titre et description : codes formatés par l'interface
+ * (annexe 53.2) ; `group` : id du groupe titré (`rest`, `spells`, `attacks`, `interrupt`, ou l'élément d'un sort).
+ */
 export interface ActionDef {
   id: string;
   situation: Situation;
   sub?: CombatSub;
   parent?: string;
-  label: string;
+  label: CoreText;
   kind: ActionKind;
   skill?: string;
   trait?: RollTrait;
@@ -332,8 +336,11 @@ export interface ActionDef {
   spell?: Spell;
   /** Groupe de la situation, titré dans la liste d'actions (« Repos »). */
   group?: string;
-  description: string;
+  description: CoreText;
 }
+
+/** Action fixe du catalogue : titre et description en français, repris par le dictionnaire `fr` (annexe 53.1). */
+export type FixedAction = Omit<ActionDef, "label" | "description"> & { label: string; description: string };
 
 export const SITUATIONS: readonly { id: Situation; label: string }[] = [
   { id: "investigation", label: "Enquête" },
@@ -351,7 +358,7 @@ export const COMBAT_SUBS: readonly { id: CombatSub; label: string }[] = [
 ];
 
 /** Actions fixes. Les attaques et dégâts d'armes sont générés depuis la fiche (core/actions). */
-export const FIXED_ACTIONS: readonly ActionDef[] = [
+export const FIXED_ACTIONS: readonly FixedAction[] = [
   // Enquête
   { id: "notice", situation: "investigation", label: "Remarquer un détail", kind: "skill", skill: "Investigation", trait: "perception", emphasisHint: "Remarquer", tn: 15, description: "Indice discret, objet dissimulé à la vue, comportement suspect. ND 10 évident, 20 bien caché." },
   { id: "search", situation: "investigation", label: "Fouiller un lieu", kind: "skill", skill: "Investigation", trait: "perception", emphasisHint: "Fouille", tn: 15, description: "Fouille méthodique d'une pièce ou d'un corps. Prends du temps : le MJ peut accorder des augmentations gratuites." },
@@ -361,7 +368,7 @@ export const FIXED_ACTIONS: readonly ActionDef[] = [
   { id: "etiquette", situation: "investigation", label: "Garder contenance", kind: "skill", skill: "Étiquette", trait: "awareness", tn: 15, description: "Ne rien laisser paraître, éviter un faux pas qui coûte de l'Honneur." },
   { id: "lore", situation: "investigation", label: "Se souvenir (Connaissance)", kind: "skill", skill: "Connaissance", trait: "intelligence", tn: 15, description: "Nomme ta Connaissance précise dans la fiche (ex. « Connaissance : Héraldique »). Sinon, jet sans compétence." },
   // Enquête, groupe Repos (annexe E.6)
-  { id: MEDITATE_ACTION_ID, situation: "investigation", group: "Repos", label: "Méditer (récupérer du Vide)", kind: "skill", skill: "Méditation", trait: "void", emphasisHint: "Récupération du Vide", tn: 20, description: "Une heure de méditation, une fois par jour. Réussite : tu récupères des points de Vide, sans dépasser ton Anneau de Vide." },
+  { id: MEDITATE_ACTION_ID, situation: "investigation", group: "rest", label: "Méditer (récupérer du Vide)", kind: "skill", skill: "Méditation", trait: "void", emphasisHint: "Récupération du Vide", tn: 20, description: "Une heure de méditation, une fois par jour. Réussite : tu récupères des points de Vide, sans dépasser ton Anneau de Vide." },
   // Cour (lot 11) : jets sociaux, le plus souvent en opposition. Les Représentations viennent de la fiche (core/actions).
   { id: "persuade", situation: "court", label: "Convaincre, manipuler", kind: "skill", skill: "Courtisan", trait: "awareness", emphasisHint: "Manipulation", tn: "opposed", description: "Courtisan (Vigilance) contre Étiquette (Vigilance ou Volonté) de l'interlocuteur." },
   { id: "resist", situation: "court", label: "Résister à une influence", kind: "skill", skill: "Étiquette", trait: "awareness", emphasisHint: "Courtoisie", tn: "opposed", description: "Étiquette (Vigilance ou Volonté) contre le Courtisan, l'Intimidation ou la Tentation adverse." },
@@ -392,20 +399,99 @@ export const FIXED_ACTIONS: readonly ActionDef[] = [
 ];
 
 /**
- * Noms de compétence équivalents (édition française, ancien libellé, anglais), le premier faisant foi
- * pour le catalogue (vocabulaire de l'annexe E.7). L'ancien libellé reste reconnu : une fiche v2.5 marche sans renommage.
+ * Compétences du livre de base 4e (annexe 53.3) : nom de l'édition française (fait foi pour le catalogue,
+ * vocabulaire de l'annexe E.7), nom anglais, anciens libellés français encore reconnus (une fiche v2.5 marche
+ * sans renommage). `social` : mot-clé Social. Une fiche saisie en anglais est reconnue sans traduction.
  */
-export const SKILL_ALIASES: readonly (readonly string[])[] = [
-  ["Courtisan", "Courtoisie", "Courtier"],
-  ["Discrétion", "Furtivité", "Stealth"],
-  ["Représentation : Conte", "Représentation : Conteur", "Perform: Storytelling"],
-  ["Représentation : Art oratoire", "Représentation : Éloquence", "Perform: Oratory"],
-  ["Sortilèges", "Spellcraft"],
+export interface SkillName { fr: string; en: string; legacy?: readonly string[]; social?: boolean }
+export const SKILL_NAMES: readonly SkillName[] = [
+  // Nobles
+  { fr: "Comédie", en: "Acting", social: true },
+  { fr: "Artisanat", en: "Artisan" },
+  { fr: "Calligraphie", en: "Calligraphy" },
+  { fr: "Courtisan", en: "Courtier", legacy: ["Courtoisie"], social: true },
+  { fr: "Divination", en: "Divination" },
+  { fr: "Étiquette", en: "Etiquette", social: true },
+  { fr: "Jeux", en: "Games" },
+  { fr: "Investigation", en: "Investigation" },
+  { fr: "Connaissance", en: "Lore" },
+  { fr: "Médecine", en: "Medicine" },
+  { fr: "Méditation", en: "Meditation" },
+  { fr: "Représentation", en: "Perform", social: true },
+  { fr: "Sincérité", en: "Sincerity", social: true },
+  { fr: "Sortilèges", en: "Spellcraft" },
+  { fr: "Cérémonie du thé", en: "Tea Ceremony" },
+  // Bugei
+  { fr: "Athlétisme", en: "Athletics" },
+  { fr: "Bataille", en: "Battle" },
+  { fr: "Défense", en: "Defense" },
+  { fr: "Équitation", en: "Horsemanship" },
+  { fr: "Chasse", en: "Hunting" },
+  { fr: "Iaijutsu", en: "Iaijutsu" },
+  { fr: "Jiujutsu", en: "Jiujutsu" },
+  { fr: "Kenjutsu", en: "Kenjutsu" },
+  { fr: "Kyujutsu", en: "Kyujutsu" },
+  { fr: "Ninjutsu", en: "Ninjutsu" },
+  { fr: "Armes à chaîne", en: "Chain Weapons" },
+  { fr: "Armes lourdes", en: "Heavy Weapons" },
+  { fr: "Couteaux", en: "Knives" },
+  { fr: "Armes d'hast", en: "Polearms" },
+  { fr: "Lances", en: "Spears" },
+  { fr: "Bâtons", en: "Staves" },
+  { fr: "Éventail de guerre", en: "War Fan" },
+  { fr: "Armes paysannes", en: "Peasant Weapons" },
+  // Marchandes
+  { fr: "Dressage", en: "Animal Handling" },
+  { fr: "Commerce", en: "Commerce" },
+  { fr: "Métier", en: "Craft" },
+  { fr: "Ingénierie", en: "Engineering" },
+  { fr: "Navigation", en: "Sailing" },
+  // Basses
+  { fr: "Contrefaçon", en: "Forgery" },
+  { fr: "Intimidation", en: "Intimidation", social: true },
+  { fr: "Escamotage", en: "Sleight of Hand" },
+  { fr: "Discrétion", en: "Stealth", legacy: ["Furtivité"] },
+  { fr: "Tentation", en: "Temptation", social: true },
 ];
+
+/**
+ * Sous-types des compétences à spécialité (« Représentation : Conte », « Perform: Storytelling »,
+ * « Connaissance : Histoire », « Lore: History »). Un sous-type absent de la table est comparé tel quel.
+ */
+export const SKILL_SUBTYPES: readonly SkillName[] = [
+  // Représentation
+  { fr: "Conte", en: "Storytelling", legacy: ["Conteur"] },
+  { fr: "Art oratoire", en: "Oratory", legacy: ["Éloquence"] },
+  { fr: "Chant", en: "Song" },
+  { fr: "Danse", en: "Dance" },
+  { fr: "Tambours", en: "Drums" },
+  { fr: "Flûte", en: "Flute" },
+  { fr: "Marionnettes", en: "Puppeteer" },
+  // Connaissance
+  { fr: "Histoire", en: "History" },
+  { fr: "Héraldique", en: "Heraldry" },
+  { fr: "Théologie", en: "Theology" },
+  { fr: "Outremonde", en: "Shadowlands" },
+  { fr: "Éléments", en: "Elements" },
+  { fr: "Anatomie", en: "Anatomy" },
+  { fr: "Pègre", en: "Underworld" },
+  // Artisanat, Jeux
+  { fr: "Peinture", en: "Painting" },
+  { fr: "Poésie", en: "Poetry" },
+  { fr: "Jardinage", en: "Gardening" },
+  { fr: "Tatouage", en: "Tattooing" },
+  { fr: "Lettres", en: "Letters" },
+];
+
+/** Noms équivalents (français, anciens libellés, anglais), le premier faisant foi ; dérivé de `SKILL_NAMES`. */
+export const SKILL_ALIASES: readonly (readonly string[])[] = SKILL_NAMES.map((s) => [s.fr, ...(s.legacy ?? []), s.en]);
+/** Même chose pour les sous-types. */
+export const SKILL_SUBTYPE_ALIASES: readonly (readonly string[])[] = SKILL_SUBTYPES.map((s) => [s.fr, ...(s.legacy ?? []), s.en]);
 
 /**
  * Renommages proposés à l'ouverture d'une fiche (annexe E.7) : ancien libellé → libellé de l'édition française.
  * La spécialisation Politesse ne change que sous Étiquette ; « Courtoisie » y reste une spécialisation.
+ * Seuls des anciens libellés français (`legacy`) : un nom anglais n'est jamais renommé (annexe 53.3).
  */
 export const VOCABULARY_UPDATES = {
   skills: [
@@ -420,18 +506,10 @@ export const VOCABULARY_UPDATES = {
 /* ---------- Bonus de jet (HANDOFF annexe B) ---------- */
 
 /**
- * Compétences sociales de la 4e (mot-clé « Social ») : noms français et anglais.
+ * Compétences sociales de la 4e (mot-clé « Social ») : noms français, anciens et anglais, dérivés de `SKILL_NAMES`.
  * Représentation (Perform) couvre aussi ses spécialités, ex. « Représentation : Chant ».
  */
-export const SOCIAL_SKILLS: readonly string[] = [
-  "Comédie", "Acting",
-  "Courtisan", "Courtoisie", "Courtier",
-  "Étiquette",
-  "Sincérité", "Sincerity",
-  "Intimidation",
-  "Tentation", "Temptation",
-  "Représentation", "Perform",
-];
+export const SOCIAL_SKILLS: readonly string[] = SKILL_NAMES.filter((s) => s.social).flatMap((s) => [s.fr, ...(s.legacy ?? []), s.en]);
 
 export const MODIFIER_SOURCE_LABELS = {
   technique: "Technique",

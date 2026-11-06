@@ -9,6 +9,7 @@ import {
   type Character, type PoolAction, type Spell,
 } from "@carnet/core";
 import perso from "../reference/perso-test-shugenja.json";
+import { say } from "./helpers/text";
 
 const kuni = (patch: Partial<Character> = {}): Character => ({ ...CharacterSchema.parse(structuredClone(perso)), ...patch });
 const spellOf = (c: Character, id: string): Spell => c.spells!.find((s) => s.id === id)!;
@@ -77,7 +78,7 @@ describe("Sorts en escarmouche (F.5, v2.12.0)", () => {
 
   it("Q14 : Initiative, groupe « Sorts », puis groupe « Attaques » (armes, actions fixes) ; ids préfixés sk-, dégâts rattachés (J.8)", () => {
     const actions = buildActions(c, "combat", "skirmish");
-    const spells = actions.filter((a) => a.group === "Sorts");
+    const spells = actions.filter((a) => a.group === "spells");
     expect(spells.map((a) => a.id)).toEqual([
       "sk-spell-sentir", "sk-spell-air-1", "sk-spell-jade-strike", "sk-spelldmg-jade-strike", "sk-spell-earth-2", "sk-spell-fire-1", "sk-spelldmg-fire-1",
     ]);
@@ -85,7 +86,7 @@ describe("Sorts en escarmouche (F.5, v2.12.0)", () => {
     expect(actions[0]?.kind).toBe("initiative");
     expect(actions.slice(1, spells.length + 1)).toEqual(spells);
     const attacks = actions.slice(spells.length + 1);
-    expect(attacks.every((a) => a.group === "Attaques")).toBe(true);
+    expect(attacks.every((a) => a.group === "attacks")).toBe(true);
     expect(attacks.some((a) => a.attack && a.weapon)).toBe(true);
     expect(attacks.at(-1)?.id).toBe("full-defense");
     expect(buildActions(c, "combat", "duel").some((a) => a.kind === "spell")).toBe(false);
@@ -101,11 +102,11 @@ describe("Sorts en escarmouche (F.5, v2.12.0)", () => {
   });
 
   it("G16 : Assaut « attaques seulement » ; Défense totale « actions gratuites seulement » ; Défense et Attaque permises ; Centre", () => {
-    expect(stanceRestriction(cast, { stance: "fullAttack" })).toBe("Assaut : attaques seulement, pas de sort.");
-    expect(stanceRestriction(cast, { stance: "fullDefense" })).toBe("Défense totale : actions gratuites seulement, pas de sort.");
+    expect(stanceRestriction(cast, { stance: "fullAttack" })).toEqual({ key: "restrict.fullAttackSpell" });
+    expect(stanceRestriction(cast, { stance: "fullDefense" })).toEqual({ key: "restrict.fullDefenseSpell" });
     expect(stanceRestriction(cast, { stance: "defense" })).toBeNull();
     expect(stanceRestriction(cast, { stance: "attack" })).toBeNull();
-    expect(stanceRestriction(cast, { stance: "center" })).toBe("Posture Centre : aucune action ce round.");
+    expect(stanceRestriction(cast, { stance: "center" })).toEqual({ key: "restrict.center" });
   });
 
   it("G17 : round après le Centre, sort de Terre maîtrise 1 avec le bonus de Centre : 6g4 + 2 (Vide 2)", () => {
@@ -118,6 +119,7 @@ describe("Rester concentré (F.2)", () => {
   it("Volonté, ND 10, ou 5 + dégâts subis ; dans la situation Magie, groupe « Interruption »", () => {
     expect([concentrationTn(null), concentrationTn(0), concentrationTn(7)]).toEqual([10, 10, 12]);
     const a = buildActions(kuni(), "magic").find((x) => x.id === "concentrate");
-    expect(a).toMatchObject({ kind: "trait", trait: "willpower", tn: 10, group: "Interruption", label: "Rester concentré (Volonté)" });
+    expect(a).toMatchObject({ kind: "trait", trait: "willpower", tn: 10, group: "interrupt", label: { key: "action.label", id: "concentrate" } });
+    expect(say(a!.label)).toBe("Rester concentré (Volonté)");
   });
 });

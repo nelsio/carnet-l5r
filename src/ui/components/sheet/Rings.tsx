@@ -1,5 +1,5 @@
 import { rings, type TraitKey } from "@carnet/core";
-import { RINGS, TRAIT_LABELS } from "../../../rules/l5r4e";
+import { RINGS } from "../../../rules/l5r4e";
 import { useT } from "../../../i18n";
 import { NumberField } from "../fields";
 import { RING_ORDER } from "./constants";
@@ -8,6 +8,7 @@ import { useSheet } from "./hooks";
 export function Rings() {
   const { c, edit, set } = useSheet("rings");
   const s = useT().sheet.rings;
+  const rules = useT().rules;
   const r = rings(c);
   const value = (path: (string | number)[], v: number, label: string) =>
     edit
@@ -18,7 +19,7 @@ export function Rings() {
     <div className="rings">
       {RING_ORDER.map((key) => (
         <div key={key} className={`ring ${key}`} style={{ ["--rc" as string]: `var(--ring-${key})` }}>
-          <div className="rn">{RINGS[key].label}</div>
+          <div className="rn">{rules.rings[key]}</div>
           <div className="rv">{r[key]}</div>
           {key === "void" ? (
             <>
@@ -27,7 +28,7 @@ export function Rings() {
             </>
           ) : (
             RINGS[key].traits.map((t: TraitKey) => (
-              <div key={t} className="tr"><span>{TRAIT_LABELS[t]}</span>{value(["traits", t], c.traits[t], TRAIT_LABELS[t])}</div>
+              <div key={t} className="tr"><span>{rules.traits[t]}</span>{value(["traits", t], c.traits[t], rules.traits[t])}</div>
             ))
           )}
         </div>

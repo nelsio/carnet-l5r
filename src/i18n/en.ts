@@ -1,4 +1,5 @@
 import type { Messages } from ".";
+import { coreEn, rulesEn } from "./rules-en";
 
 /**
  * Anglais (annexe 52.1) : traduction de `fr.ts`, même forme. Terminologie de l'édition anglaise de la 4e
@@ -786,6 +787,8 @@ export const en: Messages = {
     load: "Load the grimoire",
     gateFine: "The list is kept in this browser: it stays available offline. “Refresh” reloads it.",
   },
+  rules: rulesEn,
+  core: coreEn,
   validation: {
     intBetween: (min: number, max: number) => `must be an integer from ${min} to ${max}`,
     positiveInt: "must be a positive integer or zero",
@@ -811,5 +814,9 @@ export const en: Messages = {
     ring: "must be a Ring",
     slotKey: "must be air, earth, fire, water, void or free",
     voidPointsOverRing: "cannot exceed the Void Ring",
+    jsonObject: "must be a JSON object",
+    tooLarge: (kb: number, max: number) => `File too large (${kb} KB, maximum ${max} KB)`,
+    notJson: "Unreadable file: not valid JSON",
+    newerVersion: "File created by a newer version of the tool",
   },
 };

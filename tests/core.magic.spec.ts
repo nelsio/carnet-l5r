@@ -8,6 +8,7 @@ import {
   type Character, type PoolAction, type Spell,
 } from "@carnet/core";
 import perso from "../reference/perso-test-shugenja.json";
+import { say } from "./helpers/text";
 
 const kuni = (patch: Partial<Character> = {}): Character => ({ ...CharacterSchema.parse(structuredClone(perso)), ...patch });
 const spellOf = (c: Character, id: string): Spell => c.spells!.find((s) => s.id === id)!;
@@ -30,13 +31,13 @@ describe("Jet de sort (F.2)", () => {
 
   it("G2 : Kuni rang 1, sort d'Air : « Déficience : impossible au rang 1 »", () => {
     const c = kuni();
-    expect(spellRestriction(c, spellOf(c, "air-1"))).toBe("Déficience : impossible au rang 1.");
+    expect(spellRestriction(c, spellOf(c, "air-1"))).toEqual({ key: "spell.deficiency", rank: 1 });
     expect(spellRestriction(kuni({ schoolRank: 2 }), spellOf(c, "air-1"))).toBeNull();
   });
 
   it("G3 : sort de Terre maîtrise 2 au rang 1 : « Maîtrise 2 > rang 1 » ; au rang 2, permis", () => {
     const c = kuni();
-    expect(spellRestriction(c, spellOf(c, "earth-2"))).toBe("Maîtrise 2 > rang 1.");
+    expect(spellRestriction(c, spellOf(c, "earth-2"))).toEqual({ key: "spell.mastery", mastery: 2, rank: 1 });
     expect(spellRestriction(kuni({ schoolRank: 2 }), spellOf(c, "earth-2"))).toBeNull();
     expect(spellRestriction(c, spellOf(c, "jade-strike"))).toBeNull();
   });
@@ -44,7 +45,7 @@ describe("Jet de sort (F.2)", () => {
   it("G4 : sort Jade (Kuni) : 1 augmentation gratuite ; sort Bataille : aucune", () => {
     const c = kuni();
     expect(pool(c, cast(c, "jade-strike")).freeRaises).toBe(1);
-    expect(spellCast(c, cast(c, "jade-strike") as never).freeRaises).toEqual(["mot-clé Jade"]);
+    expect(spellCast(c, cast(c, "jade-strike") as never).freeRaises).toEqual([{ key: "spell.keyword", keyword: "Jade" }]);
     expect(pool(c, cast(c, "fire-1")).freeRaises).toBeUndefined();
   });
 
@@ -62,7 +63,7 @@ describe("Jet de sort (F.2)", () => {
     expect(castTime(3, 2)).toBe(1);
     expect(castTime(3, 5)).toBe(1);
     expect(castTime(3)).toBe(3);
-    expect([castTimeLabel(1), castTimeLabel(3)]).toEqual(["1 action complexe", "3 actions complexes"]);
+    expect([castTimeLabel(1), castTimeLabel(3)].map((x) => say(x))).toEqual(["1 action complexe", "3 actions complexes"]);
   });
 
   it("G9 : sort universel lancé en Feu : 3g2 ; par défaut, l'élément à la plus grosse réserve (Terre, 5g3)", () => {
@@ -120,12 +121,13 @@ describe("Situation « Magie » (F.5)", () => {
     expect(actions.map((a) => a.id)).toEqual([
       "spell-sentir", "spell-air-1", "spell-jade-strike", "spelldmg-jade-strike", "spell-earth-2", "spell-fire-1", "spelldmg-fire-1", "concentrate",
     ]);
-    expect(actions.map((a) => a.group)).toEqual(["Tous", "Air", "Terre", "Terre", "Terre", "Feu", "Feu", "Interruption"]);
+    expect(actions.map((a) => a.group)).toEqual(["all", "air", "earth", "earth", "earth", "fire", "fire", "interrupt"]);
     const earth2 = actions.find((a) => a.id === "spell-earth-2");
-    expect(earth2).toMatchObject({ kind: "spell", tn: 15, label: "Lancer · Mur de terre", description: "ND 15 · 2 actions complexes · Défense · parchemin" });
-    expect(actions.find((a) => a.id === "spelldmg-fire-1")).toMatchObject({
-      kind: "spellDamage", parent: "spell-fire-1", tn: null, label: "Dégâts · Feux intérieurs", description: "VD 3g2, sans la Force ni point de Vide.",
-    });
+    expect(earth2).toMatchObject({ kind: "spell", tn: 15, label: { key: "action.cast", spell: "Mur de terre" } });
+    expect(say(earth2!.description)).toBe("ND 15 · 2 actions complexes · Défense · parchemin");
+    const fire = actions.find((a) => a.id === "spelldmg-fire-1");
+    expect(fire).toMatchObject({ kind: "spellDamage", parent: "spell-fire-1", tn: null, label: { key: "action.damage", name: "Feux intérieurs" } });
+    expect(say(fire!.description)).toBe("VD 3g2, sans la Force ni point de Vide.");
   });
 
   it("une fiche sans sort : seulement « Rester concentré » (v2.12.0)", () => {

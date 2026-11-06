@@ -6,10 +6,10 @@ Toutes les fonctions sont pures. Le hasard est **injecté** (`rng: () => number`
 | Fonction | Contrat |
 |---|---|
 | `rings(c)` | Terre = min(Constitution, Volonté) ; Eau = min(Force, Perception) ; Feu = min(Agilité, Intelligence) ; Air = min(Réflexes, Vigilance) ; Vide = `voidRing`. |
-| `findSkill(c, name)` | Comparaison normalisée : minuscules, sans accents, espaces rognés. |
+| `findSkill(c, name)` | Comparaison normalisée : minuscules, sans accents, espaces rognés ; noms français, anciens et anglais équivalents, préfixe et sous-type comparés séparément (`SKILL_NAMES`, annexe 53.3). |
 | `parseDR(s)` | `"3k2"`/`"3g2"` → `{rolled:3, kept:2}` ; invalide → `{0,0}`. |
 | `applyTenDiceRule(r, k)` | Règle du livre de base 4e (§4.7). Renvoie `{rolled, kept, bonus}`. |
-| `computePool(c, action, mods)` | `{rolled, kept, bonus, explodes, explodeOn: 9 \| 10, canRaise, notes[]}` (§4.2). |
+| `computePool(c, action, mods)` | `{rolled, kept, bonus, explodes, explodeOn: 9 \| 10, canRaise, notes[]}` (§4.2) ; `notes` : codes `CoreText`, formatés par l'interface (annexe 53.2). |
 | `rollDice(pool, {emphasis, flatBonus}, rng)` | §4.3. |
 | `woundState(c)` | `{level, label, penalty, thresholds, status: "ok"|"out"|"dead"}` (§4.4). |
 | `armorTN(c, combatState)` | §4.5. |
@@ -89,7 +89,9 @@ Contenu initial = prototype :
 - **Manœuvres par défaut** (coût en augmentations) : Augmentation des dégâts 1 (cumulable, +1g0), Coup ciblé 1, Feinte 2, Renversement 2, Désarmement 3, Attaque supplémentaire 5.
 - **Clans** (§6.4).
 - **Catalogue d'actions** par situation : Enquête ; Déplacement ; Combat avec trois sous-types (Escarmouche, Duel iaijutsu, Bataille).
-  - Forme d'une action : `{id, situation, sub?, parent?, label, kind, skill?, trait, emphasisHint?, tn: number|"target"|"opposed"|"assessment"|null, attack?, fullDefense?, description}`. `parent` = id de l'attaque dont dépend un jet de dégâts.
+  - Forme d'une action : `{id, situation, sub?, parent?, label, kind, skill?, trait, emphasisHint?, tn: number|"target"|"opposed"|"assessment"|null, attack?, fullDefense?, description}`. `parent` = id de l'attaque dont dépend un jet de dégâts. `label` et `description` sont des codes `CoreText` ; les actions fixes ont leurs textes dans le dictionnaire, par id (annexe 53.2).
+- **Textes affichés** : les libellés français des règles restent ici (lus par le moteur, le prompt photo et la spécification fournie) ; l'interface les lit dans le dictionnaire `rules`, qui les reprend en français et les traduit en anglais (annexe 53.1). Toute phrase produite par le moteur est un code `CoreText` (`src/core/text.ts`) avec ses paramètres.
+- **Compétences** : `SKILL_NAMES` (nom français qui fait foi, nom anglais, anciens libellés, mot-clé Social) et `SKILL_SUBTYPES` ; `SKILL_ALIASES` et `SOCIAL_SKILLS` en sont dérivés (annexe 53.3).
   - Les attaques et dégâts sont générés depuis les armes ; mains nues et lutte (Jiujutsu) sont fixes.
   - ND d'Évaluation en duel : 10 + 5 × Rang adverse.
 
