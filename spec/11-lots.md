@@ -57,6 +57,7 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 46. **v2.28.5 — localisation, seconde moitié des textes** (**livrée**, écarts en 51.5) : annexe 51, lot 51. Bibliothèque, imports, grimoire, bonus de jet, statistiques, ressources et pied de page migrés ; dates et nombres selon la langue ; `check-i18n` bloquant ; rien ne change à l'écran.
 47. **v2.29.0 — interface en anglais** (**livrée**, écarts en 52.6) : annexe 52, lot 52. Dictionnaire anglais complet, bouton FR/EN dans l'en-tête, langue du navigateur au premier lancement, réserves en `XkY` et distances en pieds en anglais ; grimoire et portail signalés en français.
 48. **v2.30.0 — règles en anglais** (**livrée**, écarts en 53.5) : annexe 53, lot 53. Vocabulaire de règles dans le dictionnaire, textes du moteur en codes formatés par l'interface (option A), table des compétences française et anglaise : une fiche saisie en anglais reçoit ses techniques et maîtrises.
+   - **v2.30.1** (patch, 53.6) : `minimatch` 11 forcé par `overrides` (alerte Dependabot), outils de développement seulement.
 49. **Planifiés le 02/11/2026** : la fin de la localisation (lots 54 et 55, v2.31.0 et v2.31.1).
 50. **À définir** : journal d'achats en XP (K.6), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
 

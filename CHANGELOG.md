@@ -6,6 +6,11 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.30.1] - 2026-11-06
+
+### Sécurité
+- Outils de développement : `minimatch`, utilisé par ESLint, passe de 10.2.6 à 11.0.5 (déni de service, GHSA-g3hv-75wg-m249). L'application elle-même n'est pas concernée.
+
 ## [2.30.0] - 2026-11-06
 
 ### Ajouté
@@ -409,7 +414,10 @@ Simples liens ouverts dans un nouvel onglet : le Carnet ne fait toujours aucune 
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.28.5...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.30.1...HEAD
+[2.30.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.30.1
+[2.30.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.30.0
+[2.29.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.29.0
 [2.28.5]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.28.5
 [2.28.4]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.28.4
 [2.28.3]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.28.3

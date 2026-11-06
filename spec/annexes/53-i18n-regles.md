@@ -61,3 +61,10 @@ Quatrième des six lots de la localisation (50 à 55). Un seul lot, une PR, une 
 - **Noms français des compétences absentes des données** (Artisanat, Jeux, Dressage, Métier, Ingénierie, Navigation, Contrefaçon, Escamotage, Éventail de guerre, Armes paysannes…) : choisis pour l'outil, acceptés par Nelson le 06/11/2026 (P14). Le handoff associait « Artisanat » à `Craft` ; la 4e a deux compétences, Artisan (noble) et Craft (marchande) : la table les sépare, Artisanat / Artisan et Métier / Craft.
 - **Restent en français jusqu'au lot 54** : noms et résumés des écoles, techniques et maîtrises, libellés des cases à cocher et rappels d'école, événements de la table de bataille, armes du catalogue, mots-clés de sort proposés et sorts universels (des saisies de la fiche), prompt d'import photo.
 - **Onglet de l'Assistant sur ordinateur** : inchangé (annexe 52.6).
+
+### 53.6 Correctif v2.30.1 : minimatch
+
+- Alerte Dependabot n° 5 (GHSA-g3hv-75wg-m249, gravité moyenne) : `minimatch` de 7.0.0 à 11.0.0 exclu, déni de service par amplification de motifs. Version installée : 10.2.6, dépendance de développement d'ESLint (`eslint`, `@eslint/config-array`) et de `typescript-eslint`.
+- Leurs dernières versions (ESLint 10.14, typescript-eslint 8.72) demandent encore `minimatch` ^10 : pas de correctif amont. `package.json` force `"overrides": { "minimatch": "^11.0.1" }` ; 11.0.5 installé, `npm audit` sans vulnérabilité.
+- Lint, `tsc`, tests Vitest et build inchangés. `dist/carnet-l5r.html` n'est pas concerné : `minimatch` ne sert qu'aux outils.
+- À retirer quand ESLint et typescript-eslint dépendront de `minimatch` 11.
