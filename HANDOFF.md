@@ -6,7 +6,7 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document et le dossier `spec/` qu'il indexe.
 
-**État actuel :** version **v2.31.1**, lot 55 : `README.md` en anglais, version française dans `README-fr.md` (annexe 55) ; la localisation (lots 50 à 55) est livrée : interface, règles, catalogues et vitrine en français et en anglais, guide joueur en français.
+**État actuel :** version **v2.32.0**, lot 56 : formulaire « Contacter l'auteur » depuis le bouton Contact du pied de page, envoyé par Web3Forms sans adresse mail dans le code ; désactivé tant que la clé n'est pas renseignée (annexe 56). Bugs toujours vers les Issues GitHub.
 
 ---
 
@@ -63,6 +63,7 @@ Fait foi :
 | 53 | Règles en anglais, noms de compétence anglais, textes du moteur ; 53.6 : `minimatch` 11 | 53 | v2.30.0, v2.30.1 | [`53-i18n-regles.md`](spec/annexes/53-i18n-regles.md) |
 | 54 | Catalogues en anglais : écoles, maîtrises, bataille, modèles | 54 | v2.31.0 | [`54-i18n-catalogues.md`](spec/annexes/54-i18n-catalogues.md) |
 | 55 | README anglais, `README-fr.md` | 55 | v2.31.1 | [`55-readme-anglais.md`](spec/annexes/55-readme-anglais.md) |
+| 56 | Formulaire de contact (Web3Forms) | 56 | v2.32.0 | [`56-contact.md`](spec/annexes/56-contact.md) |
 
 ## Lire pour un lot
 

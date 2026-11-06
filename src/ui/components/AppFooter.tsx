@@ -1,6 +1,8 @@
 import { useState, type ReactNode } from "react";
 import { CARNET_LINKS } from "../../rules/links";
 import { useT } from "../../i18n";
+import { emptyDraft } from "../contact";
+import { ContactDialog } from "./ContactDialog";
 import { ExternalLink } from "./ExternalLink";
 import { APP_NAME } from "./Header";
 
@@ -14,10 +16,13 @@ function Chevron() {
 
 /**
  * Pied de page de tous les écrans (annexe M.3) : nom et version (lien vers les nouveautés), pastille Règles L5R 4e
- * (repliable, lot 41), état d'enregistrement, puis Guide · Signaler un bug · Projet. Sur mobile, les liens passent sous le nom.
+ * (repliable, lot 41), état d'enregistrement, puis Guide · Contact · Signaler un bug · Projet. Sur mobile, les liens passent sous le nom.
+ * Contact (lot 56, annexe 56) ouvre la fenêtre « Contacter l'auteur » ; le brouillon est gardé ici, jusqu'au rechargement.
  */
 export function AppFooter({ status }: { status?: ReactNode }) {
   const [open, setOpen] = useState(false);
+  const [contact, setContact] = useState(false);
+  const [draft, setDraft] = useState(emptyDraft);
   const t = useT().footer;
   const [cautionTerm, cautionText] = t.caution;
   return (
@@ -32,6 +37,7 @@ export function AppFooter({ status }: { status?: ReactNode }) {
       {status}
       <nav aria-label={t.links}>
         <ExternalLink href={CARNET_LINKS.guide}>{t.guide}</ExternalLink>
+        <button type="button" className="contactbtn" aria-haspopup="dialog" onClick={() => setContact(true)}>{t.contact}</button>
         <ExternalLink href={CARNET_LINKS.bug}>{t.bug}</ExternalLink>
         <ExternalLink href={CARNET_LINKS.code}>{t.project}</ExternalLink>
       </nav>
@@ -43,6 +49,7 @@ export function AppFooter({ status }: { status?: ReactNode }) {
           </ul>
         </div>
       )}
+      {contact && <ContactDialog draft={draft} onDraft={setDraft} onClose={() => setContact(false)} />}
     </footer>
   );
 }

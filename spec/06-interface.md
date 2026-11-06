@@ -88,7 +88,8 @@
 - Aucun texte saisi n'est rendu en HTML (pas de `dangerouslySetInnerHTML`).
 - Aucun texte d'interface en dur dans un composant : libellés, `aria-label`, `title`, `placeholder` viennent de `useT()` (annexe 50). Dates et nombres suivent `useLocale().intl`. En anglais : réserves en `XkY` (`formatPool`), distances en pieds (`formatDistance`), `50%` sans espace ; en français, comportement inchangé (annexe 52.3). Les saisies acceptent `3g2` et `3k2` dans les deux langues. Le grimoire et le portail, en français, sont signalés comme tels en anglais (annexe 52.4). `scripts/check-i18n.mjs` refuse tout texte JSX brut dans `src/ui` depuis le lot 51 (annexe 51.3).
 - Focus clavier visible, Échap ferme le panneau mobile, `prefers-reduced-motion` respecté.
-- Aucun appel réseau : polices embarquées, aucune bibliothèque chargée depuis un CDN.
+- Aucun appel réseau : polices embarquées, aucune bibliothèque chargée depuis un CDN. Exceptions sur un clic du joueur : le grimoire du portail (annexe N) et l'envoi du formulaire Contact (annexe 56).
+- Fenêtres modales (`Modal`, imports et Contact) : Échap, clic sur le fond, focus piégé dans la fenêtre et rendu à l'élément d'origine à la fermeture (annexe 56.2).
 
 ### 6.4 Thème et couleurs
 > **Remplacé au lot 17 (v2.14.0) par l'annexe I.1** (jetons, accents lisibles, couleurs sémantiques, Android), livré : l'annexe I.1 fait foi, cette section décrit l'état v2.13.

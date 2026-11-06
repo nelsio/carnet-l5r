@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from "react";
 import {
   importCharacter, mergeCharacter,
   type Change, type Character, type FieldError, type ParsedFile,
@@ -25,8 +25,15 @@ function Errors({ errors }: { errors: FieldError[] }) {
   );
 }
 
-/** Cadre des fenêtres d'import : fond cliquable et Échap pour fermer. */
+const FOCUSABLE = "a[href], button:not([disabled]), input:not([disabled]):not([tabindex='-1']), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])";
+
+/**
+ * Cadre des fenêtres (imports, contact) : fond cliquable et Échap pour fermer ; focus piégé dans la fenêtre
+ * et rendu à l'élément d'origine à la fermeture (annexe 56.2).
+ */
 export function Modal({ titleId, onClose, children }: { titleId: string; onClose: () => void; children: ReactNode }) {
+  const dialog = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -35,9 +42,31 @@ export function Modal({ titleId, onClose, children }: { titleId: string; onClose
     return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
 
+  useEffect(() => {
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const box = dialog.current;
+    if (box && !box.contains(document.activeElement)) (box.querySelector<HTMLElement>(FOCUSABLE) ?? box).focus();
+    return () => opener?.focus();
+  }, []);
+
+  const onKeyDown = (e: ReactKeyboardEvent) => {
+    if (e.key !== "Tab" || !dialog.current) return;
+    const items = [...dialog.current.querySelectorAll<HTMLElement>(FOCUSABLE)];
+    const first = items[0];
+    const last = items.at(-1);
+    if (!first || !last) return;
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  };
+
   return (
     <div className="modal-backdrop" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="panel modal" role="dialog" aria-modal="true" aria-labelledby={titleId}>{children}</div>
+      <div className="panel modal" role="dialog" aria-modal="true" aria-labelledby={titleId} tabIndex={-1} ref={dialog} onKeyDown={onKeyDown}>{children}</div>
     </div>
   );
 }

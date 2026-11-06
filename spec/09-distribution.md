@@ -9,6 +9,7 @@
 
 ### 9.2 Versionnement
 - SemVer. La version de l'outil est affichée en pied de page (lien vers les nouveautés, annexe M.3) et dans la section « Le Carnet » du menu Ressources.
+- Pied de page : Guide · **Contact** · Signaler un bug · Projet. Contact ouvre le formulaire « Contacter l'auteur » (annexe 56) ; les bugs restent sur les Issues GitHub. Clé Web3Forms : `CONTACT_CONFIG.accessKey` dans `src/ui/contact.ts`, procédure en annexe 56.4.
 - Toute évolution du format de fiche incrémente `schemaVersion` et ajoute une migration testée.
 - Une ancienne fiche s'ouvre toujours dans une version plus récente de l'outil.
 

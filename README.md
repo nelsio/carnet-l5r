@@ -51,6 +51,11 @@ The web address counts visits with [GoatCounter](https://www.goatcounter.com), w
 - [What's new](https://github.com/nelsio/carnet-l5r/releases) and [CHANGELOG](CHANGELOG.md) (in French).
 - [Report an issue](https://github.com/nelsio/carnet-l5r/issues/new): bug, rule to check, idea.
 
+## Contact / Feedback
+
+- **A bug?** Open a [GitHub issue](https://github.com/nelsio/carnet-l5r/issues/new): it is public, and others can follow it.
+- **A question, an idea, some feedback?** Use **Contact** at the bottom of the Carnet: a private message to the author, sent by email through the [Web3Forms](https://web3forms.com) service. Leave an email address if you want a reply. Nothing is stored in the Carnet, and your sheets are never sent.
+
 L5R is a trademark of its publisher; **unofficial**, free fan tool, not affiliated with the rights holders of *Legend of the Five Rings*. It reproduces no text from the books: **your core book is the authority**. Code under the [MIT](LICENSE) license; fonts, trademarks and credits: [CREDITS.md](docs/CREDITS.md).
 
 ---
