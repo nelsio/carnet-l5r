@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 2,
+  "name": "Tamori Ayane",
+  "clan": "Dragon",
+  "family": "Tamori",
+  "school": "Tamori Shugenja School",
+  "schoolId": "tamori-shugenja",
+  "schoolRank": null,
+  "insightRank": 1,
+  "honor": 4.5,
+  "glory": 1.0,
+  "status": 1.0,
+  "xp": { "total": 40, "spent": 34 },
+  "traits": {
+    "stamina": 3, "willpower": 2,
+    "strength": 2, "perception": 2,
+    "agility": 2, "intelligence": 3,
+    "reflexes": 2, "awareness": 2
+  },
+  "voidRing": 2,
+  "voidPoints": 2,
+  "wounds": 0,
+  "armor": { "name": "", "bonus": 0, "reduction": 0 },
+  "skills": [
+    { "name": "Calligraphy", "rank": 1, "trait": "intelligence", "emphases": ["Cipher"] },
+    { "name": "Lore: Theology", "rank": 1, "trait": "intelligence", "emphases": [] },
+    { "name": "Defense", "rank": 1, "trait": "reflexes", "emphases": [] },
+    { "name": "Divination", "rank": 1, "trait": "intelligence", "emphases": [] },
+    { "name": "Artisan: Smithing", "rank": 2, "trait": "intelligence", "emphases": [] },
+    { "name": "Meditation", "rank": 1, "trait": "void", "emphases": [] },
+    { "name": "Etiquette", "rank": 1, "trait": "awareness", "emphases": [] },
+    { "name": "Spellcraft", "rank": 1, "trait": "intelligence", "emphases": [] }
+  ],
+  "weapons": [
+    { "name": "Wakizashi", "skill": "Kenjutsu", "dr": "2k2", "keywords": ["samourai", "moyenne"] }
+  ],
+  "techniques": [],
+  "maneuvers": [],
+  "spells": [
+    {
+      "id": "sentir", "name": "Sense", "element": "all", "mastery": 1, "keywords": [],
+      "range": "Personal", "area": "50-foot radius", "duration": "Instantaneous",
+      "raises": "Area (+10 feet)", "memorized": false,
+      "effect": "Senses the presence and mood of the kami of the chosen element."
+    },
+    {
+      "id": "frappe-de-jade", "name": "Jade Strike", "element": "earth", "mastery": 1, "keywords": ["Jade"],
+      "range": "100 feet", "area": "One target", "duration": "Instantaneous",
+      "raises": "Range (+10 feet)\nTargets (+1)", "damage": "2k2", "memorized": true,
+      "effect": "Jade projectile against a Tainted creature. Check the values in your book."
+    }
+  ],
+  "spellSlotsUsed": {},
+  "modifiers": [],
+  "advantages": "",
+  "disadvantages": "",
+  "notes": "Shugenja template (Dragon, Tamori school, rank 1). Replace everything with your own character; copy your scrolls into “Scrolls & invocations”."
+}

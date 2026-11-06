@@ -49,6 +49,14 @@ describe("Jet de sort (F.2)", () => {
     expect(pool(c, cast(c, "fire-1")).freeRaises).toBeUndefined();
   });
 
+  it("mot-clé saisi en anglais (annexe 54.2) : « craft » vaut « Artisanat » pour Tamori ; un mot inconnu, rien", () => {
+    const c = kuni({ schoolId: "tamori-shugenja" });
+    const crafted: Spell = { ...spellOf(c, "fire-1"), keywords: ["craft"] };
+    expect(spellCast(c, { spell: crafted } as never).freeRaises).toEqual([{ key: "spell.keyword", keyword: "Artisanat" }]);
+    expect(spellCast(c, { spell: { ...crafted, keywords: ["Artisanat"] } } as never).freeRaises).toHaveLength(1);
+    expect(spellCast(c, { spell: { ...crafted, keywords: ["Crafting"] } } as never).freeRaises).toEqual([]);
+  });
+
   it("G5 : Isawa, affinité Vide, Vide 2, rang 1 : sort de Vide 4g2, 1 augmentation gratuite", () => {
     const c = kuni({ schoolId: "isawa-shugenja", affinity: "void" });
     const voidSpell: Spell = { ...spellOf(c, "jade-strike"), id: "v", element: "void", keywords: [] };

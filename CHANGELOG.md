@@ -6,6 +6,19 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.31.0] - 2026-11-06
+
+### Ajouté
+- Les 40 écoles, leurs techniques, les maîtrises et la table de bataille sont traduites en anglais.
+- Modèles de fiche en anglais dans la Bibliothèque.
+
+### Modifié
+- En anglais, choisir une école écrit son nom anglais dans la fiche.
+- Un sort saisi avec un mot-clé anglais (Craft, Defense…) reçoit l'augmentation gratuite de l'école.
+
+### Technique
+- Les textes anglais des catalogues sont une surcouche des données françaises : un texte absent s'affiche en français.
+
 ## [2.30.1] - 2026-11-06
 
 ### Sécurité

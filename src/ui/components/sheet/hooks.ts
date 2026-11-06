@@ -1,5 +1,6 @@
 import { computePool, defaultModifiers, findSchool, type Character, type PoolAction, type RollTrait } from "@carnet/core";
 import type { Locale } from "../../../i18n";
+import { CATALOG_EN, catalogText } from "../../../i18n/catalog";
 import { poolLabel } from "../../rolls";
 import { useCharacter, useStore, type BlockId } from "../../store";
 
@@ -19,10 +20,10 @@ export const pool = (c: Character, trait: RollTrait, skill: string, locale: Loca
 
 /**
  * Choix des techniques d'école : remplit aussi « École (nom affiché) » avec le nom du catalogue, modifiable ensuite ;
- * « — Aucune » garde le nom saisi (annexe E.19 S9).
+ * « — Aucune » garde le nom saisi (annexe E.19 S9). Le nom est écrit dans la langue de l'interface (annexe 54.2).
  */
-export function chooseSchool(set: Setter, id: string) {
+export function chooseSchool(set: Setter, id: string, locale: Locale) {
   set(["schoolId"], id);
   const school = findSchool(id);
-  if (school) set(["school"], school.name);
+  if (school) set(["school"], catalogText(school.name, CATALOG_EN.schools[school.id]?.name, locale));
 }

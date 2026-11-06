@@ -1,7 +1,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { clanAccent, schoolRankOf, serializeCharacter } from "@carnet/core";
 import { useLocale, useT } from "../../i18n";
-import { EXAMPLES, type Example } from "../../rules/example";
+import { examplesFor, type Example } from "../../rules/example";
 import { CARNET_LINKS } from "../../rules/links";
 import { FORGE_JSON_OK, PORTAL, PORTAL_NAME } from "../../rules/portal";
 import { downloadText } from "../download";
@@ -15,6 +15,7 @@ import { ImportButton, PhotoImportButton } from "./FileActions";
 export function Library() {
   const { library } = useStore();
   const t = useT().library;
+  const { locale } = useLocale();
   const { entries } = library;
 
   if (!entries.length) {
@@ -44,7 +45,7 @@ export function Library() {
           <h2 id="templates-title">{t.templatesTitle}</h2>
           <p className="muted">{t.templatesLede}</p>
           <div className="tpl-list">
-            {EXAMPLES.map((x) => <TemplateCard key={x.id} example={x} />)}
+            {examplesFor(locale).map((x) => <TemplateCard key={x.id} example={x} />)}
           </div>
         </section>
         <p className="discover">{t.discover}<ExternalLink href={PORTAL.home}>{t.discoverLink(PORTAL_NAME)}</ExternalLink></p>
@@ -81,7 +82,7 @@ export function Library() {
         </div>
         <p className="newchar-foot">
           {t.fromTemplate}{" "}
-          {EXAMPLES.map((x, i) => (
+          {examplesFor(locale).map((x, i) => (
             <span key={x.id}>
               {i > 0 && " · "}
               <button type="button" className="linkbtn" aria-label={t.fromTemplateLabel(x.type)} onClick={() => void library.importEntry(x.build(), "edit")}>{x.type}</button>

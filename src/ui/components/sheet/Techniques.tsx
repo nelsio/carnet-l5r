@@ -1,5 +1,6 @@
-import { activeEffects, reminderText, schoolOf, schoolRankOf, suggestSchool, techniqueCategories } from "@carnet/core";
-import { useT } from "../../../i18n";
+import { activeEffects, schoolOf, schoolRankOf, suggestSchool, techniqueCategories } from "@carnet/core";
+import { useLocale, useT } from "../../../i18n";
+import { useCatalog } from "../../../i18n/catalog";
 import { useStore } from "../../store";
 import { chooseSchool, useSheet } from "./hooks";
 import { AddButton, RemoveButton } from "./shared";
@@ -49,6 +50,8 @@ function SchoolTechniques() {
   const { c, edit, set } = useSheet("techniques");
   const s = useT().sheet.techniques;
   const categories = useT().rules.techniqueCategories;
+  const cat = useCatalog();
+  const { locale } = useLocale();
   const { state } = useStore();
   const school = schoolOf(c);
   const suggestion = state.mode === "edit" ? suggestSchool(c) : undefined;
@@ -57,8 +60,8 @@ function SchoolTechniques() {
       <>
         {suggestion && (
           <div className="suggest" role="group" aria-label={s.suggestion}>
-            <span>{s.associateTo} <b>{suggestion.name}</b> ?</span>
-            <button type="button" className="btn sm" onClick={() => chooseSchool(set, suggestion.id)}>{s.associate}</button>
+            <span>{s.associateTo} <b>{cat.schoolName(suggestion)}</b> ?</span>
+            <button type="button" className="btn sm" onClick={() => chooseSchool(set, suggestion.id, locale)}>{s.associate}</button>
           </div>
         )}
         {edit && <p className="hint" style={{ marginTop: 0 }}>{s.chooseSchool}</p>}
@@ -70,23 +73,23 @@ function SchoolTechniques() {
   const valued = activeEffects(c).filter((e) => e.kind === "reminder" && e.value !== undefined);
   return (
     <div data-testid="school-techniques">
-      <div className="schoolhead"><b>{school.name}</b> <span className="muted">{s.schoolMeta(school.clan, rank)}</span></div>
+      <div className="schoolhead"><b>{cat.schoolName(school)}</b> <span className="muted">{s.schoolMeta(cat.clan(school.clan), rank)}</span></div>
       {school.spellcasting && <SpellAffinity page={school.spellcasting.page} />}
       {school.ranks.map((r) => {
         const on = r.rank <= rank;
         return (
           <div key={r.rank} className={`tech${on ? "" : " locked"}`} data-testid={`school-rank-${r.rank}`}>
             <div className="techtop">
-              <b>{s.rankTitle(r.rank, r.name)}</b>
+              <b>{s.rankTitle(r.rank, cat.rankName(school, r))}</b>
               <span>
                 {on
                   ? techniqueCategories(r).map((cat) => <span key={cat} className={`badge ${BADGE_CLASS[cat]}`}>{categories[cat]}</span>)
                   : <span className="badge">{s.lockedRank(r.rank)}</span>}
               </span>
             </div>
-            <div className="muted">{r.summary}</div>
+            <div className="muted">{cat.rankSummary(school, r)}</div>
             {valued.filter((e) => e.rank === r.rank).map((e) => (
-              <div key={e.key} className="hint" style={{ color: "var(--accent-ink)" }}>→ {reminderText(e, c)}</div>
+              <div key={e.key} className="hint" style={{ color: "var(--accent-ink)" }}>→ {cat.reminder(e, c)}</div>
             ))}
           </div>
         );

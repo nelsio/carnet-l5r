@@ -34,7 +34,12 @@ export type ActiveEffect = Effect & {
   summary: string;
   /** Maîtrise de compétence : nom de la compétence de la fiche (badge « Maîtrise » du lanceur). */
   mastery?: string;
+  /** Entrée du catalogue d'où vient l'effet, pour ses textes traduits (annexe 54.2). */
+  origin: EffectOrigin;
 };
+
+/** Rang d'école (`school`, `rank`) ou maîtrise (`mastery` : « Kenjutsu@3 »), et rang de l'effet dans sa liste. */
+export type EffectOrigin = { school: string; rank: number; index: number } | { mastery: string; index: number };
 
 export type Verdict = "success" | "failure" | "baseSuccess";
 
@@ -111,6 +116,7 @@ export function schoolEffects(c: Character): ActiveEffect[] {
   return s.ranks.filter((r) => r.rank <= rank).flatMap((r) =>
     r.effects.map((e, i) => ({
       ...e, key: `${s.id}-${r.rank}-${i}`, source: `${shortSchoolName(s)} R${r.rank}`, rank: r.rank, technique: r.name, summary: r.summary,
+      origin: { school: s.id, rank: r.rank, index: i },
     })),
   );
 }
@@ -131,6 +137,7 @@ export function masteryEffects(c: Character): ActiveEffect[] {
       return {
         ...effect, key: `maitrise-${normalize(s.name)}-${m.rank}-${i}`, source: `${s.name} ${m.rank}`, rank: m.rank,
         technique: `Maîtrise ${s.name} ${m.rank}`, summary: m.summary, mastery: s.name,
+        origin: { mastery: `${m.skill}@${m.rank}`, index: i },
       };
     }),
   ));
@@ -485,10 +492,16 @@ export function schoolReminders(c: Character, contexts: readonly ReminderContext
   return activeEffects(c).filter((e) => e.kind === "reminder" && contexts.includes(e.context));
 }
 
-/** Texte d'un rappel, `{n}` remplacé par sa valeur calculée (« +10 au ND de qui te ment »). Sans texte : le résumé. */
-export function reminderText(e: ActiveEffect, c: Character): string {
-  if (e.kind !== "reminder" || !e.text) return e.summary;
-  return e.text.replace("{n}", String(resolveValue(e.value, c)));
+/**
+ * Texte d'un rappel, `{n}` remplacé par sa valeur calculée (« +10 au ND de qui te ment »). Sans texte : le résumé.
+ * `words` : texte et résumé dans la langue de l'interface (annexe 54.2), ceux du catalogue par défaut.
+ */
+export function reminderText(
+  e: ActiveEffect, c: Character,
+  words: { text?: string; summary: string } = { text: e.kind === "reminder" ? e.text : undefined, summary: e.summary },
+): string {
+  if (e.kind !== "reminder" || !words.text) return words.summary;
+  return words.text.replace("{n}", String(resolveValue(e.value, c)));
 }
 
 /** Badge d'un rang ; libellé dans le dictionnaire (annexe 53.2). */

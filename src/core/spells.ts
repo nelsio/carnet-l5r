@@ -2,7 +2,7 @@
  * Magie (HANDOFF annexe F) : Rouleaux & invocations (v2.9.0), écoles de shugenja (v2.10.0),
  * jet de sort et situation « Magie » (v2.11.0), emplacements et sorts en escarmouche (v2.12.0).
  */
-import type { SpellOption, Spellcasting } from "../rules/ecoles";
+import { SPELL_KEYWORD_ALIASES, type SpellOption, type Spellcasting } from "../rules/ecoles";
 import { CONCENTRATE_ACTION_ID, SPELL_CAST_TIME_MIN, SPELL_CONCENTRATION, SPELL_TN, type ActionDef } from "../rules/l5r4e";
 import { normalize, parseDR, rings, type PoolAction } from "./engine";
 import {
@@ -98,6 +98,13 @@ export interface SpellCast {
   freeRaises: CoreText[];
 }
 
+/** Mot-clé de sort normalisé, nom anglais ramené au nom français du catalogue (« Craft » → « artisanat », annexe 54.2). */
+function keywordKey(k: string): string {
+  const n = normalize(k);
+  const fr = Object.entries(SPELL_KEYWORD_ALIASES).find(([en]) => normalize(en) === n)?.[1];
+  return fr ? normalize(fr) : n;
+}
+
 /** Jet de sort (F.2) : (Anneau + rang de lancement) g Anneau, cases et augmentations gratuites de l'école. */
 export function spellCast(c: Character, a: Omit<SpellAction, "kind">): SpellCast {
   const element = a.spell.element === "all" ? (a.element ?? defaultSpellElement(c, a.spell)) : a.spell.element;
@@ -105,11 +112,11 @@ export function spellCast(c: Character, a: Omit<SpellAction, "kind">): SpellCast
   const { rank, affinity, deficiency } = castingRank(c, element, a.options);
   const sc = spellcastingOf(c);
   const options = chosenOptions(c, a.options);
-  const keywords = a.spell.keywords.map(normalize);
+  const keywords = a.spell.keywords.map(keywordKey);
   const freeRaises = [
     ...(sc?.freeRaiseKeywords ?? []).filter((k) => keywords.includes(normalize(k))).map((k) => text("spell.keyword", { keyword: k })),
     ...(sc?.freeRaiseAffinity && affinityOf(c) === element ? [text("spell.affinity")] : []),
-    ...options.flatMap((o) => Array.from({ length: o.freeRaises ?? 0 }, () => text("spell.option", { label: o.label }))),
+    ...options.flatMap((o) => Array.from({ length: o.freeRaises ?? 0 }, () => text("spell.option", { label: o.label, school: c.schoolId ?? "", id: o.id }))),
   ];
   return {
     element, ring, ringValue: rings(c)[ring], rank, affinity, deficiency,

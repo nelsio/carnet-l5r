@@ -1,0 +1,4 @@
+{
+  "note": "Textes anglais de la table de bataille (annexe 54) : événements, clés de table-bataille.json. Les engagements et états d'armée sont dans le dictionnaire (rules, annexe 53.1).",
+  "events": { "duel": "Duel", "heroic": "Heroic Opportunity" }
+}

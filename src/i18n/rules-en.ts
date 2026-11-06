@@ -5,7 +5,9 @@
  */
 import { formatDR } from "../core/dice";
 import type { CoreMessages, EffectPart, ModifierEffect } from "../core/text";
+import schoolsEn from "../rules/en/ecoles.json";
 import type { Messages } from ".";
+import type { SchoolWords } from "./catalog";
 
 type Rules = Messages["rules"];
 
@@ -152,6 +154,7 @@ export const rulesEn: Rules = {
     mante: "Mantis Clan", phenix: "Phoenix Clan", scorpion: "Scorpion Clan", araignee: "Spider Clan", imperial: "Imperial Families",
   },
   techniqueCategories: { auto: "auto", optional: "optional", reminder: "reminder", text: "text" },
+  masteryTitle: (skill: string, rank: number) => `Mastery ${skill} ${rank}`,
 };
 
 const signed = (n: number) => (n >= 0 ? `+${n}` : `${n}`);
@@ -222,9 +225,10 @@ export const coreEn: CoreMessages = {
   "spell.mastery": (p) => `Mastery ${p.mastery} > rank ${p.rank}.`,
   "wound.crippled": () => "Crippled: each move costs one step more (free action → simple, simple → complex).",
   "wound.down": () => "Down: free actions only, spending 1 Void Point for each.",
-  "spell.keyword": (p) => `${p.keyword} keyword`,
+  "spell.keyword": (p) => `${(schoolsEn.spellKeywords as Record<string, string>)[p.keyword] ?? p.keyword} keyword`,
   "spell.affinity": () => "affinity element",
-  "spell.option": (p) => p.label,
+  // Case d'école du lanceur de sort : texte de la surcouche anglaise (annexe 54), le français à défaut.
+  "spell.option": (p) => (schoolsEn.schools as Record<string, SchoolWords>)[p.school]?.spellcasting?.options?.[p.id] ?? p.label,
   "spell.castTime": (p) => castTime(p.n),
   "action.label": (p) => rulesEn.actions[p.id]?.label ?? p.id,
   "action.description": (p) => rulesEn.actions[p.id]?.description ?? "",

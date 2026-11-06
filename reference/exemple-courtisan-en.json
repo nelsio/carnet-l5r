@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 2,
+  "name": "Doji Sayuri",
+  "clan": "Crane",
+  "family": "Doji",
+  "school": "Doji Courtier School",
+  "schoolId": "doji-courtisan",
+  "schoolRank": null,
+  "insightRank": 1,
+  "honor": 6.5,
+  "glory": 1.0,
+  "status": 1.0,
+  "xp": { "total": 40, "spent": 34 },
+  "traits": {
+    "stamina": 2, "willpower": 2,
+    "strength": 2, "perception": 3,
+    "agility": 2, "intelligence": 2,
+    "reflexes": 2, "awareness": 3
+  },
+  "voidRing": 2,
+  "voidPoints": 2,
+  "wounds": 0,
+  "armor": { "name": "", "bonus": 0, "reduction": 0 },
+  "skills": [
+    { "name": "Calligraphy", "rank": 1, "trait": "intelligence", "emphases": [] },
+    { "name": "Courtier", "rank": 2, "trait": "awareness", "emphases": ["Manipulation"] },
+    { "name": "Etiquette", "rank": 2, "trait": "awareness", "emphases": ["Courtesy"] },
+    { "name": "Perform: Storytelling", "rank": 1, "trait": "awareness", "emphases": [] },
+    { "name": "Sincerity", "rank": 2, "trait": "awareness", "emphases": ["Honesty"] },
+    { "name": "Tea Ceremony", "rank": 1, "trait": "void", "emphases": [] },
+    { "name": "Investigation", "rank": 1, "trait": "perception", "emphases": ["Notice"] }
+  ],
+  "weapons": [
+    { "name": "Tanto", "skill": "Knives", "dr": "1k1", "keywords": ["petite"] }
+  ],
+  "techniques": [],
+  "maneuvers": [],
+  "modifiers": [
+    {
+      "id": "voix", "name": "Voice", "source": "advantage", "appliesTo": "skill", "skill": "Perform: Storytelling",
+      "rolled": 1, "kept": 1, "flat": 0, "tn": 0, "freeRaises": 0, "mode": "always",
+      "note": "Example: +1k1 to Perform rolls that use the voice."
+    },
+    {
+      "id": "timide", "name": "Example disadvantage", "source": "disadvantage", "appliesTo": "social",
+      "rolled": 0, "kept": 0, "flat": 0, "tn": 0, "freeRaises": 0, "mode": "optional",
+      "note": "Empty template to adapt: dice penalty (negative rolled/kept), to the total (flat) or to the TN (tn)."
+    }
+  ],
+  "advantages": "Voice",
+  "disadvantages": "",
+  "notes": "Courtier template (Crane, Doji school, rank 1). Replace everything with your own character."
+}

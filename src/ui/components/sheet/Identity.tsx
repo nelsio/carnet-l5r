@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { insightPoints, schoolsByClan, spellcastingOf, suggestedInsightRank, SPELL_RINGS, type Character } from "@carnet/core";
 import { useLocale, useT } from "../../../i18n";
+import { useCatalog } from "../../../i18n/catalog";
 import { decimal } from "../../format";
 import { poolLabel } from "../../rolls";
 import { useCharacter, useStore } from "../../store";
@@ -21,6 +22,7 @@ export function Identity() {
   const { c, edit, set } = useSheet("identity");
   const s = useT().sheet.identity;
   const { intl, locale } = useLocale();
+  const cat = useCatalog();
   const text = (path: string[], value: string, extra?: { list?: string; maxLength?: number }) => (
     <input className="in" type="text" value={value} maxLength={extra?.maxLength ?? 80} list={extra?.list} onChange={(e) => set(path, e.target.value)} />
   );
@@ -39,14 +41,15 @@ export function Identity() {
         <Field label={s.family}>{text(["family"], c.family)}</Field>
         <Field label={s.school}>{text(["school"], c.school, { maxLength: 120 })}</Field>
         <Field label={s.schoolTechniques} wide>
-          <RichSelect variant="catalogue" value={c.schoolId ?? ""} onChange={(v) => chooseSchool(set, v)}>
+          <RichSelect variant="catalogue" value={c.schoolId ?? ""} onChange={(v) => chooseSchool(set, v, locale)}>
             <option value=""><span className="n">{s.noSchool}</span></option>
             {schoolsByClan().map((g) => (
-              <optgroup key={g.clan} label={g.clan}>
-                <legend>{g.clan}</legend>
+              <optgroup key={g.clan} label={cat.clan(g.clan)}>
+                <legend>{cat.clan(g.clan)}</legend>
                 {g.schools.map((sc) => (
                   <option key={sc.id} value={sc.id}>
-                    <span className="n">{sc.name}</span><span className="m">{sc.class}</span><span className="d">{s.firstRank(sc.ranks[0]?.name)}</span>
+                    <span className="n">{cat.schoolName(sc)}</span><span className="m">{cat.schoolClass(sc)}</span>
+                    <span className="d">{s.firstRank(sc.ranks[0] && cat.rankName(sc, sc.ranks[0]))}</span>
                   </option>
                 ))}
               </optgroup>

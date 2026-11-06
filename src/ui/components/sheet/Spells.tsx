@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  affinityOf, createSpell, deficiencyOf, fillFromGrimoire, formatDR, grimoireConflicts, normalize, sortSpells, spellcastingOf, spellRaises, spellTn, toCarnetSpell, SPELL_ELEMENTS,
+  affinityOf, createSpell, deficiencyOf, fillFromGrimoire, formatDR, grimoireConflicts, normalize, schoolOf, sortSpells, spellcastingOf, spellRaises, spellTn, toCarnetSpell, SPELL_ELEMENTS,
   type GrimoireDiff, type GrimoireSpell, type Spell, type SpellElement,
 } from "@carnet/core";
 import { SPELL_KEYWORDS, UNIVERSAL_SPELLS } from "../../../rules/l5r4e";
 import { useLocale, useT } from "../../../i18n";
+import { useCatalog } from "../../../i18n/catalog";
 import { DICE_LETTER } from "../../format";
 import { PORTAL, spellUrl } from "../../../rules/portal";
 import { useCharacter, useStore } from "../../store";
@@ -26,7 +27,9 @@ export function Spells() {
   const elements = useT().rules.elements;
   const { locale } = useLocale();
   const spells = c.spells ?? [];
-  const starting = spellcastingOf(c)?.startingSpells;
+  const cat = useCatalog();
+  const school = spellcastingOf(c) && schoolOf(c);
+  const starting = school ? cat.startingSpells(school) : undefined;
   const [panel, setPanel] = useState(false);
   /** Sorts remplis depuis le grimoire pendant cette édition (non sauvegardé) ; le dernier porte le halo. */
   const [filled, setFilled] = useState<ReadonlySet<string>>(new Set());
