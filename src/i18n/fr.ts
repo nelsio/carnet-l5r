@@ -33,8 +33,8 @@ export const fr = {
     diceRoller: (shown: boolean) => `Lanceur de dés : ${shown ? "affiché" : "masqué"}`,
     theme: (label: string) => `Thème : ${label}`,
     themes: { auto: "auto", light: "clair", dark: "sombre" },
-    /** Bouton de langue : code affiché, nom accessible (annexe 52.2). */
-    language: { code: "FR", label: "Langue : français" },
+    /** Bascule de langue : nom du groupe ; chaque langue s'annonce dans sa propre langue (annexe 58). */
+    language: { group: "Langue", names: { fr: "Français", en: "English" } },
     woundMultiplier: (n: number) => `Blessures : Terre × ${n}`,
   },
   /** Fiche : blocs et leur mode édition. */

@@ -11,6 +11,8 @@ import type { Widen } from "./types";
 
 export type Messages = Widen<typeof fr>;
 export type Locale = "fr" | "en";
+/** Langues proposées, dans l'ordre de la bascule de l'en-tête (annexe 58). */
+export const LOCALES = ["fr", "en"] as const satisfies readonly Locale[];
 
 const DICTIONARIES: Record<Locale, Messages> = { fr, en };
 /** Locale `Intl` de chaque langue : dates, nombres. */

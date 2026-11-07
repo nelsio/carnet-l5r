@@ -63,11 +63,14 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 51. **v2.32.0 — formulaire de contact** (**livrée**, écarts en 56.6) : annexe 56, lot 56. Bouton Contact du pied de page, fenêtre « Contacter l'auteur » envoyée par Web3Forms, validation, piège à robots, délais de 3 s et 60 s, mode hors ligne ; bugs toujours vers les Issues.
    - **v2.32.1** (patch, 56.7) : clé Web3Forms renseignée, formulaire actif.
 52. **v2.32.2 — README français par défaut, guide plus digeste** (**livrée**, écarts en 57.4) : annexe 57, lot 57. `README.md` en français, version anglaise dans `README-en.md` ; `docs/GUIDE.md` réorganisé par tâche, parcours « Le Carnet en 5 minutes », détail replié, magie regroupée ; guide illustré de 15 captures annotées (`npm run guide-shots`) au style « rouleau de Rokugan » (§9.3).
-53. **À définir** : journal d'achats en XP (K.6), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
+53. **v2.32.3 — bascule de langue à part** (**livrée**, écarts en 58.5) : annexe 58, lot 58. Bascule FR | EN en haut à droite de l'en-tête sur bureau, au bout de la rangée de boutons sur mobile ; les deux langues visibles, l'active surlignée ; captures du guide et du README régénérées.
+54. **À définir** : journal d'achats en XP (K.6), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
 
 ### Historique des états
 
 Lignes d'état de l'ancien en-tête de `HANDOFF.md`, déplacées telles quelles au lot 44 (annexe 44.2).
+
+**État au 06/11/2026 (lot 57) :** version **v2.32.2**, lot 57 : `README.md` en français par défaut, version anglaise dans `README-en.md` ; guide joueur réorganisé par tâche et illustré de captures annotées au style « rouleau de Rokugan » (`npm run guide-shots`), parcours « Le Carnet en 5 minutes », détail des règles replié (annexe 57).
 
 **État au 06/11/2026 (lot 56) :** version **v2.32.1**, lot 56 : formulaire « Contacter l'auteur » depuis le bouton Contact du pied de page, envoyé par Web3Forms sans adresse mail dans le code ; clé renseignée en v2.32.1, formulaire actif (annexes 56 et 56.7). Bugs toujours vers les Issues GitHub.
 

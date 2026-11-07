@@ -90,7 +90,7 @@ Ces cas complètent la spec fournie. L'agent les écrit dans `tests/core.modifie
 | M8 | Cibles tactiles (boutons −/+, pastilles, onglets) | Au moins 40 × 40 px |
 | M9 | Tuiles de la barre d'état à 360 px de large | Les 4 libellés et valeurs sont entièrement visibles, sans troncature ni retour à la ligne |
 | M10 | Boutons « i » (reformulé au lot 19, I.3.7) | Zone de toucher ≥ 40 × 40 px ; le panneau Vide tient sur moins d'un écran détails fermés ; le panneau Posture tient sur moins d'un écran avec sa description |
-| M11 | En-tête à 360 px de large | Sceau de 52 px ; Bibliothèque, Lanceur de dés, Thème et Langue (annexe 52.2) en icônes de 40 px sous le nom, alignés à gauche ; libellé accessible avec l'état courant (annexe G, H7) |
+| M11 | En-tête à 360 px de large | Sceau de 52 px ; Bibliothèque, Lanceur de dés, Thème et Ressources en icônes de 40 px sous le nom, alignés à gauche ; libellé accessible avec l'état courant (annexe G, H7) ; bascule de langue au bout de la rangée (annexe 58, L6) |
 | M12 | Combat sur mobile, et à 360 px de large | Carte « Nouveau round » entre l'Initiative et la Posture ; sa description tient sur 2 lignes au plus |
 | M13 | Aide de jeu sur mobile, et à 360 px de large | Les 4 onglets de situation (Enquête, Cour, Déplacement, Combat) sur une ligne, sans défilement ni texte tronqué, zones de 40 px de haut ; Statistiques est dans la barre du bas |
 | M14 | Bonus de jet sur mobile, et à 360 px de large (E24) | Chaque bonus sur 3 lignes (nom et source, effet, cible et note), aucun texte tronqué |

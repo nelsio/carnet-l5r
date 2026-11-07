@@ -6,6 +6,14 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.32.3] - 2026-11-07
+
+### Modifié
+- Le choix de la langue devient une bascule FR | EN en haut à droite de l'en-tête, séparée des boutons d'action. Sur téléphone, elle se place au bout de la rangée de boutons.
+
+### Documentation
+- Guide et captures mis à jour pour la nouvelle bascule de langue.
+
 ## [2.32.2] - 2026-11-06
 
 ### Documentation
@@ -464,7 +472,8 @@ Simples liens ouverts dans un nouvel onglet : le Carnet ne fait toujours aucune 
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.32.2...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.32.3...HEAD
+[2.32.3]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.32.3
 [2.32.2]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.32.2
 [2.32.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.32.1
 [2.32.0]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.32.0

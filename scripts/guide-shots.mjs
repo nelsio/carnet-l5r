@@ -217,7 +217,7 @@ const SHOTS = [
     id: "12-en-tete", kanji: "言", viewport: "desktop", open: "Bushi",
     steps: async (p) => p.getByRole("button", { name: "Ressources" }).click(),
     marks: (p) => [
-      [1, p.getByRole("button", { name: /^Langue/ }), "tl"],
+      [1, p.getByRole("group", { name: "Langue" }), "bl"],
       [2, p.getByRole("menu", { name: "Ressources L5R" }), "br"],
       [3, p.getByRole("link", { name: /page du clan/ }), "tr"],
     ],
@@ -227,6 +227,7 @@ const SHOTS = [
     id: "04-fiche-mobile", kanji: "帳面", viewport: "mobile", open: "Bushi", steps: async () => {},
     marks: (p) => [
       [1, [p.getByRole("button", { name: "Bibliothèque", exact: true }), p.getByRole("button", { name: "Ressources" })], "bl"],
+      [4, p.getByRole("group", { name: "Langue" }), "tr"],
       [2, p.locator(".status-in"), "bl"],
       [3, p.getByRole("group", { name: "Vue" }), "tr"],
     ],
