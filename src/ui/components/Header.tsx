@@ -3,7 +3,7 @@ import { clanAccent, schoolRankOf } from "@carnet/core";
 import { SHOW_WOUND_MULTIPLIER, WOUND_MULTIPLIERS } from "../../rules/l5r4e";
 import { useStore } from "../store";
 import { clanUrl } from "../../rules/portal";
-import { useLocale, useT } from "../../i18n";
+import { LOCALES, useLocale, useT } from "../../i18n";
 import { NEXT_THEME } from "../theme";
 import { ExternalLink } from "./ExternalLink";
 import { ResourcesMenu } from "./ResourcesMenu";
@@ -65,9 +65,6 @@ export function Header() {
           onClick={() => dispatch({ type: "diceRoller", show: !ui.showDiceRoller })}
         />
         <HeaderButton icon={ICONS.theme} label={t.header.theme(t.header.themes[ui.theme])} onClick={() => dispatch({ type: "theme", theme: NEXT_THEME[ui.theme] })} />
-        {/* Langue courante, un clic bascule (annexe 52.2). */}
-        <button type="button" className="theme-btn lang-btn" title={t.header.language.label} aria-label={t.header.language.label}
-          onClick={() => setLocale(locale === "fr" ? "en" : "fr")}>{t.header.language.code}</button>
         <ResourcesMenu />
         {SHOW_WOUND_MULTIPLIER && (
           <HeaderButton
@@ -84,6 +81,14 @@ export function Header() {
             <button type="button" aria-pressed={ui.view === "stats"} onClick={() => dispatch({ type: "view", view: "stats" })}>{t.nav.stats}</button>
           </div>
         )}
+        {/* Bascule de langue, à part des actions (lot 58, annexe 58). La langue active ne se réenregistre pas. */}
+        <div className="lang-switch" role="group" aria-label={t.header.language.group}>
+          <svg className="globe" viewBox="0 0 24 24" aria-hidden="true">{ICONS.globe}</svg>
+          {LOCALES.map((l) => (
+            <button key={l} type="button" lang={l} aria-pressed={locale === l} aria-label={t.header.language.names[l]}
+              onClick={() => { if (l !== locale) setLocale(l); }}>{l.toUpperCase()}</button>
+          ))}
+        </div>
       </div>
     </header>
   );
@@ -106,6 +111,12 @@ const ICONS = {
     <>
       <circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
       <path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor" />
+    </>
+  ),
+  globe: (
+    <>
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18" fill="none" stroke="currentColor" strokeWidth="1.6" />
     </>
   ),
   wounds: <path d="M12 3.5c3.2 4.2 6 7.4 6 10.6a6 6 0 0 1-12 0c0-3.2 2.8-6.4 6-10.6z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />,

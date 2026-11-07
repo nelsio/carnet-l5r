@@ -14,17 +14,17 @@ test.describe("navigateur en anglais", () => {
     await page.goto(pageUrl);
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
     await expect(page.getByRole("button", { name: "New blank sheet" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Language: English" })).toHaveText("EN");
+    await expect(page.getByRole("group", { name: "Language" }).getByRole("button", { name: "English" })).toHaveAttribute("aria-pressed", "true");
     await expect(page).toHaveTitle(/^Carnet de Rokugan – L5R 4th edition/);
   });
 
   test("E3 : choix FR gardé au rechargement", async ({ page }) => {
     await page.goto(pageUrl);
-    await page.getByRole("button", { name: "Language: English" }).click();
+    await page.getByRole("button", { name: "Français", exact: true }).click();
     await expect(page.getByRole("button", { name: "Nouvelle fiche vierge" })).toBeVisible();
     await page.reload();
     await expect(page.locator("html")).toHaveAttribute("lang", "fr");
-    await expect(page.getByRole("button", { name: "Langue : français" })).toBeVisible();
+    await expect(page.getByRole("group", { name: "Langue" }).getByRole("button", { name: "Français" })).toHaveAttribute("aria-pressed", "true");
   });
 
   test("E5 : modèle bushi en anglais, réserves XkY et TN", async ({ page }) => {
@@ -71,7 +71,7 @@ test.describe("navigateur en anglais", () => {
     await expect(tabs).toHaveText(["Sheet", "Assistant", "Statistics"], { useInnerText: true });
     const tops = await Promise.all((await tabs.all()).map(async (t) => (await box(t)).y));
     expect(new Set(tops).size).toBe(1);
-    const lang = await box(page.getByRole("button", { name: "Language: English" }));
+    const lang = await box(page.getByRole("group", { name: "Language" }));
     expect(lang.x + lang.width).toBeLessThanOrEqual(360);
     for (const name of [/^Theme: /, "Resources"]) {
       const other = await box(page.getByRole("button", { name }));

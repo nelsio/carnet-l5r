@@ -27,7 +27,7 @@ export const en: Messages = {
     diceRoller: (shown: boolean) => `Dice roller: ${shown ? "shown" : "hidden"}`,
     theme: (label: string) => `Theme: ${label}`,
     themes: { auto: "auto", light: "light", dark: "dark" },
-    language: { code: "EN", label: "Language: English" },
+    language: { group: "Language", names: { fr: "Français", en: "English" } },
     woundMultiplier: (n: number) => `Wounds: Earth × ${n}`,
   },
   sheet: {

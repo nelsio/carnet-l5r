@@ -131,6 +131,12 @@ describe("Contrastes (annexe I.1.11)", () => {
   it.each(THEMES)("V8 : %s : kanji du sceau (pied de page, section « Le Carnet ») ≥ 4,5:1", (t) => {
     expect(contrast(token("--seal-ink", t), token("--seal", t))).toBeGreaterThanOrEqual(4.5);
   });
+  it.each(ALL_CLANS)("L8 : %s : bascule de langue (encre sur accent pâle, texte secondaire sur surface) ≥ 4,5:1, deux thèmes (annexe 58)", (_label, c) => {
+    for (const t of THEMES) {
+      expect(contrast(token("--ink", t, c), token("--accent-pale", t, c)), `${t} ink / accent-pale`).toBeGreaterThanOrEqual(4.5);
+      expect(contrast(token("--muted", t, c), token("--surface", t, c)), `${t} muted / surface`).toBeGreaterThanOrEqual(4.5);
+    }
+  });
   it.each(ALL_CLANS)("V9 : %s : pastille Règles L5R 4e ouverte (accent-ink sur accent-pale) ≥ 4,5:1, deux thèmes (annexe R)", (_label, c) => {
     for (const t of THEMES) expect(contrast(token("--accent-ink", t, c), token("--accent-pale", t, c)), t).toBeGreaterThanOrEqual(4.5);
   });

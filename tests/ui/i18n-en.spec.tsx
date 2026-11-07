@@ -1,4 +1,4 @@
-/** Interface en anglais (annexe 52) : langue au lancement, bouton FR/EN, notation XkY, distances, contenu en français. */
+/** Interface en anglais (annexe 52) : langue au lancement, bascule FR | EN (annexe 58), notation XkY, distances, contenu en français. */
 import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Character } from "@carnet/core";
@@ -50,21 +50,19 @@ describe("Langue au lancement (52.2)", () => {
   });
 });
 
-describe("Bouton FR/EN (52.2)", () => {
+describe("Bascule FR | EN (52.2, annexe 58)", () => {
   it("un clic bascule : textes, <html lang>, description, choix mémorisé", async () => {
     await openKakita("fr");
-    const button = screen.getByRole("button", { name: "Langue : français" });
-    expect(button).toHaveTextContent("FR");
     expect(document.documentElement.lang).toBe("fr");
 
-    act(() => fireEvent.click(button));
-    expect(screen.getByRole("button", { name: "Language: English" })).toHaveTextContent("EN");
+    act(() => fireEvent.click(screen.getByRole("button", { name: "English" })));
+    expect(screen.getByRole("group", { name: "Language" })).toBeInTheDocument();
     expect(screen.getByRole("group", { name: "View" })).toHaveTextContent("SheetAssistant L5RStatistics");
     expect(document.documentElement.lang).toBe("en");
     expect(localStorage.getItem(LOCALE_KEY)).toBe("en");
     expect(document.title).toBe("Kakita Haruto · Carnet de Rokugan");
 
-    act(() => fireEvent.click(screen.getByRole("button", { name: "Language: English" })));
+    act(() => fireEvent.click(screen.getByRole("button", { name: "Français" })));
     expect(screen.getByRole("group", { name: "Vue" })).toBeInTheDocument();
     expect(localStorage.getItem(LOCALE_KEY)).toBe("fr");
   });
@@ -72,8 +70,8 @@ describe("Bouton FR/EN (52.2)", () => {
   it("stockage bloqué en écriture : la langue change quand même", async () => {
     vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => { throw new Error("bloqué"); });
     await openKakita("fr");
-    act(() => fireEvent.click(screen.getByRole("button", { name: "Langue : français" })));
-    expect(screen.getByRole("button", { name: "Language: English" })).toBeInTheDocument();
+    act(() => fireEvent.click(screen.getByRole("button", { name: "English" })));
+    expect(screen.getByRole("group", { name: "Language" })).toBeInTheDocument();
   });
 
   it("la description de la page suit la langue", async () => {
@@ -82,9 +80,49 @@ describe("Bouton FR/EN (52.2)", () => {
     document.head.append(meta);
     await openKakita("en");
     expect(meta.content).toMatch(/^Free tool for Legend of the Five Rings/);
-    act(() => fireEvent.click(screen.getByRole("button", { name: "Language: English" })));
+    act(() => fireEvent.click(screen.getByRole("button", { name: "Français" })));
     expect(meta.content).toMatch(/^Outil gratuit/);
     meta.remove();
+  });
+});
+
+describe("Bascule FR | EN : forme (annexe 58.4)", () => {
+  it("L1 : groupe « Langue », deux boutons, « Français » pressé en français", async () => {
+    await openKakita("fr");
+    const group = screen.getByRole("group", { name: "Langue" });
+    const buttons = within(group).getAllByRole("button");
+    expect(buttons.map((b) => b.textContent)).toEqual(["FR", "EN"]);
+    expect(within(group).getByRole("button", { name: "Français" })).toHaveAttribute("aria-pressed", "true");
+    expect(within(group).getByRole("button", { name: "English" })).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("L2 : clic sur « English » → interface anglaise, groupe « Language », « English » pressé", async () => {
+    await openKakita("fr");
+    act(() => fireEvent.click(screen.getByRole("button", { name: "English" })));
+    const group = screen.getByRole("group", { name: "Language" });
+    expect(within(group).getByRole("button", { name: "English" })).toHaveAttribute("aria-pressed", "true");
+    expect(within(group).getByRole("button", { name: "Français" })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("group", { name: "View" })).toBeInTheDocument();
+  });
+
+  it("L3 : clic sur la langue active : aucun enregistrement", async () => {
+    await openKakita("fr");
+    const setItem = vi.spyOn(Storage.prototype, "setItem");
+    act(() => fireEvent.click(screen.getByRole("button", { name: "Français" })));
+    expect(setItem.mock.calls.filter(([key]) => key === LOCALE_KEY)).toEqual([]);
+    expect(localStorage.getItem(LOCALE_KEY)).toBeNull();
+  });
+
+  it("L4 : chaque bouton porte la langue qu'il annonce (lang)", async () => {
+    await openKakita("en");
+    expect(screen.getByRole("button", { name: "Français" })).toHaveAttribute("lang", "fr");
+    expect(screen.getByRole("button", { name: "English" })).toHaveAttribute("lang", "en");
+  });
+
+  it("plus de bouton de langue parmi les actions de l'en-tête", async () => {
+    await openKakita("fr");
+    const titles = [...document.querySelectorAll("header.top .theme-btn")].map((x) => x.getAttribute("title"));
+    expect(titles.some((x) => /langue|language/i.test(x ?? ""))).toBe(false);
   });
 });
 
@@ -117,7 +155,7 @@ describe("Notation et unités (52.3)", () => {
     const weapons = [{ name: "Katana", skill: "Kenjutsu", dr: "3g2" }];
     await openKakita("en", { weapons } as Partial<Character>);
     expect(within(screen.getByTestId("block-weapons")).getByText(/DR 3k2/)).toBeInTheDocument();
-    act(() => fireEvent.click(screen.getByRole("button", { name: "Language: English" })));
+    act(() => fireEvent.click(screen.getByRole("button", { name: "Français" })));
     expect(within(screen.getByTestId("block-weapons")).getByText(/VD 3g2/)).toBeInTheDocument();
   });
 
@@ -141,7 +179,7 @@ describe("Contenu en français (52.4)", () => {
     fireEvent.click(magic.getByRole("button", { name: "Add from the grimoire" }));
     const panel = screen.getByRole("region", { name: "Add from the grimoire" });
     expect(panel).toHaveTextContent("Spells come from the campaign portal and are in French.");
-    act(() => fireEvent.click(screen.getByRole("button", { name: "Language: English" })));
+    act(() => fireEvent.click(screen.getByRole("button", { name: "Français" })));
     expect(screen.getByRole("region", { name: "Ajouter depuis le grimoire" }).querySelector(".gfr")).toBeNull();
   });
 

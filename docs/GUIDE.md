@@ -155,9 +155,10 @@ Sur téléphone, la même fiche tient sur une colonne :
 
 ![Fiche de Kakita Haruto sur téléphone, trois zones marquées d'un sceau](img/guide/04-fiche-mobile.png)
 
-- **一** (1) **Boutons ronds de l'en-tête** : Bibliothèque, lanceur de dés, thème, langue, Ressources.
+- **一** (1) **Boutons ronds de l'en-tête** : Bibliothèque, lanceur de dés, thème, Ressources.
 - **二** (2) **Barre d'état** : la même qu'à l'ordinateur, en plus compact.
 - **三** (3) **Fiche · Assistant · Statistiques** : les onglets passent en bas de l'écran.
+- **四** (4) **FR | EN** : la langue, au bout de la rangée.
 
 ### La barre d'état
 
@@ -488,11 +489,11 @@ Pour mettre à jour la fiche d'un joueur, **importe son nouveau fichier**.
 
 ![En-tête de la fiche avec le menu Ressources ouvert, trois zones marquées d'un sceau](img/guide/12-en-tete.png)
 
-- **一** (1) **FR** : le bouton de langue, français ou anglais.
+- **一** (1) **FR | EN** : la langue ; celle qui est surlignée est active.
 - **二** (2) **Ressources** : les liens vers le portail et vers ce guide, chacun dans un nouvel onglet.
 - **三** (3) **Clan de la Grue** : la page de ton clan sur le portail.
 
-Le Carnet s'ouvre dans la langue de ton navigateur, français ou anglais. Le bouton **FR** / **EN** de l'en-tête, à côté du thème, change de langue ; le choix est mémorisé. **Tes fiches ne sont jamais traduites** : ce que tu as saisi reste tel quel.
+Le Carnet s'ouvre dans la langue de ton navigateur, français ou anglais. La bascule **FR | EN**, en haut à droite de l'en-tête (au bout de la rangée de boutons sur téléphone), change de langue ; le choix est mémorisé. **Tes fiches ne sont jamais traduites** : ce que tu as saisi reste tel quel.
 
 <details>
 <summary>詳 · Pour aller plus loin : le Carnet en anglais</summary>
