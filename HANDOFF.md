@@ -6,7 +6,7 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document et le dossier `spec/` qu'il indexe.
 
-**État actuel :** version **v2.32.3**, lot 58 : bascule de langue FR | EN à part des boutons d'action, en haut à droite de l'en-tête (au bout de la rangée sur mobile) ; captures du guide régénérées (annexe 58).
+**État actuel :** version **v2.32.4**, lot 59 : guide joueur en anglais (`docs/GUIDE-en.md`), ouvert par les liens de l'application en anglais ; captures du guide compactes, en clair et en sombre ; contrôle `check-guides` (annexe 59).
 
 ---
 
@@ -66,6 +66,7 @@ Fait foi :
 | 56 | Formulaire de contact (Web3Forms) ; 56.7 : clé renseignée | 56 | v2.32.0, v2.32.1 | [`56-contact.md`](spec/annexes/56-contact.md) |
 | 57 | README français par défaut, guide plus digeste et illustré | 57 | v2.32.2 | [`57-readme-guide.md`](spec/annexes/57-readme-guide.md) |
 | 58 | Bascule de langue FR \| EN à part des actions | 58 | v2.32.3 | [`58-langue.md`](spec/annexes/58-langue.md) |
+| 59 | Guide en anglais, captures compactes en clair et en sombre | 59 | v2.32.4 | [`59-guide-anglais.md`](spec/annexes/59-guide-anglais.md) |
 
 ## Lire pour un lot
 

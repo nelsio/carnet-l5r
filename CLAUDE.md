@@ -23,7 +23,8 @@ npm run build       # dist/carnet-l5r.html
   - `HANDOFF.md` : ligne « État actuel » remplacée, annexe ajoutée à l'index ;
   - les § de `spec/` dont une règle change ;
   - nouvelle annexe `spec/annexes/<lot>-<sujet>.md` (livré / écarts), sous-sections `### <lot>.N` ;
-  - `spec/11-lots.md`.
+  - `spec/11-lots.md` ;
+  - si un écran change : `docs/GUIDE.md` **et** `docs/GUIDE-en.md`, et `npm run guide-shots` puis `-- en` si un écran capturé change (§9.3).
 
 ## Lire la spécification
 

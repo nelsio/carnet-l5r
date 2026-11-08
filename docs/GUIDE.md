@@ -1,5 +1,7 @@
 # Guide du Carnet de Rokugan
 
+**Français** · [English](GUIDE-en.md)
+
 [← Retour au README](../README.md)
 
 Ce guide se lit dans l'ordre la première fois, puis se consulte par section. Chaque section commence par l'essentiel ; le détail des règles est replié sous **« 詳 · Pour aller plus loin »**, à ouvrir au besoin.
@@ -36,7 +38,10 @@ Licences, polices et crédits : [CREDITS.md](CREDITS.md).
 
 *« Six gestes suffisent pour entrer dans la cour. Le reste viendra avec la pratique. »*
 
-![Écran d'accueil du Carnet sur ordinateur, sans fiche : quatre façons de commencer, marquées d'un sceau](img/guide/01-accueil.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="img/guide/sombre/01-accueil.png">
+  <img src="img/guide/01-accueil.png" alt="Écran d'accueil du Carnet sur ordinateur, sans fiche : quatre façons de commencer, marquées d'un sceau" width="640">
+</picture>
 
 - **一** (1) **Depuis une photo…** : ta fiche papier, lue par l'IA de ton choix.
 - **二** (2) **Ouvrir la Forge** : créer ton personnage sur le portail, avec le calcul de l'XP.
@@ -98,13 +103,19 @@ La **Bibliothèque** liste toutes tes fiches. On y revient par le bouton **Bibli
 | **Modèle** | **Modèles de personnage** → **Utiliser** | tu veux essayer avec un Bushi (Kakita), un Shugenja (Tamori) ou un Courtisan (Doji) déjà remplis |
 | **Fiche vierge** | **Nouvelle fiche vierge** (ou **Nouvelle fiche**, sous la liste) | tu préfères tout saisir toi-même |
 
-![Modèles de personnage dans la Bibliothèque, le bouton Utiliser du Bushi marqué d'un sceau](img/guide/01b-modeles.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="img/guide/sombre/01b-modeles.png">
+  <img src="img/guide/01b-modeles.png" alt="Modèles de personnage dans la Bibliothèque, le bouton Utiliser du Bushi marqué d'un sceau" width="640">
+</picture>
 
 - **五** (5) **Utiliser** : crée une fiche à partir du modèle et l'ouvre. **JSON**, juste à côté, télécharge le fichier du modèle.
 
 ### Depuis une photo de fiche papier
 
-![Fenêtre « Importer depuis une fiche papier », trois zones marquées d'un sceau](img/guide/03-photo.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="img/guide/sombre/03-photo.png">
+  <img src="img/guide/03-photo.png" alt="Fenêtre « Importer depuis une fiche papier », trois zones marquées d'un sceau" width="480">
+</picture>
 
 - **一** (1) **Copier le prompt** : le texte à envoyer à ton IA avec tes photos.
 - **二** (2) **Réponse de l'IA** : colle ici toute sa réponse, phrases autour comprises.
@@ -131,7 +142,10 @@ Dans la Bibliothèque vide, **Modèles de personnage** propose trois fiches comp
 
 *« Un samouraï tient ses comptes comme il tient son sabre : avec soin, chaque jour. »*
 
-![Fiche de Kakita Haruto sur ordinateur, six zones marquées d'un sceau](img/guide/04-fiche.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="img/guide/sombre/04-fiche.png">
+  <img src="img/guide/04-fiche.png" alt="Fiche de Kakita Haruto sur ordinateur, six zones marquées d'un sceau" width="640">
+</picture>
 
 - **一** (1) **Bibliothèque** : retrouver toutes tes fiches.
 - **二** (2) **Lanceur de dés** : afficher ou masquer le lanceur, à droite de l'écran.
@@ -146,14 +160,20 @@ Ta fiche s'enregistre d'elle-même à chaque modification.
 - Les **réserves** (`5g3`, `6g2`…) se recalculent à chaque changement, techniques d'école et maîtrises comprises ([§ 8](#8-écoles-maîtrises-et-bonus)).
 - **Nouvelle journée…** (en tête de fiche), après une nuit de repos : aperçu puis **Confirmer**. Points de Vide au maximum, `2 × Constitution + Rang` blessures soignées, emplacements de sorts rechargés, initiative et compteurs d'escarmouche remis à zéro.
 
-![Bloc Anneaux & Traits en saisie, deux zones marquées d'un sceau](img/guide/04-edition.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="img/guide/sombre/04-edition.png">
+  <img src="img/guide/04-edition.png" alt="Bloc Anneaux & Traits en saisie, deux zones marquées d'un sceau" width="640">
+</picture>
 
 - **一** (1) **Agilité** : un trait modifié ; l'Anneau et toutes les réserves suivent aussitôt.
 - **二** (2) **Terminer** : repasse le bloc en lecture.
 
 Sur téléphone, la même fiche tient sur une colonne :
 
-![Fiche de Kakita Haruto sur téléphone, trois zones marquées d'un sceau](img/guide/04-fiche-mobile.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="img/guide/sombre/04-fiche-mobile.png">
+  <img src="img/guide/04-fiche-mobile.png" alt="Fiche de Kakita Haruto sur téléphone, trois zones marquées d'un sceau" width="256">
+</picture>
 
 - **一** (1) **Boutons ronds de l'en-tête** : Bibliothèque, lanceur de dés, thème, Ressources.
 - **二** (2) **Barre d'état** : la même qu'à l'ordinateur, en plus compact.
@@ -162,7 +182,10 @@ Sur téléphone, la même fiche tient sur une colonne :
 
 ### La barre d'état
 
-![Barre d'état sur ordinateur, cinq zones marquées d'un sceau](img/guide/04-barre-etat.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="img/guide/sombre/04-barre-etat.png">
+  <img src="img/guide/04-barre-etat.png" alt="Barre d'état sur ordinateur, cinq zones marquées d'un sceau" width="720">
+</picture>
 
 - **一** (1) **Niveaux de blessure** : la piste des 8 niveaux et leur pénalité.
 - **二** (2) **Blessures · Ajuster / Encaisser** : corriger, soigner ou encaisser un coup.
@@ -213,7 +236,10 @@ Retoucher ensuite le bonus ou la Réduction en fait une **armure personnalisée*
 
 L'onglet **Assistant L5R** (**Assistant** dans la barre du bas sur mobile) propose les jets de chaque situation. Choisis la situation, touche une action : le lanceur s'ouvre ([§ 6](#6-le-lanceur)).
 
-![Assistant L5R en Combat, Escarmouche, sur ordinateur, quatre zones marquées d'un sceau](img/guide/05-assistant.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="img/guide/sombre/05-assistant.png">
+  <img src="img/guide/05-assistant.png" alt="Assistant L5R en Combat, Escarmouche, sur ordinateur, quatre zones marquées d'un sceau" width="600">
+</picture>
 
 - **一** (1) **Enquête · Cour · Déplacement · Combat** : la situation du moment (et **Magie** pour un shugenja).
 - **二** (2) **Escarmouche · Duel iaijutsu · Bataille** : le type de combat.
@@ -234,7 +260,10 @@ Une action que ta posture interdit est **grisée** avec la raison ; **Lancer qua
 
 ### Escarmouche
 
-![Haut de l'Escarmouche : Initiative, Nouveau round et Posture, marqués d'un sceau](img/guide/05-escarmouche.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="img/guide/sombre/05-escarmouche.png">
+  <img src="img/guide/05-escarmouche.png" alt="Haut de l'Escarmouche : Initiative, Nouveau round et Posture, marqués d'un sceau" width="560">
+</picture>
 
 - **一** (1) **Posture** : Attaque, Assaut, Défense, Défense totale ou Centre ; le ND d'armure suit.
 - **二** (2) **Nouveau round** : efface le Vide en armure et la Défense totale.
@@ -286,7 +315,10 @@ Pas d'initiative ; le panneau suit un tour de bataille :
 
 Choisir une action ouvre le **lanceur** (un panneau qui monte du bas sur mobile).
 
-![Lanceur de dés après une Attaque · Katana réussie, cinq zones marquées d'un sceau](img/guide/06-lanceur.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="img/guide/sombre/06-lanceur.png">
+  <img src="img/guide/06-lanceur.png" alt="Lanceur de dés après une Attaque · Katana réussie, cinq zones marquées d'un sceau" width="304">
+</picture>
 
 - **一** (1) **Réserve** : `5g3` = 5 dés lancés, 3 gardés.
 - **二** (2) **Réussite** : ta chance de réussite contre le ND final.
@@ -308,7 +340,10 @@ Le lanceur donne aussi **Min · Moy. · Max**, les augmentations gratuites, le b
 
 Tout ce qui concerne la magie, de la saisie des sorts au lancer. La section apparaît pour une **école de shugenja** ([§ 8](#8-écoles-maîtrises-et-bonus)) ou dès qu'un sort est noté.
 
-![Assistant L5R en Magie sur téléphone, fiche de Tamori Ayane, quatre zones marquées d'un sceau](img/guide/07-magie-mobile.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="img/guide/sombre/07-magie-mobile.png">
+  <img src="img/guide/07-magie-mobile.png" alt="Assistant L5R en Magie sur téléphone, fiche de Tamori Ayane, quatre zones marquées d'un sceau" width="320">
+</picture>
 
 - **一** (1) **Sorts** : tes emplacements restants du jour, par élément.
 - **二** (2) **Magie** : la situation qui réunit tes sorts.
@@ -317,7 +352,10 @@ Tout ce qui concerne la magie, de la saisie des sorts au lancer. La section appa
 
 ### Noter tes sorts
 
-![Bloc Rouleaux & invocations de Tamori Ayane, trois zones marquées d'un sceau](img/guide/07-sorts.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="img/guide/sombre/07-sorts.png">
+  <img src="img/guide/07-sorts.png" alt="Bloc Rouleaux & invocations de Tamori Ayane, trois zones marquées d'un sceau" width="520">
+</picture>
 
 - **一** (1) **Edit** : passe le bloc en saisie, avec **+ Sort** et **Ajouter depuis le grimoire**.
 - **二** (2) **Grimoire** : le grimoire du portail, dans un nouvel onglet.
@@ -427,7 +465,10 @@ Un bonus **« d'office »** compte dans toutes les réserves ; un bonus **« au 
 
 La page **Statistiques**, à côté de **Fiche** et **Assistant L5R** (dans la barre du bas sur mobile), donne pour **tous tes jets** la réserve, le minimum, la moyenne, le maximum et la **chance de réussite** contre un ND de `10` à `40`.
 
-![Page Statistiques de Kakita Haruto, trois zones marquées d'un sceau](img/guide/09-stats.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="img/guide/sombre/09-stats.png">
+  <img src="img/guide/09-stats.png" alt="Page Statistiques de Kakita Haruto, trois zones marquées d'un sceau" width="720">
+</picture>
 
 - **一** (1) **Avec un point de Vide (+1g1)** : recalcule tout le tableau avec un point de Vide dépensé.
 - **二** (2) **Réserve** : `5g3` pour l'Attaque · Katana.
@@ -443,7 +484,10 @@ La page **Statistiques**, à côté de **Fiche** et **Assistant L5R** (dans la b
 
 *« Ce qui n'est écrit qu'une fois peut être perdu. Fais une copie de tes rouleaux. »*
 
-![Bloc Fichier d'une fiche ouverte, trois zones marquées d'un sceau](img/guide/10-fichier.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="img/guide/sombre/10-fichier.png">
+  <img src="img/guide/10-fichier.png" alt="Bloc Fichier d'une fiche ouverte, trois zones marquées d'un sceau" width="640">
+</picture>
 
 - **一** (1) **Exporter la fiche** : télécharge ta fiche en JSON, ta sauvegarde.
 - **二** (2) **Importer un JSON…** : fusionne un fichier dans cette fiche, après un aperçu.
@@ -487,10 +531,13 @@ Pour mettre à jour la fiche d'un joueur, **importe son nouveau fichier**.
 
 ### Langue
 
-![En-tête de la fiche avec le menu Ressources ouvert, trois zones marquées d'un sceau](img/guide/12-en-tete.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="img/guide/sombre/12-en-tete.png">
+  <img src="img/guide/12-en-tete.png" alt="En-tête de la fiche avec le menu Ressources ouvert, trois zones marquées d'un sceau" width="640">
+</picture>
 
 - **一** (1) **FR | EN** : la langue ; celle qui est surlignée est active.
-- **二** (2) **Ressources** : les liens vers le portail et vers ce guide, chacun dans un nouvel onglet.
+- **二** (2) **Ressources** : le bouton ; son menu ouvre le portail, ce guide et les nouveautés, chacun dans un nouvel onglet.
 - **三** (3) **Clan de la Grue** : la page de ton clan sur le portail.
 
 Le Carnet s'ouvre dans la langue de ton navigateur, français ou anglais. La bascule **FR | EN**, en haut à droite de l'en-tête (au bout de la rangée de boutons sur téléphone), change de langue ; le choix est mémorisé. **Tes fiches ne sont jamais traduites** : ce que tu as saisi reste tel quel.
@@ -498,7 +545,7 @@ Le Carnet s'ouvre dans la langue de ton navigateur, français ou anglais. La bas
 <details>
 <summary>詳 · Pour aller plus loin : le Carnet en anglais</summary>
 
-En anglais, les réserves s'écrivent `5k3`, les distances sont en pieds, et les règles de l'Assistant (anneaux, blessures, postures, actions, explications) sont en anglais ; le grimoire, le portail, les écoles et les techniques restent en français. Une fiche saisie avec les noms anglais des compétences (Stealth, Courtier, Lore: History…) fonctionne comme une fiche française : techniques d'école et maîtrises la reconnaissent.
+En anglais, les réserves s'écrivent `5k3`, les distances sont en pieds, et les règles de l'Assistant (anneaux, blessures, postures, actions, explications) sont en anglais ; les 40 écoles, leurs techniques, les maîtrises et les modèles de fiche aussi ; le grimoire et les pages du portail restent en français, marqués **(FR)** dans le menu **Ressources**. Une fiche saisie avec les noms anglais des compétences (Stealth, Courtier, Lore: History…) fonctionne comme une fiche française : techniques d'école et maîtrises la reconnaissent.
 
 </details>
 
@@ -513,7 +560,7 @@ Le bouton **Ressources** (icône de torii, en haut) ouvre les liens vers ce port
 
 - Menu **Ressources** : la page d'accueil, la page de ton clan (si une fiche est ouverte), la **Forge de personnage**, le **Grimoire**, le **Mémento de combat**, **Bushido & honneur** et **Étiquette & coutumes**.
 - Ailleurs : le **nom du clan**, au-dessus du nom du personnage, ouvre la page du clan ; dans **Rouleaux & invocations**, **Grimoire** ouvre le grimoire et l'icône de chaque sort le cherche par son nom et son élément ; dans l'**Assistant L5R**, un encadré propose le **Mémento de combat** en Combat, **Étiquette & coutumes** et **Bushido & honneur** en Cour.
-- Le menu se termine par la section **Le Carnet**, avec le numéro de version : ce **guide**, les **nouveautés**, **signaler un problème** (compte GitHub requis) et la **page du projet**. Ces liens sont aussi en **pied de page**, avec **Règles L5R 4e** (rappel des règles de jet utilisées par le Carnet) et **Contact** (message privé à l'auteur). La Bibliothèque vide propose **Lire le guide** dès la première visite.
+- Le menu se termine par la section **Le Carnet**, avec le numéro de version : ce **guide**, les **nouveautés**, **signaler un problème** (compte GitHub requis) et la **page du projet**. Ces liens sont aussi en **pied de page**, avec **Règles L5R 4e** (rappel des règles de jet utilisées par le Carnet) et **Contact** (message privé à l'auteur). La Bibliothèque vide propose **Lire le guide** dès la première visite. En anglais, le lien du guide mène au guide anglais.
 
 </details>
 

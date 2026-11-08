@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
-import { CARNET_LINKS } from "../../rules/links";
-import { useT } from "../../i18n";
+import { carnetLinks } from "../../rules/links";
+import { useLocale, useT } from "../../i18n";
 import { emptyDraft } from "../contact";
 import { ContactDialog } from "./ContactDialog";
 import { ExternalLink } from "./ExternalLink";
@@ -24,11 +24,12 @@ export function AppFooter({ status }: { status?: ReactNode }) {
   const [contact, setContact] = useState(false);
   const [draft, setDraft] = useState(emptyDraft);
   const t = useT().footer;
+  const links = carnetLinks(useLocale().locale);
   const [cautionTerm, cautionText] = t.caution;
   return (
     <footer className="appfoot">
       <span className="id"><span className="mini" aria-hidden="true">帳</span>{APP_NAME}</span>
-      <a className="ver" href={CARNET_LINKS.releases} target="_blank" rel="noopener noreferrer"
+      <a className="ver" href={links.releases} target="_blank" rel="noopener noreferrer"
         aria-label={t.version(__APP_VERSION__)}>v{__APP_VERSION__}</a>
       <button type="button" className="rulesbtn" aria-expanded={open} aria-controls="rules-memo"
         onClick={() => setOpen((o) => !o)}>
@@ -36,10 +37,10 @@ export function AppFooter({ status }: { status?: ReactNode }) {
       </button>
       {status}
       <nav aria-label={t.links}>
-        <ExternalLink href={CARNET_LINKS.guide}>{t.guide}</ExternalLink>
+        <ExternalLink href={links.guide}>{t.guide}</ExternalLink>
         <button type="button" className="contactbtn" aria-haspopup="dialog" onClick={() => setContact(true)}>{t.contact}</button>
-        <ExternalLink href={CARNET_LINKS.bug}>{t.bug}</ExternalLink>
-        <ExternalLink href={CARNET_LINKS.code}>{t.project}</ExternalLink>
+        <ExternalLink href={links.bug}>{t.bug}</ExternalLink>
+        <ExternalLink href={links.code}>{t.project}</ExternalLink>
       </nav>
       {open && (
         <div className="rulespanel" id="rules-memo">

@@ -6,6 +6,22 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.32.4] - 2026-11-08
+
+### Documentation
+- Le guide existe en anglais (`docs/GUIDE-en.md`), avec ses illustrations en anglais. Le README anglais pointe vers lui.
+- Les illustrations du guide sont plus petites et recadrées : le guide est deux fois plus court à faire défiler. Elles suivent le thème clair ou sombre de GitHub.
+
+### Modifié
+- En anglais, les liens « Guide », « Read the guide » et « User guide » ouvrent le guide anglais.
+
+### Corrigé
+- Lanceur d'attaque en anglais : le champ des augmentations annoncées s'appelle « Extra Raises », et non plus « Free Raises » comme le champ des augmentations gratuites.
+
+### Technique
+- `npm run guide-shots` produit les captures en clair et en sombre, et en anglais avec `-- en`.
+- Nouveau contrôle `check-guides` dans `npm run lint` : parité des deux guides, liens, ancres et images.
+
 ## [2.32.3] - 2026-11-07
 
 ### Modifié
@@ -472,7 +488,8 @@ Simples liens ouverts dans un nouvel onglet : le Carnet ne fait toujours aucune 
 - Bonus de jet : techniques, avantages et désavantages.
 - Publication sur GitHub Pages et en release (fichier HTML unique).
 
-[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.32.3...HEAD
+[Non publié]: https://github.com/nelsio/carnet-l5r/compare/v2.32.4...HEAD
+[2.32.4]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.32.4
 [2.32.3]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.32.3
 [2.32.2]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.32.2
 [2.32.1]: https://github.com/nelsio/carnet-l5r/releases/tag/v2.32.1

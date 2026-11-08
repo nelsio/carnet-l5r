@@ -2,6 +2,7 @@
  * Lot 25, v2.21.0 (HANDOFF annexe M.3) : liens vers le guide et le dépôt dans un vrai navigateur.
  * V5 (menu Ressources, version de package.json), V6 (pied de page sur les quatre écrans), V7 (pied de page à 390 px).
  * Lot 41 (annexe R) : pastille Règles L5R 4e dans V6, R5 (panneau ouvert à 360 et 390 px), R6 (clavier).
+ * Lot 59 (annexe 59.7) : V7 rejoué en anglais, liens vers le guide anglais.
  */
 import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
@@ -70,6 +71,23 @@ test.describe("V7 : pied de page à 390 px", () => {
     const f = (await footer(page).boundingBox())!;
     const tabs = (await page.getByRole("group", { name: "Vue" }).boundingBox())!;
     expect(f.y + f.height).toBeLessThanOrEqual(tabs.y);
+  });
+});
+
+test.describe("V7 en anglais (annexe 59.7) : pied de page à 390 px", () => {
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, locale: "en-US" });
+
+  test("trois liens visibles, guide anglais, pas de défilement horizontal", async ({ page }) => {
+    await page.goto(pageUrl);
+    await page.getByRole("button", { name: "Use the Bushi template" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Kakita Haruto" })).toBeVisible();
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+    const links = footer(page).getByRole("navigation", { name: "Carnet links" }).getByRole("link");
+    await expect(links).toHaveText(["Guide", "Report a bug", "Project"]);
+    for (const link of await links.all()) await expect(link).toBeInViewport();
+    await expect(links.first()).toHaveAttribute("href", `${REPO}/blob/main/docs/GUIDE-en.md`);
+    await expect(links.last()).toHaveAttribute("href", REPO);
   });
 });
 

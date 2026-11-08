@@ -1,0 +1,62 @@
+{
+  "01-accueil": {
+    "width": 640,
+    "height": 357
+  },
+  "01b-modeles": {
+    "width": 640,
+    "height": 157
+  },
+  "03-photo": {
+    "width": 480,
+    "height": 431
+  },
+  "04-fiche": {
+    "width": 640,
+    "height": 357
+  },
+  "04-barre-etat": {
+    "width": 720,
+    "height": 148
+  },
+  "04-edition": {
+    "width": 640,
+    "height": 202
+  },
+  "05-assistant": {
+    "width": 600,
+    "height": 417
+  },
+  "05-escarmouche": {
+    "width": 560,
+    "height": 253
+  },
+  "06-lanceur": {
+    "width": 304,
+    "height": 495
+  },
+  "07-magie-mobile": {
+    "width": 320,
+    "height": 380
+  },
+  "07-sorts": {
+    "width": 520,
+    "height": 403
+  },
+  "09-stats": {
+    "width": 720,
+    "height": 179
+  },
+  "10-fichier": {
+    "width": 640,
+    "height": 140
+  },
+  "12-en-tete": {
+    "width": 640,
+    "height": 213
+  },
+  "04-fiche-mobile": {
+    "width": 256,
+    "height": 498
+  }
+}
