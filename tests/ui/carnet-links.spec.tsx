@@ -1,11 +1,12 @@
 /**
- * Lot 25, v2.21.0 (HANDOFF annexe M.3) : liens vers le guide et le dépôt du Carnet, cas V1 à V4.
+ * Lot 25, v2.21.0 (HANDOFF annexe M.3) : liens vers le guide et le dépôt du Carnet, cas V2 à V4.
+ * Lot 59 (annexe 59.3) : G1 (remplace V1) et G2, liens selon la langue ; G4 à G8 : tests/ui/i18n-en.spec.tsx.
  * V5 à V7 (vrai navigateur, mobile 390 px) : tests/e2e/carnet-links.spec.ts.
  */
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import type { Character } from "@carnet/core";
-import { CARNET_LINKS } from "../../src/rules/links";
+import { CARNET_LINKS, carnetLinks } from "../../src/rules/links";
 import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import pkg from "../../package.json";
@@ -29,14 +30,20 @@ function expectExternal(a: Element, href: string) {
 
 const footer = () => screen.getByRole("contentinfo");
 
-describe("V1 : adresses du dépôt", () => {
-  it("exactement les quatre adresses de l'annexe M.3", () => {
+describe("G1 et G2 : adresses du dépôt (annexe 59.3)", () => {
+  it("G1 : exactement les cinq adresses, dont le guide anglais", () => {
     expect(CARNET_LINKS).toEqual({
       guide: `${REPO}/blob/main/docs/GUIDE.md`,
+      guideEn: `${REPO}/blob/main/docs/GUIDE-en.md`,
       releases: `${REPO}/releases`,
       bug: `${REPO}/issues/new`,
       code: REPO,
     });
+  });
+
+  it("G2 : guide dans la langue ; nouveautés, signalement et page du projet identiques", () => {
+    expect(carnetLinks("fr")).toEqual({ guide: CARNET_LINKS.guide, releases: CARNET_LINKS.releases, bug: CARNET_LINKS.bug, code: REPO });
+    expect(carnetLinks("en")).toEqual({ guide: CARNET_LINKS.guideEn, releases: CARNET_LINKS.releases, bug: CARNET_LINKS.bug, code: REPO });
   });
 });
 

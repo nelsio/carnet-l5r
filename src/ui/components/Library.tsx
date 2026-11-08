@@ -2,7 +2,7 @@ import { useMemo, useState, type ReactNode } from "react";
 import { clanAccent, schoolRankOf, serializeCharacter } from "@carnet/core";
 import { useLocale, useT } from "../../i18n";
 import { examplesFor, type Example } from "../../rules/example";
-import { CARNET_LINKS } from "../../rules/links";
+import { carnetLinks } from "../../rules/links";
 import { FORGE_JSON_OK, PORTAL, PORTAL_NAME } from "../../rules/portal";
 import { downloadText } from "../download";
 import type { LibraryEntry } from "../../storage";
@@ -39,7 +39,7 @@ export function Library() {
               <button type="button" className="btn accent" onClick={() => void library.create()}>{t.blank.create}</button>
             </StartOption>
           </div>
-          <p className="guide-hint">{t.firstVisit}<ExternalLink href={CARNET_LINKS.guide}>{t.readGuide}</ExternalLink></p>
+          <p className="guide-hint">{t.firstVisit}<ExternalLink href={carnetLinks(locale).guide}>{t.readGuide}</ExternalLink></p>
         </section>
         <section className="templates" aria-labelledby="templates-title">
           <h2 id="templates-title">{t.templatesTitle}</h2>

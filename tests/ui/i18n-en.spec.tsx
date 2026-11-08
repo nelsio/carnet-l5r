@@ -3,6 +3,7 @@ import { act, fireEvent, screen, waitFor, within } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Character } from "@carnet/core";
 import { initialLocale, LOCALE_KEY, type Locale } from "../../src/i18n";
+import { CARNET_LINKS } from "../../src/rules/links";
 import { formatDistance, formatPool, pct } from "../../src/ui/format";
 import { poolLabel } from "../../src/ui/rolls";
 import { memoryStorage } from "../../src/storage";
@@ -183,12 +184,12 @@ describe("Contenu en français (52.4)", () => {
     expect(screen.getByRole("region", { name: "Ajouter depuis le grimoire" }).querySelector(".gfr")).toBeNull();
   });
 
-  it("menu Ressources en anglais : (FR) après les liens du portail et le guide, pas après le dépôt", async () => {
+  it("menu Ressources en anglais : (FR) après les liens du portail, pas après le guide ni le dépôt", async () => {
     await openKakita("en");
     fireEvent.click(screen.getByRole("button", { name: "Resources" }));
     const menu = within(screen.getByRole("menu", { name: "L5R resources" }));
     expect(menu.getByRole("menuitem", { name: /^Grimoire \(FR\): / })).toBeInTheDocument();
-    expect(menu.getByRole("menuitem", { name: /^User guide \(FR\): / })).toBeInTheDocument();
+    expect(menu.getByRole("menuitem", { name: /^User guide: / })).toBeInTheDocument();
     expect(menu.getByRole("menuitem", { name: /^What's new: / })).toBeInTheDocument();
   });
 
@@ -230,6 +231,63 @@ describe("Contenu en français (52.4)", () => {
     await openKakita("fr");
     fireEvent.click(screen.getByRole("button", { name: "Ressources" }));
     expect(screen.getByRole("menu").textContent).not.toContain("(FR)");
+  });
+});
+
+describe("Liens du Carnet selon la langue (annexe 59.3)", () => {
+  const REPO = "https://github.com/nelsio/carnet-l5r";
+  const footerLinks = () => within(screen.getByRole("navigation", { name: /^(Liens du Carnet|Carnet links)$/ })).getAllByRole("link");
+
+  function expectExternal(a: Element, href: string) {
+    expect(a).toHaveAttribute("href", href);
+    expect(a).toHaveAttribute("target", "_blank");
+    expect(a.getAttribute("rel")?.split(" ")).toEqual(expect.arrayContaining(["noopener", "noreferrer"]));
+  }
+
+  it("G4 : menu Ressources : « User guide » sans (FR) vers le guide anglais, « Project page » vers le dépôt", async () => {
+    await openKakita("en");
+    fireEvent.click(screen.getByRole("button", { name: "Resources" }));
+    const carnet = within(within(screen.getByRole("menu", { name: "L5R resources" })).getByRole("group", { name: "The Carnet" }));
+    const guide = carnet.getByRole("menuitem", { name: /^User guide: / });
+    expect(guide.querySelector(".t")).not.toHaveTextContent("(FR)");
+    expectExternal(guide, CARNET_LINKS.guideEn);
+    expectExternal(carnet.getByRole("menuitem", { name: /^Project page: / }), REPO);
+    expect(screen.getByRole("menuitem", { name: /^Grimoire \(FR\): / })).toBeInTheDocument();
+  });
+
+  it("G5 : pied de page : « Guide » vers le guide anglais, « Project » vers le dépôt", async () => {
+    await openKakita("en");
+    const links = footerLinks();
+    expect(links.map((a) => a.textContent)).toEqual(["Guide", "Report a bug", "Project"]);
+    expectExternal(links[0]!, CARNET_LINKS.guideEn);
+    expectExternal(links[2]!, REPO);
+  });
+
+  it("G6 : Bibliothèque vide : « Read the guide » vers le guide anglais", async () => {
+    renderApp(<App storage={memoryStorage()} rng={() => 5} />, { locale: "en" });
+    expectExternal(await screen.findByRole("link", { name: "Read the guide" }), CARNET_LINKS.guideEn);
+  });
+
+  it("G7 : bascule fr → en sans recharger : le lien du guide change aussitôt", async () => {
+    await openKakita("fr");
+    expect(footerLinks()[0]).toHaveAttribute("href", CARNET_LINKS.guide);
+    act(() => fireEvent.click(screen.getByRole("button", { name: "English" })));
+    expect(footerLinks()[0]).toHaveAttribute("href", CARNET_LINKS.guideEn);
+    act(() => fireEvent.click(screen.getByRole("button", { name: "Français" })));
+    expect(footerLinks()[0]).toHaveAttribute("href", CARNET_LINKS.guide);
+  });
+
+  it("G8 : lanceur d'attaque : « Extra Raises » et « Free Raises » distincts, aucun nom en double", async () => {
+    await openKakita("en");
+    act(() => fireEvent.click(screen.getByRole("button", { name: "L5R Assistant" })));
+    act(() => fireEvent.click(screen.getByRole("button", { name: "Combat" })));
+    act(() => fireEvent.click(screen.getByRole("button", { name: "Skirmish" })));
+    act(() => fireEvent.click(screen.getByText("Attack · Katana")));
+    const roller = within(screen.getByRole("dialog", { name: "Dice roller" }));
+    expect(roller.getByRole("spinbutton", { name: "Extra Raises" })).toBeInTheDocument();
+    expect(roller.getByRole("spinbutton", { name: /^Free Raises/ })).toBeInTheDocument();
+    const names = roller.getAllByRole("spinbutton").map((x) => x.closest("label")?.querySelector(".label")?.textContent);
+    expect(new Set(names).size).toBe(names.length);
   });
 });
 

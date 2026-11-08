@@ -26,7 +26,7 @@ Prérequis et commandes : section [Développement du README](README.md#développ
 Captures, hors CI, après `npm run build` :
 
 - `npm run screenshots` (et `-- en`) : captures du README, dans `docs/img/` ; à relancer quand un écran capturé change visiblement ;
-- `npm run guide-shots` : captures annotées du guide, dans `docs/img/guide/` ; à relancer dès qu'un écran montré dans le guide change.
+- `npm run guide-shots` : captures annotées du guide, dans `docs/img/guide/`, en clair et en sombre ; `npm run guide-shots -- en` pour le guide anglais (`docs/img/guide/en/`). À relancer dès qu'un écran montré dans le guide change. Une nouvelle capture déclare sa largeur d'affichage (`display`) ; les deux guides l'insèrent avec `<picture>` (source sombre, `<img … width>`), et `npm run lint` (`check-guides`) vérifie la parité des deux guides.
 
 ## 5. Règles du code
 

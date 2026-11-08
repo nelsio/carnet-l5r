@@ -5,7 +5,7 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Character } from "@carnet/core";
-import { CARNET_LINKS } from "../../src/rules/links";
+import { CARNET_LINKS, carnetLinks } from "../../src/rules/links";
 import { PORTAL_NAME } from "../../src/rules/portal";
 import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
@@ -80,7 +80,7 @@ describe("O4 : menu Ressources", () => {
     expect(items[0]).toHaveTextContent("Clans, règles, aides de jeu");
     expect(items.map((a) => a.getAttribute("href"))).toEqual([
       `${PORTAL}index.html`, `${PORTAL}clans/crabe.html`, `${PORTAL}createcharacter.html`, `${PORTAL}grimoire.html`,
-      `${PORTAL}aides/combat-memento.html`, `${PORTAL}aides/bushido-honneur.html`, `${PORTAL}aides/etiquette-coutumes.html`, ...Object.values(CARNET_LINKS),
+      `${PORTAL}aides/combat-memento.html`, `${PORTAL}aides/bushido-honneur.html`, `${PORTAL}aides/etiquette-coutumes.html`, ...Object.values(carnetLinks("fr")),
     ]);
     expect(within(menu).getAllByRole("group").map((g) => g.getAttribute("aria-label"))).toEqual([PORTAL_NAME, "Créer", "Références", "Le Carnet"]);
     expect(menu).toHaveTextContent("Liens externes : s'ouvrent dans un nouvel onglet.");

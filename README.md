@@ -47,7 +47,7 @@ L'adresse web compte les visites avec [GoatCounter](https://www.goatcounter.com)
 
 ## En savoir plus
 
-- [Guide d'utilisation](docs/GUIDE.md) : le Carnet en 5 minutes, puis chaque écran ; le détail des règles se déplie au besoin.
+- [Guide d'utilisation](docs/GUIDE.md) (aussi en [anglais](docs/GUIDE-en.md)) : le Carnet en 5 minutes, puis chaque écran ; le détail des règles se déplie au besoin.
 - [Nouveautés](https://github.com/nelsio/carnet-l5r/releases) et [CHANGELOG](CHANGELOG.md).
 - [Signaler un problème](https://github.com/nelsio/carnet-l5r/issues/new) : bug, règle à vérifier, idée.
 

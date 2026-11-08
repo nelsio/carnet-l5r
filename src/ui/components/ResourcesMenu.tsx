@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { clanAccent } from "@carnet/core";
-import { CARNET_LINKS } from "../../rules/links";
+import { carnetLinks } from "../../rules/links";
 import { clanUrl, FORGE_JSON_OK, PORTAL, PORTAL_CLAN_KANJI, PORTAL_NAME } from "../../rules/portal";
-import { useT, type Messages } from "../../i18n";
+import { useLocale, useT, type Messages } from "../../i18n";
 import { useStore } from "../store";
 import { ExtIcon } from "./ExternalLink";
 import { ForgePending } from "./ForgePending";
@@ -22,12 +22,12 @@ const references = (t: Messages["resources"]): Entry[] => [
   { href: PORTAL.bushido, kanji: "義", ...t.bushido, french: true },
   { href: PORTAL.etiquette, kanji: "茶", ...t.etiquette, french: true },
 ];
-/** Liens vers le dépôt du Carnet (annexe M.3), kanji sur fond sceau. */
-const carnet = (t: Messages["resources"]): Entry[] => [
-  { href: CARNET_LINKS.guide, kanji: "帳", ...t.guide, french: true },
-  { href: CARNET_LINKS.releases, kanji: "新", ...t.releases },
-  { href: CARNET_LINKS.bug, kanji: "報", ...t.bug },
-  { href: CARNET_LINKS.code, kanji: "源", ...t.code },
+/** Liens vers le dépôt du Carnet (annexe M.3), kanji sur fond sceau ; guide dans la langue de l'interface (annexe 59.3). */
+const carnet = (t: Messages["resources"], links: ReturnType<typeof carnetLinks>): Entry[] => [
+  { href: links.guide, kanji: "帳", ...t.guide },
+  { href: links.releases, kanji: "新", ...t.releases },
+  { href: links.bug, kanji: "報", ...t.bug },
+  { href: links.code, kanji: "源", ...t.code },
 ];
 
 /**
@@ -38,6 +38,7 @@ export function ResourcesMenu() {
   const { state } = useStore();
   const t = useT().resources;
   const clanNames = useT().rules.clans;
+  const { locale } = useLocale();
   const [open, setOpen] = useState(false);
   const wrap = useRef<HTMLDivElement>(null);
   const button = useRef<HTMLButtonElement>(null);
@@ -122,7 +123,7 @@ export function ResourcesMenu() {
             {group(PORTAL_NAME, portal)}
             {group(t.groups.create, create(t))}
             {group(t.groups.references, references(t))}
-            {group(t.groups.carnet, carnet(t), { className: "res-carnet", version: __APP_VERSION__ })}
+            {group(t.groups.carnet, carnet(t, carnetLinks(locale)), { className: "res-carnet", version: __APP_VERSION__ })}
             <p className="res-foot">{t.foot}</p>
           </div>
         </>
