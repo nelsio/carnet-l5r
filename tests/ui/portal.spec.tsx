@@ -164,14 +164,14 @@ describe("O7 : Bibliothèque vide", () => {
     expect(within(start).getByRole("button", { name: "Importer un JSON" })).toHaveClass("linkbtn");
     expect(start).toHaveTextContent("Tu as déjà un fichier du Carnet ? Importer un JSON");
     const options = within(start).getAllByRole("article");
-    // Lot 43 : Fiche papier, Forge (bouton secondaire), puis Fiche vierge, qui garde le bouton principal.
+    // Lot 43 : Fiche papier, Forge, puis Fiche vierge ; lot 60 (annexe 60.1) : les trois boutons en accent.
     expect(options.map((o) => within(o).getByRole("heading").textContent)).toEqual(["Depuis une fiche papier", "Forger sur le portail", "Fiche vierge"]);
     for (const o of options) expect(within(o).getAllByRole("listitem")).toHaveLength(3);
     expect(within(options[2]!).getByRole("button", { name: "Nouvelle fiche vierge" })).toHaveClass("btn", "accent");
     const forge = within(options[1]!).getByRole("link", { name: "Ouvrir la Forge (nouvel onglet)" });
     expect(forge).toHaveAttribute("href", `${PORTAL}createcharacter.html`);
-    expect(forge).toHaveClass("btn");
-    expect(forge).not.toHaveClass("accent");
+    expect(forge).toHaveClass("btn", "accent");
+    expect(within(options[0]!).getByRole("button", { name: "Depuis une photo…" })).toHaveClass("btn", "accent");
     expectExternal(forge);
     const discover = screen.getByRole("link", { name: `Découvrir le jeu sur ${PORTAL_NAME}` });
     expect(discover).toHaveAttribute("href", `${PORTAL}index.html`);
@@ -255,7 +255,7 @@ describe("O9 : Bibliothèque avec fiches", () => {
     expect(forge).toHaveTextContent("Création guidée, puis export JSON à importer ici.");
     const link = within(forge!).getByRole("link", { name: "Ouvrir la Forge (nouvel onglet)" });
     expectExternal(link);
-    expect(link).not.toHaveClass("accent");
+    expect(link).toHaveClass("btn", "accent"); // lot 60, annexe 60.1
     expect(within(card).getAllByRole("button", { name: /^Partir du modèle/ }).map((b) => b.textContent)).toEqual(["Bushi", "Shugenja", "Courtisan"]);
   });
 

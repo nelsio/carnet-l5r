@@ -579,23 +579,14 @@ export const fr = {
     saved: "Enregistré dans ce navigateur",
     saveError: "Échec de l'enregistrement dans ce navigateur",
   },
-  /** Pied de page (annexe M.3) et mémo de règles (lot 41). */
+  /** Pied de page (annexe M.3, annexe 60). */
   footer: {
     version: (version: string) => `Version ${version} : nouveautés (nouvel onglet)`,
-    rules: "Règles L5R 4e",
     links: "Liens du Carnet",
     guide: "Guide",
     bug: "Signaler un bug",
     project: "Projet",
     contact: "Contact",
-    memo: [
-      ["Système", "Roll & Keep, L5R 4e édition"],
-      ["Explosion", "sur 10 ; dégâts sur 9 et 10 avec Kenjutsu ou Armes lourdes au rang 7"],
-      ["Augmentations", "+5 au ND chacune, maximum = Anneau de Vide"],
-      ["Blessures", "la pénalité s'ajoute au ND"],
-    ],
-    /** Dernière ligne du mémo, en couleur d'avertissement. */
-    caution: ["Duel, bataille", "procédures résumées : vérifie le détail dans ton livre de base"],
   },
   /** Formulaire de contact (annexe 56). */
   contact: {

@@ -6,6 +6,20 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.32.5] - 2026-11-12
+
+### Modifié
+- Bibliothèque : les boutons Depuis une photo… et Ouvrir la Forge ont le même fond plein que Nouvelle fiche.
+
+### Corrigé
+- Étiquette « mémorisé » des sorts : elle retrouve ses marges intérieures (une règle du mémo de règles les annulait).
+
+### Retiré
+- La pastille Règles L5R 4e du pied de page et son mémo.
+
+### Documentation
+- Guide : le pied de page ne mentionne plus la pastille Règles L5R 4e ; captures de l'écran d'accueil et des sorts mises à jour.
+
 ## [2.32.4] - 2026-11-08
 
 ### Documentation

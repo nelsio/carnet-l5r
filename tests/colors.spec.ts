@@ -1,5 +1,5 @@
 /**
- * Couleurs (annexe I.1.11) : contrastes N1 à N6, N12, V8 (pied de page, annexe M.3) et V9 (pastille Règles L5R 4e, annexe R) sur les valeurs de la feuille de style et des clans,
+ * Couleurs (annexe I.1.11) : contrastes N1 à N6, N12 et V8 (pied de page, annexe M.3 ; V9, pastille du lot 41, retiré au lot 60) sur les valeurs de la feuille de style et des clans,
  * lint N8 des couleurs littérales. Pas de navigateur : contraste WCAG et mélange oklab calculés ici.
  */
 import { readdirSync, readFileSync } from "node:fs";
@@ -136,9 +136,6 @@ describe("Contrastes (annexe I.1.11)", () => {
       expect(contrast(token("--ink", t, c), token("--accent-pale", t, c)), `${t} ink / accent-pale`).toBeGreaterThanOrEqual(4.5);
       expect(contrast(token("--muted", t, c), token("--surface", t, c)), `${t} muted / surface`).toBeGreaterThanOrEqual(4.5);
     }
-  });
-  it.each(ALL_CLANS)("V9 : %s : pastille Règles L5R 4e ouverte (accent-ink sur accent-pale) ≥ 4,5:1, deux thèmes (annexe R)", (_label, c) => {
-    for (const t of THEMES) expect(contrast(token("--accent-ink", t, c), token("--accent-pale", t, c)), t).toBeGreaterThanOrEqual(4.5);
   });
   it("N7 (données) : l'accent du Scorpion n'est pas la couleur de danger", () => {
     const scorpion = CLANS.find((c) => c.id === "scorpion")!;

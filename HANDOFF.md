@@ -6,7 +6,7 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document et le dossier `spec/` qu'il indexe.
 
-**État actuel :** version **v2.32.4**, lot 59 : guide joueur en anglais (`docs/GUIDE-en.md`), ouvert par les liens de l'application en anglais ; captures du guide compactes, en clair et en sombre ; contrôle `check-guides` (annexe 59).
+**État actuel :** version **v2.32.5**, lot 60 : boutons de création de la Bibliothèque au même contraste ; pastille Règles L5R 4e retirée du pied de page (annexe 60).
 
 ---
 
@@ -67,6 +67,7 @@ Fait foi :
 | 57 | README français par défaut, guide plus digeste et illustré | 57 | v2.32.2 | [`57-readme-guide.md`](spec/annexes/57-readme-guide.md) |
 | 58 | Bascule de langue FR \| EN à part des actions | 58 | v2.32.3 | [`58-langue.md`](spec/annexes/58-langue.md) |
 | 59 | Guide en anglais, captures compactes en clair et en sombre | 59 | v2.32.4 | [`59-guide-anglais.md`](spec/annexes/59-guide-anglais.md) |
+| 60 | Bibliothèque : boutons de création contrastés ; pastille Règles L5R 4e retirée | 60 | v2.32.5 | [`60-retouches.md`](spec/annexes/60-retouches.md) |
 
 ## Lire pour un lot
 
