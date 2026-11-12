@@ -26,7 +26,7 @@ export function Library() {
           <p className="muted">{t.startLede}<ImportButton label={t.importJson} className="linkbtn" /></p>
           <div className="start-opts">
             <StartOption kanji="写" title={t.paper.title} desc={t.paper.desc} steps={t.paper.steps}>
-              <PhotoImportButton />
+              <PhotoImportButton className="btn accent" />
             </StartOption>
             <StartOption
               kanji="鍛" title={t.forge.title} pending={!FORGE_JSON_OK} desc={t.forge.desc}
@@ -68,7 +68,7 @@ export function Library() {
         <h2 id="newchar-title">{t.newTitle}</h2>
         <div className="start-opts">
           <StartOption compact kanji="写" title={t.paper.title} desc={t.paper.desc}>
-            <PhotoImportButton />
+            <PhotoImportButton className="btn accent" />
           </StartOption>
           <StartOption
             compact kanji="鍛" title={t.forge.title} pending={!FORGE_JSON_OK}
@@ -96,7 +96,7 @@ export function Library() {
 
 function ForgeLink() {
   const t = useT().library.forge;
-  return <ExternalLink href={PORTAL.forge} className="btn" label={t.openLabel}>{t.open}</ExternalLink>;
+  return <ExternalLink href={PORTAL.forge} className="btn accent" label={t.openLabel}>{t.open}</ExternalLink>;
 }
 
 const STEP_NUMBERS = ["一", "二", "三"];

@@ -1,8 +1,8 @@
 /**
  * Lot 25, v2.21.0 (HANDOFF annexe M.3) : liens vers le guide et le dépôt dans un vrai navigateur.
  * V5 (menu Ressources, version de package.json), V6 (pied de page sur les quatre écrans), V7 (pied de page à 390 px).
- * Lot 41 (annexe R) : pastille Règles L5R 4e dans V6, R5 (panneau ouvert à 360 et 390 px), R6 (clavier).
  * Lot 59 (annexe 59.7) : V7 rejoué en anglais, liens vers le guide anglais.
+ * Lot 60 (annexe 60.2) : pastille Règles L5R 4e retirée (cas R5 et R6 du lot 41 supprimés) ; RT2, aucune pastille à 360 et 1280 px.
  */
 import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
@@ -16,7 +16,6 @@ const REPO = "https://github.com/nelsio/carnet-l5r";
 
 const footer = (page: Page) => page.getByRole("contentinfo");
 const footerLinks = (page: Page) => footer(page).getByRole("navigation", { name: "Liens du Carnet" }).getByRole("link");
-const rulesBtn = (page: Page) => footer(page).getByRole("button", { name: "Règles L5R 4e" });
 
 async function useTemplate(page: Page) {
   await page.getByRole("button", { name: "Utiliser le modèle Bushi" }).click();
@@ -43,7 +42,6 @@ test("V6 : pied de page sur la Bibliothèque, la Fiche, l'Assistant L5R et les S
   const check = async () => {
     await expect(footer(page).getByRole("link", { name: `Version ${version} : nouveautés (nouvel onglet)` })).toHaveAttribute("href", `${REPO}/releases`);
     await expect(footerLinks(page)).toHaveText(["Guide", "Signaler un bug", "Projet"]);
-    await expect(rulesBtn(page)).toHaveAttribute("aria-expanded", "false");
   };
   await check();
   await expect(page.getByRole("link", { name: "Lire le guide" })).toHaveAttribute("href", `${REPO}/blob/main/docs/GUIDE.md`);
@@ -91,38 +89,16 @@ test.describe("V7 en anglais (annexe 59.7) : pied de page à 390 px", () => {
   });
 });
 
-for (const width of [390, 360]) {
-  test.describe(`R5 : Règles L5R 4e à ${width} px`, () => {
-    test.use({ viewport: { width, height: 844 }, hasTouch: true });
+for (const width of [360, 1280]) {
+  test.describe(`RT2 : pied de page sans pastille Règles L5R 4e à ${width} px (annexe 60.2)`, () => {
+    test.use({ viewport: { width, height: 844 } });
 
-    test("panneau ouvert sans défilement horizontal, pastille de 32 px sur la ligne de la version", async ({ page }) => {
+    test("ni bouton ni mémo, version puis liens", async ({ page }) => {
       await page.goto(pageUrl);
       await useTemplate(page);
-      await rulesBtn(page).click();
-      await expect(page.locator("#rules-memo")).toBeVisible();
-      await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
-      const btn = (await rulesBtn(page).boundingBox())!;
-      expect(btn.height).toBeGreaterThanOrEqual(32);
-      // À 390 px, la pastille suit la version sur la première ligne ; à 360 px, elle peut passer à la ligne.
-      const ver = (await footer(page).locator(".ver").boundingBox())!;
-      if (width === 390) expect(btn.y).toBeLessThan(ver.y + ver.height);
-      for (const link of await footerLinks(page).all()) expect((await link.boundingBox())!.y).toBeGreaterThanOrEqual(btn.y + btn.height);
+      await expect(footer(page).getByRole("button", { name: "Règles L5R 4e" })).toHaveCount(0);
+      await expect(page.locator("#rules-memo, .rulesbtn")).toHaveCount(0);
+      await expect(footer(page).getByRole("button")).toHaveText(["Contact"]);
     });
   });
 }
-
-test("R6 : la pastille s'atteint au clavier après la version, Entrée ouvre et ferme, le focus reste sur le bouton", async ({ page }) => {
-  await page.goto(pageUrl);
-  await footer(page).locator(".ver").focus();
-  await page.keyboard.press("Tab");
-  await expect(rulesBtn(page)).toBeFocused();
-  await page.keyboard.press("Enter");
-  await expect(rulesBtn(page)).toHaveAttribute("aria-expanded", "true");
-  await expect(page.locator("#rules-memo")).toBeVisible();
-  await expect(rulesBtn(page)).toBeFocused();
-  await page.keyboard.press("Enter");
-  await expect(rulesBtn(page)).toHaveAttribute("aria-expanded", "false");
-  await expect(page.locator("#rules-memo")).toHaveCount(0);
-  await expect(rulesBtn(page)).toBeFocused();
-});

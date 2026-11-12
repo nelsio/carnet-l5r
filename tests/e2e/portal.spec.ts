@@ -165,7 +165,7 @@ test.describe("O7 : Bibliothèque vide", () => {
 });
 
 test.describe("Lot 27, lot 39, lot 43 : Forge compatible, ordre lot 43", () => {
-  test("Bibliothèque vide : Fiche papier, Forge sans pastille ni encadré (étapes Forger · Exporter · Importer), Fiche vierge (bouton principal)", async ({ page }) => {
+  test("Bibliothèque vide : Fiche papier, Forge sans pastille ni encadré (étapes Forger · Exporter · Importer), Fiche vierge, trois boutons pleins (lot 60)", async ({ page }) => {
     await page.goto(pageUrl);
     const opts = page.locator(".start .start-opt");
     await expect(opts.nth(0).getByRole("heading")).toHaveText("Depuis une fiche papier");
@@ -179,7 +179,7 @@ test.describe("Lot 27, lot 39, lot 43 : Forge compatible, ordre lot 43", () => {
     await expect(link).toHaveAttribute("href", "https://vincenzorpg.github.io/L5R/createcharacter.html");
     await expect(link).toHaveAttribute("target", "_blank");
     await expect(link).toHaveAttribute("rel", "noopener noreferrer");
-    await expect(link).not.toHaveClass(/\baccent\b/);
+    await expect(link).toHaveClass(/\baccent\b/); // lot 60, annexe 60.1 : les trois boutons de création en accent
   });
 
   test("Bibliothèque avec fiches : même ordre, sans pastille ; menu Ressources : description compatible", async ({ page }) => {

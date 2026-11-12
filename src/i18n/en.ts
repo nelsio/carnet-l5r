@@ -563,19 +563,11 @@ export const en: Messages = {
   },
   footer: {
     version: (version: string) => `Version ${version}: what's new (new tab)`,
-    rules: "L5R 4e rules",
     links: "Carnet links",
     guide: "Guide",
     bug: "Report a bug",
     project: "Project",
     contact: "Contact",
-    memo: [
-      ["System", "Roll & Keep, L5R 4th edition"],
-      ["Explosion", "on 10; damage on 9 and 10 with Kenjutsu or Heavy Weapons at rank 7"],
-      ["Raises", "+5 to the TN each, maximum = Void Ring"],
-      ["Wounds", "the penalty is added to the TN"],
-    ],
-    caution: ["Duel, battle", "procedures summarized: check the details in your core book"],
   },
   contact: {
     title: "Contact the author",

@@ -560,7 +560,7 @@ Le bouton **Ressources** (icône de torii, en haut) ouvre les liens vers ce port
 
 - Menu **Ressources** : la page d'accueil, la page de ton clan (si une fiche est ouverte), la **Forge de personnage**, le **Grimoire**, le **Mémento de combat**, **Bushido & honneur** et **Étiquette & coutumes**.
 - Ailleurs : le **nom du clan**, au-dessus du nom du personnage, ouvre la page du clan ; dans **Rouleaux & invocations**, **Grimoire** ouvre le grimoire et l'icône de chaque sort le cherche par son nom et son élément ; dans l'**Assistant L5R**, un encadré propose le **Mémento de combat** en Combat, **Étiquette & coutumes** et **Bushido & honneur** en Cour.
-- Le menu se termine par la section **Le Carnet**, avec le numéro de version : ce **guide**, les **nouveautés**, **signaler un problème** (compte GitHub requis) et la **page du projet**. Ces liens sont aussi en **pied de page**, avec **Règles L5R 4e** (rappel des règles de jet utilisées par le Carnet) et **Contact** (message privé à l'auteur). La Bibliothèque vide propose **Lire le guide** dès la première visite. En anglais, le lien du guide mène au guide anglais.
+- Le menu se termine par la section **Le Carnet**, avec le numéro de version : ce **guide**, les **nouveautés**, **signaler un problème** (compte GitHub requis) et la **page du projet**. Ces liens sont aussi en **pied de page**, avec **Contact** (message privé à l'auteur). La Bibliothèque vide propose **Lire le guide** dès la première visite. En anglais, le lien du guide mène au guide anglais.
 
 </details>
 

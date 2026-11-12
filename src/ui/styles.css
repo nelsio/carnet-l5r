@@ -890,17 +890,6 @@ a.mon .ext{margin-left:0}
 .contact-bug{margin:0;font-size:13px;color:var(--muted)}
 .contact .privacy{margin:10px 0 0;font-size:12px;color:var(--muted)}
 .contact-done p{font-size:16px}
-/* Pastille Règles L5R 4e, repliée par défaut ; le panneau passe sous toute la ligne (lot 41) */
-.rulesbtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:transparent;border-radius:999px;padding:3px 10px 3px 4px;min-height:32px;font-size:12.5px;font-weight:500;color:var(--muted);cursor:pointer}
-.rulesbtn:hover,.rulesbtn[aria-expanded="true"]{color:var(--accent-ink);border-color:var(--accent);background:var(--accent-pale)}
-.rulesbtn .kj{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--surface);border:1px solid var(--line);font:800 12px/1 var(--f-display);color:var(--accent-ink)}
-.rulesbtn .chev{width:12px;height:12px;transition:rotate .15s}
-.rulesbtn[aria-expanded="true"] .chev{rotate:180deg}
-.rulespanel{flex-basis:100%;order:10;margin-top:6px;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:8px;font-size:12.5px}
-.memo{display:grid;gap:4px;margin:0;padding:0;list-style:none}
-.memo li{display:grid;grid-template-columns:7.5em 1fr;gap:10px}
-.memo b{color:var(--ink);font-weight:700}
-.memo .warn{font-style:italic}
 /* Présentation statique sous l'application, ajoutée sur l'adresse Pages seulement (annexe P) */
 .presentation{max-width:1080px;margin:12px auto 0;padding-top:12px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
 .presentation h1{margin:0 0 4px;font:800 15px/1.3 var(--f-display);color:var(--ink)}
@@ -912,8 +901,6 @@ a.mon .ext{margin-left:0}
   /* Liens sous le nom, tous visibles ; le padding bas du body garde le pied au-dessus de la barre d'onglets */
   .appfoot{font-size:12px;gap:2px 12px}
   .appfoot nav{margin-left:0;width:100%}
-  .memo li{grid-template-columns:1fr;gap:0}
-  .memo li + li{margin-top:4px}
 }
 /* ---------- v2.22.0 : sorts depuis le grimoire du portail (annexe N.5) ---------- */
 .spell-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}

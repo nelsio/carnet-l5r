@@ -562,7 +562,7 @@ The **Resources** button (torii icon, at the top) opens the links to this portal
 
 - **Resources** menu: the home page, your clan's page (if a sheet is open), the **Character Forge**, the **Grimoire**, the **Combat memento**, **Bushido & honor** and **Etiquette & customs**.
 - Elsewhere: the **clan name**, above the character's name, opens the clan page; in **Scrolls & invocations**, **Grimoire** opens the grimoire and each spell's icon looks it up by name and element; in the **L5R Assistant**, a box offers the **Mémento de combat** in Combat, **Étiquette & coutumes** and **Bushido & honneur** at Court (portal page titles, in French).
-- The menu ends with the **The Carnet** section, with the version number: this **User guide**, **What's new**, **Report a problem** (GitHub account required) and the **Project page**. These links are also in the **footer**, with **L5R 4e rules** (a reminder of the roll rules the Carnet uses) and **Contact** (private message to the author). The empty Library offers **Read the guide** from the first visit. In English, the guide link leads to this English guide.
+- The menu ends with the **The Carnet** section, with the version number: this **User guide**, **What's new**, **Report a problem** (GitHub account required) and the **Project page**. These links are also in the **footer**, with **Contact** (private message to the author). The empty Library offers **Read the guide** from the first visit. In English, the guide link leads to this English guide.
 
 </details>
 

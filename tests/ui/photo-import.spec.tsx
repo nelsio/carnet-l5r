@@ -44,7 +44,7 @@ describe("Points d'entrée", () => {
     expect(within(photo).getByRole("heading")).toHaveTextContent("Depuis une fiche papier");
     expect(within(photo).getAllByRole("listitem").map((li) => li.querySelector(".step-s")?.textContent)).toEqual(["Photographier", "Demander", "Coller"]);
     const button = within(photo).getByRole("button", { name: "Depuis une photo…" });
-    expect(button).not.toHaveClass("accent");
+    expect(button).toHaveClass("btn", "accent");
     fireEvent.click(button);
     expect(screen.getByRole("dialog", { name: TITLE })).toBeInTheDocument();
   });
@@ -68,6 +68,18 @@ describe("Points d'entrée", () => {
     expect(screen.getByText(/L'import peut aussi fusionner un fichier ou une fiche papier dans cette fiche/)).toBeInTheDocument();
     paste(openDialog(), reply);
     expect(screen.getByRole("radio", { name: "Fusionner dans « Kakita Haruto »" })).toBeChecked();
+  });
+
+  it("RT1 (lot 60, annexe 60.1) : Bibliothèque avec une fiche, les trois boutons de création en accent ; celui du bloc Fichier reste secondaire", async () => {
+    await mount([entry()]);
+    const fileButton = within(screen.getByRole("heading", { name: "Fichier" }).parentElement!).getByRole("button", { name: "Depuis une photo…" });
+    expect(fileButton).toHaveClass("btn");
+    expect(fileButton).not.toHaveClass("accent");
+    fireEvent.click(screen.getByRole("button", { name: "Carnet de Rokugan — ouvrir la bibliothèque" }));
+    const options = within(await screen.findByRole("region", { name: "Un nouveau personnage ?" })).getAllByRole("article");
+    expect(within(options[0]!).getByRole("button", { name: "Depuis une photo…" })).toHaveClass("btn", "accent");
+    expect(within(options[1]!).getByRole("link", { name: "Ouvrir la Forge (nouvel onglet)" })).toHaveClass("btn", "accent");
+    expect(within(options[2]!).getByRole("button", { name: "Nouvelle fiche" })).toHaveClass("btn", "accent");
   });
 
   it("Consultation : pas de bouton « Depuis une photo… »", async () => {
