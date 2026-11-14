@@ -48,14 +48,19 @@ export const afterRoll = (ui: UiState): Partial<UiState> => ({
   centerBonusUsed: ui.centerBonusUsed || ui.opts.centerBonus,
 });
 
-/** Bilan d'un jet : dépense de Vide, emplacements de sort, initiative, Défense totale, dégâts en attente, historique. */
+/**
+ * Bilan d'un jet : dépense de Vide, emplacements de sort, initiative, Défense totale, dégâts en attente, historique.
+ * Total noté à la main (annexe 62.4) : même bilan ; noté de nouveau sur la même action, il corrige le précédent
+ * (ligne d'historique remplacée, Vide d'Initiative gardé, rien dépensé de nouveau), jusqu'au « Nouveau round ».
+ */
 export function rolled(state: AppState, c: Character, action: Extract<AppAction, { type: "rolled" }>): AppState {
   const a = selectedAction(c, state.ui);
   if (!a) return state;
   const { opts } = state.ui;
   const { total } = action.result;
   const success = typeof action.tn === "number" && total >= action.tn;
-  let next = spendRollCosts(state, c, a);
+  const correction = !!action.manual && !!state.ui.lastRoll?.correctable && state.ui.lastRoll.actionId === a.id;
+  let next = correction ? state : spendRollCosts(state, c, a);
   if (a.kind === "spell") next = castSpell(next, c, a, typeof action.tn === "number" ? success : null);
   const ui = next.ui;
   const damageDice = a.attack && success ? (ui.maneuvers[DAMAGE_MANEUVER_ID] ?? 0) : 0;
@@ -73,6 +78,7 @@ export function rolled(state: AppState, c: Character, action: Extract<AppAction,
     actionId: a.id, label: a.label, kind: a.kind, result: action.result, tn: action.tn,
     raises: action.raises, free: action.free ?? opts.free, maneuvers, damageDice, fullDefense: !!a.fullDefense, disarm,
     baseTn: action.baseTn, baseSuccess: action.baseSuccess,
+    ...(action.manual ? { manual: true, correctable: true } : {}),
     ...(feint ? { feint } : {}),
     ...(opts.opponentTotal !== null && action.tn === "opposed" ? { opponent: opts.opponentTotal } : {}),
   };
@@ -82,15 +88,16 @@ export function rolled(state: AppState, c: Character, action: Extract<AppAction,
       ...ui,
       ...afterRoll(ui),
       initiative: a.kind === "initiative" ? total : ui.initiative,
-      // Une nouvelle Initiative ouvre une nouvelle escarmouche : le Vide d'Initiative retombe.
-      voidInitiative: a.kind === "initiative" ? 0 : ui.voidInitiative,
+      // Une nouvelle Initiative ouvre une nouvelle escarmouche : le Vide d'Initiative retombe, sauf correction d'un total noté.
+      voidInitiative: a.kind === "initiative" && !correction ? 0 : ui.voidInitiative,
       ...(a.fullDefense ? { stance: "fullDefense" as const, fullDefenseBonus: fullDefenseBonus(total) } : {}),
       pendingDamage: a.attack
         ? (disarm ? { parent: a.id, dice: 0, disarm }
           : damageDice || feint ? { parent: a.id, dice: damageDice, ...(feint ? { flat: feint } : {}) } : null)
         : ui.pendingDamage,
       lastRoll: record,
-      history: [{ label: a.label, total, tn: action.tn }, ...ui.history].slice(0, HISTORY_SIZE),
+      history: [{ label: a.label, total, tn: action.tn, ...(action.manual ? { manual: true } : {}) }, ...(correction ? ui.history.slice(1) : ui.history)]
+        .slice(0, HISTORY_SIZE),
     },
   };
 }

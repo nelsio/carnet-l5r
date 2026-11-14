@@ -145,7 +145,7 @@ function InitiativeCard({ action }: { action: ActionDef }) {
       <span className="p" data-testid="initiative">{value !== null ? <span style={{ color: "var(--ink)", fontSize: 20 }}>{value}</span> : dice}</span>
       <span className="d">
         {value !== null
-          ? tx.initiativeRolled(dice)
+          ? tx.initiativeRolled(dice, !ui.showDiceRoller)
           : tx.initiativeHint(c.insightRank, c.traits.reflexes)}
       </span>
     </button>

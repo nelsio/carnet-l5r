@@ -102,6 +102,8 @@ export function uiReducer(state: AppState, action: AppAction): AppState {
         stance: ui.stance === "fullDefense" ? "defense" : ui.stance,
         // Bataille : nouveau tour, nouveaux jets ; l'engagement, le commandement et le Tacticien restent.
         battle: { ...ui.battle, gap: null, die: null, total: null, woundDice: null, woundsTaken: false },
+        // Un total noté au round précédent ne se corrige plus : le suivant est un nouveau jet (annexe 62.4).
+        lastRoll: ui.lastRoll?.correctable ? { ...ui.lastRoll, correctable: false } : ui.lastRoll,
       });
     default: return state;
   }

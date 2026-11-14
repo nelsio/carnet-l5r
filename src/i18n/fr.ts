@@ -283,7 +283,9 @@ export const fr = {
     oncePerCombat: "· une fois par combat",
     initiativeCenter: (n: number) => `+${n} Centre`,
     initiativeVoid: (n: number) => `+${n} Vide`,
-    initiativeRolled: (dice: string) => `Ton rang dans l'ordre du combat. Clique pour relancer si un nouveau combat commence (${dice}).`,
+    /** `manual` : lanceur masqué, le score a été noté à la main (annexe 62.3). */
+    initiativeRolled: (dice: string, manual = false) =>
+      `Ton rang dans l'ordre du combat. Clique pour ${manual ? "saisir à nouveau" : "relancer"} si un nouveau combat commence (${dice}).`,
     initiativeHint: (insightRank: number, reflexes: number) => `Rang ${insightRank} + Réflexes ${reflexes}, gardé Réflexes. À lancer au début du combat.`,
     stance: "Posture",
     armorTn: "ND d'armure",
@@ -525,6 +527,24 @@ export const fr = {
     prefilled: (bonus: string) => `${bonus} pré-rempli sur le prochain jet de dégâts.`,
     feint: (n: number) => `Feinte réussie : +${n} pré-rempli sur le prochain jet de dégâts.`,
     disarm: "Désarmement réussi : le prochain jet de dégâts est 2g1 sans la Force, sans augmentation de dégâts.",
+    /** Jet aux vrais dés, lanceur masqué (annexe 62.3, 62.5). */
+    manualRoll: {
+      title: "Ton jet aux vrais dés",
+      total: "Total",
+      totalLabel: "Total obtenu aux dés",
+      note: "Noter le résultat",
+      tag: "saisi à la main",
+      uses: {
+        initiative: "Ton score d'Initiative s'affiche dans la carte Initiative ; le Carnet y ajoute lui-même le Centre et le Vide d'Initiative.",
+        attack: (tn: number) => `Réussite ou échec contre le ND final (${tn}).`,
+        damageDice: (dice: string, label: string) => `Si l'attaque touche : ${dice} pré-remplis sur ${label}.`,
+        feint: (cap: number) => `Feinte : la moitié de l'excédent sur le ND s'ajoute aux dégâts (${cap} au plus).`,
+        disarm: "Désarmement : si l'attaque touche, les dégâts passent à 2g1 sans la Force.",
+        baseTn: (tn: number) => `Un échec qui atteint le ND de base (${tn}) reste une réussite sans les augmentations.`,
+        fullDefense: "La moitié du total (arrondie au supérieur) s'ajoute à ton ND d'armure ce round, en posture Défense totale.",
+        voidSpend: "Le point de Vide coché est dépensé en notant.",
+      },
+    },
     margin: (margin: number, raises: number) => `Marge de ${margin} : tu aurais pu annoncer ${raises} augmentation(s).`,
     toCompare: "à comparer au jet adverse",
     against: (n: number) => `contre ${n}`,

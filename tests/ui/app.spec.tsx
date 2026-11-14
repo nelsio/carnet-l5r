@@ -334,7 +334,8 @@ describe("Assistant L5R", () => {
     fireEvent.click(toggle);
     expect(screen.getByRole("button", { name: "Lanceur de dés : masqué" })).toHaveAttribute("aria-pressed", "false");
     expect(roller().queryByRole("button", { name: /^Lancer/ })).toBeNull();
-    expect(roller().queryByText("Derniers jets")).toBeNull();
+    // Lot 62 (annexe 62.3) : l'historique reste affiché lanceur masqué dès qu'il contient un jet.
+    expect(roller().getByText("Derniers jets")).toBeInTheDocument();
     expect(screen.getByTestId("final-tn")).toBeInTheDocument();
     await vi.waitFor(async () => expect(await storage.prefs.get()).toMatchObject({ diceRoller: false }));
     expect("showDiceRoller" in (await storage.prefs.get())).toBe(false);

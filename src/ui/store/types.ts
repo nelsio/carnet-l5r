@@ -37,6 +37,10 @@ export interface RollRecord {
   baseTn?: number;
   /** Échec rattrapé : ND de base atteint, réussite sans les augmentations (Akodo R5). */
   baseSuccess?: boolean;
+  /** Total noté aux vrais dés : pas de dés, étiquette « saisi à la main » (annexe 62.3). */
+  manual?: boolean;
+  /** Total noté qu'un nouveau total de la même action corrige ; « Nouveau round » ferme la correction (annexe 62.4). */
+  correctable?: boolean;
   /** Bonus de Feinte pré-rempli sur les dégâts liés (E.3 F4). */
   feint?: number;
   /** Total adverse saisi (jet en opposition, F7). */
@@ -93,7 +97,7 @@ export interface UiState {
   lastRoll: RollRecord | null;
   /** Dernier sort lancé (v2.12.0) : emplacements pris, pour « Annuler (interrompu) » ; `success` null : jet sans ND. */
   spellCast: { actionId: string; slots: SpellSlotKey[]; success: boolean | null } | null;
-  history: { label: CoreText; total: number; tn: number | null | "opposed" }[];
+  history: { label: CoreText; total: number; tn: number | null | "opposed"; manual?: boolean }[];
   sheetOpen: boolean;
   woundsExpanded: boolean;
   /** Bonus de jet cochés ou décochés pour le jet en cours (remis à zéro au choix d'une action). */
@@ -213,4 +217,5 @@ export type AppAction =
   | { type: "resetStacks" }
   /** Vocabulaire (annexe E.7) : renommer, annuler le renommage, masquer le bandeau. */
   | { type: "vocabulary"; op: "update" | "undo" | "hide" }
-  | { type: "rolled"; result: RollResult; tn: number | null | "opposed"; raises: number; free?: number; baseTn?: number; baseSuccess?: boolean };
+  /** `manual` : total noté aux vrais dés, sans dés (annexe 62.4). */
+  | { type: "rolled"; result: RollResult; tn: number | null | "opposed"; raises: number; free?: number; baseTn?: number; baseSuccess?: boolean; manual?: boolean };

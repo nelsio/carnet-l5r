@@ -1,11 +1,11 @@
 /** Passerelle entre les actions de l'Assistant L5R et le moteur de règles. */
 import {
-  applicableModifiers, armorModifierBonus, armorTN, assessmentTN, computePool, concentrationTn, createSpell, DEFAULT_MANEUVERS, findSkill, ignoresWoundPenalty,
+  applicableModifiers, armorModifierBonus, armorTN, assessmentTN, computePool, concentrationTn, createSpell, DAMAGE_MANEUVER_ID, DEFAULT_MANEUVERS, DISARM_MANEUVER_ID, findSkill, ignoresWoundPenalty,
   maneuverFreeRaises, maneuverRaises, modifiersOf, modifierTN, schoolContext, targetNumber, targetTnModifier, woundState,
-  type ActionDef, type ActiveEffect, type Character, type Maneuver, type Modifier, type Pool, type PoolAction, type SchoolContext,
+  type ActionDef, type ActiveEffect, type Character, type CoreText, type Maneuver, type Modifier, type Pool, type PoolAction, type SchoolContext,
   rollStance, type CombatSub, type Situation, type SpellRing, type Stance,
 } from "@carnet/core";
-import { CALLED_ZONES, CONCENTRATE_ACTION_ID, KNOCKDOWN_QUADRUPED_COST, shownWoundMultiplier, TN_PER_RAISE, type CalledZone } from "../rules/l5r4e";
+import { CALLED_ZONES, CONCENTRATE_ACTION_ID, FEINT, FEINT_MANEUVER_ID, KNOCKDOWN_QUADRUPED_COST, shownWoundMultiplier, TN_PER_RAISE, type CalledZone } from "../rules/l5r4e";
 import type { Locale } from "../i18n";
 import { formatPool } from "./format";
 
@@ -271,3 +271,39 @@ export function finalTN(
     modifier: modifierTN(active) + (t.techTn ?? 0) + (t.weaponTn ?? 0) + (t.armorTn ?? 0) - TN_PER_RAISE * (t.freeToTn ?? 0),
   });
 }
+
+/** Ce qu'un total noté à la main déclenche (annexe 62.2), formaté par `src/i18n` : une ligne de la liste « sert à la suite ». */
+export type ManualUse =
+  | { code: "initiative" }
+  | { code: "attack"; tn: number }
+  | { code: "damageDice"; dice: number; label: CoreText }
+  | { code: "feint"; cap: number }
+  | { code: "disarm" }
+  | { code: "baseTn"; tn: number }
+  | { code: "fullDefense" }
+  | { code: "voidSpend" };
+
+/**
+ * Lignes « sert à la suite » d'un jet aux vrais dés : Initiative, attaques et Défense totale seulement (annexe 62.2).
+ * `at` : ND final, ND de base quand un échec peut le rattraper (Akodo R5), dégâts liés, dépense de Vide cochée. Liste vide : pas de bloc.
+ */
+export function manualRollUses(c: Character, a: ActionDef, maneuvers: Readonly<Record<string, number>>, at: {
+  tn: number | null | "opposed"; baseTn?: number; damage?: CoreText; voidSpent: boolean;
+}): ManualUse[] {
+  const uses: ManualUse[] = [];
+  if (a.kind === "initiative") uses.push({ code: "initiative" });
+  else if (a.fullDefense) uses.push({ code: "fullDefense" });
+  else if (a.attack && typeof at.tn === "number") {
+    uses.push({ code: "attack", tn: at.tn });
+    const dice = maneuvers[DAMAGE_MANEUVER_ID] ?? 0;
+    const disarm = (maneuvers[DISARM_MANEUVER_ID] ?? 0) > 0;
+    if (disarm) uses.push({ code: "disarm" });
+    else if (dice > 0 && at.damage) uses.push({ code: "damageDice", dice, label: at.damage });
+    if (!disarm && (maneuvers[FEINT_MANEUVER_ID] ?? 0) > 0) uses.push({ code: "feint", cap: FEINT.capPerInsight * c.insightRank });
+    if (at.baseTn !== undefined) uses.push({ code: "baseTn", tn: at.baseTn });
+  }
+  else return [];
+  if (at.voidSpent) uses.push({ code: "voidSpend" });
+  return uses;
+}
+

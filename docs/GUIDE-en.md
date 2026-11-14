@@ -330,9 +330,19 @@ Choosing an action opens the **roller** (a panel that slides up from the bottom 
 
 The roller also gives **Min · Avg. · Max**, Free Raises, the flat bonus, the Void Point, the **emphasis** (it rerolls `1`s), attack maneuvers, and the **“roll by hand”** line: the reroll rules for **playing with your own dice** (“10s explode…”, bonus to add to the total). Raises are limited by your Void Ring.
 
-**The tool's dice or real dice?** By default, the tool rolls the dice: **Roll** button, result and history. To play with your own dice, press **Dice roller** in the header (the die icon on mobile) to hide it. The choice is remembered.
+**The tool's dice or real dice?** By default, the tool rolls the dice: **Roll** button, result and history. To play with your own dice, press **Dice roller** in the header (the die icon on mobile) to hide it. The choice is remembered. With your own dice, when the score matters for what comes next (Initiative, attacks, Full Defense), enter your **Total** in **Your roll with real dice** then **Record result**: the Carnet shows your Initiative, adds Full Defense to your Armor TN and pre-fills damage (Increased Damage, Feint), as if it had rolled. The total is the one from the “roll by hand” line, bonus included.
 
-> With the dice roller shown, a successful attack with **Increased Damage** pre-fills the extra dice on the damage roll (tag “+2k0 · attack Raises”, which **Remove** cancels).
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="img/guide/en/sombre/06b-vrais-des.png">
+  <img src="img/guide/en/06b-vrais-des.png" alt="Hidden dice roller: total of an Attack · Katana recorded with real dice, four areas marked with a seal" width="304">
+</picture>
+
+- **一** (1) **Total**: the sum of your kept dice, bonus included.
+- **二** (2) **Record result**: the Carnet carries on as after **Roll**; recording again corrects the total, without spending anything more.
+- **三** (3) **What it is used for**: what this total will trigger, and the checked Void Point that will be spent.
+- **四** (4) **Result**: success or failure against the TN, marked “entered by hand”.
+
+> Rolled by the tool or recorded with real dice, a successful attack with **Increased Damage** pre-fills the extra dice on the damage roll (tag “+2k0 · attack Raises”, which **Remove** cancels).
 
 <a id="7-shugenja-spells-and-magic"></a>
 

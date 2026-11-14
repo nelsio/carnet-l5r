@@ -328,9 +328,19 @@ Choisir une action ouvre le **lanceur** (un panneau qui monte du bas sur mobile)
 
 Le lanceur donne aussi **Min · Moy. · Max**, les augmentations gratuites, le bonus fixe, le point de Vide, la **spécialisation** (elle relance les `1`), les manœuvres des attaques, et la ligne **« lancer à la main »** : les règles de relance pour **jouer avec tes propres dés** (« Les `10` explosent… », bonus à ajouter au total). Les augmentations sont limitées par ton Anneau de Vide.
 
-**Dés de l'outil ou vrais dés ?** Par défaut, l'outil lance les dés : bouton **Lancer**, résultat et historique. Pour jouer avec tes dés, appuie sur **Lanceur de dés** dans l'en-tête (l'icône de dé sur mobile) pour le masquer. Le choix est mémorisé.
+**Dés de l'outil ou vrais dés ?** Par défaut, l'outil lance les dés : bouton **Lancer**, résultat et historique. Pour jouer avec tes dés, appuie sur **Lanceur de dés** dans l'en-tête (l'icône de dé sur mobile) pour le masquer. Le choix est mémorisé. Avec tes dés, quand le score compte pour la suite (Initiative, attaques, Défense totale), saisis ton **Total** dans **Ton jet aux vrais dés** puis **Noter le résultat** : le Carnet affiche ton Initiative, ajoute la Défense totale à ton ND d'armure et pré-remplit les dégâts (Augmentation des dégâts, Feinte), comme s'il avait lancé. Le total est celui de la ligne « lancer à la main », bonus compris.
 
-> Avec le lanceur de dés affiché, une attaque réussie avec **Augmentation des dégâts** pré-remplit les dés en plus sur le jet de dégâts (étiquette « +2g0 · augmentations de l'attaque », que **Retirer** annule).
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="img/guide/sombre/06b-vrais-des.png">
+  <img src="img/guide/06b-vrais-des.png" alt="Lanceur masqué : total d'une Attaque · Katana noté aux vrais dés, quatre zones marquées d'un sceau" width="304">
+</picture>
+
+- **一** (1) **Total** : la somme de tes dés gardés, bonus compris.
+- **二** (2) **Noter le résultat** : le Carnet enchaîne comme après **Lancer** ; noter de nouveau corrige le total, sans rien dépenser de plus.
+- **三** (3) **Ce qui sert à la suite** : ce que ce total va déclencher, et le point de Vide coché qui sera dépensé.
+- **四** (4) **Résultat** : réussite ou échec contre le ND, marqué « saisi à la main ».
+
+> Lancée par l'outil ou notée aux vrais dés, une attaque réussie avec **Augmentation des dégâts** pré-remplit les dés en plus sur le jet de dégâts (étiquette « +2g0 · augmentations de l'attaque », que **Retirer** annule).
 
 <a id="7-shugenja--sorts-et-magie"></a>
 
