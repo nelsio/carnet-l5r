@@ -6,7 +6,7 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document et le dossier `spec/` qu'il indexe.
 
-**État actuel :** version **v2.32.5**, lot 60 : boutons de création de la Bibliothèque au même contraste ; pastille Règles L5R 4e retirée du pied de page (annexe 60).
+**État actuel :** version **v2.33.0**, lot 61 : panneaux Posture (réduit au menu, aux modificateurs et au ND d'armure) et Dépenser du Vide (replié) repliables par un chevron mémorisé (annexe 61).
 
 ---
 
@@ -68,6 +68,7 @@ Fait foi :
 | 58 | Bascule de langue FR \| EN à part des actions | 58 | v2.32.3 | [`58-langue.md`](spec/annexes/58-langue.md) |
 | 59 | Guide en anglais, captures compactes en clair et en sombre | 59 | v2.32.4 | [`59-guide-anglais.md`](spec/annexes/59-guide-anglais.md) |
 | 60 | Bibliothèque : boutons de création contrastés ; pastille Règles L5R 4e retirée | 60 | v2.32.5 | [`60-retouches.md`](spec/annexes/60-retouches.md) |
+| 61 | Posture et Dépenser du Vide repliables | 61 | v2.33.0 | [`61-panneaux-repliables.md`](spec/annexes/61-panneaux-repliables.md) |
 
 ## Lire pour un lot
 

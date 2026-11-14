@@ -16,6 +16,8 @@ export const initialUi: UiState = {
   showDiceRoller: true,
   woundMultiplier: WOUND_NEXT_MULTIPLIER,
   compactActions: false,
+  stanceOptions: false,
+  voidPanel: false,
   info: {},
   armorEdit: false,
   view: "sheet",

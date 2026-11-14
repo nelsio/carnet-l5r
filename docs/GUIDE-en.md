@@ -258,7 +258,7 @@ The **L5R Assistant** tab (**Assistant** in the bottom bar on mobile) offers the
 
 **Meditate** (Meditation/Void TN 20): the **Success** button gives you back 1 Void Point, 2 with Meditation 3, 3 with Meditation 7.
 
-An action your stance forbids is **greyed out** with the reason; **Roll anyway** is still possible. Once you know your actions by heart, the **“i”** next to the **Actions** title hides their explanations (setting remembered for all your sheets); the other **“i”** buttons hide the details of Void, movement, battle and school reminders.
+An action your stance forbids is **greyed out** with the reason; **Roll anyway** is still possible. Once you know your actions by heart, the **“i”** next to the **Actions** title hides their explanations (setting remembered for all your sheets); the other **“i”** buttons hide the details of Void, movement, battle and school reminders. The **⌄** arrows of Stance and Spend Void are remembered the same way.
 
 ### Skirmish
 
@@ -275,8 +275,8 @@ From top to bottom, in the order of a round:
 
 1. **Initiative**: roll it at the start of combat; your score is shown afterwards.
 2. **New round**: clears Void on armor and Full Defense, **keeps initiative and counters**.
-3. **Stance**: its effects are shown and the **Armor TN** follows. Below: **Mounted** and **I guard an ally**.
-4. **Spend Void**: choose the spending, then **Spend 1 Void Point**; **Cancel** refunds the point.
+3. **Stance**: a menu with Attack, Full Attack…; the modifiers of the chosen stance are shown below it and the **Armor TN** follows. The **⌄** arrow shows the description, **Mounted** and **I guard an ally**; a ticked box stays visible in the header when the panel is folded.
+4. **Spend Void**: folded by default, it shows your points and the spending in progress; the **⌄** arrow opens it. Choose the spending, then **Spend 1 Void Point**; **Cancel** refunds the point.
 5. **Attacks** for each weapon, with their **damage** right below (`└`). A shugenja sees their **spells** right after Initiative.
 
 To **take** a hit: **Wounds** tile → **Attack damage**.

@@ -988,3 +988,16 @@ a.mon .ext{margin-left:0}
   .sugg{width:100%}
   .gconfirm .btn{min-height:44px;flex:1 1 auto}
 }
+/* ---------- v2.33.0 : panneaux Posture et Dépenser du Vide repliables (annexe 61) ---------- */
+.fold{flex:none;width:22px;height:22px;border-radius:50%;border:1px solid var(--line);background:var(--bg);color:var(--muted);padding:0;display:grid;place-items:center;cursor:pointer}
+.fold svg{width:12px;height:12px;transition:rotate .15s}
+.fold[aria-expanded="true"]{background:var(--accent-fill);border-color:var(--accent-fill);color:var(--on-accent)}
+.fold[aria-expanded="true"] svg{rotate:180deg}
+.fold:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.panel-head .side{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.panel.folded .panel-head{margin-bottom:0!important}
+.posture-fx{margin-top:.5rem}
+.posture-fx .fx{display:flex;flex-wrap:wrap;gap:.3rem}
+.posture-fx .fx span{font:600 .7rem var(--f-mono);padding:.1rem .4rem;border-radius:4px;background:color-mix(in oklab,var(--ink) 7%,var(--surface-2));color:var(--ink)}
+.posture-fx .fx .up{background:var(--accent-pale);color:var(--accent-ink)}
+@media (max-width:720px){.fold{width:26px;height:26px}}

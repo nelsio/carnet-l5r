@@ -6,6 +6,7 @@ import { memoryStorage, type LibraryEntry } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
 import { woundsField } from "../helpers/wounds";
+import { openStanceOptions } from "../helpers/stance";
 import { VIEW } from "../helpers/views";
 
 const base = () => structuredClone(kakita) as Character;
@@ -114,6 +115,7 @@ describe("Lanceur", () => {
     expect(screen.getByTestId("armor-tn")).toHaveTextContent("25");
     click(VIEW.aid);
     click("Combat");
+    openStanceOptions();
     fireEvent.click(screen.getByRole("checkbox", { name: /Esquive/ }));
     expect(screen.getByTestId("armor-tn")).toHaveTextContent("28");
     fireEvent.click(screen.getByRole("checkbox", { name: /Kata/ }));

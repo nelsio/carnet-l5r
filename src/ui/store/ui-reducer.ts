@@ -51,6 +51,7 @@ export function uiReducer(state: AppState, action: AppAction): AppState {
     case "woundMultiplier":
       return (WOUND_MULTIPLIERS as readonly number[]).includes(action.value) ? withUi({ woundMultiplier: action.value }) : state;
     case "compactActions": return withUi({ compactActions: action.value });
+    case "panel": return withUi({ [action.panel]: action.open });
     case "toggleInfo": return withUi({ info: { ...ui.info, [action.panel]: !ui.info[action.panel] } });
     case "toggleArmorEdit": return withUi({ armorEdit: state.mode === "edit" && !ui.armorEdit });
     case "view":

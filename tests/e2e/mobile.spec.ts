@@ -252,9 +252,12 @@ async function touchArea(el: Locator) {
 }
 
 // Lot 19 (annexe I.3.7) : le panneau Posture n'a plus de « i » ; lot 20 (annexe J.6) : le panneau Vide non plus.
-test("M10 : Vide et Posture tiennent sur un écran avec leur description ; menu Vide de 40 px", async ({ page }) => {
+// Lot 61 (annexe 61) : panneaux repliés par défaut ; M10 vérifie le cas le plus haut, les deux ouverts.
+test("M10 : Vide et Posture ouverts tiennent sur un écran avec leur description ; menu Vide de 40 px", async ({ page }) => {
   await tab(page, VIEW.aid).click();
   await page.getByRole("group", { name: "Situation" }).getByRole("button", { name: "Combat", exact: true }).click();
+  await page.getByRole("button", { name: "Options de posture : Monté, Je garde un allié" }).click();
+  await page.getByRole("button", { name: "Dépenses de Vide" }).click();
   const vp = page.viewportSize()!;
   const stance = page.getByRole("combobox", { name: "Posture" });
   await stance.evaluate((e) => e.scrollIntoView({ block: "center" }));

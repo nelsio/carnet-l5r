@@ -1,6 +1,12 @@
 import { fireEvent, screen } from "@testing-library/react";
 import { STANCES } from "../../src/rules/l5r4e";
 
+/** Affiche description, Monté, Je garde un allié et bonus d'armure du panneau Posture s'ils sont repliés (annexe 61.3). */
+export function openStanceOptions(name = "Options de posture : Monté, Je garde un allié") {
+  const fold = screen.getByRole("button", { name });
+  if (fold.getAttribute("aria-expanded") === "false") fireEvent.click(fold);
+}
+
 /** Sélecteur « Posture » du panneau Combat (annexe I.3.4). */
 export const stanceSelect = () => screen.getByRole<HTMLSelectElement>("combobox", { name: "Posture" });
 

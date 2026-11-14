@@ -6,12 +6,14 @@ import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import perso from "../../reference/perso-test-ecoles.json";
 import kakita from "../fixtures/kakita-v1.json";
-import { chooseStance, currentStance, stanceOption, stanceSelect } from "../helpers/stance";
+import { chooseStance, currentStance, openStanceOptions, stanceOption, stanceSelect } from "../helpers/stance";
 import { VIEW } from "../helpers/views";
 
 const base = () => structuredClone(kakita) as Character;
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
+/** Description de la posture choisie, dans la zone repliée (annexe 61.3) ; ses modificateurs sont affichés à part. */
 const desc = () => screen.getByTestId("posture-desc");
+const fx = () => screen.getByTestId("posture-fx");
 
 async function mount(character: Character = base(), rng = () => 5) {
   const storage = memoryStorage();
@@ -44,9 +46,10 @@ describe("Panneau Posture en menu déroulant (annexe I.3.4)", () => {
     expect(within(stanceOption("Assaut")).getByText("+2g1 attaque")).toHaveClass("up");
     expect(within(stanceOption("Assaut")).getByText("ND armure −10")).not.toHaveClass("up");
     expect(within(stanceOption("Assaut")).getByText("+2g1 à l'attaque, −10 au ND d'armure.")).toHaveClass("d");
-    // Sous le sélecteur : la posture choisie.
+    // Sous le sélecteur : modificateurs de la posture choisie ; description dans la zone repliée (annexe 61.3).
+    expect(fx()).toHaveTextContent("aucun modificateur");
     expect(desc()).toHaveAttribute("id", "posture-desc");
-    expect(desc()).toHaveTextContent("aucun modificateur");
+    expect(desc()).not.toHaveTextContent("aucun modificateur");
     expect(desc()).toHaveTextContent("Posture normale.");
   });
 
@@ -61,7 +64,7 @@ describe("Panneau Posture en menu déroulant (annexe I.3.4)", () => {
     expect(screen.getByTestId("armor-tn")).toHaveTextContent("10");
     expect(katana()).toHaveTextContent("7g4");
     expect(desc()).toHaveTextContent("+2g1 à l'attaque, −10 au ND d'armure.");
-    expect(within(desc()).getByText("+2g1 attaque")).toHaveClass("up");
+    expect(within(fx()).getByText("+2g1 attaque")).toHaveClass("up");
     expect(desc()).not.toHaveTextContent("Posture normale.");
   });
 
@@ -71,7 +74,7 @@ describe("Panneau Posture en menu déroulant (annexe I.3.4)", () => {
     click(/^Défense totale.*moitié du résultat/);
     click("Lancer 4g3");
     expect(currentStance()).toBe("Défense totale");
-    expect(desc()).toHaveTextContent("ND armure +jet");
+    expect(fx()).toHaveTextContent("ND armure +jet");
     // « Nouveau round » : retour en Défense, comme avec les boutons.
     click("Nouveau round");
     expect(currentStance()).toBe("Défense");
@@ -81,19 +84,20 @@ describe("Panneau Posture en menu déroulant (annexe I.3.4)", () => {
     await mount({ ...(structuredClone(perso) as Character), schoolId: "hiruma-bushi", insightRank: 3 });
     skirmish();
     const tags = ["+1g0 · Hiruma R1", "+5 au ND d'armure par cran · Hiruma R2"];
-    for (const t of tags) expect(within(desc()).getByText(t)).toHaveClass("up");
+    for (const t of tags) expect(within(fx()).getByText(t)).toHaveClass("up");
     for (const t of tags) expect(within(stanceOption("Attaque")).getByText(t)).toBeInTheDocument();
     expect(within(stanceOption("Assaut")).queryByText(tags[0]!)).toBeNull();
     const techniques = screen.getByRole("group", { name: "Techniques d'école" });
     expect(stanceSelect().compareDocumentPosition(techniques) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(within(techniques).getByText("Touches au corps à corps")).toBeInTheDocument();
     chooseStance("Assaut");
-    expect(within(desc()).queryByText(tags[0]!)).toBeNull();
+    expect(within(fx()).queryByText(tags[0]!)).toBeNull();
   });
 
   it("Assaut monté sans Équitation 3 : option désactivée, avec la raison", async () => {
     await mount();
     skirmish();
+    openStanceOptions();
     fireEvent.click(screen.getByRole("checkbox", { name: /^Monté/ }));
     expect(stanceOption("Assaut")).toBeDisabled();
     expect(stanceOption("Assaut")).toHaveAttribute("title", "Assaut à cheval : Équitation 3 requise");

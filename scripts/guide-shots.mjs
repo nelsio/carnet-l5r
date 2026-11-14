@@ -178,14 +178,14 @@ const SHOTS = [
     clip: (p) => [p.getByRole("group", { name: T.situation }), p.getByRole("button", { name: T.attack }), p.getByRole("link", { name: T.memento })],
   },
   {
-    // De l'Initiative au bas de la Posture, sans « Dépenser du Vide » (annexe 59.5).
+    // De l'Initiative aux modificateurs de la Posture, repliée par défaut, sans « Dépenser du Vide » (annexes 59.5, 61.7).
     id: "05-escarmouche", kanji: "戦", viewport: "desktop", display: 560, open: "Bushi", steps: skirmish,
     marks: (p) => [
       [1, p.getByRole("combobox", { name: T.stance }), "tr"],
       [2, p.getByRole("button", { name: T.newRound }), "tr"],
       [3, p.getByRole("button", { name: T.initiative }), "tr"],
     ],
-    clip: (p) => [p.getByRole("button", { name: T.initiative }), p.getByTestId("posture-desc")],
+    clip: (p) => [p.getByRole("button", { name: T.initiative }), p.getByTestId("posture-fx")],
     margin: 8,
   },
   {

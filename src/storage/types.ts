@@ -39,6 +39,10 @@ export interface Prefs {
   woundMultiplier?: number;
   /** Explications des actions masquées dans l'Assistant ; absente = affichées (annexe 46.2). */
   compactActions?: boolean;
+  /** Options du panneau Posture affichées ; absente = repliées (annexe 61.5). */
+  stanceOptions?: boolean;
+  /** Panneau « Dépenser du Vide » ouvert ; absente = replié (annexe 61.5). */
+  voidPanel?: boolean;
   lastOpenedId?: string;
   persistRequested?: boolean;
 }

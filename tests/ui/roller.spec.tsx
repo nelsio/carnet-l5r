@@ -6,6 +6,7 @@ import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import perso from "../../reference/perso-test-shugenja.json";
 import kakita from "../fixtures/kakita-v1.json";
+import { openStanceOptions } from "../helpers/stance";
 import { VIEW } from "../helpers/views";
 
 const DICE_K = /\b\d+k\d+\b/;
@@ -136,7 +137,8 @@ describe("Lanceur : correctifs de règles (annexe E.2)", () => {
     click(/^Tir · Yumi/);
     fireEvent.change(roller().getByRole("spinbutton", { name: "ND d'armure cible" }), { target: { value: "20" } });
     expect(screen.getByTestId("final-tn")).toHaveTextContent("20");
-    // La case « Monté » est dans le panneau Posture, même sans école (annexe E.3 F2).
+    // La case « Monté » est dans le panneau Posture, même sans école (annexe E.3 F2), zone repliable (annexe 61.3).
+    openStanceOptions();
     fireEvent.click(screen.getByRole("checkbox", { name: /^Monté/ }));
     expect(screen.getByTestId("final-tn")).toHaveTextContent("30");
     expect(roller().getByText(/\+ 10 arc/)).toBeInTheDocument();

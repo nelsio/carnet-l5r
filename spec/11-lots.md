@@ -66,11 +66,14 @@ Chaque lot fait l'objet d'une PR, livrée avec ses tests verts.
 53. **v2.32.3 — bascule de langue à part** (**livrée**, écarts en 58.5) : annexe 58, lot 58. Bascule FR | EN en haut à droite de l'en-tête sur bureau, au bout de la rangée de boutons sur mobile ; les deux langues visibles, l'active surlignée ; captures du guide et du README régénérées.
 54. **v2.32.4 — guide en anglais, captures compactes** (**livrée**, écarts en 59.9) : annexe 59, lot 59. `docs/GUIDE-en.md` illustré de captures anglaises ; en anglais, les liens du guide ouvrent le guide anglais ; « Extra Raises » dans le lanceur d'attaque ; captures du guide plus petites, recadrées, en clair et en sombre ; contrôle `check-guides`.
 55. **v2.32.5 — retouches** (**livrée**) : annexe 60, lot 60. Les trois boutons de création de la Bibliothèque en fond plein ; pastille Règles L5R 4e et son mémo retirés du pied de page.
-56. **À définir** : journal d'achats en XP (K.6), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
+56. **v2.33.0 — panneaux repliables** (**livrée**, écarts en 61.8) : annexe 61, lot 61. Posture réduite au menu, aux modificateurs et au ND d'armure ; Dépenser du Vide replié ; chevron mémorisé, cases cochées en étiquettes dans l'en-tête.
+57. **À définir** : journal d'achats en XP (K.6), kata (évalués le 26/10/2026, reportés), voies alternatives et écoles avancées (exclues en D-a), catalogue de sorts hors grimoire du portail (fichier personnel importable, pas dans le dépôt ; le grimoire du portail est lu à la demande depuis la v2.22.0, annexe N), compteurs « N fois par séance » (D-g).
 
 ### Historique des états
 
 Lignes d'état de l'ancien en-tête de `HANDOFF.md`, déplacées telles quelles au lot 44 (annexe 44.2).
+
+**État au 12/11/2026 (lot 60) :** version **v2.32.5**, lot 60 : boutons de création de la Bibliothèque au même contraste ; pastille Règles L5R 4e retirée du pied de page (annexe 60).
 
 **État au 08/11/2026 (lot 59) :** version **v2.32.4**, lot 59 : guide joueur en anglais (`docs/GUIDE-en.md`), ouvert par les liens de l'application en anglais ; captures du guide compactes, en clair et en sombre ; contrôle `check-guides` (annexe 59).
 

@@ -11,6 +11,8 @@ export type BlockId = "rings" | "identity" | "skills" | "weapons" | "armor" | "t
 
 /** Panneaux de l'Assistant L5R dotés d'un bouton « i » (HANDOFF §6.2). */
 export type InfoPanel = "move" | "reminders" | "battle";
+/** Panneau repliable par son chevron (annexe 61.2). */
+export type FoldPanel = "stanceOptions" | "voidPanel";
 /** Option du panneau « Dépenser du Vide » (annexe J.6) ; Initiative et Échanger en escarmouche seulement. */
 export type VoidChoice = "roll" | "armor" | "skill" | "ability" | "initiative" | "swap";
 
@@ -49,6 +51,10 @@ export interface UiState {
   woundMultiplier: number;
   /** Préférence : explications des actions masquées dans l'Assistant, sauf celle de l'action choisie (annexe 46.2). */
   compactActions: boolean;
+  /** Préférence : description, Monté, Je garde un allié et bonus d'armure du panneau Posture affichés (annexe 61.3). */
+  stanceOptions: boolean;
+  /** Préférence : panneau « Dépenser du Vide » ouvert (annexe 61.4). */
+  voidPanel: boolean;
   /** Détails dépliés par le « i » de chaque panneau (non persisté). */
   info: Partial<Record<InfoPanel, boolean>>;
   /** Éditeur d'armure ouvert sous les tuiles de la barre d'état. */
@@ -162,6 +168,8 @@ export type AppAction =
   | { type: "diceRoller"; show: boolean }
   | { type: "woundMultiplier"; value: number }
   | { type: "compactActions"; value: boolean }
+  /** Chevron des panneaux Posture et Dépenser du Vide (annexe 61.5). */
+  | { type: "panel"; panel: FoldPanel; open: boolean }
   /** Nouvelle journée (annexe E.6) : Vide plein, blessures soignées, initiative et compteurs à zéro. */
   | { type: "newDay" }
   /** Méditation réussie : points de Vide rendus. */

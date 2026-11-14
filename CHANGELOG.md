@@ -6,6 +6,14 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.33.0] - 2026-11-14
+
+### Modifié
+- Assistant L5R : le panneau Posture est réduit au menu, aux modificateurs de la posture et au ND d'armure, et Dépenser du Vide est replié ; une flèche les ouvre, réglage mémorisé. Les cases cochées restent visibles dans l'en-tête.
+
+### Documentation
+- Guide : Posture et Dépenser du Vide repliables ; captures de l'Assistant et de l'Escarmouche mises à jour.
+
 ## [2.32.5] - 2026-11-12
 
 ### Modifié

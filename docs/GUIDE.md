@@ -256,7 +256,7 @@ L'onglet **Assistant L5R** (**Assistant** dans la barre du bas sur mobile) propo
 
 **Méditer** (Méditation/Vide ND 20) : le bouton **Réussi** te rend 1 point de Vide, 2 avec Méditation 3, 3 avec Méditation 7.
 
-Une action que ta posture interdit est **grisée** avec la raison ; **Lancer quand même** reste possible. Quand tu connais tes actions par cœur, le **« i »** à côté du titre **Actions** masque leurs explications (réglage mémorisé pour toutes tes fiches) ; les autres **« i »** masquent le détail du Vide, du déplacement, de la bataille et des rappels d'école.
+Une action que ta posture interdit est **grisée** avec la raison ; **Lancer quand même** reste possible. Quand tu connais tes actions par cœur, le **« i »** à côté du titre **Actions** masque leurs explications (réglage mémorisé pour toutes tes fiches) ; les autres **« i »** masquent le détail du Vide, du déplacement, de la bataille et des rappels d'école. Les flèches **⌄** de Posture et Dépenser du Vide sont mémorisées de la même façon.
 
 ### Escarmouche
 
@@ -273,8 +273,8 @@ De haut en bas, dans l'ordre d'un round :
 
 1. **Initiative** : à lancer au début du combat ; ton score s'affiche ensuite.
 2. **Nouveau round** : efface le Vide en armure et la Défense totale, **garde l'initiative et les compteurs**.
-3. **Posture** : ses effets s'affichent et le **ND d'armure** suit. Dessous : **Monté** et **Je garde un allié**.
-4. **Dépenser du Vide** : choisis la dépense, puis **Dépenser 1 point de Vide** ; **Annuler** rend le point.
+3. **Posture** : un menu Attaque, Assaut… ; les modificateurs de la posture choisie s'affichent dessous et le **ND d'armure** suit. La flèche **⌄** affiche la description, **Monté** et **Je garde un allié** ; une case cochée reste visible dans l'en-tête quand le panneau est replié.
+4. **Dépenser du Vide** : replié par défaut, il montre tes points et les dépenses en cours ; la flèche **⌄** l'ouvre. Choisis la dépense, puis **Dépenser 1 point de Vide** ; **Annuler** rend le point.
 5. **Attaques** de chaque arme, avec leurs **dégâts** juste dessous (`└`). Un shugenja voit ses **sorts** juste après l'Initiative.
 
 Pour **encaisser** un coup : tuile **Blessures** → **Dégâts de l'attaque**.
