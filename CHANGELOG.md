@@ -6,6 +6,17 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Non publié]
 
+## [2.34.0] - 2026-11-14
+
+### Ajouté
+- Lanceur de dés masqué : note le total de tes vrais dés pour l'Initiative, les attaques et la Défense totale ; le Carnet affiche ton Initiative, met à jour ton ND d'armure et pré-remplit les dégâts.
+
+### Modifié
+- Lanceur de dés masqué : les derniers jets restent affichés ; un total noté à la main y porte « ✎ ».
+
+### Documentation
+- Guide : « Ton jet aux vrais dés », avec une capture annotée.
+
 ## [2.33.0] - 2026-11-14
 
 ### Modifié

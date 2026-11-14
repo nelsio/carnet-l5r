@@ -30,6 +30,7 @@ const LABELS = {
     combatType: "Type de combat", skirmish: "Escarmouche", combat: "Combat", attack: /^Attaque · Katana/, damageRow: /^└ Dégâts · Katana/, memento: /^Mémento de combat/,
     stance: "Posture", newRound: "Nouveau round", initiative: /^Initiative/,
     roll: /^Lancer/, rollerDialog: "Lanceur de dés", raisesExtra: "Augm. libres",
+    addDamage: "Ajouter Augmentation des dégâts", realTotal: "Total obtenu aux dés", realNote: "Noter le résultat",
     slots: "Emplacements de sorts restants", magic: "Magie", cast: /^Lancer · Frappe de jade/, spellDamage: /^Dégâts · Frappe de jade/,
     scrolls: "Rouleaux & invocations", grimoire: "Grimoire (nouvel onglet)", spellLink: /^Frappe de jade dans le grimoire/,
     voidPoint: /^Avec un point de Vide/, export: "Exporter la fiche", link: "Lier à un fichier…", file: "Fichier",
@@ -45,6 +46,7 @@ const LABELS = {
     combatType: "Combat type", skirmish: "Skirmish", combat: "Combat", attack: /^Attack · Katana/, damageRow: /^└ Damage · Katana/, memento: /^Mémento de combat/,
     stance: "Stance", newRound: "New round", initiative: /^Initiative/,
     roll: /^Roll/, rollerDialog: "Dice roller", raisesExtra: "Extra Raises",
+    addDamage: "Add Increased Damage", realTotal: "Total rolled", realNote: "Record result",
     slots: "Spell slots left", magic: "Magic", cast: /^Cast · Jade Strike/, spellDamage: /^Damage · Jade Strike/,
     scrolls: "Scrolls & invocations", grimoire: "Grimoire (new tab)", spellLink: /^Jade Strike in the grimoire/,
     voidPoint: /^With a Void Point/, export: "Export the sheet", link: "Link to a file…", file: "File",
@@ -211,6 +213,35 @@ const SHOTS = [
       return { x: [d], y: [d.getByRole("heading").first(), d.locator(".verdict"), d.locator(".verdict + *")] };
     },
     margin: 16,
+  },
+  {
+    // Lanceur masqué : Attaque · Katana, 1 Augmentation des dégâts, total 31 noté aux vrais dés (annexe 62.7).
+    id: "06b-vrais-des", kanji: "賽", viewport: "desktop", display: 304, open: "Bushi",
+    steps: async (p) => {
+      await p.getByRole("button", { name: T.roller }).click();
+      await skirmish(p);
+      await p.getByRole("button", { name: T.attack }).click(); await settle(p);
+      const d = p.getByRole("dialog", { name: T.rollerDialog });
+      await d.getByRole("button", { name: T.addDamage }).click();
+      await d.getByRole("spinbutton", { name: T.realTotal }).fill("31");
+      await d.getByRole("button", { name: T.realNote }).click();
+      // Le champ se vide après « Noter » : on y remet le total pour la capture.
+      await d.getByRole("spinbutton", { name: T.realTotal }).fill("31");
+    },
+    marks: (p) => {
+      const d = p.getByRole("dialog", { name: T.rollerDialog });
+      return [
+        [1, d.getByRole("spinbutton", { name: T.realTotal }), "tr"],
+        [2, d.getByRole("button", { name: T.realNote }), "tr"],
+        [3, d.locator(".mr-use"), "tr"],
+        [4, d.locator(".verdict"), "tr"],
+      ];
+    },
+    clip: (p) => {
+      const d = p.getByRole("dialog", { name: T.rollerDialog });
+      return { x: [d], y: [d.locator(".tnline").last(), d.locator(".verdict"), d.locator(".verdict ~ .hint").last()] };
+    },
+    margin: 8,
   },
   {
     // Des emplacements (一) à la carte des dégâts du sort (四), sans en-tête, blessures ni barre d'onglets (annexe 59.5).

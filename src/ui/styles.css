@@ -1001,3 +1001,15 @@ a.mon .ext{margin-left:0}
 .posture-fx .fx span{font:600 .7rem var(--f-mono);padding:.1rem .4rem;border-radius:4px;background:color-mix(in oklab,var(--ink) 7%,var(--surface-2));color:var(--ink)}
 .posture-fx .fx .up{background:var(--accent-pale);color:var(--accent-ink)}
 @media (max-width:720px){.fold{width:26px;height:26px}}
+/* ---------- v2.34.0 : total d'un jet aux vrais dés, lanceur masqué (annexe 62) ---------- */
+.manualroll{margin-top:12px;padding:10px 12px;border:1px solid var(--accent);border-radius:8px;background:var(--accent-pale)}
+.manualroll .mr-row{display:flex;flex-wrap:nowrap;gap:8px 12px;align-items:flex-end;margin-top:6px}
+.manualroll .field{flex:0 1 130px;min-width:80px}
+.manualroll .btn{white-space:nowrap}
+.manualroll .field .in{background:var(--surface-2);font-size:18px;font-weight:700}
+.manualroll .mr-use{margin:8px 0 0;color:var(--accent-ink)}
+.manualroll .mr-use li{margin-left:1.1em}
+.manualroll ul.mr-use{padding:0}
+.tag.manual-tag{background:var(--surface);border:1px solid var(--line);color:var(--muted);font-family:var(--f-body);font-size:11.5px;vertical-align:4px;margin-left:6px}
+.hist .mt{color:var(--muted);font-size:11px;margin-left:4px}
+@media (max-width:720px){.manualroll .field{flex:1 1 90px}.manualroll .btn{min-height:44px}.manualroll .field .in{min-height:44px}}

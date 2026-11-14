@@ -6,7 +6,7 @@ Fait foi :
 - pour l'UX, le rendu et la version mobile : le prototype validé `reference/prototype.html` ;
 - pour l'architecture, les données et les règles : ce document et le dossier `spec/` qu'il indexe.
 
-**État actuel :** version **v2.33.0**, lot 61 : panneaux Posture (réduit au menu, aux modificateurs et au ND d'armure) et Dépenser du Vide (replié) repliables par un chevron mémorisé (annexe 61).
+**État actuel :** version **v2.34.0**, lot 62 : lanceur de dés masqué, total des vrais dés noté pour l'Initiative, les attaques et la Défense totale, avec les mêmes enchaînements qu'un lancer (annexe 62). Handoff des lots 60 à 62 terminé.
 
 ---
 
@@ -69,6 +69,7 @@ Fait foi :
 | 59 | Guide en anglais, captures compactes en clair et en sombre | 59 | v2.32.4 | [`59-guide-anglais.md`](spec/annexes/59-guide-anglais.md) |
 | 60 | Bibliothèque : boutons de création contrastés ; pastille Règles L5R 4e retirée | 60 | v2.32.5 | [`60-retouches.md`](spec/annexes/60-retouches.md) |
 | 61 | Posture et Dépenser du Vide repliables | 61 | v2.33.0 | [`61-panneaux-repliables.md`](spec/annexes/61-panneaux-repliables.md) |
+| 62 | Noter un jet fait aux vrais dés | 62 | v2.34.0 | [`62-jets-notes.md`](spec/annexes/62-jets-notes.md) |
 
 ## Lire pour un lot
 

@@ -1,10 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   applicableModifiers, armorRollTn, bowStrength, DAMAGE_MANEUVER_ID, describeEffect, focusOutcome, opposedMargin, opposedVerdict, stanceRestriction, woundEffectNote, describeModifier, effectOn, findSkill, fullDefenseBonus, maneuverCost, maneuverFreeRaises, modifierTN,
   formatDR, isRanged, isSocialSkill, meditationVoidPoints, poolStats, rollDice, schoolContext, schoolReminders, verdict, voidMultiplier,
   castTime, castTimeLabel, concentrationTn, schoolOf, schoolRankOf, slotFor, spellCast, spellOptions, spellRaises, spellRestriction, SPELL_RINGS, spellSlotNeed, spellSlots,
   voidPointBonus, voidSpendBonus, voidSpendOption, woundState, type Spell, type SpellAction, type SpellRing, type SpellSlotKey,
-  type ActionDef, type ActiveEffect, type Character, type CoreText, type Pool,
+  type ActionDef, type ActiveEffect, type Character, type CoreText, type Pool, type RollResult,
 } from "@carnet/core";
 import type { SpellOption } from "../../rules/ecoles";
 import { CALLED_ZONES, CENTER_BONUS, CONCENTRATE_ACTION_ID, MEDITATE_ACTION_ID, MELEE_TARGET_PENALTY, SPELL_CONCENTRATION, TN_PER_RAISE, TN_SCALE, type CalledZone } from "../../rules/l5r4e";
@@ -12,10 +12,11 @@ import { useCoreText, useLocale, useT, type Locale, type Messages } from "../../
 import { useCatalog } from "../../i18n/catalog";
 import { actionSkillLabel, DICE_LETTER, formatPool, maneuverText, pct } from "../format";
 import {
-  activeModifiers, calledRaises, contextOf, effectiveManeuvers, finalTN, isActive, isUnskilled, maneuverCosts, poolFor, rollWoundPenalty,
-  selectedKeys, targetBaseTN, toPoolAction, uiRollStance, type RollOptions,
+  activeModifiers, calledRaises, contextOf, effectiveManeuvers, finalTN, isActive, isUnskilled, maneuverCosts, manualRollUses, poolFor, rollWoundPenalty,
+  selectedKeys, targetBaseTN, toPoolAction, uiRollStance, type ManualUse, type RollOptions,
 } from "../rolls";
-import { selectedAction, useCharacter, useStore, type RollRecord } from "../store";
+import { currentActions, selectedAction, useCharacter, useStore, type RollRecord } from "../store";
+import { spendRollCosts } from "../store/roll";
 import { RichSelect, RingOption } from "./RichSelect";
 import { NumberField } from "./fields";
 
@@ -100,13 +101,22 @@ export function Roller() {
   const stats = pool.rolled > 0 ? poolStats(pool, { emphasis: opts.emphasis && emphasisOffered, flatBonus: opts.flat }) : null;
   const context = ui.situation === "combat" ? t.rules.combatSubs[ui.sub] : t.rules.situations[ui.situation];
 
-  const roll = () => {
-    const result = rollDice(pool, { emphasis: opts.emphasis && emphasisOffered, flatBonus: opts.flat }, rng);
-    const baseTn = typeof tn === "number" ? tn - TN_PER_RAISE * raises : undefined;
+  const baseTn = typeof tn === "number" ? tn - TN_PER_RAISE * raises : undefined;
+  // Bilan commun à « Lancer » et à « Noter le résultat » (annexe 62.4).
+  const record = (result: RollResult, manual = false) => {
     const baseSuccess = baseTn !== undefined && typeof tn === "number"
       && verdict(c, toPoolAction(a), ctx, result.total, tn, baseTn) === "baseSuccess";
-    dispatch({ type: "rolled", result, tn, raises, free: freeToTn ? 0 : totalFree, baseTn, baseSuccess });
+    dispatch({ type: "rolled", result, tn, raises, free: freeToTn ? 0 : totalFree, baseTn, baseSuccess, ...(manual ? { manual } : {}) });
   };
+  const roll = () => record(rollDice(pool, { emphasis: opts.emphasis && emphasisOffered, flatBonus: opts.flat }, rng));
+  const note = (total: number) => record({ dice: [], total }, true);
+  // Lanceur masqué : ce qu'un total noté déclenchera ; un échec au ND de base n'est rattrapé qu'avec Akodo R5.
+  const manualUses = ui.showDiceRoller ? [] : manualRollUses(c, a, ui.maneuvers, {
+    tn,
+    baseTn: raises > 0 && baseTn !== undefined && typeof tn === "number" && verdict(c, pa, ctx, baseTn, tn, baseTn) === "baseSuccess" ? baseTn : undefined,
+    damage: currentActions(c, ui).find((x) => x.parent === a.id)?.label,
+    voidSpent: (spendRollCosts(state, c, a).character?.voidPoints ?? c.voidPoints) < c.voidPoints,
+  });
 
   return (
     <>
@@ -312,23 +322,26 @@ export function Roller() {
       {a.kind === "spell" && !ui.showDiceRoller && <SpellCastLine action={a} manual />}
 
       {ui.showDiceRoller && (
-        <>
-          <button type="button" className="btn primary rollbtn" style={{ width: "100%", marginTop: 12, padding: 12 }} onClick={roll}>
-            {r.roll(formatPool(pool.rolled, pool.kept, locale))}
-          </button>
-          <div ref={resultRef} aria-live="polite">
-            {lastRoll && lastRoll.actionId === a.id && <RollOutcome roll={lastRoll} />}
-            {lastRoll && lastRoll.actionId === a.id && a.kind === "spell" && <SpellCastLine action={a} />}
-          </div>
-        </>
+        <button type="button" className="btn primary rollbtn" style={{ width: "100%", marginTop: 12, padding: 12 }} onClick={roll}>
+          {r.roll(formatPool(pool.rolled, pool.kept, locale))}
+        </button>
       )}
-      {ui.showDiceRoller && ui.history.length > 0 && (
+      {manualUses.length > 0 && <ManualRoll uses={manualUses} onNote={note} />}
+      {/* Hors du bloc du lanceur : le résultat d'un total noté défile aussi jusqu'à l'écran (annexe 62.3). */}
+      <div ref={resultRef} aria-live="polite">
+        {lastRoll && lastRoll.actionId === a.id && <RollOutcome roll={lastRoll} />}
+        {ui.showDiceRoller && lastRoll && lastRoll.actionId === a.id && a.kind === "spell" && <SpellCastLine action={a} />}
+      </div>
+      {ui.history.length > 0 && (
         <div className="hist">
           <span className="label">{r.history}</span>
           {ui.history.map((h, i) => (
             <div key={i}>
               <span>{ct(h.label)}</span>
-              <span className="mono">{h.total}{typeof h.tn === "number" ? (h.total >= h.tn ? " ✓" : " ✗") : ""}</span>
+              <span className="mono">
+                {h.total}{typeof h.tn === "number" ? (h.total >= h.tn ? " ✓" : " ✗") : ""}
+                {h.manual && <span className="mt" role="img" aria-label={r.manualRoll.tag}>✎</span>}
+              </span>
             </div>
           ))}
         </div>
@@ -756,9 +769,10 @@ function RollOutcome({ roll: r }: { roll: RollRecord }) {
   const hasTN = typeof r.tn === "number";
   const ok = hasTN && total >= (r.tn as number);
   const margin = hasTN ? total - (r.tn as number) : 0;
+  const manualTag = r.manual && <span className="tag manual-tag">{t.manualRoll.tag}</span>;
   return (
     <>
-      <div className="dice" aria-label={t.dice}>
+      {r.result.dice.length > 0 && <div className="dice" aria-label={t.dice}>
         {r.result.dice.map((d, i) => (
           <span
             key={i}
@@ -766,11 +780,11 @@ function RollOutcome({ roll: r }: { roll: RollRecord }) {
             title={t.dieTitle(d.faces.join(" + "), !!d.rerolledOne)}
           >{d.total}{d.faces.length > 1 && <small>{d.faces.join("+")}</small>}</span>
         ))}
-      </div>
+      </div>}
       {hasTN ? (
         <>
           <div className={`verdict ${ok ? "ok" : "ko"}`}>
-            {ok ? t.success : t.failure} <span className="mono" style={{ fontSize: 16 }}>{total} / {r.tn} ({margin >= 0 ? "+" : ""}{margin})</span>
+            {ok ? t.success : t.failure} <span className="mono" style={{ fontSize: 16 }}>{total} / {r.tn} ({margin >= 0 ? "+" : ""}{margin})</span>{manualTag}
           </div>
           {r.baseSuccess && (
             <div className="hint" data-testid="base-success" style={{ color: "var(--accent-ink)" }}>
@@ -793,7 +807,7 @@ function RollOutcome({ roll: r }: { roll: RollRecord }) {
           {total}{" "}
           <span className="muted" style={{ fontSize: 15, fontFamily: "var(--f-body)" }}>
             {r.tn === "opposed" ? (r.opponent === undefined ? t.toCompare : t.against(r.opponent)) : r.kind === "damage" ? t.woundsDealt : r.kind === "initiative" ? t.initiative : ""}
-          </span>
+          </span>{manualTag}
         </div>
       )}
       {r.tn === "opposed" && r.opponent !== undefined && (
@@ -804,6 +818,55 @@ function RollOutcome({ roll: r }: { roll: RollRecord }) {
       )}
       {r.fullDefense && <div className="hint">{t.fullDefense(fullDefenseBonus(total))}</div>}
     </>
+  );
+}
+
+/** Une ligne « sert à la suite » d'un total noté (annexe 62.2). */
+function manualUseText(u: ManualUse, t: Messages["roller"]["manualRoll"]["uses"], ct: (x: CoreText) => string, locale: Locale): string {
+  switch (u.code) {
+    case "attack": return t.attack(u.tn);
+    case "damageDice": return t.damageDice(`+${formatPool(u.dice, 0, locale)}`, ct(u.label));
+    case "feint": return t.feint(u.cap);
+    case "baseTn": return t.baseTn(u.tn);
+    default: return t[u.code];
+  }
+}
+
+/**
+ * Lanceur masqué : total d'un jet fait aux vrais dés, pour les jets dont le score sert à la suite (annexe 62.3).
+ * Entrée dans le champ vaut un clic ; après validation, champ vidé et focus rendu au champ.
+ */
+function ManualRoll({ uses, onNote }: { uses: readonly ManualUse[]; onNote: (total: number) => void }) {
+  const m = useT().roller.manualRoll;
+  const ct = useCoreText();
+  const { locale } = useLocale();
+  const [draft, setDraft] = useState("");
+  const input = useRef<HTMLInputElement>(null);
+  const submit = () => {
+    if (draft === "") return;
+    onNote(Math.max(0, Math.trunc(Number(draft)) || 0));
+    setDraft("");
+    input.current?.focus();
+  };
+  return (
+    <div className="manualroll" role="group" aria-labelledby="mr-title" data-testid="manual-roll">
+      <span className="label" id="mr-title">{m.title}</span>
+      <div className="mr-row">
+        <label className="field">
+          <span className="label">{m.total}</span>
+          <input
+            ref={input} className="in mono" type="number" inputMode="numeric" min={0} step={1} placeholder="—"
+            aria-label={m.totalLabel} aria-describedby="mr-use" value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); submit(); } }}
+          />
+        </label>
+        <button type="button" className="btn accent" disabled={draft === ""} onClick={submit}>{m.note}</button>
+      </div>
+      <ul className="hint mr-use" id="mr-use">
+        {uses.map((u) => <li key={u.code}>{manualUseText(u, m.uses, ct, locale)}</li>)}
+      </ul>
+    </div>
   );
 }
 
