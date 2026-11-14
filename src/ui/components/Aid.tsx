@@ -14,8 +14,9 @@ import { useCoreText, useLocale, useT } from "../../i18n";
 import { useCatalog } from "../../i18n/catalog";
 import { formatDistance, formatPool } from "../format";
 import { contextOf, currentArmorTN, DEFAULT_ROLL_OPTIONS, isActive, isRollable, poolFor, poolLabel, toPoolAction, uiRollStance } from "../rolls";
-import { currentActions, useCharacter, useStore, type AidSituation, type BattleState, type InfoPanel, type VoidChoice } from "../store";
+import { currentActions, useCharacter, useStore, type AidSituation, type BattleState, type FoldPanel, type InfoPanel, type VoidChoice } from "../store";
 import { ExtIcon } from "./ExternalLink";
+import { Chevron } from "./icons";
 import { EffectTags, RichSelect } from "./RichSelect";
 import { Roller } from "./Roller";
 import { TakeDamage } from "./StatusBar";
@@ -167,13 +168,24 @@ function StancePanel() {
     ...stanceEffects(c, s.id).map((e) => ({ label: `${ct(describeEffect(e, c)) || cat.effect(e).technique} · ${e.source}`, up: true })),
   ];
   const current = STANCES.find((s) => s.id === ui.stance);
+  const open = ui.stanceOptions;
+  // Panneau réduit : chaque case cochée de la zone masquée reste lisible en étiquette (annexe 61.3).
+  const hiddenTags = open ? [] : [
+    ...(ui.mounted ? [tx.mounted] : []),
+    ...(ui.guard ? [tx.guardTag] : []),
+    ...armorMods.filter((m) => isActive(m, ui.armorToggles)).map((m) => m.name),
+  ];
   return (
-    <div className="panel" style={{ padding: 12 }}>
+    <div className={`panel${open ? "" : " folded"}`} style={{ padding: 12 }}>
       <div className="panel-head" style={{ marginBottom: 8 }}>
         <span className="label">{tx.stance}</span>
-        <span className="muted" style={{ fontSize: 13 }}>
-          {tx.armorTn} <b className="mono" style={{ color: "var(--ink)", fontSize: 16 }}>{tn}</b>
-          {ui.voidArmor && <> <span className="tag">{tx.voidTag(10 * voidMultiplier(c))}</span></>}
+        <span className="side">
+          <span className="muted" style={{ fontSize: 13 }}>
+            {hiddenTags.map((label) => <Fragment key={label}><span className="tag" data-testid="stance-active">{label}</span> </Fragment>)}
+            {tx.armorTn} <b className="mono" style={{ color: "var(--ink)", fontSize: 16 }}>{tn}</b>
+            {ui.voidArmor && <> <span className="tag">{tx.voidTag(10 * voidMultiplier(c))}</span></>}
+          </span>
+          <FoldButton panel="stanceOptions" controls="stance-options" label={tx.stanceOptions} />
         </span>
       </div>
       {/* Menu déroulant à la place des boutons (annexe I.3.4) : nom, étiquettes et description de chaque posture. */}
@@ -193,29 +205,28 @@ function StancePanel() {
           );
         })}
       </RichSelect>
-      {current && (
-        <div className="posture-desc" id="posture-desc" data-testid="posture-desc">
-          <EffectTags tags={tagsOf(current)} />
-          {r.stances[current.id]?.description}
-        </div>
-      )}
-      <div className="grid" style={{ gap: 4, marginTop: 8 }}>
-        <label className="chk">
-          <input type="checkbox" checked={ui.mounted} onChange={(e) => dispatch({ type: "mounted", on: e.target.checked })} /> {tx.mounted}
-          {ui.mounted && !fullAttackAllowed(c, true) && <span className="muted">{tx.mountedNoAssault}</span>}
-        </label>
-        <GuardBox />
-      </div>
-      {armorMods.length > 0 && (
+      {/* Modificateurs de la posture choisie, toujours visibles ; la description est dans la zone repliable (annexe 61.3). */}
+      {current && <div className="posture-fx" data-testid="posture-fx"><EffectTags tags={tagsOf(current)} /></div>}
+      <div id="stance-options" hidden={!open}>
+        {current && <div className="posture-desc" id="posture-desc" data-testid="posture-desc">{r.stances[current.id]?.description}</div>}
         <div className="grid" style={{ gap: 4, marginTop: 8 }}>
-          {armorMods.map((m) => (
-            <label key={m.id} className="chk">
-              <input type="checkbox" checked={isActive(m, ui.armorToggles)} onChange={(e) => dispatch({ type: "toggleArmorModifier", id: m.id, on: e.target.checked })} />
-              {" "}{m.name} <span className="muted">· {ct(describeModifier(m))}{m.stance ? ` · ${r.stances[m.stance]?.label}` : ""}</span>
-            </label>
-          ))}
+          <label className="chk">
+            <input type="checkbox" checked={ui.mounted} onChange={(e) => dispatch({ type: "mounted", on: e.target.checked })} /> {tx.mounted}
+            {ui.mounted && !fullAttackAllowed(c, true) && <span className="muted">{tx.mountedNoAssault}</span>}
+          </label>
+          <GuardBox />
         </div>
-      )}
+        {armorMods.length > 0 && (
+          <div className="grid" style={{ gap: 4, marginTop: 8 }}>
+            {armorMods.map((m) => (
+              <label key={m.id} className="chk">
+                <input type="checkbox" checked={isActive(m, ui.armorToggles)} onChange={(e) => dispatch({ type: "toggleArmorModifier", id: m.id, on: e.target.checked })} />
+                {" "}{m.name} <span className="muted">· {ct(describeModifier(m))}{m.stance ? ` · ${r.stances[m.stance]?.label}` : ""}</span>
+              </label>
+            ))}
+          </div>
+        )}
+      </div>
       <SchoolCombat />
     </div>
   );
@@ -533,41 +544,61 @@ function VoidPanel() {
   const current = options.find((o) => o.id === ui.voidChoice) ?? atRoll;
   const toggleable = current.on !== undefined;
   const cancel = toggleable && current.on;
+  const open = ui.voidPanel;
   return (
-    <div className="panel" style={{ padding: 12 }} role="group" aria-label={tv.title}>
+    <div className={`panel${open ? "" : " folded"}`} style={{ padding: 12 }} role="group" aria-label={tv.title}>
       <div className="panel-head" style={{ marginBottom: 8 }}>
         <span className="label">{tv.title}</span>
-        <span className="muted" style={{ fontSize: 13 }}>
-          {tv.points} <b className="mono" style={{ color: "var(--ink)", fontSize: 16 }}>{c.voidPoints}</b>
-          {options.filter((o) => o.on).map((o) => <Fragment key={o.id}> <span className="tag" data-testid="void-active">{o.active}</span></Fragment>)}
+        <span className="side">
+          <span className="muted" style={{ fontSize: 13 }}>
+            {tv.points} <b className="mono" style={{ color: "var(--ink)", fontSize: 16 }}>{c.voidPoints}</b>
+            {options.filter((o) => o.on).map((o) => <Fragment key={o.id}> <span className="tag" data-testid="void-active">{o.active}</span></Fragment>)}
+            {/* Panneau replié : le message « déjà dépensé » est masqué, une étiquette le remplace (annexe 61.4). */}
+            {!open && ui.voidSpentThisRound && <> <span className="tag" data-testid="void-spent" style={{ color: "var(--danger)" }}>{tv.spentTag}</span></>}
+          </span>
+          <FoldButton panel="voidPanel" controls="void-options" label={tv.fold} />
         </span>
       </div>
-      {ui.voidSpentThisRound && (
-        <p className="hint" style={{ color: "var(--danger)", margin: "0 0 8px" }}>{tv.alreadySpent}</p>
-      )}
-      {/* Même motif que le panneau Posture (annexe I.3.4) : choisir une option ne dépense rien. */}
-      <RichSelect
-        variant="effet" aria-label={tv.choice} aria-describedby="void-desc" value={current.id}
-        onChange={(v) => dispatch({ type: "voidChoice", choice: v as VoidChoice })}
-      >
-        {options.map((o) => (
-          <option key={o.id} value={o.id}>
-            <span className="n">{o.label}</span>
-            <EffectTags tags={o.tags} />
-            <span className="d">{o.description}</span>
-          </option>
-        ))}
-      </RichSelect>
-      <div className="posture-desc" id="void-desc" data-testid="void-desc">
-        <EffectTags tags={current.tags} />
-        {current.description}
+      <div id="void-options" hidden={!open}>
+        {ui.voidSpentThisRound && (
+          <p className="hint" style={{ color: "var(--danger)", margin: "0 0 8px" }}>{tv.alreadySpent}</p>
+        )}
+        {/* Même motif que le panneau Posture (annexe I.3.4) : choisir une option ne dépense rien. */}
+        <RichSelect
+          variant="effet" aria-label={tv.choice} aria-describedby="void-desc" value={current.id}
+          onChange={(v) => dispatch({ type: "voidChoice", choice: v as VoidChoice })}
+        >
+          {options.map((o) => (
+            <option key={o.id} value={o.id}>
+              <span className="n">{o.label}</span>
+              <EffectTags tags={o.tags} />
+              <span className="d">{o.description}</span>
+            </option>
+          ))}
+        </RichSelect>
+        <div className="posture-desc" id="void-desc" data-testid="void-desc">
+          <EffectTags tags={current.tags} />
+          {current.description}
+        </div>
+        <button
+          type="button" className={`btn sm${cancel ? "" : " accent"}`} style={{ marginTop: 8 }}
+          aria-pressed={toggleable ? !!current.on : undefined} disabled={!cancel && c.voidPoints < 1}
+          onClick={current.spend}
+        >{cancel ? t.common.cancel : tv.spend}</button>
       </div>
-      <button
-        type="button" className={`btn sm${cancel ? "" : " accent"}`} style={{ marginTop: 8 }}
-        aria-pressed={toggleable ? !!current.on : undefined} disabled={!cancel && c.voidPoints < 1}
-        onClick={current.spend}
-      >{cancel ? t.common.cancel : tv.spend}</button>
     </div>
+  );
+}
+
+/** Chevron rond au bout de l'en-tête des panneaux Posture et Dépenser du Vide, plein quand le panneau est ouvert (annexe 61.2). */
+function FoldButton({ panel, controls, label }: { panel: FoldPanel; controls: string; label: string }) {
+  const { state, dispatch } = useStore();
+  const open = state.ui[panel];
+  return (
+    <button
+      type="button" className="fold" aria-expanded={open} aria-controls={controls} aria-label={label}
+      onClick={() => dispatch({ type: "panel", panel, open: !open })}
+    ><Chevron /></button>
   );
 }
 

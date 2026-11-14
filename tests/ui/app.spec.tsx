@@ -5,6 +5,7 @@ import { memoryStorage, type LibraryEntry } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
 import { chooseStance, currentStance, stanceSelect } from "../helpers/stance";
+import { openVoidPanel, voidPanel } from "../helpers/void";
 import { clickWounds, woundsField } from "../helpers/wounds";
 import { VIEW } from "../helpers/views";
 
@@ -235,7 +236,7 @@ describe("Assistant L5R", () => {
     await renderApp();
     goToAid();
     click("Combat");
-    const panel = within(screen.getByRole("group", { name: "Dépenser du Vide" }));
+    const panel = voidPanel();
     const menu = panel.getByRole("combobox", { name: "Dépense de Vide" });
     expect(menu).toHaveValue("roll");
     expect(panel.getByTestId("void-desc")).toHaveTextContent("+1g1Dépensé au prochain jet lancé.");
@@ -257,6 +258,7 @@ describe("Assistant L5R", () => {
     await renderApp();
     goToAid();
     click("Combat");
+    openVoidPanel();
     const menu = () => screen.getByRole("combobox", { name: "Dépense de Vide" });
     const values = () => [...menu().querySelectorAll("option")].map((o) => o.getAttribute("value"));
     expect(values()).toEqual(["roll", "armor", "skill", "ability", "initiative", "swap"]);

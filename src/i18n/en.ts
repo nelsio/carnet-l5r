@@ -280,6 +280,8 @@ export const en: Messages = {
     voidTag: (n: number) => `+${n} Void`,
     mountedAssaultLocked: "Mounted assault: Horsemanship 3 required",
     mounted: "Mounted",
+    stanceOptions: "Stance options: Mounted, Guarding an ally",
+    guardTag: "Guarding an ally",
     mountedNoAssault: " · No Assault without Horsemanship 3",
     schoolTechniques: "School techniques",
     centerActive: "Center bonus from last round active",
@@ -333,6 +335,8 @@ export const en: Messages = {
     void: {
       title: "Spend Void",
       points: "Void Points",
+      fold: "Void spending",
+      spentTag: "spent this round",
       alreadySpent: "Already spent a Void Point this round (normal limit: 1 per round).",
       choice: "Void spending",
       spend: "Spend 1 Void Point",

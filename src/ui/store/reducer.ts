@@ -8,8 +8,10 @@ import type { AppAction, AppState, UiState } from "./types";
 import { select, uiReducer } from "./ui-reducer";
 
 /** État d'interface conservé d'une fiche à l'autre : préférences et détails dépliés. */
-const kept = (ui: UiState): Pick<UiState, "theme" | "showDiceRoller" | "woundMultiplier" | "compactActions" | "info"> =>
-  ({ theme: ui.theme, showDiceRoller: ui.showDiceRoller, woundMultiplier: ui.woundMultiplier, compactActions: ui.compactActions, info: ui.info });
+const kept = (ui: UiState): Pick<UiState, "theme" | "showDiceRoller" | "woundMultiplier" | "compactActions" | "stanceOptions" | "voidPanel" | "info"> => ({
+  theme: ui.theme, showDiceRoller: ui.showDiceRoller, woundMultiplier: ui.woundMultiplier,
+  compactActions: ui.compactActions, stanceOptions: ui.stanceOptions, voidPanel: ui.voidPanel, info: ui.info,
+});
 
 /** Actions qui modifient la fiche : refusées en consultation. */
 const EDITING = new Set<AppAction["type"]>(["set", "add", "remove", "wounds", "pip", "toggleBlockEdit", "replaceCharacter", "newDay", "meditate", "vocabulary", "castSpell", "cancelCast"]);

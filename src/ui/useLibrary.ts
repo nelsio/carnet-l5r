@@ -79,6 +79,8 @@ export function useLibrary(
       dispatch({ type: "diceRoller", show: prefs.diceRoller ?? true });
       if (prefs.woundMultiplier) dispatch({ type: "woundMultiplier", value: prefs.woundMultiplier });
       dispatch({ type: "compactActions", value: prefs.compactActions ?? false });
+      dispatch({ type: "panel", panel: "stanceOptions", open: prefs.stanceOptions ?? false });
+      dispatch({ type: "panel", panel: "voidPanel", open: prefs.voidPanel ?? false });
       setEntries(list);
       const last = list.find((e) => e.id === prefs.lastOpenedId) ?? list[0];
       if (last) await openEntry(last);
@@ -90,11 +92,11 @@ export function useLibrary(
     };
   }, [storage, dispatch, openEntry]);
 
-  // Thème, lanceur de dés, multiplicateur de blessures et vue compacte mémorisés dans les préférences.
-  const { theme, showDiceRoller, woundMultiplier, compactActions } = state.ui;
+  // Thème, lanceur de dés, multiplicateur de blessures, vue compacte et panneaux repliés (annexe 61.5) mémorisés dans les préférences.
+  const { theme, showDiceRoller, woundMultiplier, compactActions, stanceOptions, voidPanel } = state.ui;
   useEffect(() => {
-    if (ready) void storage.prefs.set({ theme, diceRoller: showDiceRoller, showDiceRoller: undefined, woundMultiplier, compactActions });
-  }, [ready, theme, showDiceRoller, woundMultiplier, compactActions, storage]);
+    if (ready) void storage.prefs.set({ theme, diceRoller: showDiceRoller, showDiceRoller: undefined, woundMultiplier, compactActions, stanceOptions, voidPanel });
+  }, [ready, theme, showDiceRoller, woundMultiplier, compactActions, stanceOptions, voidPanel, storage]);
 
   /** Bilan de l'écriture du fichier lié. */
   const applyReport = useCallback((report: SaveReport) => {

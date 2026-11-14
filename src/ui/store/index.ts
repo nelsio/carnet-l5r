@@ -3,7 +3,7 @@
  * Un seul reducer pur ; le hasard est tiré avant le dispatch (action `rolled`).
  */
 export type {
-  AidSituation, AppAction, AppState, BattleState, BlockId, EntryMode, InfoPanel, ListKey, RollRecord, Screen, Theme, UiState, View, VoidChoice,
+  AidSituation, AppAction, AppState, BattleState, BlockId, EntryMode, FoldPanel, InfoPanel, ListKey, RollRecord, Screen, Theme, UiState, View, VoidChoice,
 } from "./types";
 export { HISTORY_SIZE, initialBattle, initialState, initialUi, NEW_CHARACTER_BLOCK } from "./state";
 export { setIn } from "./path";

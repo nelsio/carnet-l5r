@@ -5,7 +5,7 @@ import type { Character } from "@carnet/core";
 import { memoryStorage } from "../../src/storage";
 import { App } from "../../src/ui/App";
 import kakita from "../fixtures/kakita-v1.json";
-import { chooseStance, currentStance, stanceOption } from "../helpers/stance";
+import { chooseStance, currentStance, openStanceOptions, stanceOption } from "../helpers/stance";
 import { openWounds, woundsField } from "../helpers/wounds";
 import { spendVoid } from "../helpers/void";
 import { VIEW } from "../helpers/views";
@@ -67,6 +67,7 @@ describe("Restrictions de posture (F2)", () => {
     chooseStance("Assaut");
     expect(screen.getByTestId("blocked-atk-skirmish-Yumi")).toHaveTextContent("Assaut : pas d'attaque à distance.");
     expect(screen.queryByTestId("blocked-atk-skirmish-Katana")).toBeNull();
+    openStanceOptions();
     fireEvent.click(screen.getByRole("checkbox", { name: /^Monté/ }));
     // Équitation 1 : l'Assaut est désactivé, la posture repasse en Attaque.
     expect(stanceOption("Assaut")).toBeDisabled();
@@ -78,6 +79,7 @@ describe("Restrictions de posture (F2)", () => {
     c.skills.find((s) => s.name === "Équitation")!.rank = 3;
     await renderApp(c);
     toCombat();
+    openStanceOptions();
     fireEvent.click(screen.getByRole("checkbox", { name: /^Monté/ }));
     expect(stanceOption("Assaut")).toBeEnabled();
   });
@@ -126,6 +128,7 @@ describe("Vide, Feinte, Garde, encaissement (F3 à F6)", () => {
   it("L14 : « Je garde un allié » → ND d'armure 15 ; indisponible en Assaut ; « Nouveau round » ne la décoche pas", async () => {
     await renderApp();
     toCombat();
+    openStanceOptions();
     const guard = () => screen.getByRole("checkbox", { name: /Je garde un allié/ });
     fireEvent.click(guard());
     expect(screen.getByTestId("armor-tn")).toHaveTextContent("15");
@@ -140,6 +143,7 @@ describe("Vide, Feinte, Garde, encaissement (F3 à F6)", () => {
   it("L14 : Daidoji R2 → ND d'armure 20 en gardant, allié +15", async () => {
     await renderApp({ ...base(), schoolId: "daidoji-bushi", insightRank: 2 });
     toCombat();
+    openStanceOptions();
     fireEvent.click(screen.getByRole("checkbox", { name: /Je garde un allié/ }));
     expect(screen.getByTestId("armor-tn")).toHaveTextContent("20");
     expect(screen.getByTestId("guard-note")).toHaveTextContent("Aucune pénalité pour toi jusqu'à ton tour suivant (un round de plus) ; ton allié : +15");

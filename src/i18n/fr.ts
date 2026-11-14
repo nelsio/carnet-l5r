@@ -290,6 +290,9 @@ export const fr = {
     voidTag: (n: number) => `+${n} Vide`,
     mountedAssaultLocked: "Assaut à cheval : Équitation 3 requise",
     mounted: "Monté",
+    /** Chevron du panneau Posture (annexe 61.2) et étiquette de la garde, panneau replié (61.3). */
+    stanceOptions: "Options de posture : Monté, Je garde un allié",
+    guardTag: "Garde un allié",
     mountedNoAssault: " · Assaut impossible sans Équitation 3",
     schoolTechniques: "Techniques d'école",
     centerActive: "Bonus de Centre du round précédent actif",
@@ -344,6 +347,9 @@ export const fr = {
     void: {
       title: "Dépenser du Vide",
       points: "Points de Vide",
+      /** Chevron du panneau (annexe 61.2) et étiquette « déjà dépensé », panneau replié (61.4). */
+      fold: "Dépenses de Vide",
+      spentTag: "dépensé ce round",
       alreadySpent: "Déjà un point de Vide dépensé ce round (limite normale : 1 par round).",
       choice: "Dépense de Vide",
       spend: "Dépenser 1 point de Vide",
